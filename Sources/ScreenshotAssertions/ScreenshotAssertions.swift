@@ -3,6 +3,7 @@ import XCTest
 @discardableResult
 public func assertScreenshot(
   matching view: UIView,
+  identifier: String? = nil,
   _ file: StaticString = #file,
   _ function: String = #function,
   _ line: UInt = #line)
@@ -26,7 +27,12 @@ public func assertScreenshot(
     let data = UIImagePNGRepresentation(image)!
 
     let screenshotURL = screenshotsURL
-      .appendingPathComponent("\(fileURL.deletingPathExtension().lastPathComponent).\(function).png")
+      .appendingPathComponent(
+        fileURL.deletingPathExtension().lastPathComponent
+          + "_\(function.prefix(function.count - 2))"
+          + (identifier.map({ "_" + $0 }) ?? "")
+      )
+      .appendingPathExtension("png")
 
     guard fileManager.fileExists(atPath: screenshotURL.path) else {
       try! data.write(to: screenshotURL)
