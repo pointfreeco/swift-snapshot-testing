@@ -51,7 +51,12 @@ ksdiff "\(trimFileProtocol(screenshotURL))" "\(trimFileProtocol(failedScreenshot
 
       XCTAssert(
         false,
-        "\(screenshotURL.debugDescription) does not match screenshot\n\n\(ksdiff)\n",
+        """
+\(screenshotURL.debugDescription) does not match screenshot
+
+\(ksdiff)
+
+""",
         file: file,
         line: line
       )
