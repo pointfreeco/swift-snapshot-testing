@@ -9,11 +9,12 @@ public func assertScreenshot(
   -> XCTAttachment? {
 
     let fileURL = URL(fileURLWithPath: String(describing: file))
-    let screenshotsURL = fileURL.deletingLastPathComponent().appendingPathComponent("__Screenshots__")
+    let screenshotsDirectoryURL = fileURL.deletingLastPathComponent()
+      .appendingPathComponent("__Screenshots__")
     let fileManager = FileManager.default
 
     try! fileManager.createDirectory(
-      at: screenshotsURL,
+      at: screenshotsDirectoryURL,
       withIntermediateDirectories: true,
       attributes: nil
     )
@@ -25,8 +26,8 @@ public func assertScreenshot(
     UIGraphicsEndImageContext()
     let data = UIImagePNGRepresentation(image)!
 
-    let screenshotURL = screenshotsURL
-      .appendingPathComponent("\(fileURL.deletingPathExtension().lastPathComponent).\(function).png")
+    let screenshotName = "\(fileURL.deletingPathExtension().lastPathComponent).\(function).png"
+    let screenshotURL = URL(string: screenshotName, relativeTo: screenshotsDirectoryURL)!
 
     guard fileManager.fileExists(atPath: screenshotURL.path) else {
       try! data.write(to: screenshotURL)
@@ -40,9 +41,17 @@ public func assertScreenshot(
       let attachment = XCTAttachment(image: imageDiff)
       attachment.lifetime = .deleteOnSuccess
 
+      let failedScreenshotUrl = URL.init(fileURLWithPath: NSTemporaryDirectory())
+        .appendingPathComponent(screenshotName)
+      try! data.write(to: failedScreenshotUrl)
+
+      let ksdiff = """
+ksdiff "\(trimFileProtocol(screenshotURL))" "\(trimFileProtocol(failedScreenshotUrl))"
+"""
+
       XCTAssert(
         false,
-        "\(screenshotURL.debugDescription) does not match screenshot",
+        "\(screenshotURL.debugDescription) does not match screenshot\n\n\(ksdiff)\n",
         file: file,
         line: line
       )
@@ -68,4 +77,8 @@ func diff(_ a: UIImage, _ b: UIImage) -> UIImage {
   let image = UIGraphicsGetImageFromCurrentImageContext()!
   UIGraphicsEndImageContext()
   return image
+}
+
+private func trimFileProtocol(_ url: URL) -> String {
+  return String(url.absoluteString.suffix(url.absoluteString.count - 7))
 }
