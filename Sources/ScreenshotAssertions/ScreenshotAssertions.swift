@@ -46,7 +46,7 @@ public func assertScreenshot(
       try! data.write(to: failedScreenshotUrl)
 
       let ksdiff = """
-ksdiff "\(trimFileProtocol(screenshotURL))" "\(trimFileProtocol(failedScreenshotUrl))"
+ksdiff "\(screenshotURL.path)" "\(failedScreenshotUrl.path)"
 """
 
       XCTAssert(
@@ -82,8 +82,4 @@ func diff(_ a: UIImage, _ b: UIImage) -> UIImage {
   let image = UIGraphicsGetImageFromCurrentImageContext()!
   UIGraphicsEndImageContext()
   return image
-}
-
-private func trimFileProtocol(_ url: URL) -> String {
-  return String(url.absoluteString.suffix(url.absoluteString.count - 7))
 }
