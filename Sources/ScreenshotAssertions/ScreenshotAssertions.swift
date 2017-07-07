@@ -6,51 +6,51 @@ public func assertScreenshot(
   _ file: StaticString = #file,
   _ function: String = #function,
   _ line: UInt = #line)
--> XCTAttachment?
-{
-  let fileURL = URL(fileURLWithPath: String(describing: file))
-  let screenshotsURL = fileURL.deletingLastPathComponent().appendingPathComponent("__Screenshots__")
-  let fileManager = FileManager.default
+  -> XCTAttachment? {
 
-  try! fileManager.createDirectory(
-    at: screenshotsURL,
-    withIntermediateDirectories: true,
-    attributes: nil
-  )
+    let fileURL = URL(fileURLWithPath: String(describing: file))
+    let screenshotsURL = fileURL.deletingLastPathComponent().appendingPathComponent("__Screenshots__")
+    let fileManager = FileManager.default
 
-  UIGraphicsBeginImageContextWithOptions(view.bounds.size, false, 0)
-  let context = UIGraphicsGetCurrentContext()!
-  view.layer.render(in: context)
-  let image = UIGraphicsGetImageFromCurrentImageContext()!
-  UIGraphicsEndImageContext()
-  let data = UIImagePNGRepresentation(image)!
-
-  let screenshotURL = screenshotsURL
-    .appendingPathComponent("\(fileURL.deletingPathExtension().lastPathComponent).\(function).png")
-
-  guard fileManager.fileExists(atPath: screenshotURL.path) else {
-    try! data.write(to: screenshotURL)
-    return nil
-  }
-
-  let existingData = try! Data(contentsOf: screenshotURL)
-
-  guard existingData == data else {
-    let imageDiff = diff(image, UIImage(data: existingData)!)
-    let attachment = XCTAttachment(image: imageDiff)
-    attachment.lifetime = .deleteOnSuccess
-
-    XCTAssert(
-      false,
-      "\(screenshotURL.debugDescription) does not match screenshot",
-      file: file,
-      line: line
+    try! fileManager.createDirectory(
+      at: screenshotsURL,
+      withIntermediateDirectories: true,
+      attributes: nil
     )
 
-    return attachment
-  }
+    UIGraphicsBeginImageContextWithOptions(view.bounds.size, false, 0)
+    let context = UIGraphicsGetCurrentContext()!
+    view.layer.render(in: context)
+    let image = UIGraphicsGetImageFromCurrentImageContext()!
+    UIGraphicsEndImageContext()
+    let data = UIImagePNGRepresentation(image)!
 
-  return nil
+    let screenshotURL = screenshotsURL
+      .appendingPathComponent("\(fileURL.deletingPathExtension().lastPathComponent).\(function).png")
+
+    guard fileManager.fileExists(atPath: screenshotURL.path) else {
+      try! data.write(to: screenshotURL)
+      return nil
+    }
+
+    let existingData = try! Data(contentsOf: screenshotURL)
+
+    guard existingData == data else {
+      let imageDiff = diff(image, UIImage(data: existingData)!)
+      let attachment = XCTAttachment(image: imageDiff)
+      attachment.lifetime = .deleteOnSuccess
+
+      XCTAssert(
+        false,
+        "\(screenshotURL.debugDescription) does not match screenshot",
+        file: file,
+        line: line
+      )
+
+      return attachment
+    }
+
+    return nil
 }
 
 func diff(_ a: UIImage, _ b: UIImage) -> UIImage {
