@@ -41,7 +41,7 @@ public func assertScreenshot(
       let attachment = XCTAttachment(image: imageDiff)
       attachment.lifetime = .deleteOnSuccess
 
-      let failedScreenshotUrl = URL.init(fileURLWithPath: NSTemporaryDirectory())
+      let failedScreenshotUrl = URL(fileURLWithPath: NSTemporaryDirectory())
         .appendingPathComponent(screenshotName)
       try! data.write(to: failedScreenshotUrl)
 
