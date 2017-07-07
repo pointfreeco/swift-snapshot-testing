@@ -4,6 +4,6 @@ import ScreenshotAssertions
 class ScreenshotAssertionsTests: XCTestCase {
   func testExample() {
     let view = UIButton(type: .contactAdd)
-    assertScreenshot(matching: view)
+    assertScreenshot(matching: view).map(add)
   }
 }
