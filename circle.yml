@@ -1,0 +1,6 @@
+machine:
+  xcode:
+    version: "9.0"
+test:
+  override:
+    - swift test
