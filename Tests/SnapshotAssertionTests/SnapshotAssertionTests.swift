@@ -4,11 +4,15 @@ import SnapshotAssertion
 class SnapshotAssertionTests: XCTestCase {
   func testExample() {
     let view = UIButton(type: .contactAdd)
-    assertSnapshot(matching: view).map(add)
+    assertSnapshot(matching: view)
   }
 
   func testWithIdentifier() {
     let view = UIButton(type: .infoDark)
-    assertSnapshot(matching: view, identifier: "info_dark").map(add)
+    assertSnapshot(matching: view, identifier: "info_dark")
+  }
+
+  func testWithString() {
+    assertSnapshot(matching: "Hello, world!")
   }
 }

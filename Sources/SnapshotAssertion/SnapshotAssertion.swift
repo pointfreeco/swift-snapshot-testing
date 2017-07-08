@@ -1,90 +1,71 @@
 import XCTest
 
-@discardableResult
-public func assertSnapshot(
-  matching view: UIView,
+var diffTool: String? = nil
+
+public protocol Diffable {
+  static var diffableFileExtension: String? { get }
+  var diffableData: Data { get }
+  func diff(comparing other: Data) -> XCTAttachment?
+}
+
+public protocol Snapshot {
+  associatedtype Format: Diffable
+  static var snapshotFileExtension: String? { get }
+  var snapshotFormat: Format { get }
+}
+
+extension Snapshot {
+  public static var snapshotFileExtension: String? {
+    return Format.diffableFileExtension
+  }
+}
+
+public func assertSnapshot<S: Snapshot>(
+  matching snapshot: S,
   identifier: String? = nil,
   _ file: StaticString = #file,
   _ function: String = #function,
   _ line: UInt = #line)
-  -> XCTAttachment? {
+{
+  let testFileURL = URL(fileURLWithPath: "\(file)")
+  let snapshotsDirectoryURL = testFileURL.deletingLastPathComponent()
+    .appendingPathComponent("__Snapshots__")
 
-    let fileURL = URL(fileURLWithPath: String(describing: file))
-    let snapshotsDirectoryURL = fileURL.deletingLastPathComponent()
-      .appendingPathComponent("__Snapshots__")
-    let fileManager = FileManager.default
+  let fileManager = FileManager.default
+  try! fileManager
+    .createDirectory(at: snapshotsDirectoryURL, withIntermediateDirectories: true, attributes: nil)
 
-    try! fileManager.createDirectory(
-      at: snapshotsDirectoryURL,
-      withIntermediateDirectories: true,
-      attributes: nil
-    )
+  let snapshotFileName = testFileURL.deletingPathExtension().lastPathComponent
+    + ".\(function.dropLast(2))"
+    + (identifier.map { ".\($0)" } ?? "")
+    + (S.snapshotFileExtension.map { ".\($0)" } ?? "")
+  let snapshotFileURL = snapshotsDirectoryURL.appendingPathComponent(snapshotFileName)
+  let snapshotFormat = snapshot.snapshotFormat
+  let snapshotData = snapshotFormat.diffableData
 
-    UIGraphicsBeginImageContextWithOptions(view.bounds.size, false, 0)
-    let context = UIGraphicsGetCurrentContext()!
-    view.layer.render(in: context)
-    let image = UIGraphicsGetImageFromCurrentImageContext()!
-    UIGraphicsEndImageContext()
-    let data = UIImagePNGRepresentation(image)!
+  guard fileManager.fileExists(atPath: snapshotFileURL.path) else {
+    try! snapshotData.write(to: snapshotFileURL)
+    return
+  }
 
-    let snapshotName = fileURL.deletingPathExtension().lastPathComponent
-      + "_\(function.prefix(function.count - 2))"
-      + (identifier.map({ "_" + $0 }) ?? "")
-      + ".png"
+  let existingData = try! Data(contentsOf: snapshotFileURL)
 
-    let snapshotURL = URL(string: snapshotName, relativeTo: snapshotsDirectoryURL)!
+  guard existingData == snapshotData else {
+    let failedSnapshotFileURL = URL(fileURLWithPath: NSTemporaryDirectory())
+      .appendingPathComponent(snapshotFileName)
+    try! snapshotData.write(to: failedSnapshotFileURL)
 
-    guard fileManager.fileExists(atPath: snapshotURL.path) else {
-      try! data.write(to: snapshotURL)
-      return nil
-    }
+    let baseMessage = "\(snapshotFileURL.path) does not match snapshot"
+    let message = diffTool
+      .map { "\(baseMessage)\n\n\($0) \"\(snapshotFileURL.path)\" \"\(failedSnapshotFileURL.path)\"" }
+      ?? baseMessage
 
-    let existingData = try! Data(contentsOf: snapshotURL)
+    XCTAssert(false, message, file: file, line: line)
 
-    guard existingData == data else {
-      let imageDiff = diff(image, UIImage(data: existingData)!)
-      let attachment = XCTAttachment(image: imageDiff)
+    if let attachment = snapshotFormat.diff(comparing: existingData) {
       attachment.lifetime = .deleteOnSuccess
-
-      let failedSnapshotUrl = URL(fileURLWithPath: NSTemporaryDirectory())
-        .appendingPathComponent(snapshotName)
-      try! data.write(to: failedSnapshotUrl)
-
-      let ksdiff = """
-ksdiff "\(snapshotURL.path)" "\(failedSnapshotUrl.path)"
-"""
-
-      XCTAssert(
-        false,
-        """
-\(snapshotURL.debugDescription) does not match snapshot
-
-\(ksdiff)
-
-""",
-        file: file,
-        line: line
-      )
-
-      return attachment
+      XCTContext.runActivity(named: "Attached failure diff") { activity in activity.add(attachment) }
     }
-
-    return nil
-}
-
-func diff(_ a: UIImage, _ b: UIImage) -> UIImage {
-  let maxSize = CGSize(width: max(a.size.width, b.size.width), height: max(a.size.height, b.size.height))
-  UIGraphicsBeginImageContextWithOptions(maxSize, true, 0)
-  let context = UIGraphicsGetCurrentContext()!
-  a.draw(in: CGRect(origin: .zero, size: a.size))
-  context.setAlpha(0.5)
-  context.beginTransparencyLayer(auxiliaryInfo: nil)
-  b.draw(in: CGRect(origin: .zero, size: b.size))
-  context.setBlendMode(.difference)
-  context.setFillColor(UIColor.white.cgColor)
-  context.fill(CGRect(origin: .zero, size: a.size))
-  context.endTransparencyLayer()
-  let image = UIGraphicsGetImageFromCurrentImageContext()!
-  UIGraphicsEndImageContext()
-  return image
+    return
+  }
 }
