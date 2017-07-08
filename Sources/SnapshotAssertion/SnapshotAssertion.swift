@@ -1,7 +1,7 @@
 import XCTest
 
 @discardableResult
-public func assertScreenshot(
+public func assertSnapshot(
   matching view: UIView,
   identifier: String? = nil,
   _ file: StaticString = #file,
@@ -10,12 +10,12 @@ public func assertScreenshot(
   -> XCTAttachment? {
 
     let fileURL = URL(fileURLWithPath: String(describing: file))
-    let screenshotsDirectoryURL = fileURL.deletingLastPathComponent()
-      .appendingPathComponent("__Screenshots__")
+    let snapshotsDirectoryURL = fileURL.deletingLastPathComponent()
+      .appendingPathComponent("__Snapshots__")
     let fileManager = FileManager.default
 
     try! fileManager.createDirectory(
-      at: screenshotsDirectoryURL,
+      at: snapshotsDirectoryURL,
       withIntermediateDirectories: true,
       attributes: nil
     )
@@ -27,37 +27,37 @@ public func assertScreenshot(
     UIGraphicsEndImageContext()
     let data = UIImagePNGRepresentation(image)!
 
-    let screenshotName = fileURL.deletingPathExtension().lastPathComponent
+    let snapshotName = fileURL.deletingPathExtension().lastPathComponent
       + "_\(function.prefix(function.count - 2))"
       + (identifier.map({ "_" + $0 }) ?? "")
       + ".png"
 
-    let screenshotURL = URL(string: screenshotName, relativeTo: screenshotsDirectoryURL)!
+    let snapshotURL = URL(string: snapshotName, relativeTo: snapshotsDirectoryURL)!
 
-    guard fileManager.fileExists(atPath: screenshotURL.path) else {
-      try! data.write(to: screenshotURL)
+    guard fileManager.fileExists(atPath: snapshotURL.path) else {
+      try! data.write(to: snapshotURL)
       return nil
     }
 
-    let existingData = try! Data(contentsOf: screenshotURL)
+    let existingData = try! Data(contentsOf: snapshotURL)
 
     guard existingData == data else {
       let imageDiff = diff(image, UIImage(data: existingData)!)
       let attachment = XCTAttachment(image: imageDiff)
       attachment.lifetime = .deleteOnSuccess
 
-      let failedScreenshotUrl = URL(fileURLWithPath: NSTemporaryDirectory())
-        .appendingPathComponent(screenshotName)
-      try! data.write(to: failedScreenshotUrl)
+      let failedSnapshotUrl = URL(fileURLWithPath: NSTemporaryDirectory())
+        .appendingPathComponent(snapshotName)
+      try! data.write(to: failedSnapshotUrl)
 
       let ksdiff = """
-ksdiff "\(screenshotURL.path)" "\(failedScreenshotUrl.path)"
+ksdiff "\(snapshotURL.path)" "\(failedSnapshotUrl.path)"
 """
 
       XCTAssert(
         false,
         """
-\(screenshotURL.debugDescription) does not match screenshot
+\(snapshotURL.debugDescription) does not match snapshot
 
 \(ksdiff)
 

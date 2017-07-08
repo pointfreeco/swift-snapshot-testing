@@ -1,5 +1,5 @@
-# swift-screenshot-assertions
+# swift-snapshot-assertion
 
-[![CircleCI](https://circleci.com/gh/pointfreeco/swift-screenshot-assertions.svg?style=svg)](https://circleci.com/gh/pointfreeco/swift-screenshot-assertions)
+[![CircleCI](https://circleci.com/gh/pointfreeco/swift-snapshot-assertion.svg?style=svg)](https://circleci.com/gh/pointfreeco/swift-snapshot-assertion)
 
-Swift screenshot testing
+Swift snapshot testing
