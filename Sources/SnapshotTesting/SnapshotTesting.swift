@@ -3,27 +3,10 @@ import XCTest
 public var diffTool: String? = nil
 public var recording = false
 
-private var snapshots: [String: Set<String>] = [:]
-private var attached = false
-private func attach() {
-  if !attached {
-    defer { attached = true }
-    atexit {
-      let stale = snapshots.flatMap { $0.value }
-      let staleCount = stale.count
-      let staleList = stale.map { "  - \($0.debugDescription)" }.sorted().joined(separator: "\n")
-      print(
-        """
-
-        \(staleCount) stale snapshot\(staleCount == 1 ? "" : "s"):
-
-        \(staleList)
-
-
-        """
-      )
-    }
-  }
+public func record(during: () -> Void) {
+  recording = true
+  defer { recording = false }
+  during()
 }
 
 public protocol Diffable: Equatable {
@@ -118,7 +101,7 @@ public func assertSnapshot<S: Snapshot>(
   let snapshotFormat = snapshot.snapshotFormat
   let snapshotData = snapshotFormat.diffableData
 
-  attach()
+  trackStaleSnapshots()
   let tracked: () -> Set<String> = {
     try! fileManager.contentsOfDirectory(atPath: snapshotsDirectoryURL.path)
       .filter { !$0.starts(with: ".") }
@@ -183,8 +166,25 @@ public func assertSnapshot<S: Encodable>(
   )
 }
 
-public func record(during: () -> Void) {
-  recording = true
-  defer { recording = false }
-  during()
+private var snapshots: [String: Set<String>] = [:]
+private var trackingStaleSnapshots = false
+private func trackStaleSnapshots() {
+  if !trackingStaleSnapshots {
+    defer { trackingStaleSnapshots = true }
+    atexit {
+      let stale = snapshots.flatMap { $0.value }
+      let staleCount = stale.count
+      let staleList = stale.map { "  - \($0.debugDescription)" }.sorted().joined(separator: "\n")
+      print(
+        """
+
+        Found \(staleCount) stale snapshot\(staleCount == 1 ? "" : "s"):
+
+        \(staleList)
+
+
+        """
+      )
+    }
+  }
 }
