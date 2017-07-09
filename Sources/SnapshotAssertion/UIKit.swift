@@ -7,6 +7,10 @@
       return "png"
     }
 
+    public static func fromDiffableData(_ data: Data) -> Self {
+      return self.init(data: data)!
+    }
+
     public var diffableData: Data {
       return UIImagePNGRepresentation(self)!
     }
@@ -35,6 +39,16 @@
     }
   }
 
+  extension CALayer: Snapshot {
+    public var snapshotFormat: UIImage {
+      UIGraphicsBeginImageContextWithOptions(self.bounds.size, false, 2.0)
+      defer { UIGraphicsEndImageContext() }
+      let context = UIGraphicsGetCurrentContext()!
+      self.render(in: context)
+      return UIGraphicsGetImageFromCurrentImageContext()!
+    }
+  }
+
   extension UIImage: Snapshot {
     public var snapshotFormat: Data {
       return self.diffableData
@@ -43,11 +57,13 @@
 
   extension UIView: Snapshot {
     public var snapshotFormat: UIImage {
-      UIGraphicsBeginImageContextWithOptions(self.bounds.size, false, 2.0)
-      defer { UIGraphicsEndImageContext() }
-      let context = UIGraphicsGetCurrentContext()!
-      self.layer.render(in: context)
-      return UIGraphicsGetImageFromCurrentImageContext()!
+      return self.layer.snapshotFormat
+    }
+  }
+
+  extension UIViewController: Snapshot {
+    public var snapshotFormat: UIImage {
+      return self.view.snapshotFormat
     }
   }
 #endif
