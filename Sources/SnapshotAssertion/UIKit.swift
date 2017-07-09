@@ -41,7 +41,7 @@
 
   extension CALayer: Snapshot {
     public var snapshotFormat: UIImage {
-      UIGraphicsBeginImageContextWithOptions(self.size, false, 2.0)
+      UIGraphicsBeginImageContextWithOptions(self.bounds.size, false, 2.0)
       defer { UIGraphicsEndImageContext() }
       let context = UIGraphicsGetCurrentContext()!
       self.render(in: context)
