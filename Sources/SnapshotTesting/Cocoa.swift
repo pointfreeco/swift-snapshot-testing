@@ -21,18 +21,17 @@
       return data
     }
 
-    public func isEqual(to other: Data) -> Bool {
-      let existing = NSImage(data: other)!
-      return self.cgImage(forProposedRect: nil, context: nil, hints: nil)!.bitmapInfo
-        == existing.cgImage(forProposedRect: nil, context: nil, hints: nil)!.bitmapInfo
+    public func diff(from other: NSImage) -> Bool {
+      let bitmapInfo = NSImage(data: self.diffableData)!
+        .cgImage(forProposedRect: nil, context: nil, hints: nil)!
+        .bitmapInfo
+      return bitmapInfo != other.cgImage(forProposedRect: nil, context: nil, hints: nil)!.bitmapInfo
     }
 
-    public func diff(comparing other: Data) -> XCTAttachment? {
-      let existing = NSImage(data: other)!
-
+    public func diff(with other: NSImage) -> XCTAttachment? {
       let maxSize = CGSize(
-        width: max(self.size.width, existing.size.width),
-        height: max(self.size.height, existing.size.height)
+        width: max(self.size.width, other.size.width),
+        height: max(self.size.height, other.size.height)
       )
 
       let image = NSImage(size: maxSize)
@@ -41,7 +40,7 @@
       self.draw(in: .init(origin: .zero, size: self.size))
       context.setAlpha(0.5)
       context.beginTransparencyLayer(auxiliaryInfo: nil)
-      existing.draw(in: .init(origin: .zero, size: existing.size))
+      other.draw(in: .init(origin: .zero, size: other.size))
       context.setBlendMode(.difference)
       context.fill(.init(origin: .zero, size: self.size))
       context.endTransparencyLayer()

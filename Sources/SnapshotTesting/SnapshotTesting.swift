@@ -27,13 +27,13 @@ public protocol Diffable: Equatable {
   static var diffableFileExtension: String? { get }
   static func fromDiffableData(_ data: Data) -> Self
   var diffableData: Data { get }
-  func isEqual(to other: Data) -> Bool
-  func diff(comparing other: Data) -> XCTAttachment?
+  func diff(from other: Self) -> Bool
+  func diff(with other: Self) -> XCTAttachment?
 }
 
 extension Diffable {
-  public func isEqual(to other: Data) -> Bool {
-    return self.diffableData == other.diffableData
+  public func diff(from other: Self) -> Bool {
+    return self.diffableData != other.diffableData
   }
 }
 
@@ -62,7 +62,7 @@ extension Data: Diffable {
     return self
   }
 
-  public func diff(comparing other: Data) -> XCTAttachment? {
+  public func diff(with other: Data) -> XCTAttachment? {
     return nil
   }
 }
@@ -86,7 +86,7 @@ extension String: Diffable {
     return self.data(using: .utf8)!
   }
 
-  public func diff(comparing other: Data) -> XCTAttachment? {
+  public func diff(with other: String) -> XCTAttachment? {
     return nil
   }
 }
@@ -141,7 +141,8 @@ public func assertSnapshot<S: Snapshot>(
   }
 
   let existingData = try! Data(contentsOf: snapshotFileURL)
-  guard existingData.isEqual(to: snapshotData) else {
+  let existingFormat = S.Format.fromDiffableData(existingData)
+  guard !snapshotFormat.diff(from: existingFormat) else {
     let artifactsPath = ProcessInfo.processInfo.environment["SNAPSHOT_ARTIFACTS"] ?? NSTemporaryDirectory()
     let failedSnapshotFileURL = URL(fileURLWithPath: artifactsPath)
       .appendingPathComponent(snapshotFileName)
@@ -158,10 +159,8 @@ public func assertSnapshot<S: Snapshot>(
       }
       ?? baseMessage
 
-    let existingFormat = S.Format.fromDiffableData(existingData)
     XCTAssertEqual(existingFormat, snapshotFormat, message, file: file, line: line)
-
-    if let attachment = snapshotFormat.diff(comparing: existingData) {
+    if let attachment = snapshotFormat.diff(with: existingFormat) {
       attachment.lifetime = .deleteOnSuccess
       XCTContext.runActivity(named: "Attached failure diff") { activity in activity.add(attachment) }
     }
