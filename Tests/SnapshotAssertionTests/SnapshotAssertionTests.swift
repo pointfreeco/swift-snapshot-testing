@@ -13,6 +13,10 @@ class SnapshotAssertionTests: XCTestCase {
   }
 
   func testWithString() {
-    assertSnapshot(matching: "Hello, world!")
+    struct User: Encodable {
+      let id: Int
+      let name: String
+    }
+    assertSnapshot(encoding: User(id: 1, name: "Blob"))
   }
 }
