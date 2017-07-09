@@ -1,6 +1,7 @@
 import XCTest
 
-var diffTool: String? = nil
+public var diffTool: String? = nil
+public var recording = false
 
 public protocol Diffable: Equatable {
   static var diffableFileExtension: String? { get }
@@ -92,8 +93,9 @@ public func assertSnapshot<S: Snapshot>(
   let snapshotFormat = snapshot.snapshotFormat
   let snapshotData = snapshotFormat.diffableData
 
-  guard fileManager.fileExists(atPath: snapshotFileURL.path) else {
+  guard !recording, fileManager.fileExists(atPath: snapshotFileURL.path) else {
     try! snapshotData.write(to: snapshotFileURL)
+    XCTAssert(!recording, "Recorded \"\(snapshotFileURL.path)\"")
     return
   }
 
@@ -104,9 +106,15 @@ public func assertSnapshot<S: Snapshot>(
       .appendingPathComponent(snapshotFileName)
     try! snapshotData.write(to: failedSnapshotFileURL)
 
-    let baseMessage = "\(snapshotFileURL.path) does not match snapshot"
+    let baseMessage = "\(snapshotFileURL.path.debugDescription) does not match snapshot"
     let message = diffTool
-      .map { "\(baseMessage)\n\n\($0) \"\(snapshotFileURL.path)\" \"\(failedSnapshotFileURL.path)\"" }
+      .map {
+        """
+        \(baseMessage)
+
+        \($0) \(snapshotFileURL.path.debugDescription) \(failedSnapshotFileURL.path.debugDescription)
+        """
+      }
       ?? baseMessage
 
     let existingFormat = S.Format(diffableData: existingData)
@@ -118,4 +126,10 @@ public func assertSnapshot<S: Snapshot>(
     }
     return
   }
+}
+
+public func record(during: () -> Void) {
+  recording = true
+  defer { recording = false }
+  during()
 }
