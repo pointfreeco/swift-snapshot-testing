@@ -34,6 +34,7 @@ class MyViewControllerTest: XCTestCase {
 
 The `assertSnapshot(matches:)` function can be called with any type conforming to the `Snapshot` protocol. Out of the box, this includes:
 
+- `Cocoa.NSImage`
 - `Cocoa.NSView`
 - `Cocoa.NSViewController`
 - `Foundation.Data`
