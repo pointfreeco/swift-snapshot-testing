@@ -43,3 +43,24 @@ The `assertSnapshot(matches:)` function can be called with any type conforming t
 - `UIKit.UIImage`
 - `UIKit.UIView`
 - `UIKit.UIViewController`
+
+### `Encodable` support
+
+The `assertSnapshot(encoding:)` function can be called with any type conforming to the `Encodable` protocol.
+
+``` swift
+import SnapshotTesting
+import XCTest
+
+struct User: Encodable {
+  let id: Int
+  let name: String
+}
+
+class UserTest: XCTestCase {
+  func testUser() {
+    let user = User(id: 1, name: "Blob")
+    assertSnapshot(encoding: user)
+  }
+}
+```
