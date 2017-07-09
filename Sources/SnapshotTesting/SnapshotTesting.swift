@@ -1,6 +1,27 @@
 import XCTest
 
-var diffTool: String? = nil
+public var diffTool: String? = nil
+public var recording = false
+
+private var snapshots: [String: [String: ()]] = [:]
+private var attached = false
+private func attach() {
+  if !attached {
+    defer { attached = true }
+    atexit {
+      let stale = snapshots.flatMap { $0.value.keys }
+      let staleList = stale.map { "  - \($0.debugDescription)" }.joined(separator: "\n")
+      print(
+        """
+
+        \(stale.count) stale snapshots:
+
+        \(staleList)
+        """
+      )
+    }
+  }
+}
 
 public protocol Diffable: Equatable {
   static var diffableFileExtension: String? { get }
@@ -77,7 +98,8 @@ public func assertSnapshot<S: Snapshot>(
   function: String = #function,
   line: UInt = #line)
 {
-  let testFileURL = URL(fileURLWithPath: "\(file)")
+  let filePath = "\(file)"
+  let testFileURL = URL(fileURLWithPath: filePath)
   let snapshotsDirectoryURL = testFileURL.deletingLastPathComponent()
     .appendingPathComponent("__Snapshots__")
 
@@ -93,8 +115,21 @@ public func assertSnapshot<S: Snapshot>(
   let snapshotFormat = snapshot.snapshotFormat
   let snapshotData = snapshotFormat.diffableData
 
-  guard fileManager.fileExists(atPath: snapshotFileURL.path) else {
+  attach()
+  let tracked: () -> [String: ()] = {
+    try! fileManager.contentsOfDirectory(atPath: snapshotsDirectoryURL.path)
+      .filter { !$0.starts(with: ".") }
+      .reduce([:]) {
+        var copy = $0
+        copy[snapshotsDirectoryURL.appendingPathComponent($1).path] = ()
+        return copy
+    }
+  }
+  snapshots[filePath, default: tracked()][snapshotFileURL.path] = nil
+
+  guard !recording, fileManager.fileExists(atPath: snapshotFileURL.path) else {
     try! snapshotData.write(to: snapshotFileURL)
+    XCTAssert(!recording, "Recorded \"\(snapshotFileURL.path)\"", file: file, line: line)
     return
   }
 
@@ -105,9 +140,15 @@ public func assertSnapshot<S: Snapshot>(
       .appendingPathComponent(snapshotFileName)
     try! snapshotData.write(to: failedSnapshotFileURL)
 
-    let baseMessage = "\(snapshotFileURL.path) does not match snapshot"
+    let baseMessage = "\(snapshotFileURL.path.debugDescription) does not match snapshot"
     let message = diffTool
-      .map { "\(baseMessage)\n\n\($0) \"\(snapshotFileURL.path)\" \"\(failedSnapshotFileURL.path)\"" }
+      .map {
+        """
+        \(baseMessage)
+
+        \($0) \(snapshotFileURL.path.debugDescription) \(failedSnapshotFileURL.path.debugDescription)
+        """
+      }
       ?? baseMessage
 
     let existingFormat = S.Format.fromDiffableData(existingData)
@@ -141,4 +182,10 @@ public func assertSnapshot<S: Encodable>(
     function: function,
     line: line
   )
+}
+
+public func record(during: () -> Void) {
+  recording = true
+  defer { recording = false }
+  during()
 }
