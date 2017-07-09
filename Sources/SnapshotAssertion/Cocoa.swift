@@ -12,7 +12,11 @@ import XCTest
     }
 
     public var diffableData: Data {
-      return NSBitmapImageRep(data: self.tiffRepresentation!)!.representation(using: .png, properties: [:])!
+      let cgImage = self.cgImage(forProposedRect: nil, context: nil, hints: nil)!
+      let rep = NSBitmapImageRep(cgImage: cgImage)
+      rep.size = self.size
+      let data = rep.representation(using: .png, properties: [:])!
+      return data
     }
 
     public func diff(comparing other: Data) -> XCTAttachment? {
