@@ -26,13 +26,13 @@
       UIGraphicsBeginImageContextWithOptions(maxSize, true, 0)
       defer { UIGraphicsEndImageContext() }
       let context = UIGraphicsGetCurrentContext()!
-      self.draw(in: CGRect(origin: .zero, size: self.size))
+      self.draw(in: .init(origin: .zero, size: self.size))
       context.setAlpha(0.5)
       context.beginTransparencyLayer(auxiliaryInfo: nil)
-      existing.draw(in: CGRect(origin: .zero, size: existing.size))
+      existing.draw(in: .init(origin: .zero, size: existing.size))
       context.setBlendMode(.difference)
       context.setFillColor(UIColor.white.cgColor)
-      context.fill(CGRect(origin: .zero, size: self.size))
+      context.fill(.init(origin: .zero, size: self.size))
       context.endTransparencyLayer()
       let image = UIGraphicsGetImageFromCurrentImageContext()!
       return XCTAttachment(image: image)
@@ -41,7 +41,7 @@
 
   extension CALayer: Snapshot {
     public var snapshotFormat: UIImage {
-      UIGraphicsBeginImageContextWithOptions(self.bounds.size, false, 2.0)
+      UIGraphicsBeginImageContextWithOptions(self.size, false, 2.0)
       defer { UIGraphicsEndImageContext() }
       let context = UIGraphicsGetCurrentContext()!
       self.render(in: context)

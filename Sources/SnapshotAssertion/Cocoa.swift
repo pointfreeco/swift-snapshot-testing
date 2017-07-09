@@ -20,7 +20,25 @@ import XCTest
     }
 
     public func diff(comparing other: Data) -> XCTAttachment? {
-      return nil
+      let existing = NSImage(data: other)!
+
+      let maxSize = CGSize(
+        width: max(self.size.width, existing.size.width),
+        height: max(self.size.height, existing.size.height)
+      )
+
+      let image = NSImage(size: maxSize)
+      image.lockFocus()
+      let context = NSGraphicsContext.current!.cgContext
+      self.draw(in: .init(origin: .zero, size: self.size))
+      context.setAlpha(0.5)
+      context.beginTransparencyLayer(auxiliaryInfo: nil)
+      existing.draw(in: .init(origin: .zero, size: existing.size))
+      context.setBlendMode(.difference)
+      context.fill(.init(origin: .zero, size: self.size))
+      context.endTransparencyLayer()
+      image.unlockFocus()
+      return XCTAttachment(image: image)
     }
   }
 
