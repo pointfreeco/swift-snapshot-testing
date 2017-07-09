@@ -72,9 +72,10 @@ extension String: Snapshot {
 public func assertSnapshot<S: Snapshot>(
   matching snapshot: S,
   identifier: String? = nil,
-  _ file: StaticString = #file,
-  _ function: String = #function,
-  _ line: UInt = #line)
+  pathExtension: String? = nil,
+  file: StaticString = #file,
+  function: String = #function,
+  line: UInt = #line)
 {
   let testFileURL = URL(fileURLWithPath: "\(file)")
   let snapshotsDirectoryURL = testFileURL.deletingLastPathComponent()
@@ -87,7 +88,7 @@ public func assertSnapshot<S: Snapshot>(
   let snapshotFileName = testFileURL.deletingPathExtension().lastPathComponent
     + ".\(function.dropLast(2))"
     + (identifier.map { ".\($0)" } ?? "")
-    + (S.snapshotFileExtension.map { ".\($0)" } ?? "")
+    + ((pathExtension ?? S.snapshotFileExtension).map { ".\($0)" } ?? "")
   let snapshotFileURL = snapshotsDirectoryURL.appendingPathComponent(snapshotFileName)
   let snapshotFormat = snapshot.snapshotFormat
   let snapshotData = snapshotFormat.diffableData
@@ -118,4 +119,26 @@ public func assertSnapshot<S: Snapshot>(
     }
     return
   }
+}
+
+public func assertSnapshot<S: Encodable>(
+  encoding snapshot: S,
+  identifier: String? = nil,
+  file: StaticString = #file,
+  function: String = #function,
+  line: UInt = #line)
+{
+  let encoder = JSONEncoder()
+  encoder.outputFormatting = .prettyPrinted
+  let data = try! encoder.encode(snapshot)
+  let string = String(data: data, encoding: .utf8)!
+
+  assertSnapshot(
+    matching: string,
+    identifier: identifier,
+    pathExtension: "json",
+    file: file,
+    function: function,
+    line: line
+  )
 }
