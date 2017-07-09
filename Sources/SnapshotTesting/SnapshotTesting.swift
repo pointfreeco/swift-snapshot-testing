@@ -134,9 +134,9 @@ public func assertSnapshot<S: Snapshot>(
   }
 
   let existingData = try! Data(contentsOf: snapshotFileURL)
-
   guard existingData == snapshotData else {
-    let failedSnapshotFileURL = URL(fileURLWithPath: NSTemporaryDirectory())
+    let artifactsPath = ProcessInfo.processInfo.environment["SNAPSHOT_ARTIFACTS"] ?? NSTemporaryDirectory()
+    let failedSnapshotFileURL = URL(fileURLWithPath: artifactsPath)
       .appendingPathComponent(snapshotFileName)
     try! snapshotData.write(to: failedSnapshotFileURL)
 

@@ -1,6 +1,8 @@
 machine:
   xcode:
     version: "9.0"
+  environment:
+    SNAPSHOT_ARTIFACTS: $CIRCLE_ARTIFACTS
 test:
   pre:
     - swift package generate-xcodeproj
