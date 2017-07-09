@@ -15,6 +15,7 @@
       let layer = CALayer()
       layer.bounds = .init(origin: .zero, size: self.size)
       layer.contents = self.layerContents(forContentsScale: 2.0)
+      layer.contentsScale = 2.0
       let image = layer.snapshotFormat
 
       let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil)!
