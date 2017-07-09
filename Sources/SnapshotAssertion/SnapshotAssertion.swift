@@ -25,8 +25,8 @@ private func attach() {
 
 public protocol Diffable: Equatable {
   static var diffableFileExtension: String? { get }
+  static func fromDiffableData(_ data: Data) -> Self
   var diffableData: Data { get }
-  init(diffableData: Data)
   func diff(comparing other: Data) -> XCTAttachment?
 }
 
@@ -47,12 +47,12 @@ extension Data: Diffable {
     return nil
   }
 
-  public var diffableData: Data {
-    return self
+  public static func fromDiffableData(_ data: Data) -> Data {
+    return data
   }
 
-  public init(diffableData: Data) {
-    self = diffableData
+  public var diffableData: Data {
+    return self
   }
 
   public func diff(comparing other: Data) -> XCTAttachment? {
@@ -71,12 +71,12 @@ extension String: Diffable {
     return "txt"
   }
 
-  public var diffableData: Data {
-    return self.data(using: .utf8)!
+  public static func fromDiffableData(_ data: Data) -> String {
+    return String(data: data, encoding: .utf8)!
   }
 
-  public init(diffableData: Data) {
-    self.init(data: diffableData, encoding: .utf8)!
+  public var diffableData: Data {
+    return self.data(using: .utf8)!
   }
 
   public func diff(comparing other: Data) -> XCTAttachment? {
@@ -93,9 +93,10 @@ extension String: Snapshot {
 public func assertSnapshot<S: Snapshot>(
   matching snapshot: S,
   identifier: String? = nil,
-  _ file: StaticString = #file,
-  _ function: String = #function,
-  _ line: UInt = #line)
+  pathExtension: String? = nil,
+  file: StaticString = #file,
+  function: String = #function,
+  line: UInt = #line)
 {
   let filePath = "\(file)"
   let testFileURL = URL(fileURLWithPath: filePath)
@@ -109,7 +110,7 @@ public func assertSnapshot<S: Snapshot>(
   let snapshotFileName = testFileURL.deletingPathExtension().lastPathComponent
     + ".\(function.dropLast(2))"
     + (identifier.map { ".\($0)" } ?? "")
-    + (S.snapshotFileExtension.map { ".\($0)" } ?? "")
+    + ((pathExtension ?? S.snapshotFileExtension).map { ".\($0)" } ?? "")
   let snapshotFileURL = snapshotsDirectoryURL.appendingPathComponent(snapshotFileName)
   let snapshotFormat = snapshot.snapshotFormat
   let snapshotData = snapshotFormat.diffableData
@@ -150,7 +151,7 @@ public func assertSnapshot<S: Snapshot>(
       }
       ?? baseMessage
 
-    let existingFormat = S.Format(diffableData: existingData)
+    let existingFormat = S.Format.fromDiffableData(existingData)
     XCTAssertEqual(existingFormat, snapshotFormat, message, file: file, line: line)
 
     if let attachment = snapshotFormat.diff(comparing: existingData) {
@@ -159,6 +160,28 @@ public func assertSnapshot<S: Snapshot>(
     }
     return
   }
+}
+
+public func assertSnapshot<S: Encodable>(
+  encoding snapshot: S,
+  identifier: String? = nil,
+  file: StaticString = #file,
+  function: String = #function,
+  line: UInt = #line)
+{
+  let encoder = JSONEncoder()
+  encoder.outputFormatting = .prettyPrinted
+  let data = try! encoder.encode(snapshot)
+  let string = String(data: data, encoding: .utf8)!
+
+  assertSnapshot(
+    matching: string,
+    identifier: identifier,
+    pathExtension: "json",
+    file: file,
+    function: function,
+    line: line
+  )
 }
 
 public func record(during: () -> Void) {
