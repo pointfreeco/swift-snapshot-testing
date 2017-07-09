@@ -12,10 +12,11 @@
     }
 
     public var diffableData: Data {
+      let scale = NSScreen.main!.backingScaleFactor
+      self.size = .init(width: self.size.width * 2.0 / scale, height: self.size.height * 2.0 / scale)
       let cgImage = self.cgImage(forProposedRect: nil, context: nil, hints: nil)!
       let rep = NSBitmapImageRep(cgImage: cgImage)
-      let scale = NSScreen.main!.backingScaleFactor
-      rep.size = .init(width: self.size.width * 2.0 / scale, height: self.size.height * 2.0 / scale)
+      rep.size = self.size
       let data = rep.representation(using: .png, properties: [:])!
       return data
     }
