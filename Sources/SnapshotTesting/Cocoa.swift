@@ -61,6 +61,8 @@
 
   extension NSView: Snapshot {
     public var snapshotFormat: NSImage {
+      self.wantsLayer = true
+      print("contents scale:", self.layer!.contentsScale)
       return NSImage(data: self.dataWithPDF(inside: self.bounds))!
     }
   }
