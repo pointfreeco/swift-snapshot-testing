@@ -1,7 +1,7 @@
-import Cocoa
-import XCTest
-
 #if os(macOS)
+  import Cocoa
+  import XCTest
+
   extension NSImage: Diffable {
     public static var diffableFileExtension: String? {
       return "png"

@@ -3,4 +3,4 @@ machine:
     version: "9.0"
 test:
   override:
-    - swift package generate-xcodeproj && xcodebuild test -scheme SnapshotAssertion-Package -destination platform="iOS Simulator,name=iPhone 7,OS=11.0"
+    - swift package generate-xcodeproj && xcodebuild test -scheme SnapshotTesting-Package -destination platform="iOS Simulator,name=iPhone 7,OS=11.0"

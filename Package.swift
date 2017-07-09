@@ -3,20 +3,20 @@
 import PackageDescription
 
 let package = Package(
-  name: "SnapshotAssertion",
+  name: "SnapshotTesting",
   products: [
     .library(
-      name: "SnapshotAssertion",
-      targets: ["SnapshotAssertion"]),
+      name: "SnapshotTesting",
+      targets: ["SnapshotTesting"]),
   ],
   dependencies: [
   ],
   targets: [
     .target(
-      name: "SnapshotAssertion",
+      name: "SnapshotTesting",
       dependencies: []),
     .testTarget(
-      name: "SnapshotAssertionTests",
-      dependencies: ["SnapshotAssertion"]),
+      name: "SnapshotTestingTests",
+      dependencies: ["SnapshotTesting"]),
   ]
 )
