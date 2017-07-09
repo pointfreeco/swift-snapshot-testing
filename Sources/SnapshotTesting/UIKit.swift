@@ -8,19 +8,17 @@
     }
 
     public static func fromDiffableData(_ data: Data) -> Self {
-      return self.init(data: data)!
+      return self.init(data: data, scale: 2.0)!
     }
 
     public var diffableData: Data {
       return UIImagePNGRepresentation(self)!
     }
 
-    public func diff(comparing other: Data) -> XCTAttachment? {
-      let existing = UIImage(data: other, scale: 2.0)!
-
+    public func diff(with other: UIImage) -> XCTAttachment? {
       let maxSize = CGSize(
-        width: max(self.size.width, existing.size.width),
-        height: max(self.size.height, existing.size.height)
+        width: max(self.size.width, other.size.width),
+        height: max(self.size.height, other.size.height)
       )
 
       UIGraphicsBeginImageContextWithOptions(maxSize, true, 0)
@@ -29,7 +27,7 @@
       self.draw(in: .init(origin: .zero, size: self.size))
       context.setAlpha(0.5)
       context.beginTransparencyLayer(auxiliaryInfo: nil)
-      existing.draw(in: .init(origin: .zero, size: existing.size))
+      other.draw(in: .init(origin: .zero, size: other.size))
       context.setBlendMode(.difference)
       context.setFillColor(UIColor.white.cgColor)
       context.fill(.init(origin: .zero, size: self.size))

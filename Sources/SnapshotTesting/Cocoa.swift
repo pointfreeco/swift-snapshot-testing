@@ -25,7 +25,8 @@
       let bitmapInfo = NSImage(data: self.diffableData)!
         .cgImage(forProposedRect: nil, context: nil, hints: nil)!
         .bitmapInfo
-      return bitmapInfo != other.cgImage(forProposedRect: nil, context: nil, hints: nil)!.bitmapInfo
+      return bitmapInfo
+        != other.cgImage(forProposedRect: nil, context: nil, hints: nil)!.bitmapInfo
     }
 
     public func diff(with other: NSImage) -> XCTAttachment? {
