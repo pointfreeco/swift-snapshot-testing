@@ -3,6 +3,26 @@ import XCTest
 public var diffTool: String? = nil
 public var recording = false
 
+private var snapshots: [String: [String: ()]] = [:]
+private var attached = false
+private func attach() {
+  if !attached {
+    defer { attached = true }
+    atexit {
+      let stale = snapshots.flatMap { $0.value.keys }
+      let staleList = stale.map { "  - \($0.debugDescription)" }.joined(separator: "\n")
+      print(
+        """
+
+        \(stale.count) stale snapshots:
+
+        \(staleList)
+        """
+      )
+    }
+  }
+}
+
 public protocol Diffable: Equatable {
   static var diffableFileExtension: String? { get }
   var diffableData: Data { get }
@@ -77,7 +97,8 @@ public func assertSnapshot<S: Snapshot>(
   _ function: String = #function,
   _ line: UInt = #line)
 {
-  let testFileURL = URL(fileURLWithPath: "\(file)")
+  let filePath = "\(file)"
+  let testFileURL = URL(fileURLWithPath: filePath)
   let snapshotsDirectoryURL = testFileURL.deletingLastPathComponent()
     .appendingPathComponent("__Snapshots__")
 
@@ -92,6 +113,18 @@ public func assertSnapshot<S: Snapshot>(
   let snapshotFileURL = snapshotsDirectoryURL.appendingPathComponent(snapshotFileName)
   let snapshotFormat = snapshot.snapshotFormat
   let snapshotData = snapshotFormat.diffableData
+
+  attach()
+  let tracked: () -> [String: ()] = {
+    try! fileManager.contentsOfDirectory(atPath: snapshotsDirectoryURL.path)
+      .filter { !$0.starts(with: ".") }
+      .reduce([:]) {
+        var copy = $0
+        copy[snapshotsDirectoryURL.appendingPathComponent($1).path] = ()
+        return copy
+    }
+  }
+  snapshots[filePath, default: tracked()][snapshotFileURL.path] = nil
 
   guard !recording, fileManager.fileExists(atPath: snapshotFileURL.path) else {
     try! snapshotData.write(to: snapshotFileURL)
