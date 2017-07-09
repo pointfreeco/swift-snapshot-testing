@@ -2,9 +2,10 @@ import XCTest
 
 var diffTool: String? = nil
 
-public protocol Diffable {
+public protocol Diffable: Equatable {
   static var diffableFileExtension: String? { get }
   var diffableData: Data { get }
+  init(diffableData: Data)
   func diff(comparing other: Data) -> XCTAttachment?
 }
 
@@ -29,6 +30,10 @@ extension Data: Diffable {
     return self
   }
 
+  public init(diffableData: Data) {
+    self = diffableData
+  }
+
   public func diff(comparing other: Data) -> XCTAttachment? {
     return nil
   }
@@ -47,6 +52,10 @@ extension String: Diffable {
 
   public var diffableData: Data {
     return self.data(using: .utf8)!
+  }
+
+  public init(diffableData: Data) {
+    self.init(data: diffableData, encoding: .utf8)!
   }
 
   public func diff(comparing other: Data) -> XCTAttachment? {
@@ -100,7 +109,8 @@ public func assertSnapshot<S: Snapshot>(
       .map { "\(baseMessage)\n\n\($0) \"\(snapshotFileURL.path)\" \"\(failedSnapshotFileURL.path)\"" }
       ?? baseMessage
 
-    XCTAssert(false, message, file: file, line: line)
+    let existingFormat = S.Format(diffableData: existingData)
+    XCTAssertEqual(existingFormat, snapshotFormat, message, file: file, line: line)
 
     if let attachment = snapshotFormat.diff(comparing: existingData) {
       attachment.lifetime = .deleteOnSuccess
