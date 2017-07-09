@@ -43,13 +43,13 @@ import XCTest
   }
 
   extension CALayer: Snapshot {
-    public var snapshotFormat: Data {
+    public var snapshotFormat: NSImage {
       let image = NSImage(size: self.bounds.size)
       image.lockFocus()
       let context = NSGraphicsContext.current!.cgContext
       self.render(in: context)
       image.unlockFocus()
-      return image.snapshotFormat
+      return image
     }
   }
 
