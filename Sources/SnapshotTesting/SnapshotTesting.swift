@@ -168,6 +168,7 @@ public func assertSnapshot<S: Encodable>(
 
 private var snapshots: [String: Set<String>] = [:]
 private var trackingStaleSnapshots = false
+
 private func trackStaleSnapshots() {
   if !trackingStaleSnapshots {
     defer { trackingStaleSnapshots = true }
