@@ -1,4 +1,4 @@
-# swift-snapshot-assertion [![CircleCI](https://circleci.com/gh/pointfreeco/swift-snapshot-assertion.svg?style=svg)](https://circleci.com/gh/pointfreeco/swift-snapshot-assertion)
+# swift-snapshot-testing [![CircleCI](https://circleci.com/gh/pointfreeco/swift-snapshot-testing.svg?style=svg)](https://circleci.com/gh/pointfreeco/swift-snapshot-testing)
 
 Tests that save and assert against reference data.
 
@@ -13,7 +13,7 @@ import PackageDescription
 
 let package = Package(
   dependencies: [
-    .package(url: "https://github.com/pointfreeco/swift-snapshot-assertion.git", .branch("master")),
+    .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", .branch("master")),
   ]
 )
 ```
@@ -21,7 +21,7 @@ let package = Package(
 ## Usage
 
 ```swift
-import SnapshotAssertion
+import SnapshotTesting
 import XCTest
 
 class MyViewControllerTest: XCTestCase {
@@ -34,6 +34,8 @@ class MyViewControllerTest: XCTestCase {
 
 The `assertSnapshot(matches:)` function can be called with any type conforming to the `Snapshot` protocol. Out of the box, this includes:
 
+- `Cocoa.NSView`
+- `Cocoa.NSViewController`
 - `Foundation.Data`
 - `Foundation.String`
 - `QuartzCore.CALayer`

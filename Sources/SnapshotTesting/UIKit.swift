@@ -1,8 +1,8 @@
-import Cocoa
-import XCTest
+#if os(iOS)
+  import UIKit
+  import XCTest
 
-#if os(macOS)
-  extension NSImage: Diffable {
+  extension UIImage: Diffable {
     public static var diffableFileExtension: String? {
       return "png"
     }
@@ -12,61 +12,57 @@ import XCTest
     }
 
     public var diffableData: Data {
-      let cgImage = self.cgImage(forProposedRect: nil, context: nil, hints: nil)!
-      let rep = NSBitmapImageRep(cgImage: cgImage)
-      rep.size = self.size
-      let data = rep.representation(using: .png, properties: [:])!
-      return data
+      return UIImagePNGRepresentation(self)!
     }
 
     public func diff(comparing other: Data) -> XCTAttachment? {
-      let existing = NSImage(data: other)!
+      let existing = UIImage(data: other, scale: 2.0)!
 
       let maxSize = CGSize(
         width: max(self.size.width, existing.size.width),
         height: max(self.size.height, existing.size.height)
       )
 
-      let image = NSImage(size: maxSize)
-      image.lockFocus()
-      let context = NSGraphicsContext.current!.cgContext
+      UIGraphicsBeginImageContextWithOptions(maxSize, true, 0)
+      defer { UIGraphicsEndImageContext() }
+      let context = UIGraphicsGetCurrentContext()!
       self.draw(in: .init(origin: .zero, size: self.size))
       context.setAlpha(0.5)
       context.beginTransparencyLayer(auxiliaryInfo: nil)
       existing.draw(in: .init(origin: .zero, size: existing.size))
       context.setBlendMode(.difference)
+      context.setFillColor(UIColor.white.cgColor)
       context.fill(.init(origin: .zero, size: self.size))
       context.endTransparencyLayer()
-      image.unlockFocus()
+      let image = UIGraphicsGetImageFromCurrentImageContext()!
       return XCTAttachment(image: image)
     }
   }
 
   extension CALayer: Snapshot {
-    public var snapshotFormat: NSImage {
-      let image = NSImage(size: self.bounds.size)
-      image.lockFocus()
-      let context = NSGraphicsContext.current!.cgContext
+    public var snapshotFormat: UIImage {
+      UIGraphicsBeginImageContextWithOptions(self.bounds.size, false, 2.0)
+      defer { UIGraphicsEndImageContext() }
+      let context = UIGraphicsGetCurrentContext()!
       self.render(in: context)
-      image.unlockFocus()
-      return image
+      return UIGraphicsGetImageFromCurrentImageContext()!
     }
   }
 
-  extension NSImage: Snapshot {
+  extension UIImage: Snapshot {
     public var snapshotFormat: Data {
       return self.diffableData
     }
   }
 
-  extension NSView: Snapshot {
-    public var snapshotFormat: NSImage {
-      return NSImage(data: self.dataWithPDF(inside: self.bounds))!
+  extension UIView: Snapshot {
+    public var snapshotFormat: UIImage {
+      return self.layer.snapshotFormat
     }
   }
 
-  extension NSViewController: Snapshot {
-    public var snapshotFormat: NSImage {
+  extension UIViewController: Snapshot {
+    public var snapshotFormat: UIImage {
       return self.view.snapshotFormat
     }
   }

@@ -1,7 +1,7 @@
 import XCTest
-import SnapshotAssertion
+import SnapshotTesting
 
-class SnapshotAssertionTests: XCTestCase {
+class SnapshotTestingTests: XCTestCase {
   #if os(iOS)
     func testExample() {
       let view = UIButton(type: .contactAdd)
