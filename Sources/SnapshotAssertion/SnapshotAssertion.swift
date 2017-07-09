@@ -20,6 +20,46 @@ extension Snapshot {
   }
 }
 
+extension Data: Diffable {
+  public static var diffableFileExtension: String? {
+    return nil
+  }
+
+  public var diffableData: Data {
+    return self
+  }
+
+  public func diff(comparing other: Data) -> XCTAttachment? {
+    return nil
+  }
+}
+
+extension Data: Snapshot {
+  public var snapshotFormat: Data {
+    return self
+  }
+}
+
+extension String: Diffable {
+  public static var diffableFileExtension: String? {
+    return "txt"
+  }
+
+  public var diffableData: Data {
+    return self.data(using: .utf8)!
+  }
+
+  public func diff(comparing other: Data) -> XCTAttachment? {
+    return nil
+  }
+}
+
+extension String: Snapshot {
+  public var snapshotFormat: String {
+    return self
+  }
+}
+
 public func assertSnapshot<S: Snapshot>(
   matching snapshot: S,
   identifier: String? = nil,
