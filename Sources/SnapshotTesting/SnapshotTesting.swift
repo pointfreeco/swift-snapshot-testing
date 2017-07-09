@@ -27,7 +27,14 @@ public protocol Diffable: Equatable {
   static var diffableFileExtension: String? { get }
   static func fromDiffableData(_ data: Data) -> Self
   var diffableData: Data { get }
+  func isEqual(to other: Data) -> Bool
   func diff(comparing other: Data) -> XCTAttachment?
+}
+
+extension Diffable {
+  public func isEqual(to other: Data) -> Bool {
+    return self.diffableData == other.diffableData
+  }
 }
 
 public protocol Snapshot {
@@ -134,7 +141,7 @@ public func assertSnapshot<S: Snapshot>(
   }
 
   let existingData = try! Data(contentsOf: snapshotFileURL)
-  guard existingData == snapshotData else {
+  guard existingData.isEqual(to: snapshotData) else {
     let artifactsPath = ProcessInfo.processInfo.environment["SNAPSHOT_ARTIFACTS"] ?? NSTemporaryDirectory()
     let failedSnapshotFileURL = URL(fileURLWithPath: artifactsPath)
       .appendingPathComponent(snapshotFileName)

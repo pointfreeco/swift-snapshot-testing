@@ -21,6 +21,12 @@
       return data
     }
 
+    public func isEqual(to other: Data) -> Bool {
+      let existing = NSImage(data: other)!
+      return self.cgImage(forProposedRect: nil, context: nil, hints: nil)!.bitmapInfo
+        == existing.cgImage(forProposedRect: nil, context: nil, hints: nil)!.bitmapInfo
+    }
+
     public func diff(comparing other: Data) -> XCTAttachment? {
       let existing = NSImage(data: other)!
 
