@@ -12,9 +12,14 @@
     }
 
     public var diffableData: Data {
-      let cgImage = self.cgImage(forProposedRect: nil, context: nil, hints: nil)!
+      let layer = CALayer()
+      layer.bounds = .init(origin: .zero, size: self.size)
+      layer.contents = self.layerContents(forContentsScale: 2.0)
+      let image = layer.snapshotFormat
+
+      let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil)!
       let rep = NSBitmapImageRep(cgImage: cgImage)
-      rep.size = self.size
+      rep.size = image.size
       let data = rep.representation(using: .png, properties: [:])!
       return data
     }
@@ -61,8 +66,6 @@
 
   extension NSView: Snapshot {
     public var snapshotFormat: NSImage {
-      self.wantsLayer = true
-      self.layer!.contentsScale = 2.0
       return NSImage(data: self.dataWithPDF(inside: self.bounds))!
     }
   }
