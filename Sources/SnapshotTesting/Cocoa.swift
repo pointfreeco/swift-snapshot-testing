@@ -12,15 +12,10 @@
     }
 
     public var diffableData: Data {
-      let layer = CALayer()
-      layer.bounds = .init(origin: .zero, size: self.size)
-      layer.contents = self.layerContents(forContentsScale: 2.0)
-      layer.contentsScale = 2.0
-      let image = layer.snapshotFormat
-
-      let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil)!
+      let cgImage = self.cgImage(forProposedRect: nil, context: nil, hints: nil)!
       let rep = NSBitmapImageRep(cgImage: cgImage)
-      rep.size = image.size
+      let scale = NSScreen.main!.backingScaleFactor
+      rep.size = .init(width: self.size.width * 2.0 / scale, height: self.size.height * 2.0 / scale)
       let data = rep.representation(using: .png, properties: [:])!
       return data
     }
