@@ -95,7 +95,7 @@ public func assertSnapshot<S: Snapshot>(
 
   guard !recording, fileManager.fileExists(atPath: snapshotFileURL.path) else {
     try! snapshotData.write(to: snapshotFileURL)
-    XCTAssert(!recording, "Recorded \"\(snapshotFileURL.path)\"")
+    XCTAssert(!recording, "Recorded \"\(snapshotFileURL.path)\"", file: file, line: line)
     return
   }
 
