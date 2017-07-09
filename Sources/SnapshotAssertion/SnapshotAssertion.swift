@@ -4,8 +4,8 @@ var diffTool: String? = nil
 
 public protocol Diffable: Equatable {
   static var diffableFileExtension: String? { get }
+  static func fromDiffableData(_ data: Data) -> Self
   var diffableData: Data { get }
-  init(diffableData: Data)
   func diff(comparing other: Data) -> XCTAttachment?
 }
 
@@ -26,12 +26,12 @@ extension Data: Diffable {
     return nil
   }
 
-  public var diffableData: Data {
-    return self
+  public static func fromDiffableData(_ data: Data) -> Data {
+    return data
   }
 
-  public init(diffableData: Data) {
-    self = diffableData
+  public var diffableData: Data {
+    return self
   }
 
   public func diff(comparing other: Data) -> XCTAttachment? {
@@ -50,12 +50,12 @@ extension String: Diffable {
     return "txt"
   }
 
-  public var diffableData: Data {
-    return self.data(using: .utf8)!
+  public static func fromDiffableData(_ data: Data) -> String {
+    return String(data: data, encoding: .utf8)!
   }
 
-  public init(diffableData: Data) {
-    self.init(data: diffableData, encoding: .utf8)!
+  public var diffableData: Data {
+    return self.data(using: .utf8)!
   }
 
   public func diff(comparing other: Data) -> XCTAttachment? {
@@ -110,7 +110,7 @@ public func assertSnapshot<S: Snapshot>(
       .map { "\(baseMessage)\n\n\($0) \"\(snapshotFileURL.path)\" \"\(failedSnapshotFileURL.path)\"" }
       ?? baseMessage
 
-    let existingFormat = S.Format(diffableData: existingData)
+    let existingFormat = S.Format.fromDiffableData(existingData)
     XCTAssertEqual(existingFormat, snapshotFormat, message, file: file, line: line)
 
     if let attachment = snapshotFormat.diff(comparing: existingData) {
