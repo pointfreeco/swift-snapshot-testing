@@ -29,11 +29,17 @@
         != other.cgImage(forProposedRect: nil, context: nil, hints: nil)!.bitmapInfo
     }
 
-    public func diff(with other: NSImage) -> XCTAttachment? {
+    public func diff(with other: NSImage) -> [XCTAttachment] {
       let maxSize = CGSize(
         width: max(self.size.width, other.size.width),
         height: max(self.size.height, other.size.height)
       )
+
+      let reference = XCTAttachment(image: other)
+      reference.name = "reference"
+
+      let failure = XCTAttachment(image: self)
+      failure.name = "failure"
 
       let image = NSImage(size: maxSize)
       image.lockFocus()
@@ -46,7 +52,10 @@
       context.fill(.init(origin: .zero, size: self.size))
       context.endTransparencyLayer()
       image.unlockFocus()
-      return XCTAttachment(image: image)
+      let diff = XCTAttachment(image: image)
+      diff.name = "difference"
+
+      return [reference, failure, diff]
     }
   }
 

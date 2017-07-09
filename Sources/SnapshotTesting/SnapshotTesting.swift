@@ -28,7 +28,7 @@ public protocol Diffable: Equatable {
   static func fromDiffableData(_ data: Data) -> Self
   var diffableData: Data { get }
   func diff(from other: Self) -> Bool
-  func diff(with other: Self) -> XCTAttachment?
+  func diff(with other: Self) -> [XCTAttachment]
 }
 
 extension Diffable {
@@ -62,8 +62,8 @@ extension Data: Diffable {
     return self
   }
 
-  public func diff(with other: Data) -> XCTAttachment? {
-    return nil
+  public func diff(with other: Data) -> [XCTAttachment] {
+    return []
   }
 }
 
@@ -86,8 +86,8 @@ extension String: Diffable {
     return self.data(using: .utf8)!
   }
 
-  public func diff(with other: String) -> XCTAttachment? {
-    return nil
+  public func diff(with other: String) -> [XCTAttachment] {
+    return []
   }
 }
 
@@ -160,9 +160,14 @@ public func assertSnapshot<S: Snapshot>(
       ?? baseMessage
 
     XCTAssertEqual(existingFormat, snapshotFormat, message, file: file, line: line)
-    if let attachment = snapshotFormat.diff(with: existingFormat) {
-      attachment.lifetime = .deleteOnSuccess
-      XCTContext.runActivity(named: "Attached failure diff") { activity in activity.add(attachment) }
+    let attachments = snapshotFormat.diff(with: existingFormat)
+    if !attachments.isEmpty {
+      XCTContext.runActivity(named: "Attached failure diff") { activity in
+        for attachment in attachments {
+          attachment.lifetime = .deleteOnSuccess
+          activity.add(attachment)
+        }
+      }
     }
     return
   }
