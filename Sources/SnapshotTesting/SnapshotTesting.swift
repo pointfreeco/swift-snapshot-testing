@@ -107,7 +107,7 @@ public func assertSnapshot<S: Snapshot>(
       .filter { !$0.starts(with: ".") }
       .reduce([]) { $0.union([snapshotsDirectoryURL.appendingPathComponent($1).path]) }
   }
-  snapshots[filePath, default: tracked()].remove(snapshotFileURL.path)
+  trackedSnapshots[filePath, default: tracked()].remove(snapshotFileURL.path)
 
   guard !recording, fileManager.fileExists(atPath: snapshotFileURL.path) else {
     try! snapshotData.write(to: snapshotFileURL)
@@ -166,14 +166,14 @@ public func assertSnapshot<S: Encodable>(
   )
 }
 
-private var snapshots: [String: Set<String>] = [:]
+private var trackedSnapshots: [String: Set<String>] = [:]
 private var trackingStaleSnapshots = false
 
 private func trackStaleSnapshots() {
   if !trackingStaleSnapshots {
     defer { trackingStaleSnapshots = true }
     atexit {
-      let stale = snapshots.flatMap { $0.value }
+      let stale = trackedSnapshots.flatMap { $0.value }
       let staleCount = stale.count
       let staleList = stale.map { "  - \($0.debugDescription)" }.sorted().joined(separator: "\n")
       print(
