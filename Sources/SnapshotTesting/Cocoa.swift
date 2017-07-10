@@ -22,11 +22,33 @@
     }
 
     public func diff(from other: NSImage) -> Bool {
-      let bitmapInfo = NSImage(data: self.diffableData)!
-        .cgImage(forProposedRect: nil, context: nil, hints: nil)!
-        .bitmapInfo
-      return bitmapInfo
-        != other.cgImage(forProposedRect: nil, context: nil, hints: nil)!.bitmapInfo
+      let repA = NSImage(data: self.diffableData)!.representations[0] as! NSBitmapImageRep
+      let repB = other.representations[0] as! NSBitmapImageRep
+
+      guard
+        repA.bitmapFormat == repB.bitmapFormat,
+        repA.bitsPerPixel == repB.bitsPerPixel,
+        repA.bitsPerSample == repB.bitsPerSample,
+        repA.bytesPerPlane == repB.bytesPerPlane,
+        repA.bytesPerRow == repB.bytesPerRow,
+        repA.hasAlpha == repB.hasAlpha,
+        repA.isOpaque == repB.isOpaque,
+        repA.isPlanar == repB.isPlanar,
+        repA.numberOfPlanes == repB.numberOfPlanes,
+        repA.samplesPerPixel == repB.samplesPerPixel,
+        repA.pixelsWide == repB.pixelsWide,
+        repA.pixelsHigh == repB.pixelsHigh
+        else { return true }
+
+      for x in 0..<repA.pixelsWide {
+        for y in 0..<repA.pixelsHigh {
+          if repA.colorAt(x: x, y: y) != repB.colorAt(x: x, y: y) {
+            return true
+          }
+        }
+      }
+
+      return false
     }
 
     public func diff(with other: NSImage) -> [XCTAttachment] {
