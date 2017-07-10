@@ -12,8 +12,6 @@
     }
 
     public var diffableData: Data {
-      let scale = NSScreen.main!.backingScaleFactor
-//      self.size = .init(width: self.size.width * 2.0 / scale, height: self.size.height * 2.0 / scale)
       let cgImage = self.cgImage(forProposedRect: nil, context: nil, hints: nil)!
       let rep = NSBitmapImageRep(cgImage: cgImage)
       rep.size = self.size
@@ -93,7 +91,10 @@
 
   extension NSView: Snapshot {
     public var snapshotFormat: NSImage {
-      return NSImage(data: self.dataWithPDF(inside: self.bounds))!
+      let image = NSImage(data: self.dataWithPDF(inside: self.bounds))!
+      let scale = NSScreen.main!.backingScaleFactor
+      image.size = .init(width: image.size.width * 2.0 / scale, height: image.size.height * 2.0 / scale)
+      return image
     }
   }
 
