@@ -23,8 +23,6 @@
       let repA = NSImage(data: self.diffableData)!.representations[0] as! NSBitmapImageRep
       let repB = other.representations[0] as! NSBitmapImageRep
 
-      print("wide", repA.pixelsWide, repB.pixelsWide)
-      print("high", repA.pixelsHigh, repB.pixelsHigh)
       guard
         repA.pixelsWide == repB.pixelsWide,
         repA.pixelsHigh == repB.pixelsHigh
@@ -33,7 +31,6 @@
       for x in 0..<repA.pixelsWide {
         for y in 0..<repA.pixelsHigh {
           if repA.colorAt(x: x, y: y) != repB.colorAt(x: x, y: y) {
-            print("PIXEL x:\(x) y:\(y) not equal!")
             return true
           }
         }
