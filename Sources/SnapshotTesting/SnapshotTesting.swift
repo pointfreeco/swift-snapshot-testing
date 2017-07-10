@@ -3,24 +3,10 @@ import XCTest
 public var diffTool: String? = nil
 public var recording = false
 
-private var snapshots: [String: [String: ()]] = [:]
-private var attached = false
-private func attach() {
-  if !attached {
-    defer { attached = true }
-    atexit {
-      let stale = snapshots.flatMap { $0.value.keys }
-      let staleList = stale.map { "  - \($0.debugDescription)" }.joined(separator: "\n")
-      print(
-        """
-
-        \(stale.count) stale snapshots:
-
-        \(staleList)
-        """
-      )
-    }
-  }
+public func record(during: () -> Void) {
+  recording = true
+  defer { recording = false }
+  during()
 }
 
 public protocol Diffable: Equatable {
@@ -122,17 +108,13 @@ public func assertSnapshot<S: Snapshot>(
   let snapshotFormat = snapshot.snapshotFormat
   let snapshotData = snapshotFormat.diffableData
 
-  attach()
-  let tracked: () -> [String: ()] = {
+  trackStaleSnapshots()
+  let tracked: () -> Set<String> = {
     try! fileManager.contentsOfDirectory(atPath: snapshotsDirectoryURL.path)
       .filter { !$0.starts(with: ".") }
-      .reduce([:]) {
-        var copy = $0
-        copy[snapshotsDirectoryURL.appendingPathComponent($1).path] = ()
-        return copy
-    }
+      .reduce([]) { $0.union([snapshotsDirectoryURL.appendingPathComponent($1).path]) }
   }
-  snapshots[filePath, default: tracked()][snapshotFileURL.path] = nil
+  trackedSnapshots[filePath, default: tracked()].remove(snapshotFileURL.path)
 
   guard !recording, fileManager.fileExists(atPath: snapshotFileURL.path) else {
     try! snapshotData.write(to: snapshotFileURL)
@@ -195,8 +177,26 @@ public func assertSnapshot<S: Encodable>(
   )
 }
 
-public func record(during: () -> Void) {
-  recording = true
-  defer { recording = false }
-  during()
+private var trackedSnapshots: [String: Set<String>] = [:]
+private var trackingStaleSnapshots = false
+
+private func trackStaleSnapshots() {
+  if !trackingStaleSnapshots {
+    defer { trackingStaleSnapshots = true }
+    atexit {
+      let stale = trackedSnapshots.flatMap { $0.value }
+      let staleCount = stale.count
+      let staleList = stale.map { "  - \($0.debugDescription)" }.sorted().joined(separator: "\n")
+      print(
+        """
+
+        Found \(staleCount) stale snapshot\(staleCount == 1 ? "" : "s"):
+
+        \(staleList)
+
+
+        """
+      )
+    }
+  }
 }
