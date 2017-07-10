@@ -1,6 +1,11 @@
 machine:
   xcode:
     version: "9.0"
+  environment:
+    SNAPSHOT_ARTIFACTS: $CIRCLE_ARTIFACTS
 test:
+  pre:
+    - swift package generate-xcodeproj
   override:
-    - swift package generate-xcodeproj && xcodebuild test -scheme SnapshotTesting-Package -destination platform="iOS Simulator,name=iPhone 7,OS=11.0"
+    - xcodebuild test -scheme SnapshotTesting-Package -destination platform="iOS Simulator,name=iPhone 7,OS=11.0"
+    - xcodebuild test -scheme SnapshotTesting-Package -destination platform="macOS"

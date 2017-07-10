@@ -27,7 +27,14 @@ public protocol Diffable: Equatable {
   static var diffableFileExtension: String? { get }
   static func fromDiffableData(_ data: Data) -> Self
   var diffableData: Data { get }
-  func diff(comparing other: Data) -> XCTAttachment?
+  func diff(from other: Self) -> Bool
+  func diff(with other: Self) -> [XCTAttachment]
+}
+
+extension Diffable {
+  public func diff(from other: Self) -> Bool {
+    return self.diffableData != other.diffableData
+  }
 }
 
 public protocol Snapshot {
@@ -55,8 +62,8 @@ extension Data: Diffable {
     return self
   }
 
-  public func diff(comparing other: Data) -> XCTAttachment? {
-    return nil
+  public func diff(with other: Data) -> [XCTAttachment] {
+    return []
   }
 }
 
@@ -79,8 +86,8 @@ extension String: Diffable {
     return self.data(using: .utf8)!
   }
 
-  public func diff(comparing other: Data) -> XCTAttachment? {
-    return nil
+  public func diff(with other: String) -> [XCTAttachment] {
+    return []
   }
 }
 
@@ -134,9 +141,10 @@ public func assertSnapshot<S: Snapshot>(
   }
 
   let existingData = try! Data(contentsOf: snapshotFileURL)
-
-  guard existingData == snapshotData else {
-    let failedSnapshotFileURL = URL(fileURLWithPath: NSTemporaryDirectory())
+  let existingFormat = S.Format.fromDiffableData(existingData)
+  guard !snapshotFormat.diff(from: existingFormat) else {
+    let artifactsPath = ProcessInfo.processInfo.environment["SNAPSHOT_ARTIFACTS"] ?? NSTemporaryDirectory()
+    let failedSnapshotFileURL = URL(fileURLWithPath: artifactsPath)
       .appendingPathComponent(snapshotFileName)
     try! snapshotData.write(to: failedSnapshotFileURL)
 
@@ -151,12 +159,15 @@ public func assertSnapshot<S: Snapshot>(
       }
       ?? baseMessage
 
-    let existingFormat = S.Format.fromDiffableData(existingData)
     XCTAssertEqual(existingFormat, snapshotFormat, message, file: file, line: line)
-
-    if let attachment = snapshotFormat.diff(comparing: existingData) {
-      attachment.lifetime = .deleteOnSuccess
-      XCTContext.runActivity(named: "Attached failure diff") { activity in activity.add(attachment) }
+    let attachments = snapshotFormat.diff(with: existingFormat)
+    if !attachments.isEmpty {
+      XCTContext.runActivity(named: "Attached failure diff") { activity in
+        for attachment in attachments {
+          attachment.lifetime = .deleteOnSuccess
+          activity.add(attachment)
+        }
+      }
     }
     return
   }
