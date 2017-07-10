@@ -26,24 +26,13 @@
       let repB = other.representations[0] as! NSBitmapImageRep
 
       guard
-        repA.bitmapFormat == repB.bitmapFormat,
-        repA.bitsPerPixel == repB.bitsPerPixel,
-        repA.bitsPerSample == repB.bitsPerSample,
-        repA.bytesPerPlane == repB.bytesPerPlane,
-        repA.bytesPerRow == repB.bytesPerRow,
-        repA.hasAlpha == repB.hasAlpha,
-        repA.isOpaque == repB.isOpaque,
-        repA.isPlanar == repB.isPlanar,
-        repA.numberOfPlanes == repB.numberOfPlanes,
-        repA.samplesPerPixel == repB.samplesPerPixel,
         repA.pixelsWide == repB.pixelsWide,
         repA.pixelsHigh == repB.pixelsHigh
-        else { print("failure-1"); return true }
+        else { return true }
 
       for x in 0..<repA.pixelsWide {
         for y in 0..<repA.pixelsHigh {
           if repA.colorAt(x: x, y: y) != repB.colorAt(x: x, y: y) {
-            print("failure-2");
             return true
           }
         }
