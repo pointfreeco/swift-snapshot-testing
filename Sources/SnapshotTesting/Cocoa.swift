@@ -38,11 +38,12 @@
         repA.samplesPerPixel == repB.samplesPerPixel,
         repA.pixelsWide == repB.pixelsWide,
         repA.pixelsHigh == repB.pixelsHigh
-        else { return true }
+        else { print("failure-1"); return true }
 
       for x in 0..<repA.pixelsWide {
         for y in 0..<repA.pixelsHigh {
           if repA.colorAt(x: x, y: y) != repB.colorAt(x: x, y: y) {
+            print("failure-2");
             return true
           }
         }
