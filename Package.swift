@@ -10,11 +10,12 @@ let package = Package(
       targets: ["SnapshotTesting"]),
   ],
   dependencies: [
+    .package(url: "https://github.com/pointfreeco/swift-prelude.git", .branch("master")),
   ],
   targets: [
     .target(
       name: "SnapshotTesting",
-      dependencies: []),
+      dependencies: ["Prelude", "Either"]),
     .testTarget(
       name: "SnapshotTestingTests",
       dependencies: ["SnapshotTesting"]),

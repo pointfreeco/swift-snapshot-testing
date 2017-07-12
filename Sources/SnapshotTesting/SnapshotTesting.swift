@@ -1,12 +1,14 @@
+import Either
+import Prelude
 import XCTest
 
 public var diffTool: String? = nil
 public var recording = false
 
-public func record(during: () -> Void) {
+public func record(while body: () -> Void) {
   recording = true
   defer { recording = false }
-  during()
+  body()
 }
 
 public func assertSnapshot<S: Snapshot>(
@@ -17,36 +19,51 @@ public func assertSnapshot<S: Snapshot>(
   function: String = #function,
   line: UInt = #line)
 {
-  let filePath = "\(file)"
-  let testFileURL = URL(fileURLWithPath: filePath)
-  let snapshotsDirectoryURL = testFileURL.deletingLastPathComponent()
-    .appendingPathComponent("__Snapshots__")
+  let testFileURL = file |> String.init >>> URL.init(fileURLWithPath:)
 
-  let fileManager = FileManager.default
-  try! fileManager
-    .createDirectory(at: snapshotsDirectoryURL, withIntermediateDirectories: true, attributes: nil)
+  let snapshotsDirectoryURL = testFileURL
+    |> deletingLastPathComponent >>> appendingPathComponent("__Snapshots__")
 
-  let snapshotFileName = testFileURL.deletingPathExtension().lastPathComponent
-    + ".\(function.dropLast(2))"
-    + (identifier.map { ".\($0)" } ?? "")
-    + ((pathExtension ?? S.snapshotFileExtension).map { ".\($0)" } ?? "")
-  let snapshotFileURL = snapshotsDirectoryURL.appendingPathComponent(snapshotFileName)
+  let dotPrefix: (String?) -> String = { "." + $0 } |> optional("")
+
+  let snapshotFileName = [
+    testFileURL |> deletingPathExtension >>> get(\.lastPathComponent),
+    function |> dropLast(2) >>> String.init,
+    identifier |> dotPrefix,
+    (pathExtension ?? S.snapshotFileExtension) |> dotPrefix
+  ].joined()
+
+  let snapshotFileURL = snapshotsDirectoryURL |> appendingPathComponent(snapshotFileName)
+
+
+  // IO: create snapshots dir
+  let io = createDirectory(snapshotsDirectoryURL)
+    .flatMap(either(pure <<< Either.left)(const <<< contentsOfDirectory <| snapshotsDirectoryURL))
+
+  try! io.perform().unwrap()
+  // IO
   let snapshotFormat = snapshot.snapshotFormat
   let snapshotData = snapshotFormat.diffableData
 
+  snapshotFileURL |> get(\.path) >>> fileExists
+  snapshotData |> write(to: snapshotFileURL)
+//  guard !recording, FileManager.default.fileExists(atPath: snapshotFileURL.path) else {
+//    try! snapshotData.write(to: snapshotFileURL)
+//    XCTAssert(!recording, "Recorded \"\(snapshotFileURL.path)\"", file: file, line: line)
+//    return
+//  }
+
+  snapshotsDirectoryURL |> contentsOfDirectory
+
   trackStaleSnapshots()
   let tracked: () -> Set<String> = {
-    try! fileManager.contentsOfDirectory(atPath: snapshotsDirectoryURL.path)
+    try! FileManager.default.contentsOfDirectory(atPath: snapshotsDirectoryURL.path)
       .filter { !$0.starts(with: ".") }
       .reduce([]) { $0.union([snapshotsDirectoryURL.appendingPathComponent($1).path]) }
   }
-  trackedSnapshots[filePath, default: tracked()].remove(snapshotFileURL.path)
+  trackedSnapshots[testFileURL, default: tracked()].remove(snapshotFileURL.path)
 
-  guard !recording, fileManager.fileExists(atPath: snapshotFileURL.path) else {
-    try! snapshotData.write(to: snapshotFileURL)
-    XCTAssert(!recording, "Recorded \"\(snapshotFileURL.path)\"", file: file, line: line)
-    return
-  }
+  snapshotFileURL |> contentsOf
 
   let existingData = try! Data(contentsOf: snapshotFileURL)
   let existingFormat = S.Format.fromDiffableData(existingData)
@@ -103,7 +120,7 @@ public func assertSnapshot<S: Encodable>(
   )
 }
 
-private var trackedSnapshots: [String: Set<String>] = [:]
+private var trackedSnapshots: [URL: Set<String>] = [:]
 private var trackingStaleSnapshots = false
 
 private func trackStaleSnapshots() {
