@@ -31,4 +31,11 @@ class SnapshotTestingTests: XCTestCase {
     }
     assertSnapshot(encoding: User(id: 1, name: "Blob"))
   }
+
+  func testUrlRequest() {
+    var request = URLRequest(url: URL(string: "https://pointfree.co")!)
+    request.addValue("text/html", forHTTPHeaderField: "Content-Type")
+
+    assertSnapshot(matching: request)
+  }
 }
