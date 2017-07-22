@@ -104,7 +104,7 @@ public func assertSnapshot<S: Encodable>(
 }
 
 public func assertSnapshot(
-  any snapshot: Any,
+  matching snapshot: Any,
   identifier: String? = nil,
   file: StaticString = #file,
   function: String = #function,
