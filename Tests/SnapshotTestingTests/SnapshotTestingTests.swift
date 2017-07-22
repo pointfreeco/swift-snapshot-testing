@@ -31,4 +31,10 @@ class SnapshotTestingTests: XCTestCase {
     }
     assertSnapshot(encoding: User(id: 1, name: "Blob"))
   }
+
+  func testWithAny() {
+    struct User { let id: Int, name: String, bio: String }
+    let user = User.init(id: 1, name: "Blob", bio: "Blobbed around the world.")
+    assertSnapshot(matching: user)
+  }
 }
