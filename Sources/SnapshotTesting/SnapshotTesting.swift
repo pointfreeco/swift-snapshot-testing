@@ -103,6 +103,26 @@ public func assertSnapshot<S: Encodable>(
   )
 }
 
+public func assertSnapshot(
+  matching snapshot: Any,
+  identifier: String? = nil,
+  file: StaticString = #file,
+  function: String = #function,
+  line: UInt = #line)
+{
+  var string = ""
+  dump(snapshot, to: &string)
+
+  assertSnapshot(
+    matching: string,
+    identifier: identifier,
+    pathExtension: "txt",
+    file: file,
+    function: function,
+    line: line
+  )
+}
+
 private var trackedSnapshots: [String: Set<String>] = [:]
 private var trackingStaleSnapshots = false
 
