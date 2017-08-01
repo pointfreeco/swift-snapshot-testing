@@ -3,10 +3,6 @@ import SnapshotTesting
 import XCTest
 
 class SceneKitTests: XCTestCase {
-//  override func setUp() {
-//    super.setUp()
-//    recording = true
-//  }
   func testScene() {
     let scene = SCNScene()
 
