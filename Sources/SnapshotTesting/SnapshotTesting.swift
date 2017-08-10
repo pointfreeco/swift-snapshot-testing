@@ -39,12 +39,19 @@ public func assertSnapshot<S: Snapshot>(
   function: String = #function,
   line: UInt = #line)
 {
-  let snapshotDirectoryUrl = URL(fileURLWithPath: "\(file)")
-    .deletingPathExtension()
+  let snapshotDirectoryUrl: URL = {
+    let fileUrl = URL(fileURLWithPath: "\(file)")
+    let directoryUrl = fileUrl.deletingLastPathComponent()
+    return directoryUrl
+      .appendingPathComponent("__Snapshots__")
+      .appendingPathComponent(fileUrl.deletingPathExtension().lastPathComponent)
+  }()
 
-  let testIdentifier = "\(snapshotDirectoryUrl):\(function)"
-  counter[testIdentifier, default: 0] += 1
-  let testName = "\(function.dropLast(2)).\(counter[testIdentifier]!)"
+  let testName: String = {
+    let testIdentifier = "\(snapshotDirectoryUrl):\(function)"
+    counter[testIdentifier, default: 0] += 1
+    return "\(function.dropLast(2)).\(counter[testIdentifier]!)"
+  }()
 
   let snapshotFileUrl = snapshotDirectoryUrl
     .appendingPathComponent(name.map { "\(testName).\($0)" } ?? testName)

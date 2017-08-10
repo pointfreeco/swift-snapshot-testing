@@ -26,7 +26,7 @@ class SnapshotTestingTests: XCTestCase {
 
   func testWithAny() {
     struct User { let id: Int, name: String, bio: String }
-    let user = User(id: 1, name: "Blob", bio: "Blobbed around the world.")
+    let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
     assertSnapshot(matching: user)
   }
 
