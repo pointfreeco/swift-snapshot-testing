@@ -33,4 +33,9 @@ class SnapshotTestingTests: XCTestCase {
   func testWithNSObject() {
     assertSnapshot(matching: NSObject())
   }
+
+  func testMultipleSnapshots() {
+    assertSnapshot(matching: [1])
+    assertSnapshot(matching: [1, 2])
+  }
 }
