@@ -13,8 +13,11 @@ let package = Package(
   ],
   targets: [
     .target(
-      name: "SnapshotTesting",
+      name: "Diff",
       dependencies: []),
+    .target(
+      name: "SnapshotTesting",
+      dependencies: ["Diff"]),
     .testTarget(
       name: "SnapshotTestingTests",
       dependencies: ["SnapshotTesting"]),
