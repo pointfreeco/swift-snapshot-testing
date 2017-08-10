@@ -3,46 +3,52 @@
   import XCTest
 
   extension UIImage: Diffable {
-    public static var diffableFileExtension: String? {
-      return "png"
+    public static let diffablePathExtension = String?.some("png")
+
+    public static func diffableDiff(_ fst: UIImage, _ snd: UIImage) -> (String, [XCTAttachment])? {
+      guard fst.diffableData != snd.diffableData else { return nil }
+
+      let maxSize = CGSize(
+        width: max(fst.size.width, snd.size.width),
+        height: max(fst.size.height, snd.size.height)
+      )
+
+      let reference = XCTAttachment(image: fst)
+      reference.name = "reference"
+
+      let failure = XCTAttachment(image: snd)
+      failure.name = "failure"
+
+      UIGraphicsBeginImageContextWithOptions(maxSize, true, 0)
+      defer { UIGraphicsEndImageContext() }
+      let context = UIGraphicsGetCurrentContext()!
+      fst.draw(in: .init(origin: .zero, size: fst.size))
+      context.setAlpha(0.5)
+      context.beginTransparencyLayer(auxiliaryInfo: nil)
+      snd.draw(in: .init(origin: .zero, size: snd.size))
+      context.setBlendMode(.difference)
+      context.setFillColor(UIColor.white.cgColor)
+      context.fill(.init(origin: .zero, size: maxSize))
+      context.endTransparencyLayer()
+      let image = UIGraphicsGetImageFromCurrentImageContext()!
+
+      let diff = XCTAttachment(image: image)
+      diff.name = "difference"
+
+      return ("Expected image@\(snd.size) to match image@\(fst.size)", [reference, failure, diff])
     }
 
-    public static func fromDiffableData(_ data: Data) -> Self {
-      return self.init(data: data, scale: 2.0)!
+
+    public static func fromDiffableData(_ diffableData: Data) -> Self {
+      return self.init(data: diffableData, scale: 2.0)!
     }
 
     public var diffableData: Data {
       return UIImagePNGRepresentation(self)!
     }
 
-    public func diff(with other: UIImage) -> [XCTAttachment] {
-      let maxSize = CGSize(
-        width: max(self.size.width, other.size.width),
-        height: max(self.size.height, other.size.height)
-      )
-
-      let reference = XCTAttachment(image: other)
-      reference.name = "reference"
-
-      let failure = XCTAttachment(image: self)
-      failure.name = "failure"
-
-      UIGraphicsBeginImageContextWithOptions(maxSize, true, 0)
-      defer { UIGraphicsEndImageContext() }
-      let context = UIGraphicsGetCurrentContext()!
-      self.draw(in: .init(origin: .zero, size: self.size))
-      context.setAlpha(0.5)
-      context.beginTransparencyLayer(auxiliaryInfo: nil)
-      other.draw(in: .init(origin: .zero, size: other.size))
-      context.setBlendMode(.difference)
-      context.setFillColor(UIColor.white.cgColor)
-      context.fill(.init(origin: .zero, size: self.size))
-      context.endTransparencyLayer()
-      let image = UIGraphicsGetImageFromCurrentImageContext()!
-      let diff = XCTAttachment(image: image)
-      diff.name = "difference"
-
-      return [reference, failure, diff]
+    public var diffableDescription: String? {
+      return nil
     }
   }
 
