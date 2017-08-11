@@ -27,10 +27,10 @@ class SceneKitTests: XCTestCase {
     scene.rootNode.addChildNode(omniLightNode)
 
     #if os(macOS)
-      assertSnapshot(matching: scene, identifier: "mac")
+      assertSnapshot(matching: scene, named: "mac")
     #endif
     #if os(iOS)
-      assertSnapshot(matching: scene, identifier: "ios")
+      assertSnapshot(matching: scene, named: "ios")
     #endif
   }
 }
