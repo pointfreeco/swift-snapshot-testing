@@ -8,9 +8,9 @@ class SnapshotTestingTests: XCTestCase {
       assertSnapshot(matching: view)
     }
 
-    func testWithIdentifier() {
+    func testWithName() {
       let view = UIButton(type: .infoDark)
-      assertSnapshot(matching: view, identifier: "info_dark")
+      assertSnapshot(matching: view, named: "info-dark")
     }
   #endif
 
@@ -24,17 +24,18 @@ class SnapshotTestingTests: XCTestCase {
     }
   #endif
 
-  func testWithString() {
-    struct User: Encodable {
-      let id: Int
-      let name: String
-    }
-    assertSnapshot(encoding: User(id: 1, name: "Blob"))
-  }
-
   func testWithAny() {
     struct User { let id: Int, name: String, bio: String }
-    let user = User.init(id: 1, name: "Blob", bio: "Blobbed around the world.")
+    let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
     assertSnapshot(matching: user)
+  }
+
+  func testWithNSObject() {
+    assertSnapshot(matching: NSObject())
+  }
+
+  func testMultipleSnapshots() {
+    assertSnapshot(matching: [1])
+    assertSnapshot(matching: [1, 2])
   }
 }

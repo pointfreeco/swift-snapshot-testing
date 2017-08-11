@@ -1,4 +1,4 @@
 ▿ User #1 in SnapshotTestingTests.SnapshotTestingTests.testWithAny() -> ()
   - id: 1
-  - name: "Blob"
+  - name: "Blobby"
   - bio: "Blobbed around the world."

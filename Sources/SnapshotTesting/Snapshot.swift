@@ -2,13 +2,13 @@ import Foundation
 
 public protocol Snapshot {
   associatedtype Format: Diffable
-  static var snapshotFileExtension: String? { get }
+  static var snapshotPathExtension: String? { get }
   var snapshotFormat: Format { get }
 }
 
 extension Snapshot {
-  public static var snapshotFileExtension: String? {
-    return Format.diffableFileExtension
+  public static var snapshotPathExtension: String? {
+    return Format.diffablePathExtension
   }
 }
 

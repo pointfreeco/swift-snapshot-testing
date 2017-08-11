@@ -1,148 +1,107 @@
 import XCTest
 
-public var diffTool: String? = nil
-public var recording = false
+public var record = false
 
-public func record(during: () -> Void) {
-  recording = true
-  defer { recording = false }
-  during()
+public func assertSnapshot(
+  matching any: Any,
+  named name: String? = nil,
+  pathExtension: String? = "txt",
+  record recording: Bool = SnapshotTesting.record,
+  file: StaticString = #file,
+  function: String = #function,
+  line: UInt = #line)
+{
+  let snapshot: String = {
+    var string = ""
+    dump(any, to: &string)
+    return string
+      // Scrub NSObject pointers
+      .replacingOccurrences(of: ": 0x[\\da-f]+?(?=> #\\d+)", with: "", options: .regularExpression)
+  }()
+
+  assertSnapshot(
+    matching: snapshot,
+    named: name,
+    pathExtension: pathExtension,
+    record: recording,
+    file: file,
+    function: function,
+    line: line
+  )
 }
 
 public func assertSnapshot<S: Snapshot>(
   matching snapshot: S,
-  identifier: String? = nil,
-  pathExtension: String? = nil,
+  named name: String? = nil,
+  pathExtension: String? = S.snapshotPathExtension,
+  record recording: Bool = SnapshotTesting.record,
   file: StaticString = #file,
   function: String = #function,
   line: UInt = #line)
 {
-  let filePath = "\(file)"
-  let testFileURL = URL(fileURLWithPath: filePath)
-  let snapshotsDirectoryURL = testFileURL.deletingLastPathComponent()
-    .appendingPathComponent("__Snapshots__")
+  let snapshotDirectoryUrl: URL = {
+    let fileUrl = URL(fileURLWithPath: "\(file)")
+    let directoryUrl = fileUrl.deletingLastPathComponent()
+    return directoryUrl
+      .appendingPathComponent("__Snapshots__")
+      .appendingPathComponent(fileUrl.deletingPathExtension().lastPathComponent)
+  }()
 
+  let testName: String = {
+    let testIdentifier = "\(snapshotDirectoryUrl):\(function)"
+    counter[testIdentifier, default: 0] += 1
+    return "\(function.dropLast(2)).\(counter[testIdentifier]!)"
+  }()
+
+  let snapshotFileUrl = snapshotDirectoryUrl
+    .appendingPathComponent(name.map { "\(testName).\($0)" } ?? testName)
+    .appendingPathExtension(pathExtension ?? "")
   let fileManager = FileManager.default
   try! fileManager
-    .createDirectory(at: snapshotsDirectoryURL, withIntermediateDirectories: true, attributes: nil)
+    .createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true, attributes: nil)
 
-  let snapshotFileName = testFileURL.deletingPathExtension().lastPathComponent
-    + ".\(function.dropLast(2))"
-    + (identifier.map { ".\($0)" } ?? "")
-    + ((pathExtension ?? S.snapshotFileExtension).map { ".\($0)" } ?? "")
-  let snapshotFileURL = snapshotsDirectoryURL.appendingPathComponent(snapshotFileName)
-  let snapshotFormat = snapshot.snapshotFormat
-  let snapshotData = snapshotFormat.diffableData
-
-  trackStaleSnapshots()
-  let tracked: () -> Set<String> = {
-    try! fileManager.contentsOfDirectory(atPath: snapshotsDirectoryURL.path)
-      .filter { !$0.starts(with: ".") }
-      .reduce([]) { $0.union([snapshotsDirectoryURL.appendingPathComponent($1).path]) }
-  }
-  trackedSnapshots[filePath, default: tracked()].remove(snapshotFileURL.path)
-
-  guard !recording, fileManager.fileExists(atPath: snapshotFileURL.path) else {
-    try! snapshotData.write(to: snapshotFileURL)
-    XCTAssert(!recording, "Recorded \"\(snapshotFileURL.path)\"", file: file, line: line)
-    return
+  defer {
+    staleSnapshots[snapshotDirectoryUrl, default: Set(
+      try! fileManager.contentsOfDirectory(
+        at: snapshotDirectoryUrl, includingPropertiesForKeys: nil, options: .skipsHiddenFiles
+      )
+    )].remove(snapshotFileUrl)
+    _ = trackSnapshots
   }
 
-  let existingData = try! Data(contentsOf: snapshotFileURL)
-  let existingFormat = S.Format.fromDiffableData(existingData)
-  guard !snapshotFormat.diff(from: existingFormat) else {
-    let artifactsPath = ProcessInfo.processInfo.environment["SNAPSHOT_ARTIFACTS"] ?? NSTemporaryDirectory()
-    let failedSnapshotFileURL = URL(fileURLWithPath: artifactsPath)
-      .appendingPathComponent(snapshotFileName)
-    try! snapshotData.write(to: failedSnapshotFileURL)
-
-    let baseMessage = "\(snapshotFileURL.path.debugDescription) does not match snapshot"
-    let message = diffTool
-      .map {
-        """
-        \(baseMessage)
-
-        \($0) \(snapshotFileURL.path.debugDescription) \(failedSnapshotFileURL.path.debugDescription)
-        """
-      }
-      ?? baseMessage
-
-    XCTAssertEqual(existingFormat, snapshotFormat, message, file: file, line: line)
-    let attachments = snapshotFormat.diff(with: existingFormat)
-    if !attachments.isEmpty {
-      XCTContext.runActivity(named: "Attached failure diff") { activity in
-        for attachment in attachments {
-          attachment.lifetime = .deleteOnSuccess
-          activity.add(attachment)
+  let format = snapshot.snapshotFormat
+  if !recording && fileManager.fileExists(atPath: snapshotFileUrl.path) {
+    let expected = S.Format.fromDiffableData(try! Data(contentsOf: snapshotFileUrl, options: []))
+    if let (failure, attachments) = S.Format.diffableDiff(expected, format) {
+      XCTFail(failure, file: file, line: line)
+      XCTContext.runActivity(named: "Attached Failure Diff") { activity in
+        attachments.forEach {
+          $0.lifetime = .deleteOnSuccess
+          activity.add($0)
         }
       }
     }
-    return
+  } else {
+    try! format.diffableData.write(to: snapshotFileUrl)
+    XCTFail(
+      "Recorded snapshot to \(snapshotFileUrl.path.debugDescription)"
+        + (format.diffableDescription.map { ":\n\n\($0)" } ?? ""),
+      file: file,
+      line: line
+    )
   }
 }
 
-public func assertSnapshot<S: Encodable>(
-  encoding snapshot: S,
-  identifier: String? = nil,
-  file: StaticString = #file,
-  function: String = #function,
-  line: UInt = #line)
-{
-  let encoder = JSONEncoder()
-  encoder.outputFormatting = .prettyPrinted
-  let data = try! encoder.encode(snapshot)
-  let string = String(data: data, encoding: .utf8)!
+private var counter: [String: Int] = [:]
 
-  assertSnapshot(
-    matching: string,
-    identifier: identifier,
-    pathExtension: "json",
-    file: file,
-    function: function,
-    line: line
-  )
-}
+private var staleSnapshots: [URL: Set<URL>] = [:]
 
-public func assertSnapshot(
-  matching snapshot: Any,
-  identifier: String? = nil,
-  file: StaticString = #file,
-  function: String = #function,
-  line: UInt = #line)
-{
-  var string = ""
-  dump(snapshot, to: &string)
-
-  assertSnapshot(
-    matching: string,
-    identifier: identifier,
-    pathExtension: "txt",
-    file: file,
-    function: function,
-    line: line
-  )
-}
-
-private var trackedSnapshots: [String: Set<String>] = [:]
-private var trackingStaleSnapshots = false
-
-private func trackStaleSnapshots() {
-  if !trackingStaleSnapshots {
-    defer { trackingStaleSnapshots = true }
-    atexit {
-      let stale = trackedSnapshots.flatMap { $0.value }
-      let staleCount = stale.count
-      let staleList = stale.map { "  - \($0.debugDescription)" }.sorted().joined(separator: "\n")
-      print(
-        """
-
-        Found \(staleCount) stale snapshot\(staleCount == 1 ? "" : "s"):
-
-        \(staleList)
-
-
-        """
-      )
-    }
+private var trackSnapshots = {
+  atexit {
+    let stale = staleSnapshots.flatMap { $1 }
+    let count = stale.count
+    guard count > 0 else { return }
+    let list = stale.map { "- \($0.path.debugDescription)" }.sorted().joined(separator: "\n")
+    print("Found \(count) stale snapshot\(count == 1 ? "" : "s"):\n\n\(list)")
   }
-}
+}()

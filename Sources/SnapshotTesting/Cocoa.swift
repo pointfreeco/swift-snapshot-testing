@@ -2,13 +2,63 @@
   import Cocoa
   import XCTest
 
-  extension NSImage: Diffable {
-    public static var diffableFileExtension: String? {
-      return "png"
+  private func bitmapEqual(_ lhs: NSBitmapImageRep, _ rhs: NSBitmapImageRep) -> Bool {
+    guard
+      lhs.pixelsWide == rhs.pixelsWide,
+      lhs.pixelsHigh == rhs.pixelsHigh
+      else { return false }
+
+    for x in 0..<lhs.pixelsWide {
+      for y in 0..<lhs.pixelsHigh {
+        if lhs.colorAt(x: x, y: y) != rhs.colorAt(x: x, y: y) {
+          return false
+        }
+      }
     }
 
-    public static func fromDiffableData(_ data: Data) -> Self {
-      return self.init(data: data)!
+    return true
+  }
+
+  extension NSImage: Diffable {
+    public static let diffablePathExtension = String?.some("png")
+
+    public static func diffableDiff(_ fst: NSImage, _ snd: NSImage) -> (String, [XCTAttachment])? {
+      let repA = fst.representations[0] as! NSBitmapImageRep
+      let repB = NSImage(data: snd.diffableData)!.representations[0] as! NSBitmapImageRep
+
+      guard !bitmapEqual(repA, repB) else { return nil }
+
+      let maxSize = CGSize(
+        width: max(fst.size.width, snd.size.width),
+        height: max(fst.size.height, snd.size.height)
+      )
+
+      let reference = XCTAttachment(image: fst)
+      reference.name = "reference"
+
+      let failure = XCTAttachment(image: snd)
+      failure.name = "failure"
+
+      let image = NSImage(size: maxSize)
+      image.lockFocus()
+      let context = NSGraphicsContext.current!.cgContext
+      fst.draw(in: .init(origin: .zero, size: fst.size))
+      context.setAlpha(0.5)
+      context.beginTransparencyLayer(auxiliaryInfo: nil)
+      snd.draw(in: .init(origin: .zero, size: snd.size))
+      context.setBlendMode(.difference)
+      context.fill(.init(origin: .zero, size: maxSize))
+      context.endTransparencyLayer()
+      image.unlockFocus()
+
+      let diff = XCTAttachment(image: image)
+      diff.name = "difference"
+
+      return ("Expected image@\(snd.size) to match image@\(fst.size)", [reference, failure, diff])
+    }
+
+    public static func fromDiffableData(_ diffableData: Data) -> Self {
+      return self.init(data: diffableData)!
     }
 
     public var diffableData: Data {
@@ -19,53 +69,8 @@
       return data
     }
 
-    public func diff(from other: NSImage) -> Bool {
-      let repA = NSImage(data: self.diffableData)!.representations[0] as! NSBitmapImageRep
-      let repB = other.representations[0] as! NSBitmapImageRep
-
-      guard
-        repA.pixelsWide == repB.pixelsWide,
-        repA.pixelsHigh == repB.pixelsHigh
-        else { return true }
-
-      for x in 0..<repA.pixelsWide {
-        for y in 0..<repA.pixelsHigh {
-          if repA.colorAt(x: x, y: y) != repB.colorAt(x: x, y: y) {
-            return true
-          }
-        }
-      }
-
-      return false
-    }
-
-    public func diff(with other: NSImage) -> [XCTAttachment] {
-      let maxSize = CGSize(
-        width: max(self.size.width, other.size.width),
-        height: max(self.size.height, other.size.height)
-      )
-
-      let reference = XCTAttachment(image: other)
-      reference.name = "reference"
-
-      let failure = XCTAttachment(image: self)
-      failure.name = "failure"
-
-      let image = NSImage(size: maxSize)
-      image.lockFocus()
-      let context = NSGraphicsContext.current!.cgContext
-      self.draw(in: .init(origin: .zero, size: self.size))
-      context.setAlpha(0.5)
-      context.beginTransparencyLayer(auxiliaryInfo: nil)
-      other.draw(in: .init(origin: .zero, size: other.size))
-      context.setBlendMode(.difference)
-      context.fill(.init(origin: .zero, size: self.size))
-      context.endTransparencyLayer()
-      image.unlockFocus()
-      let diff = XCTAttachment(image: image)
-      diff.name = "difference"
-
-      return [reference, failure, diff]
+    public var diffableDescription: String? {
+      return nil
     }
   }
 
