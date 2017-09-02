@@ -44,15 +44,15 @@ private let plus = "+"
 private let figureSpace = "\u{2007}"
 
 public struct Hunk {
-  public fileprivate(set) var fstIdx: Int = 1
+  public fileprivate(set) var fstIdx: Int = 0
   public fileprivate(set) var fstLen: Int = 0
-  public fileprivate(set) var sndIdx: Int = 1
+  public fileprivate(set) var sndIdx: Int = 0
   public fileprivate(set) var sndLen: Int = 0
   public fileprivate(set) var lines: [String] = []
 
   public var patchMark: String {
-    let fstMark = "\(minus)\(fstIdx),\(fstLen)"
-    let sndMark = "\(plus)\(sndIdx),\(sndLen)"
+    let fstMark = "\(minus)\(fstIdx + 1),\(fstLen)"
+    let sndMark = "\(plus)\(sndIdx + 1),\(sndLen)"
     return "@@ \(fstMark) \(sndMark) @@"
   }
 }
