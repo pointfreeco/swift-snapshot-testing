@@ -38,20 +38,10 @@ extension String: Diffable {
   public static func diffableDiff(_ fst: String, _ snd: String) -> (String, [XCTAttachment])? {
     guard fst != snd else { return nil }
 
-    let failure = diff(fst.split(separator: "\n"), snd.split(separator: "\n"))
-      .map {
-        switch $0 {
-        case let .fst(line):
-          return "− \(line)"
-        case let .snd(line):
-          return "+ \(line)"
-        case let .tup(line, _):
-          return "\u{2007} \(line)" // figure space
-        }
-      }
-      .joined(separator: "\n")
+    let hunks = chunk(diff: diff(fst.split(separator: "\n"), snd.split(separator: "\n")))
+    let failure = hunks.flatMap { [$0.patchMark] + $0.lines }.joined(separator: "\n")
 
-    return ("Diff:\n\n\(failure)", [.init(string: failure)])
+    return ("Diff: …\n\n\(failure)", [.init(string: failure)])
   }
 
   public static func fromDiffableData(_ diffableData: Data) -> String {
