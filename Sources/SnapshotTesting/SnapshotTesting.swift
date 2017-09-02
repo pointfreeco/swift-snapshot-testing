@@ -57,8 +57,7 @@ public func assertSnapshot<S: Snapshot>(
     .appendingPathComponent(name.map { "\(testName).\($0)" } ?? testName)
     .appendingPathExtension(pathExtension ?? "")
   let fileManager = FileManager.default
-  try! fileManager
-    .createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true, attributes: nil)
+  try! fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
 
   defer {
     staleSnapshots[snapshotDirectoryUrl, default: Set(
@@ -71,13 +70,15 @@ public func assertSnapshot<S: Snapshot>(
 
   let format = snapshot.snapshotFormat
   if !recording && fileManager.fileExists(atPath: snapshotFileUrl.path) {
-    let expected = S.Format.fromDiffableData(try! Data(contentsOf: snapshotFileUrl, options: []))
-    if let (failure, attachments) = S.Format.diffableDiff(expected, format) {
+    let reference = S.Format.fromDiffableData(try! Data(contentsOf: snapshotFileUrl))
+    if let (failure, attachments) = S.Format.diffableDiff(reference, format) {
       XCTFail(failure, file: file, line: line)
-      XCTContext.runActivity(named: "Attached Failure Diff") { activity in
-        attachments.forEach {
-          $0.lifetime = .deleteOnSuccess
-          activity.add($0)
+      if !attachments.isEmpty {
+        XCTContext.runActivity(named: "Attached Failure Diff") { activity in
+          attachments.forEach {
+            $0.lifetime = .deleteOnSuccess
+            activity.add($0)
+          }
         }
       }
     }
@@ -92,10 +93,14 @@ public func assertSnapshot<S: Snapshot>(
   }
 }
 
+/// Coeffect: global mutable state tracking the number of snapshots per test.
 private var counter: [String: Int] = [:]
 
+/// Coeffect: global mutable state tracking stale snapshots.
 private var staleSnapshots: [URL: Set<URL>] = [:]
 
+/// Prepares an `atexit` hook to print a list of any stale snapshots (those that were detected in
+/// `__Snapshots__` directories but were not used in any assertions).
 private var trackSnapshots = {
   atexit {
     let stale = staleSnapshots.flatMap { $1 }
