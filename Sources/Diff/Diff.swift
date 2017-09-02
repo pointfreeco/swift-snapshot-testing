@@ -59,7 +59,7 @@ public struct Hunk {
 
 public func chunk<S: StringProtocol>(diff diffs: [Diff<S>], context ctx: Int = 4) -> [Hunk] {
   func prepending<S: StringProtocol>(_ prefix: String) -> (S) -> String {
-    return { prefix + $0 }
+    return { prefix + $0 + ($0.hasSuffix(" ") ? "¬" : "") }
   }
 
   let (hunk, hunks) = diffs
