@@ -38,7 +38,10 @@ extension String: Diffable {
   public static func diffableDiff(_ fst: String, _ snd: String) -> (String, [XCTAttachment])? {
     guard fst != snd else { return nil }
 
-    let hunks = chunk(diff: diff(fst.split(separator: "\n"), snd.split(separator: "\n")))
+    let hunks = chunk(diff: diff(
+      fst.split(separator: "\n", omittingEmptySubsequences: false),
+      snd.split(separator: "\n", omittingEmptySubsequences: false)
+    ))
     let failure = hunks.flatMap { [$0.patchMark] + $0.lines }.joined(separator: "\n")
 
     return ("Diff: …\n\n\(failure)", [.init(string: failure)])

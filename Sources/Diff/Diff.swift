@@ -44,16 +44,42 @@ private let plus = "+"
 private let figureSpace = "\u{2007}"
 
 public struct Hunk {
-  public fileprivate(set) var fstIdx: Int = 0
-  public fileprivate(set) var fstLen: Int = 0
-  public fileprivate(set) var sndIdx: Int = 0
-  public fileprivate(set) var sndLen: Int = 0
-  public fileprivate(set) var lines: [String] = []
+  public let fstIdx: Int
+  public let fstLen: Int
+  public let sndIdx: Int
+  public let sndLen: Int
+  public let lines: [String]
 
   public var patchMark: String {
     let fstMark = "\(minus)\(fstIdx + 1),\(fstLen)"
     let sndMark = "\(plus)\(sndIdx + 1),\(sndLen)"
     return "@@ \(fstMark) \(sndMark) @@"
+  }
+
+  // Semigroup
+
+  public static func +(lhs: Hunk, rhs: Hunk) -> Hunk {
+    return Hunk(
+      fstIdx: lhs.fstIdx + rhs.fstIdx,
+      fstLen: lhs.fstLen + rhs.fstLen,
+      sndIdx: lhs.sndIdx + rhs.sndIdx,
+      sndLen: lhs.sndLen + rhs.sndLen,
+      lines: lhs.lines + rhs.lines
+    )
+  }
+
+  // Monoid
+
+  public init(fstIdx: Int = 0, fstLen: Int = 0, sndIdx: Int = 0, sndLen: Int = 0, lines: [String] = []) {
+    self.fstIdx = fstIdx
+    self.fstLen = fstLen
+    self.sndIdx = sndIdx
+    self.sndLen = sndLen
+    self.lines = lines
+  }
+
+  public init(idx: Int = 0, len: Int = 0, lines: [String] = []) {
+    self.init(fstIdx: idx, fstLen: len, sndIdx: idx, sndLen: len, lines: lines)
   }
 }
 
@@ -61,53 +87,36 @@ public func chunk<S: StringProtocol>(diff diffs: [Diff<S>], context ctx: Int = 4
   func prepending(_ prefix: String) -> (S) -> String {
     return { prefix + $0 + ($0.hasSuffix(" ") ? "¬" : "") }
   }
+  let changed: (Hunk) -> Bool = { $0.lines.contains(where: { $0.hasPrefix(minus) || $0.hasPrefix(plus) }) }
 
   let (hunk, hunks) = diffs
     .reduce((current: Hunk(), hunks: [Hunk]())) { cursor, diff in
-      var (current, hunks) = cursor
+      let (current, hunks) = cursor
       let len = diff.elements.count
 
       switch diff.type {
+      case .both where len > ctx * 2:
+        let hunk = current + Hunk(len: ctx, lines: diff.elements.prefix(ctx).map(prepending(figureSpace)))
+        let next = Hunk(
+          fstIdx: current.fstIdx + current.fstLen + len - ctx,
+          fstLen: ctx,
+          sndIdx: current.sndIdx + current.sndLen + len - ctx,
+          sndLen: ctx,
+          lines: (diff.elements.suffix(ctx) as ArraySlice<S>).map(prepending(figureSpace))
+        )
+        return (next, changed(hunk) ? hunks + [hunk] : hunks)
+      case .both where current.lines.isEmpty:
+        let lines = (diff.elements.suffix(ctx) as ArraySlice<S>).map(prepending(figureSpace))
+        let count = lines.count
+        return (current + Hunk(idx: len - count, len: count, lines: lines), hunks)
       case .both:
-        if len > ctx * 2 {
-          current.fstLen += ctx
-          current.sndLen += ctx
-          current.lines.append(contentsOf: diff.elements.prefix(ctx).map(prepending(figureSpace)))
-          if current.lines.contains(where: { $0.hasPrefix(minus) || $0.hasPrefix(plus) }) {
-            hunks.append(current)
-          }
-
-          current.fstIdx += len + 1
-          current.fstLen = ctx
-          current.sndIdx += len + 1
-          current.sndLen = ctx
-          current.lines = (diff.elements.suffix(ctx) as ArraySlice<S>).map(prepending(figureSpace))
-        } else if current.lines.isEmpty {
-          let lines = (diff.elements.suffix(ctx) as ArraySlice<S>).map(prepending(figureSpace))
-          let count = lines.count
-          current.fstIdx += len - count
-          current.fstLen += count
-          current.sndIdx += len - count
-          current.sndLen += count
-          current.lines.append(contentsOf: lines)
-        } else {
-          current.fstLen += len
-          current.sndLen += len
-          current.lines.append(contentsOf: diff.elements.map(prepending(figureSpace)))
-        }
-        return (current, hunks)
+        return (current + Hunk(len: len, lines: diff.elements.map(prepending(figureSpace))), hunks)
       case .first:
-        current.fstLen += len
-        current.lines.append(contentsOf: diff.elements.map(prepending(minus)))
+        return (current + Hunk(fstLen: len, lines: diff.elements.map(prepending(minus))), hunks)
       case .second:
-        current.sndLen += len
-        current.lines.append(contentsOf: diff.elements.map(prepending(plus)))
+        return (current + Hunk(sndLen: len, lines: diff.elements.map(prepending(plus))), hunks)
       }
-
-      return (current, hunks)
   }
 
-  return hunk.lines.contains(where: { $0.hasPrefix(minus) || $0.hasPrefix(plus) })
-    ? hunks + [hunk]
-    : hunks
+  return changed(hunk) ? hunks + [hunk] : hunks
 }
