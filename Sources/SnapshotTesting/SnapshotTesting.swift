@@ -106,7 +106,7 @@ private var trackSnapshots = {
     let stale = staleSnapshots.flatMap { $1 }
     let count = stale.count
     guard count > 0 else { return }
-    let list = stale.map { "- \($0.path.debugDescription)" }.sorted().joined(separator: "\n")
+    let list = stale.map { "  \($0.path.debugDescription)" }.sorted().joined(separator: " \\\n")
     print("Found \(count) stale snapshot\(count == 1 ? "" : "s"):\n\n\(list)")
   }
 }()
