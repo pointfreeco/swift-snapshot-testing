@@ -103,4 +103,4 @@ The above will write to an image on disk. If that image ever renders differently
 
 ## License
 
-All modules are released under the MIT license. See [LICENSE](LICENSE) for details.
+This library is released under the MIT license. See [LICENSE](LICENSE) for details.
