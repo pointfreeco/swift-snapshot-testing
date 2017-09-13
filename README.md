@@ -24,7 +24,7 @@ let package = Package(
 
 ## Usage
 
-Snapshot Testing provides an `assertSnapshot` function, which records data structures as text or image accordingly.
+Snapshot Testing provides an `assertSnapshot` function, which records data structures as text or images accordingly.
 
 Here's how you might test a URL request you've prepared for your app's API client:
 
@@ -70,7 +70,7 @@ The above will render as the following text to `__Snapshots__/ApiServiceTests/te
   - httpShouldUsePipelining: false
 ```
 
-Renderable data will write as an image. This includes `UIImage` and `NSImage`, but also data that is typically viewed visually, like `UIView` and `NSView`.
+Renderable data will write as an image. This includes `UIImage`s and `NSImage`s, but also data that is typically viewed visually, like `UIView`s and `NSView`s.
 
 Given a view:
 
@@ -89,7 +89,7 @@ class HomepageTests: XCTestCase {
 }
 ```
 
-The above will render to an image on disk. If it ever renders differently in the future, the test will fail and produce a diff for inspection.
+The above will write to an image on disk. If that image ever renders differently in the future, the assertion will fail and produce a diff for inspection.
 
 ![A screen shot failure.](.github/kaleidoscope-diff.png)
 
