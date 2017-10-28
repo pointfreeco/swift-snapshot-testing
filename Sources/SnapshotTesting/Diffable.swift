@@ -48,11 +48,11 @@ extension String: Diffable {
   }
 
   public static func fromDiffableData(_ diffableData: Data) -> String {
-    return String(data: diffableData, encoding: .utf8)!
+    return String(decoding: diffableData, as: UTF8.self)
   }
 
   public var diffableData: Data {
-    return self.data(using: .utf8)!
+    return Data(self.utf8)
   }
 
   public var diffableDescription: String? {
