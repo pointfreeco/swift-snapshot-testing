@@ -7,5 +7,5 @@ test:
   pre:
     - swift package generate-xcodeproj
   override:
-    - xcodebuild test -scheme SnapshotTesting-Package -destination platform="iOS Simulator,name=iPhone 7,OS=11.0"
+    - xcodebuild test -scheme SnapshotTesting-Package -destination platform="iOS Simulator,name=iPhone 8,OS=11.0.1"
     - xcodebuild test -scheme SnapshotTesting-Package -destination platform="macOS"
