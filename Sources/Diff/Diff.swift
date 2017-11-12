@@ -9,10 +9,6 @@ public enum DiffType {
 public struct Diff<A> {
   public let type: DiffType
   public let elements: [A]
-
-  public func map<B>(_ f: (A) -> B) -> Diff<B> {
-    return .init(type: self.type, elements: self.elements.map(f))
-  }
 }
 
 public func diff<A: Hashable>(_ fst: [A], _ snd: [A]) -> [Diff<A>] {
