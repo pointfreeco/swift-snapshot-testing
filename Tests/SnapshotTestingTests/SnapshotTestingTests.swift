@@ -41,13 +41,13 @@ class SnapshotTestingTests: XCTestCase {
 }
 
 #if os(Linux)
-extension SnapshotTestingTests {
-	static var allTests : [(String, (SnapshotTestingTests) -> () throws -> Void)] {
-		return [
-      ("testWithAny", testWithAny),
-      ("testWithNSObject", testWithNSObject),
-      ("testMultipleSnapshots", testMultipleSnapshots),
-		]
-	}
-}
+  extension SnapshotTestingTests {
+    static var allTests : [(String, (SnapshotTestingTests) -> () throws -> Void)] {
+      return [
+        ("testWithAny", testWithAny),
+        ("testWithNSObject", testWithNSObject),
+        ("testMultipleSnapshots", testMultipleSnapshots),
+      ]
+    }
+  }
 #endif
