@@ -3,9 +3,9 @@ import Foundation
 import XCTest
 
 #if os(Linux)
-  struct XCTAttachment {}
+  public struct XCTAttachment {}
   extension XCTAttachment {
-    init(string: String) {
+    public init(string: String) {
     }
   }
 #endif
