@@ -39,8 +39,8 @@ extension String: Diffable {
     guard fst != snd else { return nil }
 
     let hunks = chunk(diff: diff(
-      fst.split(separator: "\n", omittingEmptySubsequences: false).map(String.init),
-      snd.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
+      fst.split(separator: "\n", omittingEmptySubsequences: false),
+      snd.split(separator: "\n", omittingEmptySubsequences: false)
     ))
     let failure = hunks.flatMap { [$0.patchMark] + $0.lines }.joined(separator: "\n")
 
