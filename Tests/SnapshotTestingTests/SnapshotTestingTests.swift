@@ -39,3 +39,15 @@ class SnapshotTestingTests: XCTestCase {
     assertSnapshot(matching: [1, 2])
   }
 }
+
+#if os(Linux)
+extension TodoTests {
+	static var allTests : [(String, TodoTests -> () throws -> Void)] {
+		return [
+      ("testWithAny", testWithAny),
+      ("testWithNSObject", testWithNSObject),
+      ("testMultipleSnapshots", testMultipleSnapshots),
+		]
+	}
+}
+#endif
