@@ -58,7 +58,7 @@ public func assertSnapshot<S: Snapshot>(
     .appendingPathExtension(pathExtension ?? "")
   let fileManager = FileManager.default
   try! fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
-  
+
   defer {
     // NB: Linux doesn't have file manager enumeration capabilities, so we skip this work on Linux.
     #if !os(Linux)
