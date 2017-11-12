@@ -42,7 +42,7 @@ class SnapshotTestingTests: XCTestCase {
 
 #if os(Linux)
 extension SnapshotTestingTests {
-	static var allTests : [(String, TodoTests -> () throws -> Void)] {
+	static var allTests : [(String, SnapshotTestingTests -> () throws -> Void)] {
 		return [
       ("testWithAny", testWithAny),
       ("testWithNSObject", testWithNSObject),
