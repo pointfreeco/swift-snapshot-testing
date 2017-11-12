@@ -1,3 +1,5 @@
+import Foundation
+
 public enum DiffType {
   case first
   case second
@@ -83,8 +85,8 @@ public struct Hunk {
   }
 }
 
-public func chunk<S: StringProtocol>(diff diffs: [Diff<S>], context ctx: Int = 4) -> [Hunk] {
-  func prepending(_ prefix: String) -> (S) -> String {
+public func chunk(diff diffs: [Diff<String>], context ctx: Int = 4) -> [Hunk] {
+  func prepending(_ prefix: String) -> (String) -> String {
     return { prefix + $0 + ($0.hasSuffix(" ") ? "¬" : "") }
   }
   let changed: (Hunk) -> Bool = { $0.lines.contains(where: { $0.hasPrefix(minus) || $0.hasPrefix(plus) }) }
@@ -102,11 +104,11 @@ public func chunk<S: StringProtocol>(diff diffs: [Diff<S>], context ctx: Int = 4
           fstLen: ctx,
           sndIdx: current.sndIdx + current.sndLen + len - ctx,
           sndLen: ctx,
-          lines: (diff.elements.suffix(ctx) as ArraySlice<S>).map(prepending(figureSpace))
+          lines: (diff.elements.suffix(ctx) as ArraySlice<String>).map(prepending(figureSpace))
         )
         return (next, changed(hunk) ? hunks + [hunk] : hunks)
       case .both where current.lines.isEmpty:
-        let lines = (diff.elements.suffix(ctx) as ArraySlice<S>).map(prepending(figureSpace))
+        let lines = (diff.elements.suffix(ctx) as ArraySlice<String>).map(prepending(figureSpace))
         let count = lines.count
         return (current + Hunk(idx: len - count, len: count, lines: lines), hunks)
       case .both:

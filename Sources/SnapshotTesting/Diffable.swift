@@ -2,6 +2,15 @@ import Diff
 import Foundation
 import XCTest
 
+#if os(Linux)
+  // NB: Linux doesn't have XCTAttachment, so stubbing out the minimal interface.
+  public struct XCTAttachment {}
+  extension XCTAttachment {
+    public init(string: String) {
+    }
+  }
+#endif
+
 public protocol Diffable {
   static var diffablePathExtension: String? { get }
   static func diffableDiff(_ fst: Self, _ snd: Self) -> (String, [XCTAttachment])?
@@ -39,8 +48,8 @@ extension String: Diffable {
     guard fst != snd else { return nil }
 
     let hunks = chunk(diff: diff(
-      fst.split(separator: "\n", omittingEmptySubsequences: false),
-      snd.split(separator: "\n", omittingEmptySubsequences: false)
+      fst.split(separator: "\n", omittingEmptySubsequences: false).map(String.init),
+      snd.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
     ))
     let failure = hunks.flatMap { [$0.patchMark] + $0.lines }.joined(separator: "\n")
 

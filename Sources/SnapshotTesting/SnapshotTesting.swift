@@ -48,7 +48,7 @@ public func assertSnapshot<S: Snapshot>(
   }()
 
   let testName: String = {
-    let testIdentifier = "\(snapshotDirectoryUrl):\(function)"
+    let testIdentifier = "\(snapshotDirectoryUrl.absoluteString):\(function)"
     counter[testIdentifier, default: 0] += 1
     return "\(function.dropLast(2)).\(counter[testIdentifier]!)"
   }()
@@ -60,26 +60,32 @@ public func assertSnapshot<S: Snapshot>(
   try! fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
 
   defer {
-    staleSnapshots[snapshotDirectoryUrl, default: Set(
-      try! fileManager.contentsOfDirectory(
-        at: snapshotDirectoryUrl, includingPropertiesForKeys: nil, options: .skipsHiddenFiles
-      )
-    )].remove(snapshotFileUrl)
-    _ = trackSnapshots
+    // NB: Linux doesn't have file manager enumeration capabilities, so we skip this work on Linux.
+    #if !os(Linux)
+      staleSnapshots[snapshotDirectoryUrl, default: Set(
+        try! fileManager.contentsOfDirectory(
+          at: snapshotDirectoryUrl, includingPropertiesForKeys: nil, options: .skipsHiddenFiles
+        )
+      )].remove(snapshotFileUrl)
+      _ = trackSnapshots
+    #endif
   }
-
+  
   let format = snapshot.snapshotFormat
   if !recording && fileManager.fileExists(atPath: snapshotFileUrl.path) {
     let reference = S.Format.fromDiffableData(try! Data(contentsOf: snapshotFileUrl))
     if let (failure, attachments) = S.Format.diffableDiff(reference, format) {
       XCTFail(failure, file: file, line: line)
       if !attachments.isEmpty {
-        XCTContext.runActivity(named: "Attached Failure Diff") { activity in
-          attachments.forEach {
-            $0.lifetime = .deleteOnSuccess
-            activity.add($0)
+        // NB: Linux doesn't have XCTAttachment, and we don't even need it, so can skip all of this work.
+        #if !os(Linux)
+          XCTContext.runActivity(named: "Attached Failure Diff") { activity in
+            attachments.forEach {
+              $0.lifetime = .deleteOnSuccess
+              activity.add($0)
+            }
           }
-        }
+        #endif
       }
     }
   } else {

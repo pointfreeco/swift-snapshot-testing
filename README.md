@@ -1,4 +1,6 @@
-# swift-snapshot-testing [![CircleCI](https://circleci.com/gh/pointfreeco/swift-snapshot-testing.svg?style=svg)](https://circleci.com/gh/pointfreeco/swift-snapshot-testing)
+# swift-snapshot-testing
+
+macOS [![CircleCI](https://circleci.com/gh/pointfreeco/swift-snapshot-testing.svg?style=svg)](https://circleci.com/gh/pointfreeco/swift-snapshot-testing) Linux [![Build Status](https://travis-ci.org/pointfreeco/swift-snapshot-testing.svg?branch=master)](https://travis-ci.org/pointfreeco/swift-snapshot-testing)
 
 A library that records app data into test assertions. Because snapshot tests can capture the entirety of a data structure, they can cover far more surface area than a typical unit test.
 
