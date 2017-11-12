@@ -1,3 +1,5 @@
+import Foundation
+
 public enum DiffType {
   case first
   case second
