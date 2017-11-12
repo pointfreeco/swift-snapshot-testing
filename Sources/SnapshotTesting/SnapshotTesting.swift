@@ -74,12 +74,14 @@ public func assertSnapshot<S: Snapshot>(
     if let (failure, attachments) = S.Format.diffableDiff(reference, format) {
       XCTFail(failure, file: file, line: line)
       if !attachments.isEmpty {
-        XCTContext.runActivity(named: "Attached Failure Diff") { activity in
-          attachments.forEach {
-            $0.lifetime = .deleteOnSuccess
-            activity.add($0)
+        #if !os(Linux)
+          XCTContext.runActivity(named: "Attached Failure Diff") { activity in
+            attachments.forEach {
+              $0.lifetime = .deleteOnSuccess
+              activity.add($0)
+            }
           }
-        }
+        #endif
       }
     }
   } else {

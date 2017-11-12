@@ -2,6 +2,10 @@ import Diff
 import Foundation
 import XCTest
 
+#if os(Linux)
+  struct XCTAttachment {}
+#endif
+
 public protocol Diffable {
   static var diffablePathExtension: String? { get }
   static func diffableDiff(_ fst: Self, _ snd: Self) -> (String, [XCTAttachment])?
