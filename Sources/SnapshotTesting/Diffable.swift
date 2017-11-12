@@ -4,6 +4,10 @@ import XCTest
 
 #if os(Linux)
   struct XCTAttachment {}
+  extension XCTAttachment {
+    init(string: String) {
+    }
+  }
 #endif
 
 public protocol Diffable {
