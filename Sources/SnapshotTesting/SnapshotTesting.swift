@@ -77,6 +77,7 @@ public func assertSnapshot<S: Snapshot>(
     if let (failure, attachments) = S.Format.diffableDiff(reference, format) {
       XCTFail(failure, file: file, line: line)
       if !attachments.isEmpty {
+        // NB: Linux doesn't have XCTAttachment, and we don't even need it, so can skip all of this work.
         #if !os(Linux)
           XCTContext.runActivity(named: "Attached Failure Diff") { activity in
             attachments.forEach {
