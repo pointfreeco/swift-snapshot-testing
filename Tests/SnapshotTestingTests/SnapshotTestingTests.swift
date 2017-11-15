@@ -1,10 +1,13 @@
 import SnapshotTesting
 import XCTest
-import WebKit
 
 #if os(iOS)
+  import WebKit
+
   let platform = "ios"
 #elseif os(macOS)
+  import WebKit
+
   let platform = "macos"
 #endif
 
