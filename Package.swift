@@ -17,9 +17,12 @@ let package = Package(
       dependencies: []),
     .target(
       name: "SnapshotTesting",
-      dependencies: ["Diff"]),
+      dependencies: ["Diff", "WKSnapshotConfigurationShim"]),
     .testTarget(
       name: "SnapshotTestingTests",
       dependencies: ["SnapshotTesting"]),
+    .target(
+      name: "WKSnapshotConfigurationShim",
+      dependencies: []),
   ]
 )

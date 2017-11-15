@@ -1,5 +1,6 @@
-import XCTest
 import SnapshotTesting
+import XCTest
+import WebKit
 
 class SnapshotTestingTests: XCTestCase {
   #if os(iOS)
@@ -37,6 +38,18 @@ class SnapshotTestingTests: XCTestCase {
   func testMultipleSnapshots() {
     assertSnapshot(matching: [1])
     assertSnapshot(matching: [1, 2])
+  }
+
+  @available(iOS 11.0, macOS 10.13, *)
+  func testWebView() throws {
+    let fixtureUrl = URL(fileURLWithPath: String(#file))
+      .deletingLastPathComponent()
+      .appendingPathComponent("fixture.html")
+    let html = try String(contentsOf: fixtureUrl)
+
+    let webView = WKWebView()
+    webView.loadHTMLString(html, baseURL: nil)
+    assertSnapshot(matching: webView)
   }
 }
 

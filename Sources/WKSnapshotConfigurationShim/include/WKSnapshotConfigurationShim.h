@@ -1,0 +1,1 @@
+#import <WebKit/WKSnapshotConfiguration.h>

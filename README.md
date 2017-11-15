@@ -2,9 +2,9 @@
 
 macOS [![CircleCI](https://circleci.com/gh/pointfreeco/swift-snapshot-testing.svg?style=svg)](https://circleci.com/gh/pointfreeco/swift-snapshot-testing) Linux [![Build Status](https://travis-ci.org/pointfreeco/swift-snapshot-testing.svg)](https://travis-ci.org/pointfreeco/swift-snapshot-testing)
 
-A library that records app data into test assertions. Because snapshot tests can capture the entirety of a data structure, they can cover far more surface area than a typical unit test.
+Automatically record app data into test assertions. Snapshot tests capture the entirety of a data structure and cover far more surface area than a typical unit test.
 
-The design of this library has been covered in "[Snapshot Testing in Swift"](http://www.stephencelis.com/2017/09/snapshot-testing-in-swift).
+The design of this library has been covered in "[Snapshot Testing in Swift](http://www.stephencelis.com/2017/09/snapshot-testing-in-swift)".
 
 ![An example of a snapshot failure in Xcode.](.github/snapshot-test.png)
 
