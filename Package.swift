@@ -19,7 +19,7 @@ let targets: [Target] = [
     dependencies: []),
   .target(
     name: "SnapshotTesting",
-    dependencies: isLinux ? [] : ["WKSnapshotConfigurationShim"]),
+    dependencies: isLinux ? ["Diff"] : ["Diff", "WKSnapshotConfigurationShim"]),
   .testTarget(
     name: "SnapshotTestingTests",
     dependencies: ["SnapshotTesting"]),
