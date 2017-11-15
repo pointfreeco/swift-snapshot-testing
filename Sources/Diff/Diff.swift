@@ -12,8 +12,6 @@ public struct Diff<A> {
 }
 
 public func diff<A: Hashable>(_ fst: [A], _ snd: [A]) -> [Diff<A>] {
-
-
   var idxsOf = [A: [Int]]()
   fst.enumerated().forEach { idxsOf[$1, default: []].append($0) }
 
