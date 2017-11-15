@@ -2,12 +2,11 @@
 
 import PackageDescription
 
-let webViewSnapshotAvailable: Bool
-if #available(iOS 11.0, macOS 10.13, *) {
-  webViewSnapshotAvailable = false
-} else {
-  webViewSnapshotAvailable = true
-}
+#if os(Linux)
+let isLinux = true
+#else
+let isLinux = false
+#endif
 
 let shimTarget = Target.target(
   name: "WKSnapshotConfigurationShim",
@@ -20,12 +19,12 @@ let targets: [Target] = [
     dependencies: []),
   .target(
     name: "SnapshotTesting",
-    dependencies: webViewSnapshotAvailable ? ["Diff", "WKSnapshotConfigurationShim"] : ["Diff"]),
+    dependencies: isLinux ? ["Diff"] : ["Diff", "WKSnapshotConfigurationShim"]),
   .testTarget(
     name: "SnapshotTestingTests",
     dependencies: ["SnapshotTesting"]),
   ]
-  + (webViewSnapshotAvailable ? [shimTarget] : [])
+  + (isLinux ? [] : [shimTarget])
 
 let package = Package(
   name: "SnapshotTesting",
