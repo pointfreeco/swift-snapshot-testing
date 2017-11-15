@@ -1,5 +1,15 @@
-import XCTest
 import SnapshotTesting
+import XCTest
+
+#if os(iOS)
+  import WebKit
+
+  let platform = "ios"
+#elseif os(macOS)
+  import WebKit
+
+  let platform = "macos"
+#endif
 
 class SnapshotTestingTests: XCTestCase {
   #if os(iOS)
@@ -38,6 +48,20 @@ class SnapshotTestingTests: XCTestCase {
     assertSnapshot(matching: [1])
     assertSnapshot(matching: [1, 2])
   }
+
+  #if os(iOS) || os(macOS)
+    @available(iOS 11.0, macOS 10.13, *)
+    func testWebView() throws {
+      let fixtureUrl = URL(fileURLWithPath: String(#file))
+        .deletingLastPathComponent()
+        .appendingPathComponent("fixture.html")
+      let html = try String(contentsOf: fixtureUrl)
+
+      let webView = WKWebView()
+      webView.loadHTMLString(html, baseURL: nil)
+      assertSnapshot(matching: webView, named: platform)
+    }
+  #endif
 }
 
 #if os(Linux)

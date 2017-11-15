@@ -38,7 +38,6 @@
       return ("Expected image@\(snd.size) to match image@\(fst.size)", [reference, failure, diff])
     }
 
-
     public static func fromDiffableData(_ diffableData: Data) -> Self {
       return self.init(data: diffableData, scale: 2.0)!
     }
@@ -63,8 +62,8 @@
   }
 
   extension UIImage: Snapshot {
-    public var snapshotFormat: Data {
-      return self.diffableData
+    public var snapshotFormat: UIImage {
+      return self
     }
   }
 
