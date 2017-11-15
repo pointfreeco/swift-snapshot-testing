@@ -2,6 +2,12 @@ import SnapshotTesting
 import XCTest
 import WebKit
 
+#if os(iOS)
+  let platform = "ios"
+#elseif os(macOS)
+  let platform = "macos"
+#endif
+
 class SnapshotTestingTests: XCTestCase {
   #if os(iOS)
     func testExample() {
@@ -49,7 +55,7 @@ class SnapshotTestingTests: XCTestCase {
 
     let webView = WKWebView()
     webView.loadHTMLString(html, baseURL: nil)
-    assertSnapshot(matching: webView)
+    assertSnapshot(matching: webView, named: platform)
   }
 }
 
