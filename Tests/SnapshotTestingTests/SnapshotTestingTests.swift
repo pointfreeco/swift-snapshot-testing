@@ -46,17 +46,19 @@ class SnapshotTestingTests: XCTestCase {
     assertSnapshot(matching: [1, 2])
   }
 
-  @available(iOS 11.0, macOS 10.13, *)
-  func testWebView() throws {
-    let fixtureUrl = URL(fileURLWithPath: String(#file))
-      .deletingLastPathComponent()
-      .appendingPathComponent("fixture.html")
-    let html = try String(contentsOf: fixtureUrl)
+  #if os(iOS) || os(macOS)
+    @available(iOS 11.0, macOS 10.13, *)
+    func testWebView() throws {
+      let fixtureUrl = URL(fileURLWithPath: String(#file))
+        .deletingLastPathComponent()
+        .appendingPathComponent("fixture.html")
+      let html = try String(contentsOf: fixtureUrl)
 
-    let webView = WKWebView()
-    webView.loadHTMLString(html, baseURL: nil)
-    assertSnapshot(matching: webView, named: platform)
-  }
+      let webView = WKWebView()
+      webView.loadHTMLString(html, baseURL: nil)
+      assertSnapshot(matching: webView, named: platform)
+    }
+  #endif
 }
 
 #if os(Linux)
