@@ -4,9 +4,9 @@ import PackageDescription
 
 let webViewSnapshotAvailable: Bool
 if #available(iOS 11.0, macOS 10.13, *) {
-  webViewSnapshotAvailable = true
-} else {
   webViewSnapshotAvailable = false
+} else {
+  webViewSnapshotAvailable = true
 }
 
 let shimTarget = Target.target(
