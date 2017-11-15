@@ -2,34 +2,29 @@
 
 import PackageDescription
 
-let snapshotTestingDependencies: [Target.Dependency]
 #if os(Linux)
-  snapshotTestingDependencies = []
+let isLinux = true
 #else
-  snapshotTestingDependencies = ["WKSnapshotConfigurationShim"]
+let isLinux = false
 #endif
 
-let sharedTargets: [Target] = [
+let shimTarget = Target.target(
+  name: "WKSnapshotConfigurationShim",
+  dependencies: []
+)
+
+let targets: [Target] = [
   .target(
     name: "Diff",
     dependencies: []),
   .target(
     name: "SnapshotTesting",
-    dependencies: snapshotTestingDependencies),
+    dependencies: isLinux ? [] : ["WKSnapshotConfigurationShim"]),
   .testTarget(
     name: "SnapshotTestingTests",
     dependencies: ["SnapshotTesting"]),
-]
-
-#if os(Linux)
-  let targets = sharedTargets
-#else
-  let targets = sharedTargets + [
-    .target(
-      name: "WKSnapshotConfigurationShim",
-      dependencies: []),
   ]
-#endif
+  + (isLinux ? [] : [shimTarget])
 
 let package = Package(
   name: "SnapshotTesting",
@@ -40,18 +35,5 @@ let package = Package(
   ],
   dependencies: [
   ],
-  targets: [
-    .target(
-      name: "Diff",
-      dependencies: []),
-    .target(
-      name: "SnapshotTesting",
-      dependencies: ["Diff", "WKSnapshotConfigurationShim"]),
-    .testTarget(
-      name: "SnapshotTestingTests",
-      dependencies: ["SnapshotTesting"]),
-    .target(
-      name: "WKSnapshotConfigurationShim",
-      dependencies: []),
-  ]
+  targets: targets
 )
