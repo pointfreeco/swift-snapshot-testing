@@ -20,6 +20,7 @@ let sharedTargets: [Target] = [
     name: "SnapshotTestingTests",
     dependencies: ["SnapshotTesting"]),
 ]
+
 #if os(Linux)
   let targets = sharedTargets
 #else
