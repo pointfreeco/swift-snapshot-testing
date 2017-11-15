@@ -1,0 +1,25 @@
+version: 2
+
+jobs:
+  build-and-test:
+    macos:
+      xcode: "9.1"
+
+    steps:
+      - checkout
+
+      - run:
+        name: Generate Xcode project file
+        command: swift package generate-xcodeproj
+
+      - run:
+        name: Run iOS tests
+        command: xcodebuild test -scheme SnapshotTesting-Package -destination platform="iOS Simulator,name=iPhone 8,OS=11.1"
+        environment:
+          SNAPSHOT_ARTIFACTS: $CIRCLE_ARTIFACTS
+
+      - run:
+        name: Run macOS tests
+        command: xcodebuild test -scheme SnapshotTesting-Package -destination platform="
+        environment:
+          SNAPSHOT_ARTIFACTS: $CIRCLE_ARTIFACTS
