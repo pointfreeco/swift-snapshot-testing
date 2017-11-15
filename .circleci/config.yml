@@ -14,7 +14,7 @@ jobs:
 
       - run:
           name: Run iOS tests
-          command: xcodebuild test -scheme SnapshotTesting-Package -destination platform="iOS Simulator,name=iPhone 8,OS=11.1"
+          command: xcodebuild test -scheme SnapshotTesting-Package -destination platform="iOS Simulator,name=iPhone 8,OS=11.0"
           environment:
             SNAPSHOT_ARTIFACTS: $CIRCLE_ARTIFACTS
 
