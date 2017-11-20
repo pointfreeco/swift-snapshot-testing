@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+bundle install --quiet
 mkdir -p buddybuild_artifacts/SwiftTests
 
 xcodebuild test -scheme SnapshotTesting-Package -destination platform="macOS" | bundle exec xcpretty -r junit -o buddybuild_artifacts/SwiftTests/output-mac.xml
