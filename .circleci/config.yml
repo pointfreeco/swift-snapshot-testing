@@ -9,8 +9,8 @@ jobs:
       - checkout
 
       - run:
-        name: Mac Info
-        command: system_profiler SPSoftwareDataType
+          name: Mac Info
+          command: system_profiler SPSoftwareDataType
 
       - run:
           name: Generate Xcode project file
