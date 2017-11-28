@@ -64,7 +64,7 @@ class SnapshotTestingTests: XCTestCase {
   #endif
 }
 
-#if os(Linux)
+#if os(Linux) 
   extension SnapshotTestingTests {
     static var allTests : [(String, (SnapshotTestingTests) -> () throws -> Void)] {
       return [
