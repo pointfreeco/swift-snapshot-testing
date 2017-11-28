@@ -50,7 +50,7 @@ class SnapshotTestingTests: XCTestCase {
   }
 
   #if os(iOS) || os(macOS)
-    @available(iOS 11.0, macOS 10.13, *)
+//    @available(iOS 11.0, macOS 10.13, *)
     func testWebView() throws {
       let fixtureUrl = URL(fileURLWithPath: String(#file))
         .deletingLastPathComponent()
@@ -59,7 +59,9 @@ class SnapshotTestingTests: XCTestCase {
 
       let webView = WKWebView()
       webView.loadHTMLString(html, baseURL: nil)
-      assertSnapshot(matching: webView, named: platform)
+      if #available(macOS 10.13, *) {
+        assertSnapshot(matching: webView, named: platform)
+      }
     }
   #endif
 }
