@@ -33,10 +33,3 @@ jobs:
           command: make test-swift
           environment:
             SNAPSHOT_ARTIFACTS: $CIRCLE_ARTIFACTS
-
-      # Uncomment when CircleCI gets High Sierra (10.13) support.
-      # - run:
-      #     name: Run macOS tests
-      #     command: xcodebuild test -scheme SnapshotTesting-Package -destination platform="macOS"
-      #     environment:
-      #       SNAPSHOT_ARTIFACTS: $CIRCLE_ARTIFACTS
