@@ -3,6 +3,7 @@ test-linux:
 		&& docker run --rm snapshot-testing
 
 test-macos:
+	set -o pipefail && \
 	xcodebuild test \
 		-scheme SnapshotTesting-Package \
 		-destination platform="macOS" \
