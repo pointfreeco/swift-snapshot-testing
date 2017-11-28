@@ -1,6 +1,6 @@
 # swift-snapshot-testing
 
-macOS [![BuddyBuild](https://dashboard.buddybuild.com/api/statusImage?appID=5a0ce91b0283530001c83899&branch=master&build=latest)](https://dashboard.buddybuild.com/apps/5a0ce91b0283530001c83899/build/latest?branch=master) Linux [![Build Status](https://travis-ci.org/pointfreeco/swift-snapshot-testing.svg)](https://travis-ci.org/pointfreeco/swift-snapshot-testing)
+macOS [![CircleCI](https://circleci.com/gh/pointfreeco/swift-snapshot-testing.svg?style=svg)](https://circleci.com/gh/pointfreeco/swift-snapshot-testing) Linux [![Build Status](https://travis-ci.org/pointfreeco/swift-snapshot-testing.svg)](https://travis-ci.org/pointfreeco/swift-snapshot-testing)
 
 Automatically record app data into test assertions. Snapshot tests capture the entirety of a data structure and cover far more surface area than a typical unit test.
 

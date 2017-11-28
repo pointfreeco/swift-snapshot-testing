@@ -1,0 +1,35 @@
+version: 2
+
+jobs:
+  build:
+    macos:
+      xcode: "9.0"
+
+    steps:
+      - checkout
+
+      - run:
+          name: Mac Info
+          command: system_profiler SPSoftwareDataType
+
+      - run:
+          name: Generate Xcode project file
+          command: swift package generate-xcodeproj
+
+      - run:
+          name: Run iOS tests
+          command: make test-ios
+          environment:
+            SNAPSHOT_ARTIFACTS: $CIRCLE_ARTIFACTS
+
+      - run:
+          name: Run macOS tests
+          command: make test-macos
+          environment:
+            SNAPSHOT_ARTIFACTS: $CIRCLE_ARTIFACTS
+
+      - run:
+          name: Run Swift tests
+          command: make test-swift
+          environment:
+            SNAPSHOT_ARTIFACTS: $CIRCLE_ARTIFACTS
