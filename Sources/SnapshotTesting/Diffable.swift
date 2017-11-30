@@ -1,4 +1,6 @@
-import Diff
+#if !COCOAPODS
+    import Diff
+#endif
 import Foundation
 import XCTest
 
