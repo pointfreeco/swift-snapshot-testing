@@ -35,9 +35,10 @@ public func diff<A: Hashable>(_ fst: [A], _ snd: [A]) -> [Diff<A>] {
     let sndDiff = snd.isEmpty ? [] : [Diff(type: .second, elements: snd)]
     return fstDiff + sndDiff
   } else {
-    return diff(Array(fst.prefix(upTo: fstIdx)), Array(snd.prefix(upTo: sndIdx)))
-      + [Diff(type: .both, elements: Array(fst.suffix(from: fstIdx).prefix(len)))]
-      + diff(Array(fst.suffix(from: fstIdx + len)), Array(snd.suffix(from: sndIdx + len)))
+    let fstDiff = diff(Array(fst.prefix(upTo: fstIdx)), Array(snd.prefix(upTo: sndIdx)))
+    let midDiff = [Diff(type: .both, elements: Array(fst.suffix(from: fstIdx).prefix(len)))]
+    let lstDiff = diff(Array(fst.suffix(from: fstIdx + len)), Array(snd.suffix(from: sndIdx + len)))
+    return fstDiff + midDiff + lstDiff
   }
 }
 
