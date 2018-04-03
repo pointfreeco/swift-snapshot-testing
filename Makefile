@@ -1,3 +1,6 @@
+xcodeproj:
+	swift package generate-xcodeproj --xcconfig-overrides=Development.xcconfig
+
 test-linux:
 	docker build --tag snapshot-testing . \
 		&& docker run --rm snapshot-testing

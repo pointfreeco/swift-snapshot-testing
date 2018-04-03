@@ -30,8 +30,12 @@ public func assertSnapshot(
   }
   let tookSnapshot = XCTestExpectation()
   #if os(macOS)
-  let window = ScaledWindow()
-  window.contentView?.addSubview(webView)
+  if webView.superview == nil {
+    let window = ScaledWindow()
+    window.contentView = NSView()
+    window.contentView?.addSubview(webView)
+    window.makeKey()
+  }
   #endif
   webView.takeSnapshot(with: nil) { image, error in
     tookSnapshot.fulfill()
