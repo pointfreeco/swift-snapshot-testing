@@ -1,16 +1,16 @@
 #if !COCOAPODS
-    import Diff
+import Diff
 #endif
 import Foundation
 import XCTest
 
 #if os(Linux)
-  // NB: Linux doesn't have XCTAttachment, so stubbing out the minimal interface.
-  public struct XCTAttachment {}
-  extension XCTAttachment {
-    public init(string: String) {
-    }
+// NB: Linux doesn't have XCTAttachment, so stubbing out the minimal interface.
+public struct XCTAttachment {}
+extension XCTAttachment {
+  public init(string: String) {
   }
+}
 #endif
 
 public protocol Diffable {

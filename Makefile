@@ -1,3 +1,6 @@
+xcodeproj:
+	swift package generate-xcodeproj --xcconfig-overrides=Development.xcconfig
+
 test-linux:
 	docker build --tag snapshot-testing . \
 		&& docker run --rm snapshot-testing
@@ -13,7 +16,7 @@ test-ios:
 	set -o pipefail && \
 	xcodebuild test \
 		-scheme SnapshotTesting-Package \
-		-destination platform="iOS Simulator,name=iPhone 8,OS=11.0" \
+		-destination platform="iOS Simulator,name=iPhone 8,OS=11.3" \
 		| xcpretty
 
 test-swift:
