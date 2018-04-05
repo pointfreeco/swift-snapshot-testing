@@ -1,8 +1,6 @@
 #if os(iOS) || os(macOS)
-#if !COCOAPODS
-import WKSnapshotConfigurationShim
-#endif
 
+import WebKit
 import XCTest
 
 @available(iOS 11.0, macOS 10.13, *)
