@@ -75,7 +75,6 @@ public func assertSnapshot<S: Snapshot>(
   if !recording && fileManager.fileExists(atPath: snapshotFileUrl.path) {
     let reference = S.Format.fromDiffableData(try! Data(contentsOf: snapshotFileUrl))
     if let (failure, attachments) = S.Format.diffableDiff(reference, format) {
-      XCTFail(failure, file: file, line: line)
       if !attachments.isEmpty {
         // NB: Linux doesn't have XCTAttachment, and we don't even need it, so can skip all of this work.
         #if !os(Linux)
@@ -87,6 +86,7 @@ public func assertSnapshot<S: Snapshot>(
           }
         #endif
       }
+      XCTFail(failure, file: file, line: line)
     }
   } else {
     try! format.diffableData.write(to: snapshotFileUrl)
