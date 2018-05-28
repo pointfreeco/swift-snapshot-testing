@@ -120,7 +120,7 @@ extension NSObject: SnapshotStringConvertible {
   }
 }
 
-func snap<T>(_ value: T, name: String? = nil, indent: Int = 0) -> String {
+private func snap<T>(_ value: T, name: String? = nil, indent: Int = 0) -> String {
   let indentation = String(repeating: " ", count: indent)
   let mirror = Mirror(reflecting: value)
   let count = mirror.children.count
