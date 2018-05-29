@@ -39,7 +39,7 @@ extension UIImage: Diffable {
   }
 
   public static func fromDiffableData(_ diffableData: Data) -> Self {
-    return self.init(data: diffableData, scale: 2.0)!
+    return self.init(data: diffableData, scale: UIScreen.main.scale)!
   }
 
   public var diffableData: Data {
