@@ -35,6 +35,8 @@
 		BEE76A6220289BAF007A48DB /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEE76A5F20289BAF007A48DB /* XCTest.framework */; };
 		BEE76A6320289BAF007A48DB /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEE76A6020289BAF007A48DB /* WebKit.framework */; };
 		BEE76A6420289BAF007A48DB /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEE76A6120289BAF007A48DB /* UIKit.framework */; };
+		DCAE9B7520BD7DDD00CF2EBF /* SnapshotStringConvertible.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCAE9B7420BD7DDD00CF2EBF /* SnapshotStringConvertible.swift */; };
+		DCAE9B7620BD7DDD00CF2EBF /* SnapshotStringConvertible.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCAE9B7420BD7DDD00CF2EBF /* SnapshotStringConvertible.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -76,6 +78,7 @@
 		BEE76A5F20289BAF007A48DB /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/iPhoneOS.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		BEE76A6020289BAF007A48DB /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS11.2.sdk/System/Library/Frameworks/WebKit.framework; sourceTree = DEVELOPER_DIR; };
 		BEE76A6120289BAF007A48DB /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS11.2.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
+		DCAE9B7420BD7DDD00CF2EBF /* SnapshotStringConvertible.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotStringConvertible.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -167,6 +170,7 @@
 				BE0A3A2A202895BA005D0DD2 /* WebKit.swift */,
 				BE0A3A2B202895BA005D0DD2 /* SnapshotTesting.swift */,
 				BE0A3A2C202895BA005D0DD2 /* Snapshot.swift */,
+				DCAE9B7420BD7DDD00CF2EBF /* SnapshotStringConvertible.swift */,
 				BE0A3A2D202895BA005D0DD2 /* Cocoa.swift */,
 				BE0A3A2E202895BA005D0DD2 /* UIKit.swift */,
 				BE0A3A2F202895BA005D0DD2 /* Diffable.swift */,
@@ -378,6 +382,7 @@
 				BE0A3A38202895BA005D0DD2 /* Snapshot.swift in Sources */,
 				BE0A3A37202895BA005D0DD2 /* SnapshotTesting.swift in Sources */,
 				BE0A3A36202895BA005D0DD2 /* WebKit.swift in Sources */,
+				DCAE9B7520BD7DDD00CF2EBF /* SnapshotStringConvertible.swift in Sources */,
 				BE0A3A3E202895BA005D0DD2 /* Diff.swift in Sources */,
 				BE0A3A39202895BA005D0DD2 /* Cocoa.swift in Sources */,
 			);
@@ -400,6 +405,7 @@
 				BE0A3A6720289B19005D0DD2 /* Snapshot.swift in Sources */,
 				BE0A3A6A20289B19005D0DD2 /* Diffable.swift in Sources */,
 				BE0A3A6520289B19005D0DD2 /* WebKit.swift in Sources */,
+				DCAE9B7620BD7DDD00CF2EBF /* SnapshotStringConvertible.swift in Sources */,
 				BE0A3A6920289B19005D0DD2 /* UIKit.swift in Sources */,
 				BE0A3A6620289B19005D0DD2 /* SnapshotTesting.swift in Sources */,
 			);
