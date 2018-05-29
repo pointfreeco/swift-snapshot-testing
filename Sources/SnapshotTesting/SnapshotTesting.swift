@@ -109,17 +109,6 @@ private var trackSnapshots = {
   }
 }()
 
-public protocol SnapshotStringConvertible {
-  var snapshotDescription: String { get }
-}
-
-extension NSObject: SnapshotStringConvertible {
-  public var snapshotDescription: String {
-    return self.debugDescription
-      .replacingOccurrences(of: ": 0x[\\da-f]+", with: "", options: .regularExpression)
-  }
-}
-
 private func snap<T>(_ value: T, name: String? = nil, indent: Int = 0) -> String {
   let indentation = String(repeating: " ", count: indent)
   let mirror = Mirror(reflecting: value)
