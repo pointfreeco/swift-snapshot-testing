@@ -11,16 +11,8 @@ public func assertSnapshot(
   function: String = #function,
   line: UInt = #line)
 {
-  let snapshot: String = {
-    var string = ""
-    dump(any, to: &string)
-    return string
-      // Scrub NSObject pointers
-      .replacingOccurrences(of: ": 0x[\\da-f]+?(?=> #\\d+)", with: "", options: .regularExpression)
-  }()
-
   assertSnapshot(
-    matching: snapshot,
+    matching: snap(any),
     named: name,
     pathExtension: pathExtension,
     record: recording,
@@ -75,7 +67,6 @@ public func assertSnapshot<S: Snapshot>(
   if !recording && fileManager.fileExists(atPath: snapshotFileUrl.path) {
     let reference = S.Format.fromDiffableData(try! Data(contentsOf: snapshotFileUrl))
     if let (failure, attachments) = S.Format.diffableDiff(reference, format) {
-      XCTFail(failure, file: file, line: line)
       if !attachments.isEmpty {
         // NB: Linux doesn't have XCTAttachment, and we don't even need it, so can skip all of this work.
         #if !os(Linux)
@@ -87,6 +78,7 @@ public func assertSnapshot<S: Snapshot>(
           }
         #endif
       }
+      XCTFail(failure, file: file, line: line)
     }
   } else {
     try! format.diffableData.write(to: snapshotFileUrl)
@@ -116,3 +108,46 @@ private var trackSnapshots = {
     print("Found \(count) stale snapshot\(count == 1 ? "" : "s"):\n\n\(list)")
   }
 }()
+
+private func snap<T>(_ value: T, name: String? = nil, indent: Int = 0) -> String {
+  let indentation = String(repeating: " ", count: indent)
+  let mirror = Mirror(reflecting: value)
+  let count = mirror.children.count
+  let bullet = count == 0 ? "-" : "▿"
+
+  let description: String
+  switch (value, mirror.displayStyle) {
+  case (_, .collection?):
+    description = count == 1 ? "1 element" : "\(count) elements"
+  case (_, .dictionary?):
+    description = count == 1 ? "1 key/value pair" : "\(count) key/value pairs"
+  case (_, .set?):
+    description = count == 1 ? "1 member" : "\(count) members"
+  case (_, .tuple?):
+    description = count == 1 ? "(1 element)" : "(\(count) elements)"
+  case (_, .optional?):
+    let subjectType = String(describing: mirror.subjectType)
+      .replacingOccurrences(of: " #\\d+", with: "", options: .regularExpression)
+    description = count == 0 ? "\(subjectType).none" : "\(subjectType)"
+  case (let value as SnapshotStringConvertible, _):
+    description = value.snapshotDescription
+  case (let value as CustomDebugStringConvertible, _):
+    description = value.debugDescription
+  case (let value as CustomStringConvertible, _):
+    description = value.description
+  case (_, .class?), (_, .struct?):
+    description = String(describing: mirror.subjectType)
+      .replacingOccurrences(of: " #\\d+", with: "", options: .regularExpression)
+  case (_, .enum?):
+    let subjectType = String(describing: mirror.subjectType)
+      .replacingOccurrences(of: " #\\d+", with: "", options: .regularExpression)
+    description = count == 0 ? "\(subjectType).\(value)" : "\(subjectType)"
+  default:
+    description = "(indescribable)"
+  }
+
+  let lines = ["\(indentation)\(bullet) \(name.map { "\($0): " } ?? "")\(description)\n"]
+    + mirror.children.map { snap($1, name: $0, indent: indent + 2) }
+
+  return lines.joined()
+}

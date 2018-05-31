@@ -43,6 +43,10 @@ class SnapshotTestingTests: XCTestCase {
     assertSnapshot(matching: user)
   }
 
+  func testWithDate() {
+    assertSnapshot(matching: Date(timeIntervalSinceReferenceDate: 0))
+  }
+
   func testWithNSObject() {
     assertSnapshot(matching: NSObject())
   }
