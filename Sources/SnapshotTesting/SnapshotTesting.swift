@@ -54,15 +54,15 @@ public func assertSnapshot<S: Snapshot>(
   defer {
     // NB: Linux doesn't have file manager enumeration capabilities, so we skip this work on Linux.
     #if !os(Linux)
-      staleSnapshots[snapshotDirectoryUrl, default: Set(
-        try! fileManager.contentsOfDirectory(
-          at: snapshotDirectoryUrl, includingPropertiesForKeys: nil, options: .skipsHiddenFiles
-        )
-      )].remove(snapshotFileUrl)
-      _ = trackSnapshots
+    staleSnapshots[snapshotDirectoryUrl, default: Set(
+      try! fileManager.contentsOfDirectory(
+        at: snapshotDirectoryUrl, includingPropertiesForKeys: nil, options: .skipsHiddenFiles
+      )
+    )].remove(snapshotFileUrl)
+    _ = trackSnapshots
     #endif
   }
-  
+
   let format = snapshot.snapshotFormat
   if !recording && fileManager.fileExists(atPath: snapshotFileUrl.path) {
     let reference = S.Format.fromDiffableData(try! Data(contentsOf: snapshotFileUrl))
@@ -70,21 +70,25 @@ public func assertSnapshot<S: Snapshot>(
       if !attachments.isEmpty {
         // NB: Linux doesn't have XCTAttachment, and we don't even need it, so can skip all of this work.
         #if !os(Linux)
-          XCTContext.runActivity(named: "Attached Failure Diff") { activity in
-            attachments.forEach {
-              $0.lifetime = .deleteOnSuccess
-              activity.add($0)
-            }
+        XCTContext.runActivity(named: "Attached Failure Diff") { activity in
+          attachments.forEach {
+            $0.lifetime = .deleteOnSuccess
+            activity.add($0)
           }
+        }
         #endif
       }
       XCTFail(failure, file: file, line: line)
     }
   } else {
     try! format.diffableData.write(to: snapshotFileUrl)
+    let detail = (format.diffableDescription.map { ":\n\n\($0)" } ?? "")
+      .split(separator: "\n", omittingEmptySubsequences: false)
+      .prefix(7)
+      .map { $0.prefix(80) }
+      .joined(separator: "\n")
     XCTFail(
-      "Recorded snapshot to \(snapshotFileUrl.path.debugDescription)"
-        + (format.diffableDescription.map { ":\n\n\($0)" } ?? ""),
+      "Recorded snapshot to \(snapshotFileUrl.path.debugDescription)\(detail)",
       file: file,
       line: line
     )
