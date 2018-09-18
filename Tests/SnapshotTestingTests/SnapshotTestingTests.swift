@@ -1,4 +1,4 @@
-import SnapshotTesting
+@testable import SnapshotTesting
 import XCTest
 
 #if os(iOS)
@@ -54,6 +54,10 @@ class SnapshotTestingTests: XCTestCase {
   func testMultipleSnapshots() {
     assertSnapshot(matching: [1])
     assertSnapshot(matching: [1, 2])
+  }
+
+  func testString() {
+    assertSnapshot2(matching: "helloz", witness: stringDiffable)
   }
 
   #if os(iOS) || os(macOS)

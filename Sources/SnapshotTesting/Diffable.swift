@@ -16,8 +16,8 @@ extension XCTAttachment {
 public protocol Diffable {
   static var diffablePathExtension: String? { get }
   static func diffableDiff(_ fst: Self, _ snd: Self) -> (String, [XCTAttachment])?
-  static func fromDiffableData(_ diffableData: Data) -> Self
-  var diffableData: Data { get }
+  static func fromDiffableData(_ diffableData /*snapshotData*/: Data) -> Self
+  var diffableData/*snapshotData*/: Data { get }
   var diffableDescription: String? { get }
 }
 

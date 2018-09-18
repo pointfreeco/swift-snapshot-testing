@@ -155,3 +155,59 @@ private func snap<T>(_ value: T, name: String? = nil, indent: Int = 0) -> String
 
   return lines.joined()
 }
+
+func assertSnapshot2<A>(
+  matching snapshot: A,
+  witness: Diffable2<A>,
+  named name: String? = nil,
+  record recording: Bool = SnapshotTesting.record,
+  file: StaticString = #file,
+  function: String = #function,
+  line: UInt = #line)
+{
+  let snapshotDirectoryUrl: URL = {
+    let fileUrl = URL(fileURLWithPath: "\(file)")
+    let directoryUrl = fileUrl.deletingLastPathComponent()
+    return directoryUrl
+      .appendingPathComponent("__Snapshots__")
+      .appendingPathComponent(fileUrl.deletingPathExtension().lastPathComponent)
+  }()
+
+  let testName: String = {
+    let testIdentifier = "\(snapshotDirectoryUrl.absoluteString):\(function)"
+    counter[testIdentifier, default: 0] += 1
+    return "\(function.dropLast(2)).\(counter[testIdentifier]!)"
+  }()
+
+  let snapshotFileUrl = snapshotDirectoryUrl
+    .appendingPathComponent(name.map { "\(testName).\($0)" } ?? testName)
+    .appendingPathExtension(witness.pathExtension ?? "")
+  let fileManager = FileManager.default
+  try! fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
+
+  defer {
+    // NB: Linux doesn't have file manager enumeration capabilities, so we skip this work on Linux.
+    #if !os(Linux)
+    staleSnapshots[snapshotDirectoryUrl, default: Set(
+      try! fileManager.contentsOfDirectory(
+        at: snapshotDirectoryUrl, includingPropertiesForKeys: nil, options: .skipsHiddenFiles
+      )
+    )].remove(snapshotFileUrl)
+    _ = trackSnapshots
+    #endif
+  }
+
+  if !recording && fileManager.fileExists(atPath: snapshotFileUrl.path) {
+    let reference = witness.from(try! Data(contentsOf: snapshotFileUrl))
+    if let failure = witness.diff(reference, snapshot) {
+      XCTFail(failure, file: file, line: line)
+    }
+  } else {
+    try! witness.to(snapshot).write(to: snapshotFileUrl)
+    XCTFail(
+      "Recorded snapshot to \(snapshotFileUrl.path.debugDescription)",
+      file: file,
+      line: line
+    )
+  }
+}
