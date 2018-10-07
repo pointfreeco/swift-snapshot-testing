@@ -33,6 +33,15 @@ extension Strategy {
       return "Expected image@\(new.size) to match image@\(old.size)"
     }
   }
+
+  public static var view: Strategy<NSView, NSImage> {
+    return Strategy.image.contramap { view in
+      let image = NSImage(data: view.dataWithPDF(inside: view.bounds))!
+      let scale = NSScreen.main!.backingScaleFactor
+      image.size = .init(width: image.size.width * 2.0 / scale, height: image.size.height * 2.0 / scale)
+      return image
+    }
+  }
 }
 
 extension NSImage: Diffable {
@@ -64,6 +73,45 @@ private func bitmapEqual(_ lhs: NSBitmapImageRep, _ rhs: NSBitmapImageRep) -> Bo
   }
 
   return true
+}
+
+
+import Cocoa
+extension _Strategy {
+  static var _image: _Strategy<NSImage, NSImage> {
+    return _Strategy<NSImage, NSImage>(
+      pathExtension: "png",
+      diffable: _Diffable<NSImage>.init(
+        to: { $0.data },
+        fro: { NSImage(data: $0)! },
+        diff: { old, new in
+          let repOld = old.representations[0] as! NSBitmapImageRep
+          let repNew = NSImage(data: new.data)!.representations[0] as! NSBitmapImageRep
+
+          guard !bitmapEqual(repOld, repNew) else { return nil }
+
+          let maxSize = CGSize(
+            width: max(old.size.width, new.size.width),
+            height: max(old.size.height, new.size.height)
+          )
+
+          let image = NSImage(size: maxSize)
+          image.lockFocus()
+          let context = NSGraphicsContext.current!.cgContext
+          old.draw(in: .init(origin: .zero, size: old.size))
+          context.setAlpha(0.5)
+          context.beginTransparencyLayer(auxiliaryInfo: nil)
+          new.draw(in: .init(origin: .zero, size: new.size))
+          context.setBlendMode(.difference)
+          context.fill(.init(origin: .zero, size: maxSize))
+          context.endTransparencyLayer()
+          image.unlockFocus()
+
+          return "Expected image@\(new.size) to match image@\(old.size)"
+      }
+      ), s2d: Parallel.pure
+    )
+  }
 }
 
 #endif

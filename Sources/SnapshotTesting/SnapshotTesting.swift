@@ -82,7 +82,7 @@ public func assertSnapshot<A, B>(
 
   if !recording && fileManager.fileExists(atPath: snapshotFileUrl.path) {
     let reference = strategy.fro(try! Data(contentsOf: snapshotFileUrl))
-    if let failure = strategy.diff(reference, snapshot) {
+    if let failure = strategy.diff(reference, strategy.fro(strategy.to(snapshot))) {
       XCTFail(failure, file: file, line: line)
     }
   } else {
@@ -155,3 +155,79 @@ private var trackSnapshots = {
     print("Found \(count) stale snapshot\(count == 1 ? "" : "s"):\n\n\(list)")
   }
 }()
+
+
+
+
+
+
+public func assertSnapshot<A, B>(
+  matching snapshot: A,
+  with strategy: _Strategy<A, B>,
+  named name: String? = nil,
+  record recording: Bool = SnapshotTesting.record,
+  file: StaticString = #file,
+  function: String = #function,
+  line: UInt = #line)
+{
+  let snapshotDirectoryUrl: URL = {
+    let fileUrl = URL(fileURLWithPath: "\(file)")
+    let directoryUrl = fileUrl.deletingLastPathComponent()
+    return directoryUrl
+      .appendingPathComponent("__Snapshots__")
+      .appendingPathComponent(fileUrl.deletingPathExtension().lastPathComponent)
+  }()
+
+  let testName: String = {
+    let testIdentifier = "\(snapshotDirectoryUrl.absoluteString):\(function)"
+    counter[testIdentifier, default: 0] += 1
+    return "\(function.dropLast(2)).\(counter[testIdentifier]!)"
+  }()
+
+  let snapshotFileUrl = snapshotDirectoryUrl
+    .appendingPathComponent(name.map { "\(testName).\($0)" } ?? testName)
+    .appendingPathExtension(strategy.pathExtension ?? "")
+  let fileManager = FileManager.default
+  try! fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
+
+  defer {
+    // NB: Linux doesn't have file manager enumeration capabilities, so we skip this work on Linux.
+    #if !os(Linux)
+    staleSnapshots[snapshotDirectoryUrl, default: Set(
+      try! fileManager.contentsOfDirectory(
+        at: snapshotDirectoryUrl, includingPropertiesForKeys: nil, options: .skipsHiddenFiles
+      )
+    )].remove(snapshotFileUrl)
+    _ = trackSnapshots
+    #endif
+  }
+
+  let exp = XCTestExpectation(description: "")
+  var diffData: B!
+  strategy.s2d(snapshot).run { b in
+    diffData = b
+    exp.fulfill()
+  }
+  guard XCTWaiter.wait(for: [exp], timeout: 10) == .completed else {
+    XCTFail()
+    return
+  }
+
+  if !recording && fileManager.fileExists(atPath: snapshotFileUrl.path) {
+    let reference = strategy.diffable.fro(try! Data(contentsOf: snapshotFileUrl))
+
+
+    if let failure = strategy.diffable.diff(reference, diffData) {
+      XCTFail(failure, file: file, line: line)
+    }
+
+
+  } else {
+    try! strategy.diffable.to(diffData).write(to: snapshotFileUrl)
+    XCTFail(
+      "Recorded snapshot to \(snapshotFileUrl.path.debugDescription)",
+      file: file,
+      line: line
+    )
+  }
+}

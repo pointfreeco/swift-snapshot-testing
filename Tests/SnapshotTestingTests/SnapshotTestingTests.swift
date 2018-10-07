@@ -29,11 +29,12 @@ class SnapshotTestingTests: XCTestCase {
 
   #if os(macOS)
   func testCocoa() {
+    record = true
     let button = NSButton()
     button.bezelStyle = .rounded
     button.title = "Push Me"
     button.sizeToFit()
-    assertSnapshot(matching: button)
+    assertSnapshot(matching: button, with: .view)
   }
   #endif
 
@@ -70,7 +71,8 @@ class SnapshotTestingTests: XCTestCase {
     let webView = WKWebView()
     webView.loadHTMLString(html, baseURL: nil)
     if #available(macOS 10.13, *) {
-      assertSnapshot(matching: webView, named: platform)
+      record = true
+      assertSnapshot(matching: webView, with: ._webView, named: platform)
     }
   }
   #endif
