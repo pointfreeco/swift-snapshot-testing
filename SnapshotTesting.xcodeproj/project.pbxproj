@@ -21,7 +21,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
-		804F43C121505A4300FC538D /* Diffable2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804F43BF21505A1300FC538D /* Diffable2.swift */; };
+		804F43C121505A4300FC538D /* Strategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804F43BF21505A1300FC538D /* Strategy.swift */; };
 		OBJ_38 /* Diff.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_11 /* Diff.swift */; };
 		OBJ_45 /* Cocoa.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_18 /* Cocoa.swift */; };
 		OBJ_46 /* Diffable.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_19 /* Diffable.swift */; };
@@ -86,7 +86,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		804F43BF21505A1300FC538D /* Diffable2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diffable2.swift; sourceTree = "<group>"; };
+		804F43BF21505A1300FC538D /* Strategy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Strategy.swift; sourceTree = "<group>"; };
 		OBJ_11 /* Diff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diff.swift; sourceTree = "<group>"; };
 		OBJ_13 /* WKSnapshotConfigurationShim.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WKSnapshotConfigurationShim.m; sourceTree = "<group>"; };
 		OBJ_15 /* WKSnapshotConfigurationShim.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WKSnapshotConfigurationShim.h; sourceTree = "<group>"; };
@@ -182,7 +182,7 @@
 				OBJ_22 /* SnapshotTesting.swift */,
 				OBJ_23 /* UIKit.swift */,
 				OBJ_24 /* WebKit.swift */,
-				804F43BF21505A1300FC538D /* Diffable2.swift */,
+				804F43BF21505A1300FC538D /* Strategy.swift */,
 			);
 			name = SnapshotTesting;
 			path = Sources/SnapshotTesting;
@@ -375,7 +375,7 @@
 			buildActionMask = 0;
 			files = (
 				OBJ_45 /* Cocoa.swift in Sources */,
-				804F43C121505A4300FC538D /* Diffable2.swift in Sources */,
+				804F43C121505A4300FC538D /* Strategy.swift in Sources */,
 				OBJ_46 /* Diffable.swift in Sources */,
 				OBJ_47 /* Snapshot.swift in Sources */,
 				OBJ_48 /* SnapshotStringConvertible.swift in Sources */,

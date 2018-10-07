@@ -57,7 +57,7 @@ class SnapshotTestingTests: XCTestCase {
   }
 
   func testString() {
-    assertSnapshot2(matching: "helloz", witness: stringDiffable)
+    assertSnapshot(matching: "helloz", with: .string)
   }
 
   #if os(iOS) || os(macOS)

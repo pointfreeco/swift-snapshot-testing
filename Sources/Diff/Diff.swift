@@ -1,17 +1,17 @@
 import Foundation
 
-public enum DiffType {
-  case first
-  case second
-  case both
-}
+public struct Difference<A> {
+  public enum Which {
+    case first
+    case second
+    case both
+  }
 
-public struct Diff<A> {
-  public let type: DiffType
   public let elements: [A]
+  public let which: Which
 }
 
-public func diff<A: Hashable>(_ fst: [A], _ snd: [A]) -> [Diff<A>] {
+public func diff<A: Hashable>(_ fst: [A], _ snd: [A]) -> [Difference<A>] {
   var idxsOf = [A: [Int]]()
   fst.enumerated().forEach { idxsOf[$1, default: []].append($0) }
 
@@ -31,12 +31,12 @@ public func diff<A: Hashable>(_ fst: [A], _ snd: [A]) -> [Diff<A>] {
   let (_, fstIdx, sndIdx, len) = sub
 
   if len == 0 {
-    let fstDiff = fst.isEmpty ? [] : [Diff(type: .first, elements: fst)]
-    let sndDiff = snd.isEmpty ? [] : [Diff(type: .second, elements: snd)]
+    let fstDiff = fst.isEmpty ? [] : [Difference(elements: fst, which: .first)]
+    let sndDiff = snd.isEmpty ? [] : [Difference(elements: snd, which: .second)]
     return fstDiff + sndDiff
   } else {
     let fstDiff = diff(Array(fst.prefix(upTo: fstIdx)), Array(snd.prefix(upTo: sndIdx)))
-    let midDiff = [Diff(type: .both, elements: Array(fst.suffix(from: fstIdx).prefix(len)))]
+    let midDiff = [Difference(elements: Array(fst.suffix(from: fstIdx).prefix(len)), which: .both)]
     let lstDiff = diff(Array(fst.suffix(from: fstIdx + len)), Array(snd.suffix(from: sndIdx + len)))
     return fstDiff + midDiff + lstDiff
   }
@@ -86,7 +86,7 @@ public struct Hunk {
   }
 }
 
-public func chunk(diff diffs: [Diff<String>], context ctx: Int = 4) -> [Hunk] {
+public func chunk(diff diffs: [Difference<String>], context ctx: Int = 4) -> [Hunk] {
   func prepending(_ prefix: String) -> (String) -> String {
     return { prefix + $0 + ($0.hasSuffix(" ") ? "¬" : "") }
   }
@@ -97,7 +97,7 @@ public func chunk(diff diffs: [Diff<String>], context ctx: Int = 4) -> [Hunk] {
       let (current, hunks) = cursor
       let len = diff.elements.count
 
-      switch diff.type {
+      switch diff.which {
       case .both where len > ctx * 2:
         let hunk = current + Hunk(len: ctx, lines: diff.elements.prefix(ctx).map(prepending(figureSpace)))
         let next = Hunk(
