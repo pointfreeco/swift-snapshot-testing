@@ -15,7 +15,7 @@ extension Strategy {
   public static var image: SimpleStrategy<NSImage> {
     return .init(
       pathExtension: "png",
-      diffable: .init(to: NSImagePNGRepresentation, fro: NSImage.init(data:)) { old, new in
+      diffable: .init(to: { NSImagePNGRepresentation($0)! }, fro: { NSImage(data: $0)! }) { old, new in
         guard
           let oldRep = old.representations.first as? NSBitmapImageRep
           else { return ("Couldn't load reference image data", []) }

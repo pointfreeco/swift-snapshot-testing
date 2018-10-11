@@ -6,7 +6,7 @@ extension Strategy {
     return Strategy.image.pre { layer in
       let image = NSImage(size: layer.bounds.size)
       image.lockFocus()
-      guard let context = NSGraphicsContext.current?.cgContext else { return nil }
+      let context = NSGraphicsContext.current!.cgContext
       layer.render(in: context)
       image.unlockFocus()
       return image
@@ -25,9 +25,9 @@ extension Strategy {
     return Strategy.image.pre { layer in
       UIGraphicsBeginImageContextWithOptions(layer.bounds.size, false, 2.0)
       defer { UIGraphicsEndImageContext() }
-      guard let context = UIGraphicsGetCurrentContext() else { return nil }
+      let context = UIGraphicsGetCurrentContext()!
       layer.render(in: context)
-      return UIGraphicsGetImageFromCurrentImageContext()
+      return UIGraphicsGetImageFromCurrentImageContext()!
     }
   }
 }
