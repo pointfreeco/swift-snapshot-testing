@@ -14,20 +14,6 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "SnapshotTesting::Diff"
-               BuildableName = "Diff.framework"
-               BlueprintName = "Diff"
-               ReferencedContainer = "container:SnapshotTesting.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "SnapshotTesting::SnapshotTesting"
                BuildableName = "SnapshotTesting.framework"
                BlueprintName = "SnapshotTesting"
@@ -45,6 +31,20 @@
                BlueprintIdentifier = "SnapshotTesting::WKSnapshotConfigurationShim"
                BuildableName = "WKSnapshotConfigurationShim.framework"
                BlueprintName = "WKSnapshotConfigurationShim"
+               ReferencedContainer = "container:SnapshotTesting.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "SnapshotTesting::Diff"
+               BuildableName = "Diff.framework"
+               BlueprintName = "Diff"
                ReferencedContainer = "container:SnapshotTesting.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -83,9 +83,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "SnapshotTesting::Diff"
-            BuildableName = "Diff.framework"
-            BlueprintName = "Diff"
+            BlueprintIdentifier = "SnapshotTesting::SnapshotTesting"
+            BuildableName = "SnapshotTesting.framework"
+            BlueprintName = "SnapshotTesting"
             ReferencedContainer = "container:SnapshotTesting.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

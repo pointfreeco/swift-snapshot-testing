@@ -1,4 +1,4 @@
-import SnapshotTesting
+@testable import SnapshotTesting
 import XCTest
 
 #if os(iOS)
@@ -9,51 +9,54 @@ import WebKit
 let platform = "macos"
 #endif
 
-class SnapshotTestingTests: XCTestCase {
+class SnapshotTestingTests: SnapshotTestCase {
   override func setUp() {
     super.setUp()
 //    record = true
   }
 
-  #if os(iOS)
-  func testExample() {
-    let view = UIButton(type: .contactAdd)
-    assertSnapshot(matching: view)
+  func testWithAny() {
+    struct User { let id: Int, name: String, bio: String }
+    let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
+    assertSnapshot(matchingAny: user)
   }
 
-  func testWithName() {
-    let view = UIButton(type: .infoDark)
-    assertSnapshot(matching: view, named: "info-dark")
+  func testNamedAssertion() {
+    struct User { let id: Int, name: String, bio: String }
+    let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
+    assertSnapshot(matchingAny: user, named: "named")
+  }
+
+  #if os(iOS)
+  func testUIView() {
+    let view = UIButton(type: .contactAdd)
+    assertSnapshot(matching: view)
   }
   #endif
 
   #if os(macOS)
-  func testCocoa() {
+  func testNSView() {
     let button = NSButton()
     button.bezelStyle = .rounded
     button.title = "Push Me"
     button.sizeToFit()
-    assertSnapshot(matching: button)
+    if #available(macOS 10.14, *) {
+      assertSnapshot(matching: button)
+    }
   }
   #endif
 
-  func testWithAny() {
-    struct User { let id: Int, name: String, bio: String }
-    let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
-    assertSnapshot(matching: user)
-  }
-
   func testWithDate() {
-    assertSnapshot(matching: Date(timeIntervalSinceReferenceDate: 0))
+    assertSnapshot(matchingAny: Date(timeIntervalSinceReferenceDate: 0))
   }
 
   func testWithNSObject() {
-    assertSnapshot(matching: NSObject())
+    assertSnapshot(matchingAny: NSObject())
   }
 
   func testMultipleSnapshots() {
-    assertSnapshot(matching: [1])
-    assertSnapshot(matching: [1, 2])
+    assertSnapshot(matchingAny: [1])
+    assertSnapshot(matchingAny: [1, 2])
   }
 
   #if os(iOS) || os(macOS)
@@ -65,8 +68,8 @@ class SnapshotTestingTests: XCTestCase {
 
     let webView = WKWebView()
     webView.loadHTMLString(html, baseURL: nil)
-    if #available(macOS 10.13, *) {
-      assertSnapshot(matching: webView, named: platform)
+    if #available(macOS 10.14, *) {
+      assertSnapshot(matchingWebView: webView, named: platform)
     }
   }
   #endif
@@ -77,6 +80,8 @@ extension SnapshotTestingTests {
   static var allTests : [(String, (SnapshotTestingTests) -> () throws -> Void)] {
     return [
       ("testWithAny", testWithAny),
+      ("testNamedAssertion", testNamedAssertion),
+      ("testWithDate", testWithDate),
       ("testWithNSObject", testWithNSObject),
       ("testMultipleSnapshots", testMultipleSnapshots),
     ]
