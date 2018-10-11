@@ -53,7 +53,10 @@ extension String: Diffable {
       fst.split(separator: "\n", omittingEmptySubsequences: false).map(String.init),
       snd.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
     ))
-    let failure = hunks.flatMap { [$0.patchMark] + $0.lines }.joined(separator: "\n")
+    let failure = hunks.flatMap { [$0.patchMark] + $0.lines }
+      .prefix(5)
+      .map { $0.prefix(80) }
+      .joined(separator: "\n")
 
     return ("Diff: …\n\n\(failure)", [.init(string: failure)])
   }
