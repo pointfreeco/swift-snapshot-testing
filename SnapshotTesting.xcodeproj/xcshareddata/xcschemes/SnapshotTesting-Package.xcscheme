@@ -34,20 +34,6 @@
                ReferencedContainer = "container:SnapshotTesting.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "SnapshotTesting::WKSnapshotConfigurationShim"
-               BuildableName = "WKSnapshotConfigurationShim.framework"
-               BlueprintName = "WKSnapshotConfigurationShim"
-               ReferencedContainer = "container:SnapshotTesting.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -67,6 +53,15 @@
             </BuildableReference>
          </TestableReference>
       </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "SnapshotTesting::Diff"
+            BuildableName = "Diff.framework"
+            BlueprintName = "Diff"
+            ReferencedContainer = "container:SnapshotTesting.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>
@@ -98,6 +93,15 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "SnapshotTesting::Diff"
+            BuildableName = "Diff.framework"
+            BlueprintName = "Diff"
+            ReferencedContainer = "container:SnapshotTesting.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
