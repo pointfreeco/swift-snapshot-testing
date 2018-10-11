@@ -1,129 +1,102 @@
-import Diff
 import Foundation
-
-public struct _Diffable<D> {
-  public let to: (D) -> Data
-  public let fro: (Data) -> D
-  public let diff: (D, D) -> String?
-}
+import XCTest
 
 public struct Parallel<A> {
-  let run: (@escaping (A) -> Void) -> Void
+  public let run: (@escaping (A) -> Void) -> Void
 
-  static func fish<B, C>(_ lhs: @escaping (A) -> Parallel<B>, _ rhs: @escaping (B) -> Parallel<C>) -> (A) -> Parallel<C> {
-    return { a in
+  public init(run: @escaping (@escaping (A) -> Void) -> Void) {
+    self.run = run
+  }
+
+  public init(value: A) {
+    self.init { callback in callback(value) }
+  }
+
+  public func map<B>(_ transform: @escaping (A) -> B) -> Parallel<B> {
+    return .init { callback in
+      self.run { a in
+        callback(transform(a))
+      }
+    }
+  }
+}
+
+public struct Strategy<A, B> {
+  public let pathExtension: String?
+  public let diffable: Diffable<B>
+  public let snapshotToDiffable: (A) -> Parallel<B?>
+
+  public init(
+    pathExtension: String?,
+    diffable: Diffable<B>,
+    snapshotToDiffable: @escaping (A) -> Parallel<B?>
+    ) {
+    self.pathExtension = pathExtension
+    self.diffable = diffable
+    self.snapshotToDiffable = snapshotToDiffable
+  }
+
+  public init(
+    pathExtension: String?,
+    diffable: Diffable<B>,
+    snapshotToDiffable: @escaping (A) -> B?
+    ) {
+    self.init(pathExtension: pathExtension, diffable: diffable) {
+      Parallel(value: snapshotToDiffable($0))
+    }
+  }
+
+  public func preAsync<A0>(_ transform: @escaping (A0) -> Parallel<A?>) -> Strategy<A0, B> {
+    return Strategy<A0, B>(
+      pathExtension: self.pathExtension,
+      diffable: self.diffable
+    ) { a0 in
       return .init { callback in
-        lhs(a).run { b in
-          rhs(b).run { c in
-            callback(c)
+        transform(a0).run { a in
+          if let a = a {
+            self.snapshotToDiffable(a).run { b in
+              callback(b)
+            }
           }
         }
       }
     }
   }
 
-  static func pure(_ a: A) -> Parallel {
-    return Parallel { callback in callback(a) }
-  }
-}
-
-public struct _Strategy<S, D> {
-  public let pathExtension: String?
-  public let diffable: _Diffable<D>
-  public let s2d: (S) -> Parallel<D>
-  // (S, (D) -> Void) -> Void
-  // (S) -> (D -> Void) -> Void
-  // (S) -> Cont<D, Void>
-
-  // Cont<R, A> = ((R) -> A) -> A
-
-  //
-
-
-  func transform<T>(_ f: @escaping (T) -> ((S) -> Void) -> Void) -> _Strategy<T, D> {
+  public func pre<A0>(_ transform: @escaping (A0) -> A?) -> Strategy<A0, B> {
+    return self.preAsync { Parallel(value: transform($0)) }
   }
 
-  func transform<T>(_ f: @escaping (T) -> Parallel<S>) -> _Strategy<T, D> {
-    return _Strategy<T, D>(
-      pathExtension: self.pathExtension,
-      diffable: self.diffable,
-      s2d: Parallel.fish(f, self.s2d)
-    )
-  }
-}
-
-
-public struct Strategy<Snapshot, Diffable> {
-  public let pathExtension: String?
-  public let to: (Snapshot) -> Data
-  public let fro: (Data) -> Diffable
-  public let diff: (Diffable, Diffable) -> String?
-
-  func contramap<S>(_ f: @escaping (S) -> Snapshot) -> Strategy<S, Diffable> {
+  public func post(_ transform: @escaping (B) -> B) -> Strategy {
     return .init(
       pathExtension: self.pathExtension,
-      to: { self.to(f($0)) },
-      fro: self.fro,
-      diff: self.diff
-    )
-  }
-
-  public init(
-    pathExtension: String? = "txt",
-    to: @escaping (Snapshot) -> Data,
-    fro: @escaping (Data) -> Diffable,
-    diff: @escaping (Diffable, Diffable) -> String?
-    ) {
-
-    self.pathExtension = pathExtension
-    self.to = to
-    self.fro = fro
-    self.diff = diff
+      diffable: self.diffable
+    ) { a in
+      return .init { callback in
+        self.snapshotToDiffable(a).run { b in
+          if let b = b {
+            callback(transform(b))
+          }
+        }
+      }
+    }
   }
 }
 
 public typealias SimpleStrategy<A> = Strategy<A, A>
 
-extension Strategy {
-  static var data: SimpleStrategy<Data> {
-    return .init(
-      pathExtension: "txt",
-      to: { $0 },
-      fro: { $0 }
-    ) { old, new in
-      old == new ? nil : "Expected \(new) to match \(old)"
-    }
-  }
-
-  static var string: SimpleStrategy<String> {
-    return .init(
-      pathExtension: "txt",
-      to: { Data($0.utf8) },
-      fro: { String(decoding: $0, as: UTF8.self) }
-    ) { old, new in
-      guard old != new else { return nil }
-      let hunks = chunk(diff: Diff.diff(
-        old.split(separator: "\n", omittingEmptySubsequences: false).map(String.init),
-        new.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
-      ))
-      let failure = hunks
-        .flatMap { [$0.patchMark] + $0.lines }
-        .joined(separator: "\n")
-      return "Diff: …\n\n\(failure)"
-    }
+extension Strategy where A == B {
+  public init(pathExtension: String?, diffable: Diffable<B>) {
+    self.init(
+      pathExtension: pathExtension,
+      diffable: diffable,
+      snapshotToDiffable: Parallel.init(value:)
+    )
   }
 }
 
-public protocol Diffable {
-  associatedtype Snapshot = Self
-  associatedtype Diffable
-  static var defaultStrategy: Strategy<Snapshot, Diffable> { get }
-}
-
-extension Data: Diffable {
-  public static let defaultStrategy: SimpleStrategy<Data> = .data
-}
-
-extension String: Diffable {
-  public static let defaultStrategy: SimpleStrategy<String> = .string
+public protocol DefaultDiffable {
+  associatedtype A = Self
+  associatedtype B
+  static var defaultStrategy: Strategy<A, B> { get }
 }

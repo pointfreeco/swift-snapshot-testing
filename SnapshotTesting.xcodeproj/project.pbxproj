@@ -16,7 +16,7 @@
             "en"
          );
          mainGroup = "OBJ_5";
-         productRefGroup = "OBJ_28";
+         productRefGroup = "OBJ_36";
          projectDirPath = ".";
          targets = (
             "SnapshotTesting::Diff",
@@ -36,6 +36,76 @@
          name = "WKSnapshotConfigurationShim";
          path = "Sources/WKSnapshotConfigurationShim";
          sourceTree = "SOURCE_ROOT";
+      };
+      "OBJ_100" = {
+         isa = "XCBuildConfiguration";
+         baseConfigurationReference = "OBJ_8";
+         buildSettings = {
+            CLANG_ENABLE_MODULES = "YES";
+            DEFINES_MODULE = "YES";
+            ENABLE_TESTABILITY = "YES";
+            FRAMEWORK_SEARCH_PATHS = (
+               "$(inherited)",
+               "$(PLATFORM_DIR)/Developer/Library/Frameworks"
+            );
+            HEADER_SEARCH_PATHS = (
+               "$(inherited)",
+               "$(SRCROOT)/Sources/WKSnapshotConfigurationShim/include"
+            );
+            INFOPLIST_FILE = "SnapshotTesting.xcodeproj/WKSnapshotConfigurationShim_Info.plist";
+            LD_RUNPATH_SEARCH_PATHS = (
+               "$(inherited)",
+               "$(TOOLCHAIN_DIR)/usr/lib/swift/macosx"
+            );
+            OTHER_CFLAGS = (
+               "$(inherited)"
+            );
+            OTHER_LDFLAGS = (
+               "$(inherited)"
+            );
+            OTHER_SWIFT_FLAGS = (
+               "$(inherited)"
+            );
+            PRODUCT_BUNDLE_IDENTIFIER = "WKSnapshotConfigurationShim";
+            PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
+            PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+            SKIP_INSTALL = "YES";
+            SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+               "$(inherited)"
+            );
+            TARGET_NAME = "WKSnapshotConfigurationShim";
+         };
+         name = "Release";
+      };
+      "OBJ_101" = {
+         isa = "PBXSourcesBuildPhase";
+         files = (
+            "OBJ_102"
+         );
+      };
+      "OBJ_102" = {
+         isa = "PBXBuildFile";
+         fileRef = "OBJ_11";
+      };
+      "OBJ_103" = {
+         isa = "PBXHeadersBuildPhase";
+         files = (
+            "OBJ_104"
+         );
+      };
+      "OBJ_104" = {
+         isa = "PBXBuildFile";
+         fileRef = "OBJ_13";
+         settings = {
+            ATTRIBUTES = (
+               "Public"
+            );
+         };
+      };
+      "OBJ_105" = {
+         isa = "PBXFrameworksBuildPhase";
+         files = (
+         );
       };
       "OBJ_11" = {
          isa = "PBXFileReference";
@@ -63,10 +133,7 @@
             "OBJ_16",
             "OBJ_17",
             "OBJ_18",
-            "OBJ_19",
-            "OBJ_20",
-            "OBJ_21",
-            "OBJ_22"
+            "OBJ_19"
          );
          name = "SnapshotTesting";
          path = "Sources/SnapshotTesting";
@@ -74,7 +141,7 @@
       };
       "OBJ_15" = {
          isa = "PBXFileReference";
-         path = "Cocoa.swift";
+         path = "Attachment.swift";
          sourceTree = "<group>";
       };
       "OBJ_16" = {
@@ -84,17 +151,31 @@
       };
       "OBJ_17" = {
          isa = "PBXFileReference";
-         path = "Snapshot.swift";
+         path = "SnapshotTesting.swift";
          sourceTree = "<group>";
       };
       "OBJ_18" = {
          isa = "PBXFileReference";
-         path = "SnapshotStringConvertible.swift";
+         path = "Strategy.swift";
          sourceTree = "<group>";
       };
       "OBJ_19" = {
-         isa = "PBXFileReference";
-         path = "SnapshotTesting.swift";
+         isa = "PBXGroup";
+         children = (
+            "OBJ_20",
+            "OBJ_21",
+            "OBJ_22",
+            "OBJ_23",
+            "OBJ_24",
+            "OBJ_25",
+            "OBJ_26",
+            "OBJ_27",
+            "OBJ_28",
+            "OBJ_29",
+            "OBJ_30"
+         );
+         name = "Strategy";
+         path = "Strategy";
          sourceTree = "<group>";
       };
       "OBJ_2" = {
@@ -108,67 +189,53 @@
       };
       "OBJ_20" = {
          isa = "PBXFileReference";
-         path = "Strategy.swift";
+         path = "Any.swift";
          sourceTree = "<group>";
       };
       "OBJ_21" = {
          isa = "PBXFileReference";
-         path = "UIKit.swift";
+         path = "CALayer.swift";
          sourceTree = "<group>";
       };
       "OBJ_22" = {
          isa = "PBXFileReference";
-         path = "WebKit.swift";
+         path = "Data.swift";
          sourceTree = "<group>";
       };
       "OBJ_23" = {
-         isa = "PBXGroup";
-         children = (
-            "OBJ_24"
-         );
-         name = "Diff";
-         path = "Sources/Diff";
-         sourceTree = "SOURCE_ROOT";
+         isa = "PBXFileReference";
+         path = "NSImage.swift";
+         sourceTree = "<group>";
       };
       "OBJ_24" = {
          isa = "PBXFileReference";
-         path = "Diff.swift";
+         path = "NSView.swift";
          sourceTree = "<group>";
       };
       "OBJ_25" = {
-         isa = "PBXGroup";
-         children = (
-            "OBJ_26"
-         );
-         name = "Tests";
-         path = "";
-         sourceTree = "SOURCE_ROOT";
+         isa = "PBXFileReference";
+         path = "NSViewController.swift";
+         sourceTree = "<group>";
       };
       "OBJ_26" = {
-         isa = "PBXGroup";
-         children = (
-            "OBJ_27"
-         );
-         name = "SnapshotTestingTests";
-         path = "Tests/SnapshotTestingTests";
-         sourceTree = "SOURCE_ROOT";
+         isa = "PBXFileReference";
+         path = "String.swift";
+         sourceTree = "<group>";
       };
       "OBJ_27" = {
          isa = "PBXFileReference";
-         path = "SnapshotTestingTests.swift";
+         path = "UIImage.swift";
          sourceTree = "<group>";
       };
       "OBJ_28" = {
-         isa = "PBXGroup";
-         children = (
-            "SnapshotTesting::Diff::Product",
-            "SnapshotTesting::WKSnapshotConfigurationShim::Product",
-            "SnapshotTesting::SnapshotTestingTests::Product",
-            "SnapshotTesting::SnapshotTesting::Product"
-         );
-         name = "Products";
-         path = "";
-         sourceTree = "BUILT_PRODUCTS_DIR";
+         isa = "PBXFileReference";
+         path = "UIView.swift";
+         sourceTree = "<group>";
+      };
+      "OBJ_29" = {
+         isa = "PBXFileReference";
+         path = "UIViewController.swift";
+         sourceTree = "<group>";
       };
       "OBJ_3" = {
          isa = "XCBuildConfiguration";
@@ -209,105 +276,59 @@
          };
          name = "Debug";
       };
-      "OBJ_34" = {
-         isa = "XCConfigurationList";
-         buildConfigurations = (
-            "OBJ_35",
-            "OBJ_36"
+      "OBJ_30" = {
+         isa = "PBXFileReference";
+         path = "WKWebView.swift";
+         sourceTree = "<group>";
+      };
+      "OBJ_31" = {
+         isa = "PBXGroup";
+         children = (
+            "OBJ_32"
          );
-         defaultConfigurationIsVisible = "0";
-         defaultConfigurationName = "Release";
+         name = "Diff";
+         path = "Sources/Diff";
+         sourceTree = "SOURCE_ROOT";
+      };
+      "OBJ_32" = {
+         isa = "PBXFileReference";
+         path = "Diff.swift";
+         sourceTree = "<group>";
+      };
+      "OBJ_33" = {
+         isa = "PBXGroup";
+         children = (
+            "OBJ_34"
+         );
+         name = "Tests";
+         path = "";
+         sourceTree = "SOURCE_ROOT";
+      };
+      "OBJ_34" = {
+         isa = "PBXGroup";
+         children = (
+            "OBJ_35"
+         );
+         name = "SnapshotTestingTests";
+         path = "Tests/SnapshotTestingTests";
+         sourceTree = "SOURCE_ROOT";
       };
       "OBJ_35" = {
-         isa = "XCBuildConfiguration";
-         baseConfigurationReference = "OBJ_8";
-         buildSettings = {
-            ENABLE_TESTABILITY = "YES";
-            FRAMEWORK_SEARCH_PATHS = (
-               "$(inherited)",
-               "$(PLATFORM_DIR)/Developer/Library/Frameworks"
-            );
-            HEADER_SEARCH_PATHS = (
-               "$(inherited)"
-            );
-            INFOPLIST_FILE = "SnapshotTesting.xcodeproj/Diff_Info.plist";
-            LD_RUNPATH_SEARCH_PATHS = (
-               "$(inherited)",
-               "$(TOOLCHAIN_DIR)/usr/lib/swift/macosx"
-            );
-            OTHER_CFLAGS = (
-               "$(inherited)"
-            );
-            OTHER_LDFLAGS = (
-               "$(inherited)"
-            );
-            OTHER_SWIFT_FLAGS = (
-               "$(inherited)"
-            );
-            PRODUCT_BUNDLE_IDENTIFIER = "Diff";
-            PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
-            PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-            SKIP_INSTALL = "YES";
-            SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
-               "$(inherited)"
-            );
-            SWIFT_VERSION = "4.0";
-            TARGET_NAME = "Diff";
-         };
-         name = "Debug";
+         isa = "PBXFileReference";
+         path = "SnapshotTestingTests.swift";
+         sourceTree = "<group>";
       };
       "OBJ_36" = {
-         isa = "XCBuildConfiguration";
-         baseConfigurationReference = "OBJ_8";
-         buildSettings = {
-            ENABLE_TESTABILITY = "YES";
-            FRAMEWORK_SEARCH_PATHS = (
-               "$(inherited)",
-               "$(PLATFORM_DIR)/Developer/Library/Frameworks"
-            );
-            HEADER_SEARCH_PATHS = (
-               "$(inherited)"
-            );
-            INFOPLIST_FILE = "SnapshotTesting.xcodeproj/Diff_Info.plist";
-            LD_RUNPATH_SEARCH_PATHS = (
-               "$(inherited)",
-               "$(TOOLCHAIN_DIR)/usr/lib/swift/macosx"
-            );
-            OTHER_CFLAGS = (
-               "$(inherited)"
-            );
-            OTHER_LDFLAGS = (
-               "$(inherited)"
-            );
-            OTHER_SWIFT_FLAGS = (
-               "$(inherited)"
-            );
-            PRODUCT_BUNDLE_IDENTIFIER = "Diff";
-            PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
-            PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-            SKIP_INSTALL = "YES";
-            SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
-               "$(inherited)"
-            );
-            SWIFT_VERSION = "4.0";
-            TARGET_NAME = "Diff";
-         };
-         name = "Release";
-      };
-      "OBJ_37" = {
-         isa = "PBXSourcesBuildPhase";
-         files = (
-            "OBJ_38"
+         isa = "PBXGroup";
+         children = (
+            "SnapshotTesting::WKSnapshotConfigurationShim::Product",
+            "SnapshotTesting::SnapshotTesting::Product",
+            "SnapshotTesting::SnapshotTestingTests::Product",
+            "SnapshotTesting::Diff::Product"
          );
-      };
-      "OBJ_38" = {
-         isa = "PBXBuildFile";
-         fileRef = "OBJ_24";
-      };
-      "OBJ_39" = {
-         isa = "PBXFrameworksBuildPhase";
-         files = (
-         );
+         name = "Products";
+         path = "";
+         sourceTree = "BUILT_PRODUCTS_DIR";
       };
       "OBJ_4" = {
          isa = "XCBuildConfiguration";
@@ -341,53 +362,14 @@
          };
          name = "Release";
       };
-      "OBJ_41" = {
+      "OBJ_42" = {
          isa = "XCConfigurationList";
          buildConfigurations = (
-            "OBJ_42",
-            "OBJ_43"
+            "OBJ_43",
+            "OBJ_44"
          );
          defaultConfigurationIsVisible = "0";
          defaultConfigurationName = "Release";
-      };
-      "OBJ_42" = {
-         isa = "XCBuildConfiguration";
-         baseConfigurationReference = "OBJ_8";
-         buildSettings = {
-            ENABLE_TESTABILITY = "YES";
-            FRAMEWORK_SEARCH_PATHS = (
-               "$(inherited)",
-               "$(PLATFORM_DIR)/Developer/Library/Frameworks"
-            );
-            HEADER_SEARCH_PATHS = (
-               "$(inherited)",
-               "$(SRCROOT)/Sources/WKSnapshotConfigurationShim/include"
-            );
-            INFOPLIST_FILE = "SnapshotTesting.xcodeproj/SnapshotTesting_Info.plist";
-            LD_RUNPATH_SEARCH_PATHS = (
-               "$(inherited)",
-               "$(TOOLCHAIN_DIR)/usr/lib/swift/macosx"
-            );
-            OTHER_CFLAGS = (
-               "$(inherited)"
-            );
-            OTHER_LDFLAGS = (
-               "$(inherited)"
-            );
-            OTHER_SWIFT_FLAGS = (
-               "$(inherited)"
-            );
-            PRODUCT_BUNDLE_IDENTIFIER = "SnapshotTesting";
-            PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
-            PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-            SKIP_INSTALL = "YES";
-            SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
-               "$(inherited)"
-            );
-            SWIFT_VERSION = "4.0";
-            TARGET_NAME = "SnapshotTesting";
-         };
-         name = "Debug";
       };
       "OBJ_43" = {
          isa = "XCBuildConfiguration";
@@ -399,6 +381,157 @@
                "$(PLATFORM_DIR)/Developer/Library/Frameworks"
             );
             HEADER_SEARCH_PATHS = (
+               "$(inherited)"
+            );
+            INFOPLIST_FILE = "SnapshotTesting.xcodeproj/Diff_Info.plist";
+            LD_RUNPATH_SEARCH_PATHS = (
+               "$(inherited)",
+               "$(TOOLCHAIN_DIR)/usr/lib/swift/macosx"
+            );
+            OTHER_CFLAGS = (
+               "$(inherited)"
+            );
+            OTHER_LDFLAGS = (
+               "$(inherited)"
+            );
+            OTHER_SWIFT_FLAGS = (
+               "$(inherited)"
+            );
+            PRODUCT_BUNDLE_IDENTIFIER = "Diff";
+            PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
+            PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+            SKIP_INSTALL = "YES";
+            SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+               "$(inherited)"
+            );
+            SWIFT_VERSION = "4.0";
+            TARGET_NAME = "Diff";
+         };
+         name = "Debug";
+      };
+      "OBJ_44" = {
+         isa = "XCBuildConfiguration";
+         baseConfigurationReference = "OBJ_8";
+         buildSettings = {
+            ENABLE_TESTABILITY = "YES";
+            FRAMEWORK_SEARCH_PATHS = (
+               "$(inherited)",
+               "$(PLATFORM_DIR)/Developer/Library/Frameworks"
+            );
+            HEADER_SEARCH_PATHS = (
+               "$(inherited)"
+            );
+            INFOPLIST_FILE = "SnapshotTesting.xcodeproj/Diff_Info.plist";
+            LD_RUNPATH_SEARCH_PATHS = (
+               "$(inherited)",
+               "$(TOOLCHAIN_DIR)/usr/lib/swift/macosx"
+            );
+            OTHER_CFLAGS = (
+               "$(inherited)"
+            );
+            OTHER_LDFLAGS = (
+               "$(inherited)"
+            );
+            OTHER_SWIFT_FLAGS = (
+               "$(inherited)"
+            );
+            PRODUCT_BUNDLE_IDENTIFIER = "Diff";
+            PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
+            PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+            SKIP_INSTALL = "YES";
+            SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+               "$(inherited)"
+            );
+            SWIFT_VERSION = "4.0";
+            TARGET_NAME = "Diff";
+         };
+         name = "Release";
+      };
+      "OBJ_45" = {
+         isa = "PBXSourcesBuildPhase";
+         files = (
+            "OBJ_46"
+         );
+      };
+      "OBJ_46" = {
+         isa = "PBXBuildFile";
+         fileRef = "OBJ_32";
+      };
+      "OBJ_47" = {
+         isa = "PBXFrameworksBuildPhase";
+         files = (
+         );
+      };
+      "OBJ_49" = {
+         isa = "XCConfigurationList";
+         buildConfigurations = (
+            "OBJ_50",
+            "OBJ_51"
+         );
+         defaultConfigurationIsVisible = "0";
+         defaultConfigurationName = "Release";
+      };
+      "OBJ_5" = {
+         isa = "PBXGroup";
+         children = (
+            "OBJ_6",
+            "OBJ_7",
+            "OBJ_9",
+            "OBJ_33",
+            "OBJ_36"
+         );
+         path = "";
+         sourceTree = "<group>";
+      };
+      "OBJ_50" = {
+         isa = "XCBuildConfiguration";
+         baseConfigurationReference = "OBJ_8";
+         buildSettings = {
+            ENABLE_TESTABILITY = "YES";
+            FRAMEWORK_SEARCH_PATHS = (
+               "$(inherited)",
+               "$(PLATFORM_DIR)/Developer/Library/Frameworks"
+            );
+            HEADER_SEARCH_PATHS = (
+               "$(inherited)",
+               "$(SRCROOT)/Sources/WKSnapshotConfigurationShim/include"
+            );
+            INFOPLIST_FILE = "SnapshotTesting.xcodeproj/SnapshotTesting_Info.plist";
+            LD_RUNPATH_SEARCH_PATHS = (
+               "$(inherited)",
+               "$(TOOLCHAIN_DIR)/usr/lib/swift/macosx"
+            );
+            OTHER_CFLAGS = (
+               "$(inherited)"
+            );
+            OTHER_LDFLAGS = (
+               "$(inherited)"
+            );
+            OTHER_SWIFT_FLAGS = (
+               "$(inherited)"
+            );
+            PRODUCT_BUNDLE_IDENTIFIER = "SnapshotTesting";
+            PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
+            PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+            SKIP_INSTALL = "YES";
+            SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+               "$(inherited)"
+            );
+            SWIFT_VERSION = "4.0";
+            TARGET_NAME = "SnapshotTesting";
+         };
+         name = "Debug";
+      };
+      "OBJ_51" = {
+         isa = "XCBuildConfiguration";
+         baseConfigurationReference = "OBJ_8";
+         buildSettings = {
+            ENABLE_TESTABILITY = "YES";
+            FRAMEWORK_SEARCH_PATHS = (
+               "$(inherited)",
+               "$(PLATFORM_DIR)/Developer/Library/Frameworks"
+            );
+            HEADER_SEARCH_PATHS = (
                "$(inherited)",
                "$(SRCROOT)/Sources/WKSnapshotConfigurationShim/include"
             );
@@ -428,85 +561,53 @@
          };
          name = "Release";
       };
-      "OBJ_44" = {
+      "OBJ_52" = {
          isa = "PBXSourcesBuildPhase";
          files = (
-            "OBJ_45",
-            "OBJ_46",
-            "OBJ_47",
-            "OBJ_48",
-            "OBJ_49",
-            "OBJ_50",
-            "OBJ_51",
-            "OBJ_52"
+            "OBJ_53",
+            "OBJ_54",
+            "OBJ_55",
+            "OBJ_56",
+            "OBJ_57",
+            "OBJ_58",
+            "OBJ_59",
+            "OBJ_60",
+            "OBJ_61",
+            "OBJ_62",
+            "OBJ_63",
+            "OBJ_64",
+            "OBJ_65",
+            "OBJ_66",
+            "OBJ_67"
          );
       };
-      "OBJ_45" = {
+      "OBJ_53" = {
          isa = "PBXBuildFile";
          fileRef = "OBJ_15";
       };
-      "OBJ_46" = {
+      "OBJ_54" = {
          isa = "PBXBuildFile";
          fileRef = "OBJ_16";
       };
-      "OBJ_47" = {
+      "OBJ_55" = {
          isa = "PBXBuildFile";
          fileRef = "OBJ_17";
       };
-      "OBJ_48" = {
+      "OBJ_56" = {
          isa = "PBXBuildFile";
          fileRef = "OBJ_18";
       };
-      "OBJ_49" = {
-         isa = "PBXBuildFile";
-         fileRef = "OBJ_19";
-      };
-      "OBJ_5" = {
-         isa = "PBXGroup";
-         children = (
-            "OBJ_6",
-            "OBJ_7",
-            "OBJ_9",
-            "OBJ_25",
-            "OBJ_28"
-         );
-         path = "";
-         sourceTree = "<group>";
-      };
-      "OBJ_50" = {
+      "OBJ_57" = {
          isa = "PBXBuildFile";
          fileRef = "OBJ_20";
       };
-      "OBJ_51" = {
+      "OBJ_58" = {
          isa = "PBXBuildFile";
          fileRef = "OBJ_21";
       };
-      "OBJ_52" = {
+      "OBJ_59" = {
          isa = "PBXBuildFile";
          fileRef = "OBJ_22";
-      };
-      "OBJ_53" = {
-         isa = "PBXFrameworksBuildPhase";
-         files = (
-            "OBJ_54",
-            "OBJ_55"
-         );
-      };
-      "OBJ_54" = {
-         isa = "PBXBuildFile";
-         fileRef = "SnapshotTesting::WKSnapshotConfigurationShim::Product";
-      };
-      "OBJ_55" = {
-         isa = "PBXBuildFile";
-         fileRef = "SnapshotTesting::Diff::Product";
-      };
-      "OBJ_56" = {
-         isa = "PBXTargetDependency";
-         target = "SnapshotTesting::WKSnapshotConfigurationShim";
-      };
-      "OBJ_58" = {
-         isa = "PBXTargetDependency";
-         target = "SnapshotTesting::Diff";
       };
       "OBJ_6" = {
          isa = "PBXFileReference";
@@ -515,84 +616,47 @@
          sourceTree = "<group>";
       };
       "OBJ_60" = {
-         isa = "XCConfigurationList";
-         buildConfigurations = (
-            "OBJ_61",
-            "OBJ_62"
-         );
-         defaultConfigurationIsVisible = "0";
-         defaultConfigurationName = "Release";
+         isa = "PBXBuildFile";
+         fileRef = "OBJ_23";
       };
       "OBJ_61" = {
-         isa = "XCBuildConfiguration";
-         buildSettings = {
-            LD = "/usr/bin/true";
-            OTHER_SWIFT_FLAGS = (
-               "-swift-version",
-               "4",
-               "-I",
-               "$(TOOLCHAIN_DIR)/usr/lib/swift/pm/4",
-               "-target",
-               "x86_64-apple-macosx10.10",
-               "-sdk",
-               "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk"
-            );
-            SWIFT_VERSION = "4.0";
-         };
-         name = "Debug";
+         isa = "PBXBuildFile";
+         fileRef = "OBJ_24";
       };
       "OBJ_62" = {
-         isa = "XCBuildConfiguration";
-         buildSettings = {
-            LD = "/usr/bin/true";
-            OTHER_SWIFT_FLAGS = (
-               "-swift-version",
-               "4",
-               "-I",
-               "$(TOOLCHAIN_DIR)/usr/lib/swift/pm/4",
-               "-target",
-               "x86_64-apple-macosx10.10",
-               "-sdk",
-               "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk"
-            );
-            SWIFT_VERSION = "4.0";
-         };
-         name = "Release";
+         isa = "PBXBuildFile";
+         fileRef = "OBJ_25";
       };
       "OBJ_63" = {
-         isa = "PBXSourcesBuildPhase";
-         files = (
-            "OBJ_64"
-         );
+         isa = "PBXBuildFile";
+         fileRef = "OBJ_26";
       };
       "OBJ_64" = {
          isa = "PBXBuildFile";
-         fileRef = "OBJ_6";
+         fileRef = "OBJ_27";
+      };
+      "OBJ_65" = {
+         isa = "PBXBuildFile";
+         fileRef = "OBJ_28";
       };
       "OBJ_66" = {
-         isa = "XCConfigurationList";
-         buildConfigurations = (
-            "OBJ_67",
-            "OBJ_68"
-         );
-         defaultConfigurationIsVisible = "0";
-         defaultConfigurationName = "Release";
+         isa = "PBXBuildFile";
+         fileRef = "OBJ_29";
       };
       "OBJ_67" = {
-         isa = "XCBuildConfiguration";
-         buildSettings = {
-         };
-         name = "Debug";
+         isa = "PBXBuildFile";
+         fileRef = "OBJ_30";
       };
       "OBJ_68" = {
-         isa = "XCBuildConfiguration";
-         buildSettings = {
-         };
-         name = "Release";
+         isa = "PBXFrameworksBuildPhase";
+         files = (
+            "OBJ_69",
+            "OBJ_70"
+         );
       };
       "OBJ_69" = {
-         isa = "PBXTargetDependency";
-         target = "SnapshotTesting::SnapshotTestingTests";
+         isa = "PBXBuildFile";
+         fileRef = "SnapshotTesting::WKSnapshotConfigurationShim::Product";
       };
       "OBJ_7" = {
          isa = "PBXGroup";
@@ -603,146 +667,249 @@
          path = "";
          sourceTree = "<group>";
       };
+      "OBJ_70" = {
+         isa = "PBXBuildFile";
+         fileRef = "SnapshotTesting::Diff::Product";
+      };
       "OBJ_71" = {
+         isa = "PBXTargetDependency";
+         target = "SnapshotTesting::WKSnapshotConfigurationShim";
+      };
+      "OBJ_73" = {
+         isa = "PBXTargetDependency";
+         target = "SnapshotTesting::Diff";
+      };
+      "OBJ_75" = {
          isa = "XCConfigurationList";
          buildConfigurations = (
-            "OBJ_72",
-            "OBJ_73"
+            "OBJ_76",
+            "OBJ_77"
          );
          defaultConfigurationIsVisible = "0";
          defaultConfigurationName = "Release";
       };
-      "OBJ_72" = {
+      "OBJ_76" = {
          isa = "XCBuildConfiguration";
-         baseConfigurationReference = "OBJ_8";
          buildSettings = {
-            CLANG_ENABLE_MODULES = "YES";
-            EMBEDDED_CONTENT_CONTAINS_SWIFT = "YES";
-            FRAMEWORK_SEARCH_PATHS = (
-               "$(inherited)",
-               "$(PLATFORM_DIR)/Developer/Library/Frameworks"
-            );
-            HEADER_SEARCH_PATHS = (
-               "$(inherited)",
-               "$(SRCROOT)/Sources/WKSnapshotConfigurationShim/include"
-            );
-            INFOPLIST_FILE = "SnapshotTesting.xcodeproj/SnapshotTestingTests_Info.plist";
-            LD_RUNPATH_SEARCH_PATHS = (
-               "$(inherited)",
-               "@loader_path/../Frameworks",
-               "@loader_path/Frameworks"
-            );
-            OTHER_CFLAGS = (
-               "$(inherited)"
-            );
-            OTHER_LDFLAGS = (
-               "$(inherited)"
-            );
+            LD = "/usr/bin/true";
             OTHER_SWIFT_FLAGS = (
-               "$(inherited)"
-            );
-            SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
-               "$(inherited)"
+               "-swift-version",
+               "4",
+               "-I",
+               "$(TOOLCHAIN_DIR)/usr/lib/swift/pm/4",
+               "-target",
+               "x86_64-apple-macosx10.10",
+               "-sdk",
+               "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk"
             );
             SWIFT_VERSION = "4.0";
-            TARGET_NAME = "SnapshotTestingTests";
          };
          name = "Debug";
       };
-      "OBJ_73" = {
+      "OBJ_77" = {
          isa = "XCBuildConfiguration";
-         baseConfigurationReference = "OBJ_8";
          buildSettings = {
-            CLANG_ENABLE_MODULES = "YES";
-            EMBEDDED_CONTENT_CONTAINS_SWIFT = "YES";
-            FRAMEWORK_SEARCH_PATHS = (
-               "$(inherited)",
-               "$(PLATFORM_DIR)/Developer/Library/Frameworks"
-            );
-            HEADER_SEARCH_PATHS = (
-               "$(inherited)",
-               "$(SRCROOT)/Sources/WKSnapshotConfigurationShim/include"
-            );
-            INFOPLIST_FILE = "SnapshotTesting.xcodeproj/SnapshotTestingTests_Info.plist";
-            LD_RUNPATH_SEARCH_PATHS = (
-               "$(inherited)",
-               "@loader_path/../Frameworks",
-               "@loader_path/Frameworks"
-            );
-            OTHER_CFLAGS = (
-               "$(inherited)"
-            );
-            OTHER_LDFLAGS = (
-               "$(inherited)"
-            );
+            LD = "/usr/bin/true";
             OTHER_SWIFT_FLAGS = (
-               "$(inherited)"
-            );
-            SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
-               "$(inherited)"
+               "-swift-version",
+               "4",
+               "-I",
+               "$(TOOLCHAIN_DIR)/usr/lib/swift/pm/4",
+               "-target",
+               "x86_64-apple-macosx10.10",
+               "-sdk",
+               "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk"
             );
             SWIFT_VERSION = "4.0";
-            TARGET_NAME = "SnapshotTestingTests";
          };
          name = "Release";
       };
-      "OBJ_74" = {
+      "OBJ_78" = {
          isa = "PBXSourcesBuildPhase";
          files = (
-            "OBJ_75"
-         );
-      };
-      "OBJ_75" = {
-         isa = "PBXBuildFile";
-         fileRef = "OBJ_27";
-      };
-      "OBJ_76" = {
-         isa = "PBXFrameworksBuildPhase";
-         files = (
-            "OBJ_77",
-            "OBJ_78",
             "OBJ_79"
          );
       };
-      "OBJ_77" = {
-         isa = "PBXBuildFile";
-         fileRef = "SnapshotTesting::SnapshotTesting::Product";
-      };
-      "OBJ_78" = {
-         isa = "PBXBuildFile";
-         fileRef = "SnapshotTesting::WKSnapshotConfigurationShim::Product";
-      };
       "OBJ_79" = {
          isa = "PBXBuildFile";
-         fileRef = "SnapshotTesting::Diff::Product";
+         fileRef = "OBJ_6";
       };
       "OBJ_8" = {
          isa = "PBXFileReference";
          path = "Development.xcconfig";
          sourceTree = "<group>";
       };
-      "OBJ_80" = {
-         isa = "PBXTargetDependency";
-         target = "SnapshotTesting::SnapshotTesting";
-      };
       "OBJ_81" = {
-         isa = "PBXTargetDependency";
-         target = "SnapshotTesting::WKSnapshotConfigurationShim";
-      };
-      "OBJ_82" = {
-         isa = "PBXTargetDependency";
-         target = "SnapshotTesting::Diff";
-      };
-      "OBJ_83" = {
          isa = "XCConfigurationList";
          buildConfigurations = (
-            "OBJ_84",
-            "OBJ_85"
+            "OBJ_82",
+            "OBJ_83"
          );
          defaultConfigurationIsVisible = "0";
          defaultConfigurationName = "Release";
       };
+      "OBJ_82" = {
+         isa = "XCBuildConfiguration";
+         buildSettings = {
+         };
+         name = "Debug";
+      };
+      "OBJ_83" = {
+         isa = "XCBuildConfiguration";
+         buildSettings = {
+         };
+         name = "Release";
+      };
       "OBJ_84" = {
+         isa = "PBXTargetDependency";
+         target = "SnapshotTesting::SnapshotTestingTests";
+      };
+      "OBJ_86" = {
+         isa = "XCConfigurationList";
+         buildConfigurations = (
+            "OBJ_87",
+            "OBJ_88"
+         );
+         defaultConfigurationIsVisible = "0";
+         defaultConfigurationName = "Release";
+      };
+      "OBJ_87" = {
+         isa = "XCBuildConfiguration";
+         baseConfigurationReference = "OBJ_8";
+         buildSettings = {
+            CLANG_ENABLE_MODULES = "YES";
+            EMBEDDED_CONTENT_CONTAINS_SWIFT = "YES";
+            FRAMEWORK_SEARCH_PATHS = (
+               "$(inherited)",
+               "$(PLATFORM_DIR)/Developer/Library/Frameworks"
+            );
+            HEADER_SEARCH_PATHS = (
+               "$(inherited)",
+               "$(SRCROOT)/Sources/WKSnapshotConfigurationShim/include"
+            );
+            INFOPLIST_FILE = "SnapshotTesting.xcodeproj/SnapshotTestingTests_Info.plist";
+            LD_RUNPATH_SEARCH_PATHS = (
+               "$(inherited)",
+               "@loader_path/../Frameworks",
+               "@loader_path/Frameworks"
+            );
+            OTHER_CFLAGS = (
+               "$(inherited)"
+            );
+            OTHER_LDFLAGS = (
+               "$(inherited)"
+            );
+            OTHER_SWIFT_FLAGS = (
+               "$(inherited)"
+            );
+            SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+               "$(inherited)"
+            );
+            SWIFT_VERSION = "4.0";
+            TARGET_NAME = "SnapshotTestingTests";
+         };
+         name = "Debug";
+      };
+      "OBJ_88" = {
+         isa = "XCBuildConfiguration";
+         baseConfigurationReference = "OBJ_8";
+         buildSettings = {
+            CLANG_ENABLE_MODULES = "YES";
+            EMBEDDED_CONTENT_CONTAINS_SWIFT = "YES";
+            FRAMEWORK_SEARCH_PATHS = (
+               "$(inherited)",
+               "$(PLATFORM_DIR)/Developer/Library/Frameworks"
+            );
+            HEADER_SEARCH_PATHS = (
+               "$(inherited)",
+               "$(SRCROOT)/Sources/WKSnapshotConfigurationShim/include"
+            );
+            INFOPLIST_FILE = "SnapshotTesting.xcodeproj/SnapshotTestingTests_Info.plist";
+            LD_RUNPATH_SEARCH_PATHS = (
+               "$(inherited)",
+               "@loader_path/../Frameworks",
+               "@loader_path/Frameworks"
+            );
+            OTHER_CFLAGS = (
+               "$(inherited)"
+            );
+            OTHER_LDFLAGS = (
+               "$(inherited)"
+            );
+            OTHER_SWIFT_FLAGS = (
+               "$(inherited)"
+            );
+            SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+               "$(inherited)"
+            );
+            SWIFT_VERSION = "4.0";
+            TARGET_NAME = "SnapshotTestingTests";
+         };
+         name = "Release";
+      };
+      "OBJ_89" = {
+         isa = "PBXSourcesBuildPhase";
+         files = (
+            "OBJ_90"
+         );
+      };
+      "OBJ_9" = {
+         isa = "PBXGroup";
+         children = (
+            "OBJ_10",
+            "OBJ_14",
+            "OBJ_31"
+         );
+         name = "Sources";
+         path = "";
+         sourceTree = "SOURCE_ROOT";
+      };
+      "OBJ_90" = {
+         isa = "PBXBuildFile";
+         fileRef = "OBJ_35";
+      };
+      "OBJ_91" = {
+         isa = "PBXFrameworksBuildPhase";
+         files = (
+            "OBJ_92",
+            "OBJ_93",
+            "OBJ_94"
+         );
+      };
+      "OBJ_92" = {
+         isa = "PBXBuildFile";
+         fileRef = "SnapshotTesting::SnapshotTesting::Product";
+      };
+      "OBJ_93" = {
+         isa = "PBXBuildFile";
+         fileRef = "SnapshotTesting::WKSnapshotConfigurationShim::Product";
+      };
+      "OBJ_94" = {
+         isa = "PBXBuildFile";
+         fileRef = "SnapshotTesting::Diff::Product";
+      };
+      "OBJ_95" = {
+         isa = "PBXTargetDependency";
+         target = "SnapshotTesting::SnapshotTesting";
+      };
+      "OBJ_96" = {
+         isa = "PBXTargetDependency";
+         target = "SnapshotTesting::WKSnapshotConfigurationShim";
+      };
+      "OBJ_97" = {
+         isa = "PBXTargetDependency";
+         target = "SnapshotTesting::Diff";
+      };
+      "OBJ_98" = {
+         isa = "XCConfigurationList";
+         buildConfigurations = (
+            "OBJ_99",
+            "OBJ_100"
+         );
+         defaultConfigurationIsVisible = "0";
+         defaultConfigurationName = "Release";
+      };
+      "OBJ_99" = {
          isa = "XCBuildConfiguration";
          baseConfigurationReference = "OBJ_8";
          buildSettings = {
@@ -782,93 +949,12 @@
          };
          name = "Debug";
       };
-      "OBJ_85" = {
-         isa = "XCBuildConfiguration";
-         baseConfigurationReference = "OBJ_8";
-         buildSettings = {
-            CLANG_ENABLE_MODULES = "YES";
-            DEFINES_MODULE = "YES";
-            ENABLE_TESTABILITY = "YES";
-            FRAMEWORK_SEARCH_PATHS = (
-               "$(inherited)",
-               "$(PLATFORM_DIR)/Developer/Library/Frameworks"
-            );
-            HEADER_SEARCH_PATHS = (
-               "$(inherited)",
-               "$(SRCROOT)/Sources/WKSnapshotConfigurationShim/include"
-            );
-            INFOPLIST_FILE = "SnapshotTesting.xcodeproj/WKSnapshotConfigurationShim_Info.plist";
-            LD_RUNPATH_SEARCH_PATHS = (
-               "$(inherited)",
-               "$(TOOLCHAIN_DIR)/usr/lib/swift/macosx"
-            );
-            OTHER_CFLAGS = (
-               "$(inherited)"
-            );
-            OTHER_LDFLAGS = (
-               "$(inherited)"
-            );
-            OTHER_SWIFT_FLAGS = (
-               "$(inherited)"
-            );
-            PRODUCT_BUNDLE_IDENTIFIER = "WKSnapshotConfigurationShim";
-            PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
-            PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-            SKIP_INSTALL = "YES";
-            SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
-               "$(inherited)"
-            );
-            TARGET_NAME = "WKSnapshotConfigurationShim";
-         };
-         name = "Release";
-      };
-      "OBJ_86" = {
-         isa = "PBXSourcesBuildPhase";
-         files = (
-            "OBJ_87"
-         );
-      };
-      "OBJ_87" = {
-         isa = "PBXBuildFile";
-         fileRef = "OBJ_11";
-      };
-      "OBJ_88" = {
-         isa = "PBXHeadersBuildPhase";
-         files = (
-            "OBJ_89"
-         );
-      };
-      "OBJ_89" = {
-         isa = "PBXBuildFile";
-         fileRef = "OBJ_13";
-         settings = {
-            ATTRIBUTES = (
-               "Public"
-            );
-         };
-      };
-      "OBJ_9" = {
-         isa = "PBXGroup";
-         children = (
-            "OBJ_10",
-            "OBJ_14",
-            "OBJ_23"
-         );
-         name = "Sources";
-         path = "";
-         sourceTree = "SOURCE_ROOT";
-      };
-      "OBJ_90" = {
-         isa = "PBXFrameworksBuildPhase";
-         files = (
-         );
-      };
       "SnapshotTesting::Diff" = {
          isa = "PBXNativeTarget";
-         buildConfigurationList = "OBJ_34";
+         buildConfigurationList = "OBJ_42";
          buildPhases = (
-            "OBJ_37",
-            "OBJ_39"
+            "OBJ_45",
+            "OBJ_47"
          );
          dependencies = (
          );
@@ -884,14 +970,14 @@
       };
       "SnapshotTesting::SnapshotTesting" = {
          isa = "PBXNativeTarget";
-         buildConfigurationList = "OBJ_41";
+         buildConfigurationList = "OBJ_49";
          buildPhases = (
-            "OBJ_44",
-            "OBJ_53"
+            "OBJ_52",
+            "OBJ_68"
          );
          dependencies = (
-            "OBJ_56",
-            "OBJ_58"
+            "OBJ_71",
+            "OBJ_73"
          );
          name = "SnapshotTesting";
          productName = "SnapshotTesting";
@@ -905,26 +991,26 @@
       };
       "SnapshotTesting::SnapshotTestingPackageTests::ProductTarget" = {
          isa = "PBXAggregateTarget";
-         buildConfigurationList = "OBJ_66";
+         buildConfigurationList = "OBJ_81";
          buildPhases = (
          );
          dependencies = (
-            "OBJ_69"
+            "OBJ_84"
          );
          name = "SnapshotTestingPackageTests";
          productName = "SnapshotTestingPackageTests";
       };
       "SnapshotTesting::SnapshotTestingTests" = {
          isa = "PBXNativeTarget";
-         buildConfigurationList = "OBJ_71";
+         buildConfigurationList = "OBJ_86";
          buildPhases = (
-            "OBJ_74",
-            "OBJ_76"
+            "OBJ_89",
+            "OBJ_91"
          );
          dependencies = (
-            "OBJ_80",
-            "OBJ_81",
-            "OBJ_82"
+            "OBJ_95",
+            "OBJ_96",
+            "OBJ_97"
          );
          name = "SnapshotTestingTests";
          productName = "SnapshotTestingTests";
@@ -938,9 +1024,9 @@
       };
       "SnapshotTesting::SwiftPMPackageDescription" = {
          isa = "PBXNativeTarget";
-         buildConfigurationList = "OBJ_60";
+         buildConfigurationList = "OBJ_75";
          buildPhases = (
-            "OBJ_63"
+            "OBJ_78"
          );
          dependencies = (
          );
@@ -950,11 +1036,11 @@
       };
       "SnapshotTesting::WKSnapshotConfigurationShim" = {
          isa = "PBXNativeTarget";
-         buildConfigurationList = "OBJ_83";
+         buildConfigurationList = "OBJ_98";
          buildPhases = (
-            "OBJ_86",
-            "OBJ_88",
-            "OBJ_90"
+            "OBJ_101",
+            "OBJ_103",
+            "OBJ_105"
          );
          dependencies = (
          );
