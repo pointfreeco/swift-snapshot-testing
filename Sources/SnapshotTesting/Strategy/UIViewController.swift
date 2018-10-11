@@ -3,7 +3,7 @@ import UIKit
 
 extension Strategy {
   public static var viewController: Strategy<UIViewController, UIImage> {
-    return Strategy.view.pre { $0.view }
+    return Strategy.view.contramap { $0.view }
   }
 }
 

@@ -3,7 +3,7 @@ import Cocoa
 
 extension Strategy {
   public static var viewController: Strategy<NSViewController, NSImage> {
-    return Strategy.view.pre { $0.view }
+    return Strategy.view.contramap { $0.view }
   }
 }
 

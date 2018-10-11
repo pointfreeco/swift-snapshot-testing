@@ -21,6 +21,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		CA31E50B216FCF7A001B7113 /* Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA31E509216FCF53001B7113 /* Async.swift */; };
 		OBJ_102 /* WKSnapshotConfigurationShim.m in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_11 /* WKSnapshotConfigurationShim.m */; };
 		OBJ_104 /* WKSnapshotConfigurationShim.h in Headers */ = {isa = PBXBuildFile; fileRef = OBJ_13 /* WKSnapshotConfigurationShim.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		OBJ_46 /* Diff.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_15 /* Diff.swift */; };
@@ -94,6 +95,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		CA31E509216FCF53001B7113 /* Async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Async.swift; sourceTree = "<group>"; };
 		OBJ_11 /* WKSnapshotConfigurationShim.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WKSnapshotConfigurationShim.m; sourceTree = "<group>"; };
 		OBJ_13 /* WKSnapshotConfigurationShim.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WKSnapshotConfigurationShim.h; sourceTree = "<group>"; };
 		OBJ_15 /* Diff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diff.swift; sourceTree = "<group>"; };
@@ -188,6 +190,7 @@
 		OBJ_16 /* SnapshotTesting */ = {
 			isa = PBXGroup;
 			children = (
+				CA31E509216FCF53001B7113 /* Async.swift */,
 				OBJ_17 /* Attachment.swift */,
 				OBJ_18 /* Diffable.swift */,
 				OBJ_19 /* SnapshotTestCase.swift */,
@@ -244,7 +247,7 @@
 			name = Products;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		OBJ_5 /*  */ = {
+		OBJ_5 = {
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
@@ -253,7 +256,6 @@
 				OBJ_33 /* Tests */,
 				OBJ_36 /* Products */,
 			);
-			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_7 /* Configs */ = {
@@ -387,7 +389,7 @@
 			knownRegions = (
 				en,
 			);
-			mainGroup = OBJ_5 /*  */;
+			mainGroup = OBJ_5;
 			productRefGroup = OBJ_36 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -429,6 +431,7 @@
 				OBJ_56 /* Strategy.swift in Sources */,
 				OBJ_57 /* Any.swift in Sources */,
 				OBJ_58 /* CALayer.swift in Sources */,
+				CA31E50B216FCF7A001B7113 /* Async.swift in Sources */,
 				OBJ_59 /* Data.swift in Sources */,
 				OBJ_60 /* NSImage.swift in Sources */,
 				OBJ_61 /* NSView.swift in Sources */,
