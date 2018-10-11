@@ -40,7 +40,9 @@ class SnapshotTestingTests: SnapshotTestCase {
     button.bezelStyle = .rounded
     button.title = "Push Me"
     button.sizeToFit()
-    assertSnapshot(matching: button)
+    if #available(macOS 10.14, *) {
+      assertSnapshot(matching: button)
+    }
   }
   #endif
 
@@ -66,7 +68,7 @@ class SnapshotTestingTests: SnapshotTestCase {
 
     let webView = WKWebView()
     webView.loadHTMLString(html, baseURL: nil)
-    if #available(macOS 10.13, *) {
+    if #available(macOS 10.14, *) {
       assertSnapshot(matchingWebView: webView, named: platform)
     }
   }
