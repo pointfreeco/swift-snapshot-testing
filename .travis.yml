@@ -11,4 +11,4 @@ install:
 matrix:
   include:
     - script:
-      - make swift-test
+      - make test-swift
