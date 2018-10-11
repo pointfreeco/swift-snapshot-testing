@@ -9,19 +9,19 @@ import WebKit
 let platform = "macos"
 #endif
 
-class SnapshotTestingTests: TestCase {
+class SnapshotTestingTests: SnapshotTestCase {
   override func setUp() {
     super.setUp()
 //    record = true
   }
 
-  func testDump() {
+  func testWithAny() {
     struct User { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
     assertSnapshot(matchingAny: user)
   }
 
-  func testNamedDump() {
+  func testNamedAssertion() {
     struct User { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
     assertSnapshot(matchingAny: user, named: "named")
@@ -57,10 +57,6 @@ class SnapshotTestingTests: TestCase {
     assertSnapshot(matchingAny: [1, 2])
   }
 
-  func testString() {
-    assertSnapshot(matching: "hello", with: .string)
-  }
-
   #if os(iOS) || os(macOS)
   func testWebView() throws {
     let fixtureUrl = URL(fileURLWithPath: String(#file))
@@ -76,3 +72,17 @@ class SnapshotTestingTests: TestCase {
   }
   #endif
 }
+
+#if os(Linux)
+extension SnapshotTestingTests {
+  static var allTests : [(String, (SnapshotTestingTests) -> () throws -> Void)] {
+    return [
+      ("testWithAny", testWithAny),
+      ("testNamedAssertion", testNamedAssertion),
+      ("testWithDate", testWithDate),
+      ("testWithNSObject", testWithNSObject),
+      ("testMultipleSnapshots", testMultipleSnapshots),
+    ]
+  }
+}
+#endif

@@ -9,7 +9,7 @@ public typealias Image = UIImage
 #endif
 
 @available(iOS 11.0, macOS 10.13, *)
-extension TestCase {
+extension SnapshotTestCase {
   public func assertSnapshot(
     matchingWebView value: WKWebView,
     named name: String? = nil,

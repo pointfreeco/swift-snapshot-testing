@@ -1,6 +1,6 @@
 import Foundation
 
-extension TestCase {
+extension SnapshotTestCase {
   public func assertSnapshot(
     matchingAny value: Any,
     named name: String? = nil,

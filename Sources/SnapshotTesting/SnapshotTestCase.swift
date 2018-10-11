@@ -1,6 +1,6 @@
 import XCTest
 
-open class TestCase: XCTestCase {
+open class SnapshotTestCase: XCTestCase {
   private var counter = 1
   public var record = false
 
