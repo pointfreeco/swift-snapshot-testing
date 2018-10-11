@@ -10,6 +10,11 @@ let platform = "macos"
 #endif
 
 class SnapshotTestingTests: TestCase {
+  override func setUp() {
+    super.setUp()
+//    record = true
+  }
+
   func testDump() {
     struct User { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")

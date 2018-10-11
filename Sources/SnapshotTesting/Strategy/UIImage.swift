@@ -17,7 +17,7 @@ extension Strategy {
       pathExtension: "png",
       diffable: .init(
         to: UIImagePNGRepresentation,
-        fro: UIImage.init(data:)
+        fro: { UIImage(data: $0, scale: UIScreen.main.scale) }
       ) { old, new in
         guard UIImagePNGRepresentation(old) != UIImagePNGRepresentation(new) else { return nil }
 
