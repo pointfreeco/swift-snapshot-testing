@@ -56,7 +56,7 @@ extension Strategy {
 
             webView.takeSnapshot(with: nil) { image, _ in
               _ = delegate
-              callback(image!)
+              callback(image)
             }
           }
           webView.navigationDelegate = delegate

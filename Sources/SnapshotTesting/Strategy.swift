@@ -74,9 +74,7 @@ public struct Strategy<A, B> {
     ) { a in
       return .init { callback in
         self.snapshotToDiffable(a).run { b in
-          if let b = b {
-            callback(transform(b))
-          }
+          callback(b.map(transform))
         }
       }
     }

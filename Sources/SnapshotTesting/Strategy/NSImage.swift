@@ -33,7 +33,9 @@ extension Strategy {
 
         let diff = NSImage(size: maxSize)
         diff.lockFocus()
-        let context = NSGraphicsContext.current!.cgContext
+        guard let context = NSGraphicsContext.current?.cgContext else {
+          return ("Couldn't acquire a graphics context", [])
+        }
         old.draw(in: .init(origin: .zero, size: old.size))
         context.setAlpha(0.5)
         context.beginTransparencyLayer(auxiliaryInfo: nil)
@@ -45,7 +47,8 @@ extension Strategy {
 
         return (
           "Expected image@\(new.size) to match image@\(old.size)",
-          [Attachment(image: old), Attachment(image: new), Attachment(image: diff)])
+          [Attachment(image: old), Attachment(image: new), Attachment(image: diff)]
+        )
       }
     )
   }

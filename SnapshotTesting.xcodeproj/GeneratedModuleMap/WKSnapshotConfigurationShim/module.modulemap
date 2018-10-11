@@ -1,4 +1,0 @@
-module WKSnapshotConfigurationShim {
-    umbrella header "/Users/stephencelis/Developer/pointfreeco/swift-snapshot-testing/Sources/WKSnapshotConfigurationShim/include/WKSnapshotConfigurationShim.h"
-    export *
-}
