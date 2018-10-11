@@ -5,14 +5,14 @@ open class TestCase: XCTestCase {
   public var record = false
 
   public func assertSnapshot<A: DefaultDiffable>(
-    matching snapshot: A.A,
-    of: A.Type = A.self,
+    matching snapshot: A,
     named name: String? = nil,
     record recording: Bool = false,
     timeout: TimeInterval = 5,
     file: StaticString = #file,
     function: String = #function,
     line: UInt = #line)
+    where A.A == A
   {
     return assertSnapshot(
       matching: snapshot,

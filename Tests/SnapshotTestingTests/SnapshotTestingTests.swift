@@ -35,7 +35,7 @@ class SnapshotTestingTests: TestCase {
     button.bezelStyle = .rounded
     button.title = "Push Me"
     button.sizeToFit()
-    assertSnapshot(matching: button, with: .view)
+    assertSnapshot(matching: button)
   }
   #endif
 
