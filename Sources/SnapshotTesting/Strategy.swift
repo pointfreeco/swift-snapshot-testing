@@ -53,10 +53,12 @@ public struct Strategy<A, B> {
     ) { a0 in
       return .init { callback in
         transform(a0).run { a in
-          if let a = a {
-            self.snapshotToDiffable(a).run { b in
-              callback(b)
-            }
+          guard let a = a else {
+            callback(nil)
+            return
+          }
+          self.snapshotToDiffable(a).run { b in
+            callback(b)
           }
         }
       }

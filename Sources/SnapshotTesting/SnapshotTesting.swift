@@ -62,17 +62,13 @@ open class TestCase: XCTestCase {
       let fileManager = FileManager.default
       try fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
 
-      let expectation = XCTestExpectation(description: "Took snapshot")
+      let tookSnapshot = self.expectation(description: "Took snapshot")
       var optionalDiffable: B?
       strategy.snapshotToDiffable(value).run { b in
         optionalDiffable = b
-        expectation.fulfill()
+        tookSnapshot.fulfill()
       }
-
-      guard XCTWaiter.wait(for: [expectation], timeout: timeout) == .completed else {
-        XCTFail("Timed out preparing value to snapshot", file: file, line: line)
-        return
-      }
+      self.wait(for: [tookSnapshot], timeout: timeout)
 
       guard let diffable = optionalDiffable else {
         XCTFail("Couldn't snapshot value", file: file, line: line)
