@@ -28,9 +28,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "SnapshotTesting::WKSnapshotConfigurationShim"
-               BuildableName = "WKSnapshotConfigurationShim.framework"
-               BlueprintName = "WKSnapshotConfigurationShim"
+               BlueprintIdentifier = "SnapshotTesting::Diff"
+               BuildableName = "Diff.framework"
+               BlueprintName = "Diff"
                ReferencedContainer = "container:SnapshotTesting.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -42,9 +42,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "SnapshotTesting::Diff"
-               BuildableName = "Diff.framework"
-               BlueprintName = "Diff"
+               BlueprintIdentifier = "SnapshotTesting::WKSnapshotConfigurationShim"
+               BuildableName = "WKSnapshotConfigurationShim.framework"
+               BlueprintName = "WKSnapshotConfigurationShim"
                ReferencedContainer = "container:SnapshotTesting.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>

@@ -18,13 +18,13 @@ class SnapshotTestingTests: SnapshotTestCase {
   func testWithAny() {
     struct User { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
-    assertSnapshot(matchingAny: user)
+    assertSnapshot(matching: user)
   }
 
   func testNamedAssertion() {
     struct User { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
-    assertSnapshot(matchingAny: user, named: "named")
+    assertSnapshot(matching: user, named: "named")
   }
 
   #if os(iOS)
@@ -47,16 +47,16 @@ class SnapshotTestingTests: SnapshotTestCase {
   #endif
 
   func testWithDate() {
-    assertSnapshot(matchingAny: Date(timeIntervalSinceReferenceDate: 0))
+    assertSnapshot(matching: Date(timeIntervalSinceReferenceDate: 0))
   }
 
   func testWithNSObject() {
-    assertSnapshot(matchingAny: NSObject())
+    assertSnapshot(matching: NSObject())
   }
 
   func testMultipleSnapshots() {
-    assertSnapshot(matchingAny: [1])
-    assertSnapshot(matchingAny: [1, 2])
+    assertSnapshot(matching: [1])
+    assertSnapshot(matching: [1, 2])
   }
 
   #if os(iOS) || os(macOS)
@@ -69,7 +69,7 @@ class SnapshotTestingTests: SnapshotTestCase {
     let webView = WKWebView()
     webView.loadHTMLString(html, baseURL: nil)
     if #available(macOS 10.14, *) {
-      assertSnapshot(matchingWebView: webView, named: platform)
+      assertSnapshot(matching: webView, with: .webView, named: platform)
     }
   }
   #endif

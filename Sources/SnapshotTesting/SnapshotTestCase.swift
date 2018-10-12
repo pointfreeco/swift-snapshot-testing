@@ -76,21 +76,13 @@ open class SnapshotTestCase: XCTestCase {
       }
 
       guard !recording, fileManager.fileExists(atPath: snapshotFileUrl.path) else {
-        guard let data = strategy.diffable.to(diffable) else {
-          XCTFail("Timed out taking snapshot", file: file, line: line)
-          return
-        }
-
-        try data.write(to: snapshotFileUrl)
+        try strategy.diffable.to(diffable).write(to: snapshotFileUrl)
         XCTFail("Recorded snapshot to \(snapshotFileUrl)", file: file, line: line)
         return
       }
 
       let data = try Data(contentsOf: snapshotFileUrl)
-      guard let reference = strategy.diffable.fro(data) else {
-        XCTFail("Couldn't deserialize reference", file: file, line: line)
-        return
-      }
+      let reference = strategy.diffable.fro(data)
 
       guard let (failure, attachments) = strategy.diffable.diff(reference, diffable) else {
         return

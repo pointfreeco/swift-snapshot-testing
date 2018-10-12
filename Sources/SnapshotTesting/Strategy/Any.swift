@@ -2,7 +2,7 @@ import Foundation
 
 extension SnapshotTestCase {
   public func assertSnapshot(
-    matchingAny value: Any,
+    matching value: Any,
     named name: String? = nil,
     record recording: Bool = false,
     timeout: TimeInterval = 5,
@@ -26,7 +26,7 @@ extension SnapshotTestCase {
 
 extension Strategy {
   public static var any: Strategy<A, String> {
-    return Strategy.string.pre { snap($0) }
+    return Strategy.string.contramap { snap($0) }
   }
 }
 

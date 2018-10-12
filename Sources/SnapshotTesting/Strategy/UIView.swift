@@ -1,9 +1,13 @@
 #if os(iOS) || os(tvOS) || os(watchOS)
 import UIKit
+import WebKit
 
 extension Strategy {
   public static var view: Strategy<UIView, UIImage> {
-    return Strategy.layer.pre { $0.layer }
+    return Strategy.layer.contramap {
+      precondition(!($0 is WKWebView), "TODO")
+      return $0.layer
+    }
   }
 }
 
