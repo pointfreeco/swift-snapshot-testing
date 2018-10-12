@@ -10,14 +10,12 @@ test-macos:
 	xcodebuild test \
 		-scheme SnapshotTesting-Package \
 		-destination platform="macOS" \
-		| xcpretty
 
 test-ios:
 	set -o pipefail && \
 	xcodebuild test \
 		-scheme SnapshotTesting-Package \
-		-destination platform="iOS Simulator,name=iPhone 8,OS=11.3" \
-		| xcpretty
+		-destination platform="iOS Simulator,name=iPhone XR,OS=12.0" \
 
 test-swift:
 	swift test
