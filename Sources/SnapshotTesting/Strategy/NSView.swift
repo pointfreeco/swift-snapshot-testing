@@ -4,7 +4,7 @@ import WebKit
 
 extension Strategy {
   public static var view: Strategy<NSView, NSImage> {
-    return Strategy.image.pre { view in
+    return Strategy.image.contramap { view in
       precondition(!(view is WKWebView), "TODO")
 
       let image = NSImage(data: view.dataWithPDF(inside: view.bounds))!
