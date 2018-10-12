@@ -8,7 +8,7 @@ extension Strategy {
       precondition(!($0 is WKWebView), """
 WKWebView must be snapshot using the "webView" strategy.
 
-    assertSnapshot(view, with: .webView)
+    assertSnapshot(matching: view, with: .webView)
 """)
 
       let image = NSImage(data: $0.dataWithPDF(inside: $0.bounds))!
