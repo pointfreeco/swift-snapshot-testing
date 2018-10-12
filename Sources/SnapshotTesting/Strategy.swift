@@ -2,7 +2,7 @@ import Foundation
 import XCTest
 
 public struct Strategy<A, B> {
-  public let pathExtension: String?
+  public var pathExtension: String?
   public let diffable: Diffable<B>
   public let snapshotToDiffable: (A) -> Async<B>
 
