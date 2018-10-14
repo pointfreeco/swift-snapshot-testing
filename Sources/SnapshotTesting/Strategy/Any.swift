@@ -2,7 +2,7 @@ import Foundation
 
 extension SnapshotTestCase {
   public func assertSnapshot(
-    matching value: Any,
+    matchingAny value: Any,
     named name: String? = nil,
     record recording: Bool = false,
     timeout: TimeInterval = 5,

@@ -17,26 +17,28 @@ extension Strategy {
           webView.frame.size = .init(width: 800, height: 600)
         }
 
-        if webView.isLoading {
-          let delegate = NavigationDelegate()
-          delegate.didFinish = {
-            #if os(macOS)
-            if webView.superview == nil {
-              let window = ScaledWindow()
-              window.contentView = NSView()
-              window.contentView?.addSubview(webView)
-              window.makeKey()
-            }
-            #endif
-
-            webView.takeSnapshot(with: nil) { image, _ in
-              _ = delegate
-              callback(image!)
-            }
+        let delegate = NavigationDelegate()
+        let work = {
+          #if os(macOS)
+          if webView.superview == nil {
+            let window = ScaledWindow()
+            window.contentView = NSView()
+            window.contentView?.addSubview(webView)
+            window.makeKey()
           }
+          #endif
+
+          webView.takeSnapshot(with: nil) { image, _ in
+            _ = delegate
+            callback(image!)
+          }
+        }
+
+        if webView.isLoading {
+          delegate.didFinish = work
           webView.navigationDelegate = delegate
         } else {
-          fatalError()
+          work()
         }
       }
     }

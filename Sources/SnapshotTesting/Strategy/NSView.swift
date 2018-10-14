@@ -11,10 +11,9 @@ WKWebView must be snapshot using the "webView" strategy.
     assertSnapshot(matching: view, with: .webView)
 """)
 
-      let image = NSImage(data: $0.dataWithPDF(inside: $0.bounds))!
-      let scale = NSScreen.main!.backingScaleFactor
-      image.size = .init(width: image.size.width * 2.0 / scale, height: image.size.height * 2.0 / scale)
-      return image
+      let imageRepresentation = $0.bitmapImageRepForCachingDisplay(in: $0.bounds)!
+      $0.cacheDisplay(in: $0.bounds, to: imageRepresentation)
+      return NSImage(cgImage: imageRepresentation.cgImage!, size: $0.bounds.size)
     }
   }
 }
