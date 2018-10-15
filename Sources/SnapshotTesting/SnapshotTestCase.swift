@@ -68,7 +68,11 @@ open class SnapshotTestCase: XCTestCase {
         optionalDiffable = b
         tookSnapshot.fulfill()
       }
+      #if os(Linux)
       self.waitForExpectations(timeout: timeout)
+      #else
+      self.wait(for: [tookSnapshot], timeout: timeout)
+      #endif
 
       guard let diffable = optionalDiffable else {
         XCTFail("Couldn't snapshot value", file: file, line: line)
