@@ -19,7 +19,7 @@ extension Strategy {
         to: { UIImagePNGRepresentation($0)! },
         fro: { UIImage(data: $0, scale: UIScreen.main.scale)! }
       ) { old, new in
-        guard UIImagePNGRepresentation(old) != UIImagePNGRepresentation(new) else { return nil }
+        guard !compare(old, new) else { return nil }
 
         let maxSize = CGSize(
           width: max(old.size.width, new.size.width),
@@ -54,5 +54,45 @@ extension Strategy {
 
 extension UIImage: DefaultDiffable {
   public static let defaultStrategy: SimpleStrategy<UIImage> = .image
+}
+
+private func compare(_ old: UIImage, _ new: UIImage) -> Bool {
+  guard let oldCgImage = old.cgImage else { return false }
+  guard let newCgImage = new.cgImage else { return false }
+  guard oldCgImage.width != 0 else { return false }
+  guard newCgImage.width != 0 else { return false }
+  guard oldCgImage.width == newCgImage.width else { return false }
+  guard oldCgImage.height != 0 else { return false }
+  guard newCgImage.height != 0 else { return false }
+  guard oldCgImage.height == newCgImage.height else { return false }
+  guard let oldContext = context(for: oldCgImage) else { return false }
+  guard let newContext = context(for: newCgImage) else { return false }
+  guard let oldData = oldContext.data else { return false }
+  guard let newData = newContext.data else { return false }
+  if memcmp(oldData, newData, oldContext.height * oldContext.bytesPerRow) == 0 { return true }
+  let newer = UIImage(data: UIImagePNGRepresentation(new)!)!
+  guard let newerCgImage = newer.cgImage else { return false }
+  guard let newerContext = context(for: newerCgImage) else { return false }
+  guard let newerData = newerContext.data else { return false }
+  return memcmp(oldData, newerData, oldContext.height * oldContext.bytesPerRow) == 0
+  // TODO: Compare pixel data for precision
+}
+
+private func context(for cgImage: CGImage) -> CGContext? {
+  guard
+    let space = cgImage.colorSpace,
+    let context = CGContext(
+      data: nil,
+      width: cgImage.width,
+      height: cgImage.height,
+      bitsPerComponent: cgImage.bitsPerComponent,
+      bytesPerRow: cgImage.bytesPerRow,
+      space: space,
+      bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+    )
+    else { return nil }
+
+  context.draw(cgImage, in: CGRect(x: 0, y: 0, width: cgImage.width, height: cgImage.height))
+  return context
 }
 #endif
