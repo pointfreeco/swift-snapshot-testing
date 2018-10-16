@@ -4,7 +4,11 @@ import WebKit
 
 extension Strategy {
   public static var view: Strategy<UIView, UIImage> {
-    return Strategy.layer.contramap {
+    return .view(precision: 1)
+  }
+
+  public static func view(precision: Float) -> Strategy<UIView, UIImage> {
+    return Strategy.layer(precision: precision).contramap {
       precondition(!($0 is WKWebView), """
 WKWebView must be snapshot using the "webView" strategy.
 

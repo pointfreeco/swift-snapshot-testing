@@ -3,7 +3,11 @@ import Cocoa
 
 extension Strategy {
   public static var layer: Strategy<CALayer, NSImage> {
-    return Strategy.image.contramap { layer in
+    return .layer(precision: 1)
+  }
+
+  public static func layer(precision: Float) -> Strategy<CALayer, NSImage> {
+    return Strategy.image(precision: precision).contramap { layer in
       let image = NSImage(size: layer.bounds.size)
       image.lockFocus()
       let context = NSGraphicsContext.current!.cgContext
@@ -22,7 +26,11 @@ import UIKit
 
 extension Strategy {
   public static var layer: Strategy<CALayer, UIImage> {
-    return Strategy.image.contramap { layer in
+    return .layer(precision: 1)
+  }
+
+  public static func layer(precision: Float) -> Strategy<CALayer, UIImage> {
+    return Strategy.image(precision: precision).contramap { layer in
       UIGraphicsBeginImageContextWithOptions(layer.bounds.size, false, 2.0)
       defer { UIGraphicsEndImageContext() }
       let context = UIGraphicsGetCurrentContext()!

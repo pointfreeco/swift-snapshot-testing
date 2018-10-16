@@ -35,7 +35,11 @@ extension SnapshotTestCase {
 @available(iOS 11.0, macOS 10.13, *)
 extension Strategy {
   public static var webView: Strategy<WKWebView, Image> {
-    return Strategy.image.asyncContramap { webView in
+    return .webView(precision: 1)
+  }
+
+  public static func webView(precision: Float) -> Strategy<WKWebView, Image> {
+    return Strategy.image(precision: precision).asyncContramap { webView in
       return Async { callback in
         if webView.frame.size == .zero {
           webView.frame.size = .init(width: 800, height: 600)

@@ -13,7 +13,7 @@ extension Attachment {
 
 extension Strategy {
   public static var image: SimpleStrategy<NSImage> {
-    return .image(precision: 1.0)
+    return .image(precision: 1)
   }
 
   public static func image(precision: Float) -> SimpleStrategy<NSImage> {
