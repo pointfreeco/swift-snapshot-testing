@@ -69,12 +69,13 @@ private func compare(_ old: UIImage, _ new: UIImage) -> Bool {
   guard let newContext = context(for: newCgImage) else { return false }
   guard let oldData = oldContext.data else { return false }
   guard let newData = newContext.data else { return false }
-  if memcmp(oldData, newData, oldContext.height * oldContext.bytesPerRow) == 0 { return true }
+  let byteCount = oldContext.height * oldContext.bytesPerRow
+  if memcmp(oldData, newData, byteCount) == 0 { return true }
   let newer = UIImage(data: UIImagePNGRepresentation(new)!)!
   guard let newerCgImage = newer.cgImage else { return false }
   guard let newerContext = context(for: newerCgImage) else { return false }
   guard let newerData = newerContext.data else { return false }
-  return memcmp(oldData, newerData, oldContext.height * oldContext.bytesPerRow) == 0
+  return memcmp(oldData, newerData, byteCount) == 0
   // TODO: Compare pixel data for precision
 }
 
