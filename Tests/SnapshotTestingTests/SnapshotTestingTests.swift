@@ -12,6 +12,7 @@ let platform = "macos"
 class SnapshotTestingTests: SnapshotTestCase {
   override func setUp() {
     super.setUp()
+    diffTool = "ksdiff"
 //    record = true
   }
 

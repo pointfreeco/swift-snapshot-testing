@@ -43,8 +43,11 @@ extension Strategy {
         context.endTransparencyLayer()
         let diff = UIGraphicsGetImageFromCurrentImageContext()!
 
+        let message = new.size == old.size
+          ? "Expected images to match"
+          : "Expected image@\(new.size) to match image@\(old.size)"
         return (
-          "Expected image@\(new.size) to match image@\(old.size)",
+          message,
           [
             .init(image: old, name: "reference"),
             .init(image: new, name: "failure"),
