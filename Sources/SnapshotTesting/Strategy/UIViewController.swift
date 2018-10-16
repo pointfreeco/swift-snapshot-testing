@@ -3,7 +3,11 @@ import UIKit
 
 extension Strategy {
   public static var viewController: Strategy<UIViewController, UIImage> {
-    return Strategy.view.contramap { $0.view }
+    return .viewController(precision: 1)
+  }
+
+  public static func viewController(precision: Float) -> Strategy<UIViewController, UIImage> {
+    return Strategy.view(precision: precision).contramap { $0.view }
   }
 }
 
