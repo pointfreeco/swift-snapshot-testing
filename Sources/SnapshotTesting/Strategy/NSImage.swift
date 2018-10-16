@@ -72,21 +72,20 @@ private func compare(_ old: NSImage, _ new: NSImage) -> Bool {
   guard let oldData = oldContext.data else { return false }
   guard let newData = newContext.data else { return false }
   if memcmp(oldData, newData, oldContext.height * oldContext.bytesPerRow) == 0 { return true }
-
-  // NB: hack to normalize new image before making another comparison
-  do {
-    let new = NSImage(data: NSImagePNGRepresentation(new)!)!
-    guard let newCgImage = new.cgImage(forProposedRect: nil, context: nil, hints: nil) else { return false }
-    guard let newContext = context(for: newCgImage) else { return false }
-    guard let newData = newContext.data else { return false }
-    if memcmp(oldData, newData, oldContext.height * oldContext.bytesPerRow) == 0 { return true }
-  }
-
+  let newer = NSImage(data: NSImagePNGRepresentation(new)!)!
+  guard let newerCgImage = newer.cgImage(forProposedRect: nil, context: nil, hints: nil) else { return false }
+  guard let newerContext = context(for: newerCgImage) else { return false }
+  guard let newerData = newerContext.data else { return false }
+  if memcmp(oldData, newerData, oldContext.height * oldContext.bytesPerRow) == 0 { return true }
   let oldRep = NSBitmapImageRep(cgImage: oldCgImage)
-  let newRep = NSBitmapImageRep(cgImage: newCgImage)
+  let newRep = NSBitmapImageRep(cgImage: newerCgImage)
+  var oldPixel: Int = 0
+  var newPixel: Int = 0
   for x in 0..<oldRep.pixelsWide {
-    for y in 0..<newRep.pixelsWide {
-      if oldRep.colorAt(x: x, y: y) != newRep.colorAt(x: x, y: y) {
+    for y in 0..<oldRep.pixelsHigh {
+      oldRep.getPixel(&oldPixel, atX: x, y: y)
+      newRep.getPixel(&newPixel, atX: x, y: y)
+      if oldPixel != newPixel {
         return false
       }
     }
