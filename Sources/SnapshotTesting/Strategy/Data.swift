@@ -16,7 +16,10 @@ extension Strategy {
       pathExtension: nil,
       diffable: .init(to: { $0 }, fro: { $0 }) { old, new in
         guard old != new else { return nil }
-        return ("Expected \(new) to match \(old)", [])
+        let message = old.count == new.count
+          ? "Expected data to match"
+          : "Expected \(new) to match \(old)"
+        return (message, [])
       }
     )
   }
