@@ -1,3 +1,4 @@
+import Diff
 import XCTest
 
 open class SnapshotTestCase: XCTestCase {
@@ -112,7 +113,9 @@ open class SnapshotTestCase: XCTestCase {
 
       let message = [
         failure.trimmingCharacters(in: .whitespacesAndNewlines),
-        self.diffTool.map { "\($0) \"\(snapshotFileUrl.path)\" \"\(failedSnapshotFileUrl.path)\"" }
+        self.diffTool
+          .map { "\($0) \"\(snapshotFileUrl.path)\" \"\(failedSnapshotFileUrl.path)\"" }
+          ?? "@\(Diff.minus)\n\"\(failedSnapshotFileUrl.path)\"\n@\(Diff.plus)\n\"\(snapshotFileUrl.path)\""
       ]
       XCTFail(
         message.compactMap { $0 }.joined(separator: "\n\n"),
