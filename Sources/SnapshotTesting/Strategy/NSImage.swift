@@ -42,8 +42,11 @@ extension Strategy {
         context.fill(.init(origin: .zero, size: maxSize))
         context.endTransparencyLayer()
         diff.unlockFocus()
+        let message = new.size == old.size
+          ? "Expected images to match"
+          : "Expected image@\(new.size) to match image@\(old.size)"
         return (
-          "Expected image@\(new.size) to match image@\(old.size)",
+          message,
           [Attachment(image: old), Attachment(image: new), Attachment(image: diff)]
         )
       }

@@ -1,8 +1,10 @@
+import Diff
 import XCTest
 
 open class SnapshotTestCase: XCTestCase {
   private var counter = 1
-  public var record = false
+  open var record = false
+  open var diffTool: String? = nil
 
   public func assertSnapshot<A: DefaultDiffable>(
     matching snapshot: A,
@@ -81,7 +83,7 @@ open class SnapshotTestCase: XCTestCase {
 
       guard !recording, fileManager.fileExists(atPath: snapshotFileUrl.path) else {
         try strategy.diffable.to(diffable).write(to: snapshotFileUrl)
-        XCTFail("Recorded snapshot to \(snapshotFileUrl)", file: file, line: line)
+        XCTFail("Recorded snapshot: …\n\n\"\(snapshotFileUrl.path)\"", file: file, line: line)
         return
       }
 
@@ -109,15 +111,15 @@ open class SnapshotTestCase: XCTestCase {
         #endif
       }
 
-      XCTFail(
-        """
+      let diffMessage = self.diffTool
+        .map { "\($0) \"\(snapshotFileUrl.path)\" \"\(failedSnapshotFileUrl.path)\"" }
+        ?? "@\(Diff.minus)\n\"\(failedSnapshotFileUrl.path)\"\n@\(Diff.plus)\n\"\(snapshotFileUrl.path)\""
+      let message = """
 \(failure.trimmingCharacters(in: .whitespacesAndNewlines))
 
-ksdiff "\(snapshotFileUrl.path)" "\(failedSnapshotFileUrl.path)"
-""",
-        file: file,
-        line: line
-      )
+\(diffMessage)
+"""
+      XCTFail(message, file: file, line: line)
     } catch {
       XCTFail(error.localizedDescription, file: file, line: line)
     }
