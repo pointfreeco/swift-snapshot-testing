@@ -69,7 +69,7 @@ class SnapshotTestingTests: SnapshotTestCase {
     let webView = WKWebView()
     webView.loadHTMLString(html, baseURL: nil)
     if #available(macOS 10.14, *) {
-      assertSnapshot(matching: webView, with: .webView, named: platform)
+      assertSnapshot(matching: webView, named: platform)
     }
   }
   #endif
