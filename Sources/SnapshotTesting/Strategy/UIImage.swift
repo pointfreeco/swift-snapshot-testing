@@ -72,7 +72,7 @@ private func compare(_ old: UIImage, _ new: UIImage, precision: Float) -> Bool {
   guard oldCgImage.height != 0 else { return false }
   guard newCgImage.height != 0 else { return false }
   guard oldCgImage.height == newCgImage.height else { return false }
-  let byteCount = oldCgImage.height * oldCgImage.width * 4
+  let byteCount = oldCgImage.width * oldCgImage.height * 4
   var oldBytes = [UInt8](repeating: 0, count: byteCount)
   guard let oldContext = context(for: oldCgImage, data: &oldBytes) else { return false }
   guard let newContext = context(for: newCgImage) else { return false }
@@ -85,10 +85,11 @@ private func compare(_ old: UIImage, _ new: UIImage, precision: Float) -> Bool {
   guard let newerContext = context(for: newerCgImage, data: &newerBytes) else { return false }
   guard let newerData = newerContext.data else { return false }
   if memcmp(oldData, newerData, byteCount) == 0 { return true }
+  if precision >= 1 { return false }
   var differentPixelCount = 0
   let threshold = 1 - precision
-  for x in 1...oldCgImage.width {
-    for y in 1...oldCgImage.height {
+  for x in 0..<oldCgImage.width {
+    for y in 0..<oldCgImage.height * 4 {
       if oldBytes[x + x * y] != newerBytes[x + x * y] { differentPixelCount += 1 }
       if Float(differentPixelCount) / Float(byteCount) > threshold { return false}
     }

@@ -85,18 +85,15 @@ private func compare(_ old: NSImage, _ new: NSImage, precision: Float) -> Bool {
   guard let newerContext = context(for: newerCgImage) else { return false }
   guard let newerData = newerContext.data else { return false }
   if memcmp(oldData, newerData, byteCount) == 0 { return true }
+  if precision >= 1 { return false }
   let oldRep = NSBitmapImageRep(cgImage: oldCgImage)
   let newRep = NSBitmapImageRep(cgImage: newerCgImage)
-  var oldPixel: Int = 0
-  var newPixel: Int = 0
   var differentPixelCount = 0
   let pixelCount = oldRep.pixelsWide * oldRep.pixelsHigh
   let threshold = 1 - precision
   for x in 0..<oldRep.pixelsWide {
     for y in 0..<oldRep.pixelsHigh {
-      oldRep.getPixel(&oldPixel, atX: x, y: y)
-      newRep.getPixel(&newPixel, atX: x, y: y)
-      if oldPixel != newPixel { differentPixelCount += 1 }
+      if oldRep.colorAt(x: x, y: y) != newRep.colorAt(x: x, y: y) { differentPixelCount += 1 }
       if Float(differentPixelCount) / Float(pixelCount) > threshold { return false}
     }
   }

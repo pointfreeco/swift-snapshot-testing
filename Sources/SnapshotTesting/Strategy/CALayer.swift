@@ -31,11 +31,9 @@ extension Strategy {
 
   public static func layer(precision: Float) -> Strategy<CALayer, UIImage> {
     return Strategy.image(precision: precision).contramap { layer in
-      UIGraphicsBeginImageContextWithOptions(layer.bounds.size, false, 2.0)
-      defer { UIGraphicsEndImageContext() }
-      let context = UIGraphicsGetCurrentContext()!
-      layer.render(in: context)
-      return UIGraphicsGetImageFromCurrentImageContext()!
+      UIGraphicsImageRenderer(size: layer.bounds.size).image { context in
+        layer.render(in: context.cgContext)
+      }
     }
   }
 }

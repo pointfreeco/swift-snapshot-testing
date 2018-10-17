@@ -72,6 +72,25 @@ class SnapshotTestingTests: SnapshotTestCase {
       assertSnapshot(matching: webView, named: platform)
     }
   }
+
+  func testPrecision() {
+    #if os(iOS)
+    let label = UILabel()
+    label.frame = CGRect(origin: .zero, size: CGSize(width: 43.5, height: 20.5))
+    label.text = "Hello"
+    label.backgroundColor = .white
+    #elseif os(macOS)
+    let label = NSTextField()
+    label.frame = CGRect(origin: .zero, size: CGSize(width: 37, height: 16))
+    label.stringValue = "Hello"
+    label.backgroundColor = .white
+    label.isBezeled = false
+    label.isEditable = false
+    #endif
+    if #available(macOS 10.14, *) {
+      assertSnapshot(matching: label, with: .view(precision: 0.9), named: platform)
+    }
+  }
   #endif
 }
 
