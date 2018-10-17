@@ -85,6 +85,7 @@ private func compare(_ old: UIImage, _ new: UIImage, precision: Float) -> Bool {
   guard let newerContext = context(for: newerCgImage, data: &newerBytes) else { return false }
   guard let newerData = newerContext.data else { return false }
   if memcmp(oldData, newerData, byteCount) == 0 { return true }
+  guard precision == 1 else { return false }
   var differentPixelCount = 0
   let threshold = 1 - precision
   for x in 1...oldCgImage.width {
