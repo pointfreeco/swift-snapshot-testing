@@ -84,7 +84,7 @@ extension Date: SnapshotStringConvertible {
 }
 
 extension NSObject: SnapshotStringConvertible {
-  @objc public var snapshotDescription: String {
+  public var snapshotDescription: String {
     return self.debugDescription
       .replacingOccurrences(of: ": 0x[\\da-f]+", with: "", options: .regularExpression)
   }
