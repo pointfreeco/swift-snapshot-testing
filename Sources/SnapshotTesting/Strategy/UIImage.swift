@@ -24,25 +24,7 @@ extension Strategy {
         fro: { UIImage(data: $0, scale: UIScreen.main.scale)! }
       ) { old, new in
         guard !compare(old, new, precision: precision) else { return nil }
-
-        let maxSize = CGSize(
-          width: max(old.size.width, new.size.width),
-          height: max(old.size.height, new.size.height)
-        )
-
-        UIGraphicsBeginImageContextWithOptions(maxSize, true, 0)
-        defer { UIGraphicsEndImageContext() }
-        let context = UIGraphicsGetCurrentContext()!
-        old.draw(in: .init(origin: .zero, size: old.size))
-        context.setAlpha(0.5)
-        context.beginTransparencyLayer(auxiliaryInfo: nil)
-        new.draw(in: .init(origin: .zero, size: new.size))
-        context.setBlendMode(.difference)
-        context.setFillColor(UIColor.white.cgColor)
-        context.fill(.init(origin: .zero, size: maxSize))
-        context.endTransparencyLayer()
-        let diff = UIGraphicsGetImageFromCurrentImageContext()!
-
+        let difference = diff(old, new)
         let message = new.size == old.size
           ? "Expected images to match"
           : "Expected image@\(new.size) to match image@\(old.size)"
@@ -51,7 +33,7 @@ extension Strategy {
           [
             .init(image: old, name: "reference"),
             .init(image: new, name: "failure"),
-            .init(image: diff, name: "difference")
+            .init(image: difference, name: "difference")
           ]
         )
       }
@@ -113,5 +95,20 @@ private func context(for cgImage: CGImage, data: UnsafeMutableRawPointer? = nil)
 
   context.draw(cgImage, in: CGRect(x: 0, y: 0, width: cgImage.width, height: cgImage.height))
   return context
+}
+
+private func diff(_ old: UIImage, _ new: UIImage) -> UIImage {
+  let oldCiImage = CIImage(cgImage: old.cgImage!)
+  let newCiImage = CIImage(cgImage: new.cgImage!)
+  let differenceFilter = CIFilter(name: "CIDifferenceBlendMode")!
+  differenceFilter.setValue(oldCiImage, forKey: kCIInputImageKey)
+  differenceFilter.setValue(newCiImage, forKey: kCIInputBackgroundImageKey)
+  let differenceCiImage = differenceFilter.outputImage!
+  let invertFilter = CIFilter(name: "CIColorInvert")!
+  invertFilter.setValue(differenceCiImage, forKey: kCIInputImageKey)
+  let invertCiImage = invertFilter.outputImage!
+  let context = CIContext()
+  let invertCgImage = context.createCGImage(invertCiImage, from: invertCiImage.extent)!
+  return UIImage(cgImage: invertCgImage)
 }
 #endif

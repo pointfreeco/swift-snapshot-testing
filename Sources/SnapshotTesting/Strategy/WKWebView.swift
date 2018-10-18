@@ -9,30 +9,6 @@ public typealias Image = UIImage
 #endif
 
 @available(iOS 11.0, macOS 10.13, *)
-extension SnapshotTestCase {
-  public func assertSnapshot(
-    matching snapshot: WKWebView,
-    named name: String? = nil,
-    record recording: Bool = false,
-    timeout: TimeInterval = 5,
-    file: StaticString = #file,
-    function: String = #function,
-    line: UInt = #line)
-  {
-    return assertSnapshot(
-      matching: snapshot,
-      with: .webView,
-      named: name,
-      record: recording,
-      timeout: timeout,
-      file: file,
-      function: function,
-      line: line
-    )
-  }
-}
-
-@available(iOS 11.0, macOS 10.13, *)
 extension Strategy {
   public static var webView: Strategy<WKWebView, Image> {
     return .webView(precision: 1)

@@ -24,30 +24,13 @@ extension Strategy {
         fro: { NSImage(data: $0)! }
       ) { old, new in
         guard !compare(old, new, precision: precision) else { return nil }
-
-        let maxSize = CGSize(
-          width: max(old.size.width, new.size.width),
-          height: max(old.size.height, new.size.height)
-        )
-        let diff = NSImage(size: maxSize)
-        diff.lockFocus()
-        guard let context = NSGraphicsContext.current?.cgContext else {
-          return ("Couldn't acquire a graphics context", [])
-        }
-        old.draw(in: .init(origin: .zero, size: old.size))
-        context.setAlpha(0.5)
-        context.beginTransparencyLayer(auxiliaryInfo: nil)
-        new.draw(in: .init(origin: .zero, size: new.size))
-        context.setBlendMode(.difference)
-        context.fill(.init(origin: .zero, size: maxSize))
-        context.endTransparencyLayer()
-        diff.unlockFocus()
+        let difference = diff(old, new)
         let message = new.size == old.size
           ? "Expected images to match"
           : "Expected image@\(new.size) to match image@\(old.size)"
         return (
           message,
-          [Attachment(image: old), Attachment(image: new), Attachment(image: diff)]
+          [Attachment(image: old), Attachment(image: new), Attachment(image: difference)]
         )
       }
     )
@@ -116,5 +99,24 @@ private func context(for cgImage: CGImage) -> CGContext? {
 
   context.draw(cgImage, in: CGRect(x: 0, y: 0, width: cgImage.width, height: cgImage.height))
   return context
+}
+
+private func diff(_ old: NSImage, _ new: NSImage) -> NSImage {
+  let oldCiImage = CIImage(cgImage: old.cgImage(forProposedRect: nil, context: nil, hints: nil)!)
+  let newCiImage = CIImage(cgImage: new.cgImage(forProposedRect: nil, context: nil, hints: nil)!)
+  let differenceFilter = CIFilter(name: "CIDifferenceBlendMode")!
+  differenceFilter.setValue(oldCiImage, forKey: kCIInputImageKey)
+  differenceFilter.setValue(newCiImage, forKey: kCIInputBackgroundImageKey)
+  let maxSize = CGSize(
+    width: max(old.size.width, new.size.width),
+    height: max(old.size.height, new.size.height)
+  )
+  let differenceCiImage = differenceFilter.outputImage!
+  let invertFilter = CIFilter(name: "CIColorInvert")!
+  invertFilter.setValue(differenceCiImage, forKey: kCIInputImageKey)
+  let rep = NSCIImageRep(ciImage: invertFilter.outputImage!)
+  let difference = NSImage(size: maxSize)
+  difference.addRepresentation(rep)
+  return difference
 }
 #endif
