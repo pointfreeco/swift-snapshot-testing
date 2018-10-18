@@ -8,14 +8,16 @@ extension Strategy {
   }
 
   public static func view(precision: Float) -> Strategy<UIView, UIImage> {
-    return Strategy.layer(precision: precision).contramap {
-      precondition(!($0 is WKWebView), """
-WKWebView must be snapshot using the "webView" strategy.
-
-    assertSnapshot(matching: view, with: .webView)
-""")
-
-      return $0.layer
+    let imageStrategy = Strategy.image(precision: precision)
+    return .init(
+      pathExtension: imageStrategy.pathExtension,
+      diffable: imageStrategy.diffable
+    ) { view -> Async<UIImage> in
+      if let webView = view as? WKWebView {
+        return Strategy.webView(precision: precision).snapshotToDiffable(webView)
+      } else {
+        return Strategy.layer(precision: precision).snapshotToDiffable(view.layer)
+      }
     }
   }
 }

@@ -65,7 +65,6 @@ class SnapshotTestingTests: SnapshotTestCase {
       .deletingLastPathComponent()
       .appendingPathComponent("fixture.html")
     let html = try String(contentsOf: fixtureUrl)
-
     let webView = WKWebView()
     webView.loadHTMLString(html, baseURL: nil)
     if #available(macOS 10.14, *) {

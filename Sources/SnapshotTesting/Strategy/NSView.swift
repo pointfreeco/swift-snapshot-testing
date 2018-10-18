@@ -8,17 +8,23 @@ extension Strategy {
   }
 
   public static func view(precision: Float) -> Strategy<NSView, NSImage> {
-    return Strategy.image(precision: precision).contramap {
-      precondition(!($0 is WKWebView), """
-WKWebView must be snapshot using the "webView" strategy.
-
-    assertSnapshot(matching: view, with: .webView)
-""")
-
-      let image = NSImage(data: $0.dataWithPDF(inside: $0.bounds))!
-      let scale = NSScreen.main!.backingScaleFactor
-      image.size = .init(width: image.size.width * 2.0 / scale, height: image.size.height * 2.0 / scale)
-      return image
+    let imageStrategy = Strategy.image(precision: precision)
+    return .init(
+      pathExtension: imageStrategy.pathExtension,
+      diffable: imageStrategy.diffable
+    ) { view -> Async<NSImage> in
+      if let webView = view as? WKWebView {
+        if #available(OSX 10.13, *) {
+          return Strategy.webView(precision: precision).snapshotToDiffable(webView)
+        } else {
+          fatalError()
+        }
+      } else {
+        let image = NSImage(data: view.dataWithPDF(inside: view.bounds))!
+        let scale = NSScreen.main!.backingScaleFactor
+        image.size = .init(width: image.size.width * 2.0 / scale, height: image.size.height * 2.0 / scale)
+        return imageStrategy.snapshotToDiffable(image)
+      }
     }
   }
 }
