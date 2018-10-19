@@ -31,6 +31,14 @@ class SnapshotTestingTests: SnapshotTestCase {
     assertSnapshot(of: .any, matching: Date(timeIntervalSinceReferenceDate: 0))
   }
 
+  func testWithEncodable() {
+    struct User: Encodable { let id: Int, name: String, bio: String }
+
+    if #available(OSX 10.13, *) {
+      assertSnapshot(of: .json, matching: User(id: 1, name: "Blobby", bio: "Blobbed around the world."))
+    }
+  }
+
   func testWithNSObject() {
     assertSnapshot(of: .any, matching: NSObject())
   }
