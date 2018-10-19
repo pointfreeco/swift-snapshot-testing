@@ -1,32 +1,8 @@
 import Foundation
 
-extension SnapshotTestCase {
-  public func assertSnapshot(
-    matchingAny value: Any,
-    named name: String? = nil,
-    record recording: Bool = false,
-    timeout: TimeInterval = 5,
-    file: StaticString = #file,
-    function: String = #function,
-    line: UInt = #line
-    ) {
-
-    assertSnapshot(
-      matching: value,
-      with: .any,
-      named: name,
-      record: recording,
-      timeout: timeout,
-      file: file,
-      function: function,
-      line: line
-    )
-  }
-}
-
 extension Strategy {
   public static var any: Strategy<A, String> {
-    return Strategy.string.contramap { snap($0) }
+    return Strategy.lines.pullback { snap($0) }
   }
 }
 
@@ -85,8 +61,7 @@ extension Date: SnapshotStringConvertible {
 
 extension NSObject: SnapshotStringConvertible {
   public var snapshotDescription: String {
-    return self.debugDescription
-      .replacingOccurrences(of: ": 0x[\\da-f]+", with: "", options: .regularExpression)
+    return purgePointers(self.debugDescription)
   }
 }
 
@@ -98,3 +73,7 @@ private let snapshotDateFormatter: DateFormatter = {
   formatter.timeZone = TimeZone(abbreviation: "UTC")
   return formatter
 }()
+
+func purgePointers(_ string: String) -> String {
+  return string.replacingOccurrences(of: ":?\\s*0x[\\da-f]+(\\s*)", with: "$1", options: .regularExpression)
+}

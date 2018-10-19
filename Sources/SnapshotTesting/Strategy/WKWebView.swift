@@ -15,7 +15,7 @@ extension Strategy {
   }
 
   public static func webView(precision: Float) -> Strategy<WKWebView, Image> {
-    return Strategy.image(precision: precision).asyncContramap { webView in
+    return Strategy.image(precision: precision).asyncPullback { webView in
       Async { callback in
         if webView.frame.size == .zero {
           webView.frame.size = .init(width: 800, height: 600)
