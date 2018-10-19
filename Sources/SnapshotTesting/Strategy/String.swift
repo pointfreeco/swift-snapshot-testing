@@ -14,7 +14,7 @@ extension Strategy {
         let failure = hunks
           .flatMap { [$0.patchMark] + $0.lines }
           .joined(separator: "\n")
-        return ("Diff: …\n\n\(failure)", [.init(string: failure)])
+        return ("Diff: …\n\n\(failure)", [.init(string: failure, uniformTypeIdentifier: "public.patch-file")])
       }
     )
   }

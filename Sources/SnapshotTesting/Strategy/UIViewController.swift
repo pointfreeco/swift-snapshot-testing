@@ -2,16 +2,16 @@
 import UIKit
 
 extension Strategy {
-  public static var viewController: Strategy<UIViewController, UIImage> {
-    return .viewController(precision: 1)
+  public static var uiViewController: Strategy<UIViewController, UIImage> {
+    return .uiViewController(precision: 1)
   }
 
-  public static func viewController(precision: Float) -> Strategy<UIViewController, UIImage> {
-    return Strategy.view(precision: precision).contramap { $0.view }
+  public static func uiViewController(precision: Float) -> Strategy<UIViewController, UIImage> {
+    return Strategy.uiView(precision: precision).contramap { $0.view }
   }
 }
 
 extension UIViewController: DefaultDiffable {
-  public static let defaultStrategy: Strategy<UIViewController, UIImage> = .viewController
+  public static let defaultStrategy: Strategy<UIViewController, UIImage> = .uiViewController
 }
 #endif

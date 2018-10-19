@@ -18,13 +18,26 @@ class SnapshotTestingTests: SnapshotTestCase {
   func testWithAny() {
     struct User { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
-    assertSnapshot(matchingAny: user)
+    assertSnapshot(of: .any, matching: user)
   }
 
   func testNamedAssertion() {
     struct User { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
-    assertSnapshot(matchingAny: user, named: "named")
+    assertSnapshot(of: .any, matching: user, named: "named")
+  }
+
+  func testWithDate() {
+    assertSnapshot(of: .any, matching: Date(timeIntervalSinceReferenceDate: 0))
+  }
+
+  func testWithNSObject() {
+    assertSnapshot(of: .any, matching: NSObject())
+  }
+
+  func testMultipleSnapshots() {
+    assertSnapshot(of: .any, matching: [1])
+    assertSnapshot(of: .any, matching: [1, 2])
   }
 
   #if os(iOS)
@@ -45,19 +58,6 @@ class SnapshotTestingTests: SnapshotTestCase {
     }
   }
   #endif
-
-  func testWithDate() {
-    assertSnapshot(matchingAny: Date(timeIntervalSinceReferenceDate: 0))
-  }
-
-  func testWithNSObject() {
-    assertSnapshot(matchingAny: NSObject())
-  }
-
-  func testMultipleSnapshots() {
-    assertSnapshot(matchingAny: [1])
-    assertSnapshot(matchingAny: [1, 2])
-  }
 
   #if os(iOS) || os(macOS)
   func testWebView() throws {
@@ -87,7 +87,7 @@ class SnapshotTestingTests: SnapshotTestCase {
     label.isEditable = false
     #endif
     if #available(macOS 10.14, *) {
-      assertSnapshot(matching: label, with: .view(precision: 0.9), named: platform)
+      assertSnapshot(of: .view(precision: 0.9), matching: label, named: platform)
     }
   }
   #endif

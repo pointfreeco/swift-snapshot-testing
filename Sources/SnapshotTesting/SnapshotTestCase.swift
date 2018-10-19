@@ -17,8 +17,8 @@ open class SnapshotTestCase: XCTestCase {
     where A.A == A
   {
     return assertSnapshot(
+      of: A.defaultStrategy,
       matching: snapshot,
-      with: A.defaultStrategy,
       named: name,
       record: recording,
       timeout: timeout,
@@ -29,8 +29,8 @@ open class SnapshotTestCase: XCTestCase {
   }
 
   public func assertSnapshot<A, B>(
+    of strategy: Strategy<A, B>,
     matching value: A,
-    with strategy: Strategy<A, B>,
     named name: String? = nil,
     record recording: Bool = false,
     timeout: TimeInterval = 5,
@@ -103,9 +103,7 @@ open class SnapshotTestCase: XCTestCase {
         #if Xcode
         XCTContext.runActivity(named: "Attached Failure Diff") { activity in
           attachments.forEach {
-            let attachment = $0.rawValue
-            attachment.lifetime = .deleteOnSuccess
-            activity.add(attachment)
+            activity.add($0.rawValue)
           }
         }
         #endif

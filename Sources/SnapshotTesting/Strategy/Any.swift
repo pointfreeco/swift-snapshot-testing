@@ -1,29 +1,5 @@
 import Foundation
 
-extension SnapshotTestCase {
-  public func assertSnapshot(
-    matchingAny value: Any,
-    named name: String? = nil,
-    record recording: Bool = false,
-    timeout: TimeInterval = 5,
-    file: StaticString = #file,
-    function: String = #function,
-    line: UInt = #line
-    ) {
-
-    assertSnapshot(
-      matching: value,
-      with: .any,
-      named: name,
-      record: recording,
-      timeout: timeout,
-      file: file,
-      function: function,
-      line: line
-    )
-  }
-}
-
 extension Strategy {
   public static var any: Strategy<A, String> {
     return Strategy.string.contramap { snap($0) }

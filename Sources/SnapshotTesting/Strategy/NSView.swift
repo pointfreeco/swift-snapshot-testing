@@ -3,6 +3,19 @@ import Cocoa
 import WebKit
 
 extension Strategy {
+  public static var nsView: Strategy<NSView, NSImage> {
+    return .nsView(precision: 1)
+  }
+
+  public static func nsView(precision: Float) -> Strategy<NSView, NSImage> {
+    return Strategy.image.contramap {
+      let image = NSImage(data: $0.dataWithPDF(inside: $0.bounds))!
+      let scale = NSScreen.main!.backingScaleFactor
+      image.size = .init(width: image.size.width * 2.0 / scale, height: image.size.height * 2.0 / scale)
+      return image
+    }
+  }
+
   public static var view: Strategy<NSView, NSImage> {
     return .view(precision: 1)
   }
@@ -20,10 +33,7 @@ extension Strategy {
           fatalError()
         }
       } else {
-        let image = NSImage(data: view.dataWithPDF(inside: view.bounds))!
-        let scale = NSScreen.main!.backingScaleFactor
-        image.size = .init(width: image.size.width * 2.0 / scale, height: image.size.height * 2.0 / scale)
-        return imageStrategy.snapshotToDiffable(image)
+        return Strategy.nsView(precision: precision).snapshotToDiffable(view)
       }
     }
   }
