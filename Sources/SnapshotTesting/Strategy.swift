@@ -26,7 +26,7 @@ public struct Strategy<A, B> {
     }
   }
 
-  public func asyncContramap<A0>(_ transform: @escaping (A0) -> Async<A>) -> Strategy<A0, B> {
+  public func asyncPullback<A0>(_ transform: @escaping (A0) -> Async<A>) -> Strategy<A0, B> {
     return Strategy<A0, B>(
       pathExtension: self.pathExtension,
       diffable: self.diffable
@@ -41,8 +41,8 @@ public struct Strategy<A, B> {
     }
   }
 
-  public func contramap<A0>(_ transform: @escaping (A0) -> A) -> Strategy<A0, B> {
-    return self.asyncContramap { Async(value: transform($0)) }
+  public func pullback<A0>(_ transform: @escaping (A0) -> A) -> Strategy<A0, B> {
+    return self.asyncPullback { Async(value: transform($0)) }
   }
 }
 

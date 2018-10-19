@@ -7,7 +7,7 @@ extension Strategy {
   }
 
   public static func layer(precision: Float) -> Strategy<CALayer, NSImage> {
-    return Strategy.image(precision: precision).contramap { layer in
+    return Strategy.image(precision: precision).pullback { layer in
       let image = NSImage(size: layer.bounds.size)
       image.lockFocus()
       let context = NSGraphicsContext.current!.cgContext
@@ -30,7 +30,7 @@ extension Strategy {
   }
 
   public static func layer(precision: Float) -> Strategy<CALayer, UIImage> {
-    return Strategy.image(precision: precision).contramap { layer in
+    return Strategy.image(precision: precision).pullback { layer in
       UIGraphicsImageRenderer(size: layer.bounds.size).image { context in
         layer.render(in: context.cgContext)
       }

@@ -2,7 +2,7 @@ import Foundation
 
 extension Strategy {
   public static var any: Strategy<A, String> {
-    return Strategy.string.contramap { snap($0) }
+    return Strategy.string.pullback { snap($0) }
   }
 }
 

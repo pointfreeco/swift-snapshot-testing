@@ -8,7 +8,7 @@ extension Strategy {
   }
 
   public static func uiView(precision: Float) -> Strategy<UIView, UIImage> {
-    return Strategy.layer.contramap { $0.layer }
+    return Strategy.layer.pullback { $0.layer }
   }
 
   public static var view: Strategy<UIView, UIImage> {

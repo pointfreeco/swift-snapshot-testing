@@ -7,7 +7,7 @@ extension Strategy {
   }
 
   public static func viewController(precision: Float) -> Strategy<NSViewController, NSImage> {
-    return Strategy.view(precision: precision).contramap { $0.view }
+    return Strategy.view(precision: precision).pullback { $0.view }
   }
 }
 

@@ -8,7 +8,7 @@ extension Strategy {
   }
 
   public static func nsView(precision: Float) -> Strategy<NSView, NSImage> {
-    return Strategy.image.contramap {
+    return Strategy.image.pullback {
       let image = NSImage(data: $0.dataWithPDF(inside: $0.bounds))!
       let scale = NSScreen.main!.backingScaleFactor
       image.size = .init(width: image.size.width * 2.0 / scale, height: image.size.height * 2.0 / scale)
