@@ -4,7 +4,7 @@ import WebKit
 
 extension Strategy {
   public static var recursiveDescription: Strategy<NSView, String> {
-    return Strategy.string.pullback { view in
+    return Strategy.lines.pullback { view in
       return purgePointers(
         view.perform(Selector(("_subtreeDescription"))).retain().takeUnretainedValue()
           as! String
