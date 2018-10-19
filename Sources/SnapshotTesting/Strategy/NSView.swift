@@ -3,6 +3,15 @@ import Cocoa
 import WebKit
 
 extension Strategy {
+  public static var recursiveDescription: Strategy<NSView, String> {
+    return Strategy.string.pullback { view in
+      return purgePointers(
+        view.perform(Selector(("_subtreeDescription"))).retain().takeUnretainedValue()
+          as! String
+      )
+    }
+  }
+
   public static var nsView: Strategy<NSView, NSImage> {
     return .nsView(precision: 1)
   }

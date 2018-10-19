@@ -1,12 +1,12 @@
 #if os(iOS) || os(tvOS) || os(watchOS)
 import UIKit
 
-extension Strategy {
-  public static var uiViewController: Strategy<UIViewController, UIImage> {
+extension Strategy where A == UIViewController, B == UIImage {
+  public static var uiViewController: Strategy {
     return .uiViewController(precision: 1)
   }
 
-  public static func uiViewController(precision: Float) -> Strategy<UIViewController, UIImage> {
+  public static func uiViewController(precision: Float) -> Strategy {
     return Strategy.uiView(precision: precision).pullback { $0.view }
   }
 }

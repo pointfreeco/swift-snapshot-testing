@@ -61,8 +61,7 @@ extension Date: SnapshotStringConvertible {
 
 extension NSObject: SnapshotStringConvertible {
   public var snapshotDescription: String {
-    return self.debugDescription
-      .replacingOccurrences(of: ": 0x[\\da-f]+", with: "", options: .regularExpression)
+    return purgePointers(self.debugDescription)
   }
 }
 
@@ -74,3 +73,7 @@ private let snapshotDateFormatter: DateFormatter = {
   formatter.timeZone = TimeZone(abbreviation: "UTC")
   return formatter
 }()
+
+func purgePointers(_ string: String) -> String {
+  return string.replacingOccurrences(of: ":?\\s*0x[\\da-f]+(\\s*)", with: "$1", options: .regularExpression)
+}

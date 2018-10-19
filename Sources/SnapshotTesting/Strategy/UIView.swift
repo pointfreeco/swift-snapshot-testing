@@ -3,6 +3,15 @@ import UIKit
 import WebKit
 
 extension Strategy {
+  public static var recursiveDescription: Strategy<UIView, String> {
+    return Strategy.string.pullback { view in
+      return purgePointers(
+        view.perform(Selector(("recursiveDescription"))).retain().takeUnretainedValue()
+          as! String
+      )
+    }
+  }
+
   public static var uiView: Strategy<UIView, UIImage> {
     return .uiView(precision: 1)
   }
@@ -24,7 +33,7 @@ extension Strategy {
       if let webView = view as? WKWebView {
         return Strategy.webView(precision: precision).snapshotToDiffable(webView)
       } else {
-        return Strategy.view(precision: precision).snapshotToDiffable(view)
+        return Strategy.uiView(precision: precision).snapshotToDiffable(view)
       }
     }
   }

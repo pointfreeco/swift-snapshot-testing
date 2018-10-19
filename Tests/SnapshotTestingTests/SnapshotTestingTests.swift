@@ -44,6 +44,7 @@ class SnapshotTestingTests: SnapshotTestCase {
   func testUIView() {
     let view = UIButton(type: .contactAdd)
     assertSnapshot(matching: view)
+    assertSnapshot(of: .recursiveDescription, matching: view)
   }
   #endif
 
@@ -55,6 +56,7 @@ class SnapshotTestingTests: SnapshotTestCase {
     button.sizeToFit()
     if #available(macOS 10.14, *) {
       assertSnapshot(matching: button)
+      assertSnapshot(of: .recursiveDescription, matching: button)
     }
   }
   #endif
