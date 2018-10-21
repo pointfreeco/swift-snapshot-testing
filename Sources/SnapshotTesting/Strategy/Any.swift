@@ -43,8 +43,29 @@ private func snap<T>(_ value: T, name: String? = nil, indent: Int = 0) -> String
     description = "(indescribable)"
   }
 
+  let sortedChildren: [Mirror.Child]
+  switch mirror.displayStyle {
+  case .dictionary?:
+    sortedChildren =
+      mirror.children.sorted(by: { c1, c2 in
+      switch (c1.label, c2.label) {
+      case let (.some(c1), .some(c2)):
+        return c1 < c2
+      case (.some, .none):
+        return false
+      case (.none, .some):
+        return true
+      case (.none, .none):
+        return true
+      }
+    })
+  default:
+    // this is very clumsy but I have found no other to convert
+    // from to Mirror.Children to [Mirror.Child] (which is what sorted yields)
+    sortedChildren = mirror.children.map {$0}
+  }
   let lines = ["\(indentation)\(bullet) \(name.map { "\($0): " } ?? "")\(description)\n"]
-    + mirror.children.map { snap($1, name: $0, indent: indent + 2) }
+    + sortedChildren.map { snap($1, name: $0, indent: indent + 2) }
 
   return lines.joined()
 }
