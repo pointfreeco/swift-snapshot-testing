@@ -107,11 +107,17 @@ class SnapshotTestingTests: SnapshotTestCase {
 extension SnapshotTestingTests {
   static var allTests : [(String, (SnapshotTestingTests) -> () throws -> Void)] {
     return [
-      ("testWithAny", testWithAny),
-      ("testNamedAssertion", testNamedAssertion),
-      ("testWithDate", testWithDate),
-      ("testWithNSObject", testWithNSObject),
       ("testMultipleSnapshots", testMultipleSnapshots),
+      ("testNamedAssertion", testNamedAssertion),
+      ("testNSView", testNSView),
+      ("testPrecision", testPrecision),
+      ("testSnapshotTestCase", testSnapshotTestCase),
+      ("testUIView", testUIView),
+      ("testWebView", testWebView),
+      ("testWithAny", testWithAny),
+      ("testWithDate", testWithDate),
+      ("testWithEncodable", testWithEncodable),
+      ("testWithNSObject", testWithNSObject),
     ]
   }
 }
