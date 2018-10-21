@@ -113,7 +113,6 @@ extension SnapshotTestingTests {
       ("testNamedAssertion", testNamedAssertion),
       ("testNSView", testNSView),
       ("testPrecision", testPrecision),
-      ("testSnapshotTestCase", testSnapshotTestCase),
       ("testUIView", testUIView),
       ("testWebView", testWebView),
       ("testWithAny", testWithAny),
