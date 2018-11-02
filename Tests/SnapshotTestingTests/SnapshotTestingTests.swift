@@ -103,6 +103,13 @@ class SnapshotTestingTests: SnapshotTestCase {
     }
     #endif
   }
+
+    func testPlist() throws {
+        let plist = try testData(forResource: "test", ofType: "plist")
+        if #available(macOS 10.14, *) {
+            assertSnapshot(of: .any, matching: plist)
+        }
+    }
 }
 
 #if os(Linux)
@@ -123,3 +130,13 @@ extension SnapshotTestingTests {
   }
 }
 #endif
+
+func testData(forResource resource: String, ofType type: String) throws -> Data {
+    // For this method to find files, they need to be added to a "Copy Bundle Resource" build
+    // phase for the test target in Xcode. This won't work with "swift test" invocation.
+    // I'm not what the best way is to support both Xcode and SPM test runs.
+    let bundle = Bundle(for: SnapshotTestingTests.self)
+    let path = bundle.path(forResource: resource, ofType: type)!
+    let url = URL(fileURLWithPath: path)
+    return try Data(contentsOf: url)
+}

@@ -1,0 +1,4 @@
+▿ 166 bytes
+  - count: 166
+  ▿ pointer: 0x0000000100a11bd0
+    - pointerValue: 4305525712
