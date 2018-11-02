@@ -34,9 +34,14 @@ class SnapshotTestingTests: SnapshotTestCase {
 
   func testWithEncodable() {
     struct User: Encodable { let id: Int, name: String, bio: String }
+    let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
 
     if #available(OSX 10.13, *) {
-      assertSnapshot(of: .json, matching: User(id: 1, name: "Blobby", bio: "Blobbed around the world."))
+      assertSnapshot(of: .json, matching: user)
+
+      #if !os(Linux)
+      assertSnapshot(of: .plist, matching: user)
+      #endif
     }
   }
 
