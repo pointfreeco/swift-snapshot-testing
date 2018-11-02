@@ -81,9 +81,15 @@ extension Date: SnapshotStringConvertible {
 }
 
 extension NSObject: SnapshotStringConvertible {
-  public var snapshotDescription: String {
-    return purgePointers(self.debugDescription)
-  }
+    public var snapshotDescription: String {
+        return purgePointers(self.debugDescription)
+    }
+}
+
+extension Data: SnapshotStringConvertible {
+    public var snapshotDescription: String {
+        return purgePointers(self.debugDescription)
+    }
 }
 
 private let snapshotDateFormatter: DateFormatter = {
