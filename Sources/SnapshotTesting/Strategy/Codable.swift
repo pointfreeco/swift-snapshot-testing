@@ -9,7 +9,7 @@ extension Strategy where A: Encodable, B == String {
   }
 
   public static func json(_ encoder: JSONEncoder) -> Strategy {
-    return SimpleStrategy<String>.lines.pullback { encodable in
+    var strategy = SimpleStrategy<String>.lines.pullback { (encodable: A) in
       try! String(decoding: encoder.encode(encodable), as: UTF8.self)
     }
     strategy.pathExtension = "json"
@@ -24,7 +24,7 @@ extension Strategy where A: Encodable, B == String {
   }
 
   public static func plist(_ encoder: PropertyListEncoder) -> Strategy {
-    var strategy = Strategy.lines.pullback { encodable in
+    var strategy = SimpleStrategy<String>.lines.pullback { (encodable: A) in
       try! String(decoding: encoder.encode(encodable), as: UTF8.self)
     }
     strategy.pathExtension = "plist"
