@@ -111,7 +111,7 @@ open class SnapshotTestCase: XCTestCase {
 
       let diffMessage = self.diffTool
         .map { "\($0) \"\(snapshotFileUrl.path)\" \"\(failedSnapshotFileUrl.path)\"" }
-        ?? "@\(Diff.minus)\n\"\(failedSnapshotFileUrl.path)\"\n@\(Diff.plus)\n\"\(snapshotFileUrl.path)\""
+        ?? "@\(Diff.minus)\n\"\(snapshotFileUrl.path)\"\n@\(Diff.plus)\n\"\(failedSnapshotFileUrl.path)\""
       let message = """
 \(failure.trimmingCharacters(in: .whitespacesAndNewlines))
 

@@ -1,2 +1,1 @@
-▿ 2001-01-01T00:00:00Z
-  - timeIntervalSinceReferenceDate: 0.0
+- 2001-01-01T00:00:00Z

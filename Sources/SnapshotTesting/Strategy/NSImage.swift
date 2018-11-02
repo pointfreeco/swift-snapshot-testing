@@ -11,12 +11,12 @@ extension Attachment {
   }
 }
 
-extension Strategy {
-  public static var image: SimpleStrategy<NSImage> {
+extension Strategy where A == NSImage, B == NSImage {
+  public static var image: Strategy {
     return .image(precision: 1)
   }
 
-  public static func image(precision: Float) -> SimpleStrategy<NSImage> {
+  public static func image(precision: Float) -> Strategy {
     return .init(
       pathExtension: "png",
       diffable: .init(

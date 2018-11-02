@@ -10,7 +10,7 @@ extension Attachment {
   }
 }
 
-extension Strategy {
+extension Strategy where A == Data, B == Data {
   static var data: SimpleStrategy<Data> {
     return .init(
       pathExtension: nil,

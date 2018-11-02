@@ -1,12 +1,24 @@
 @testable import SnapshotTesting
 import XCTest
 
-#if os(iOS)
+#if os(macOS) || os(iOS)
+import SceneKit
+import SpriteKit
 import WebKit
+
+#if os(iOS)
+typealias View = UIView
 let platform = "ios"
 #elseif os(macOS)
-import WebKit
+typealias View = NSView
 let platform = "macos"
+extension NSTextField {
+  var text: String {
+    get { return self.stringValue }
+    set { self.stringValue = newValue }
+  }
+}
+#endif
 #endif
 
 class SnapshotTestingTests: SnapshotTestCase {
@@ -20,6 +32,8 @@ class SnapshotTestingTests: SnapshotTestCase {
     struct User { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
     assertSnapshot(of: .any, matching: user)
+    assertSnapshot(of: .any, matching: Data("Hello, world!".utf8))
+    assertSnapshot(of: .any, matching: URL(string: "https://www.pointfree.co")!)
   }
 
   func testNamedAssertion() {
@@ -59,7 +73,28 @@ class SnapshotTestingTests: SnapshotTestCase {
     let view = UIButton(type: .contactAdd)
     assertSnapshot(matching: view)
     assertSnapshot(of: .recursiveDescription, matching: view)
-  #endif
+    #endif
+  }
+
+  func testMixedViews() {
+    #if os(macOS) || os(iOS)
+    let webView = WKWebView(frame: .init(x: 0, y: 0, width: 50, height: 50))
+    webView.loadHTMLString("🌎", baseURL: nil)
+
+    let skView = SKView(frame: .init(x: 50, y: 0, width: 50, height: 50))
+    let scene = SKScene(size: .init(width: 50, height: 50))
+    let node = SKShapeNode(circleOfRadius: 15)
+    node.fillColor = .red
+    node.position = .init(x: 25, y: 25)
+    scene.addChild(node)
+    skView.presentScene(scene)
+
+    let view = View(frame: .init(x: 0, y: 0, width: 100, height: 50))
+    view.addSubview(webView)
+    view.addSubview(skView)
+
+    assertSnapshot(matching: view, named: platform)
+    #endif
   }
 
   func testNSView() {
@@ -68,10 +103,8 @@ class SnapshotTestingTests: SnapshotTestCase {
     button.bezelStyle = .rounded
     button.title = "Push Me"
     button.sizeToFit()
-    if #available(macOS 10.14, *) {
-      assertSnapshot(matching: button)
-      assertSnapshot(of: .recursiveDescription, matching: button)
-    }
+    assertSnapshot(matching: button)
+    assertSnapshot(of: .recursiveDescription, matching: button)
     #endif
   }
 
@@ -81,11 +114,9 @@ class SnapshotTestingTests: SnapshotTestCase {
       .deletingLastPathComponent()
       .appendingPathComponent("fixture.html")
     let html = try String(contentsOf: fixtureUrl)
-    let webView = WKWebView()
+    let webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 800, height: 600))
     webView.loadHTMLString(html, baseURL: nil)
-    if #available(macOS 10.14, *) {
-      assertSnapshot(matching: webView, named: platform)
-    }
+    assertSnapshot(matching: webView, named: platform)
     #endif
   }
 
@@ -94,19 +125,18 @@ class SnapshotTestingTests: SnapshotTestCase {
     #if os(iOS)
     let label = UILabel()
     label.frame = CGRect(origin: .zero, size: CGSize(width: 43.5, height: 20.5))
-    label.text = "Hello"
     label.backgroundColor = .white
     #elseif os(macOS)
     let label = NSTextField()
     label.frame = CGRect(origin: .zero, size: CGSize(width: 37, height: 16))
-    label.stringValue = "Hello"
     label.backgroundColor = .white
     label.isBezeled = false
     label.isEditable = false
     #endif
-    if #available(macOS 10.14, *) {
-      assertSnapshot(of: .view(precision: 0.9), matching: label, named: platform)
-    }
+    label.text = "Hello."
+    assertSnapshot(of: .view(precision: 0.9), matching: label, named: platform)
+    label.text = "Hello"
+    assertSnapshot(of: .view(precision: 0.9), matching: label, named: platform)
     #endif
   }
 }
@@ -115,6 +145,7 @@ class SnapshotTestingTests: SnapshotTestCase {
 extension SnapshotTestingTests {
   static var allTests : [(String, (SnapshotTestingTests) -> () throws -> Void)] {
     return [
+      ("testMixedViews", testMixedViews),
       ("testMultipleSnapshots", testMultipleSnapshots),
       ("testNamedAssertion", testNamedAssertion),
       ("testNSView", testNSView),

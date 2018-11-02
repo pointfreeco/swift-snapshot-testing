@@ -7,7 +7,7 @@ extension Strategy where A == UIViewController, B == UIImage {
   }
 
   public static func uiViewController(precision: Float) -> Strategy {
-    return Strategy.uiView(precision: precision).pullback { $0.view }
+    return Strategy<UIView, UIImage>.view(precision: precision).pullback { $0.view }
   }
 }
 

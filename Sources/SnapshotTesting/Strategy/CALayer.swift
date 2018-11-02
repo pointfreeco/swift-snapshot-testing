@@ -1,13 +1,13 @@
 #if os(macOS)
 import Cocoa
 
-extension Strategy {
-  public static var layer: Strategy<CALayer, NSImage> {
+extension Strategy where A == CALayer, B == NSImage {
+  public static var layer: Strategy {
     return .layer(precision: 1)
   }
 
-  public static func layer(precision: Float) -> Strategy<CALayer, NSImage> {
-    return Strategy.image(precision: precision).pullback { layer in
+  public static func layer(precision: Float) -> Strategy {
+    return SimpleStrategy<NSImage>.image(precision: precision).pullback { layer in
       let image = NSImage(size: layer.bounds.size)
       image.lockFocus()
       let context = NSGraphicsContext.current!.cgContext
@@ -24,13 +24,13 @@ extension CALayer: DefaultDiffable {
 #elseif os(iOS) || os(tvOS) || os(watchOS)
 import UIKit
 
-extension Strategy {
-  public static var layer: Strategy<CALayer, UIImage> {
+extension Strategy where A == CALayer, B == UIImage {
+  public static var layer: Strategy {
     return .layer(precision: 1)
   }
 
-  public static func layer(precision: Float) -> Strategy<CALayer, UIImage> {
-    return Strategy.image(precision: precision).pullback { layer in
+  public static func layer(precision: Float) -> Strategy {
+    return SimpleStrategy<UIImage>.image(precision: precision).pullback { layer in
       UIGraphicsImageRenderer(size: layer.bounds.size).image { context in
         layer.render(in: context.cgContext)
       }
