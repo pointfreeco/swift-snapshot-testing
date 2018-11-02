@@ -37,9 +37,8 @@ class SnapshotTestingTests: SnapshotTestCase {
 
     if #available(OSX 10.13, *) {
       assertSnapshot(of: .json, matching: user)
+      assertSnapshot(of: .plist, matching: user)
     }
-
-    assertSnapshot(of: .plist, matching: user)
   }
 
   func testWithNSObject() {

@@ -16,12 +16,14 @@ extension Strategy where A: Encodable, B == String {
     return strategy
   }
 
+  @available(OSX 10.13, *)
   public static var plist: Strategy<A, String> {
     let encoder = PropertyListEncoder()
     encoder.outputFormat = .xml
     return .plist(encoder)
   }
 
+  @available(OSX 10.13, *)
   public static func plist(_ encoder: PropertyListEncoder) -> Strategy<A, String> {
     var strategy = Strategy.lines.pullback { (encodable: A) in
       try! String(decoding: encoder.encode(encodable), as: UTF8.self)
