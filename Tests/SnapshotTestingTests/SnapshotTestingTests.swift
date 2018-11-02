@@ -48,16 +48,16 @@ class SnapshotTestingTests: SnapshotTestCase {
     assertSnapshot(of: .any, matching: [1, 2])
   }
 
-  #if os(iOS)
   func testUIView() {
+    #if os(iOS)
     let view = UIButton(type: .contactAdd)
     assertSnapshot(matching: view)
     assertSnapshot(of: .recursiveDescription, matching: view)
-  }
   #endif
+  }
 
-  #if os(macOS)
   func testNSView() {
+    #if os(macOS)
     let button = NSButton()
     button.bezelStyle = .rounded
     button.title = "Push Me"
@@ -66,11 +66,11 @@ class SnapshotTestingTests: SnapshotTestCase {
       assertSnapshot(matching: button)
       assertSnapshot(of: .recursiveDescription, matching: button)
     }
+    #endif
   }
-  #endif
 
-  #if os(iOS) || os(macOS)
   func testWebView() throws {
+    #if os(iOS) || os(macOS)
     let fixtureUrl = URL(fileURLWithPath: String(#file))
       .deletingLastPathComponent()
       .appendingPathComponent("fixture.html")
@@ -80,9 +80,11 @@ class SnapshotTestingTests: SnapshotTestCase {
     if #available(macOS 10.14, *) {
       assertSnapshot(matching: webView, named: platform)
     }
+    #endif
   }
 
   func testPrecision() {
+    #if os(iOS) || os(macOS)
     #if os(iOS)
     let label = UILabel()
     label.frame = CGRect(origin: .zero, size: CGSize(width: 43.5, height: 20.5))
@@ -99,19 +101,24 @@ class SnapshotTestingTests: SnapshotTestCase {
     if #available(macOS 10.14, *) {
       assertSnapshot(of: .view(precision: 0.9), matching: label, named: platform)
     }
+    #endif
   }
-  #endif
 }
 
 #if os(Linux)
 extension SnapshotTestingTests {
   static var allTests : [(String, (SnapshotTestingTests) -> () throws -> Void)] {
     return [
-      ("testWithAny", testWithAny),
-      ("testNamedAssertion", testNamedAssertion),
-      ("testWithDate", testWithDate),
-      ("testWithNSObject", testWithNSObject),
       ("testMultipleSnapshots", testMultipleSnapshots),
+      ("testNamedAssertion", testNamedAssertion),
+      ("testNSView", testNSView),
+      ("testPrecision", testPrecision),
+      ("testUIView", testUIView),
+      ("testWebView", testWebView),
+      ("testWithAny", testWithAny),
+      ("testWithDate", testWithDate),
+      ("testWithEncodable", testWithEncodable),
+      ("testWithNSObject", testWithNSObject),
     ]
   }
 }
