@@ -11,7 +11,7 @@ extension Attachment {
 }
 
 extension Strategy where A == Data, B == Data {
-  static var data: SimpleStrategy<Data> {
+  static var data: Strategy {
     return .init(
       pathExtension: nil,
       diffable: .init(to: { $0 }, fro: { $0 }) { old, new in
