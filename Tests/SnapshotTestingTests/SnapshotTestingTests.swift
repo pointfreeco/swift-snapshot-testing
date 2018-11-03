@@ -78,24 +78,38 @@ class SnapshotTestingTests: SnapshotTestCase {
 
   func testMixedViews() {
     #if os(macOS) || os(iOS)
+    print(1)
     let webView = WKWebView(frame: .init(x: 0, y: 0, width: 50, height: 50))
+    print(2)
     webView.loadHTMLString("🌎", baseURL: nil)
+    print(3)
 
     let skView = SKView(frame: .init(x: 50, y: 0, width: 50, height: 50))
+    print(4)
     let scene = SKScene(size: .init(width: 50, height: 50))
+    print(5)
     let node = SKShapeNode(circleOfRadius: 15)
+    print(6)
     node.fillColor = .red
+    print(7)
     node.position = .init(x: 25, y: 25)
+    print(8)
     scene.addChild(node)
+    print(9)
     skView.presentScene(scene)
+    print(10)
 
     let view = View(frame: .init(x: 0, y: 0, width: 100, height: 50))
+    print(1)
     view.addSubview(webView)
+    print(1)
     view.addSubview(skView)
+    print(1)
 
     if #available(macOS 10.14, *) {
       assertSnapshot(matching: view, named: platform)
     }
+    print(1)
     #endif
   }
 
