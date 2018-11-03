@@ -129,31 +129,34 @@ class SnapshotTestingTests: SnapshotTestCase {
 
   func testSCNView() {
     #if os(iOS) || os(macOS)
-    let scene = SCNScene()
+    // NB: CircleCI crashes while trying to instantiate SKView
+    if #available(macOS 10.14, *) {
+      let scene = SCNScene()
 
-    let sphereGeometry = SCNSphere(radius: 3)
-    sphereGeometry.segmentCount = 200
-    let sphereNode = SCNNode(geometry: sphereGeometry)
-    sphereNode.position = SCNVector3Zero
-    scene.rootNode.addChildNode(sphereNode)
+      let sphereGeometry = SCNSphere(radius: 3)
+      sphereGeometry.segmentCount = 200
+      let sphereNode = SCNNode(geometry: sphereGeometry)
+      sphereNode.position = SCNVector3Zero
+      scene.rootNode.addChildNode(sphereNode)
 
-    sphereGeometry.firstMaterial?.diffuse.contents = URL(fileURLWithPath: String(#file))
-      .deletingLastPathComponent()
-      .appendingPathComponent("__Fixtures__/earth.png")
+      sphereGeometry.firstMaterial?.diffuse.contents = URL(fileURLWithPath: String(#file))
+        .deletingLastPathComponent()
+        .appendingPathComponent("__Fixtures__/earth.png")
 
-    let cameraNode = SCNNode()
-    cameraNode.camera = SCNCamera()
-    cameraNode.position = SCNVector3Make(0, 0, 8)
-    scene.rootNode.addChildNode(cameraNode)
+      let cameraNode = SCNNode()
+      cameraNode.camera = SCNCamera()
+      cameraNode.position = SCNVector3Make(0, 0, 8)
+      scene.rootNode.addChildNode(cameraNode)
 
-    let omniLight = SCNLight()
-    omniLight.type = .omni
-    let omniLightNode = SCNNode()
-    omniLightNode.light = omniLight
-    omniLightNode.position = SCNVector3Make(10, 10, 10)
-    scene.rootNode.addChildNode(omniLightNode)
+      let omniLight = SCNLight()
+      omniLight.type = .omni
+      let omniLightNode = SCNNode()
+      omniLightNode.light = omniLight
+      omniLightNode.position = SCNVector3Make(10, 10, 10)
+      scene.rootNode.addChildNode(omniLightNode)
 
-    assertSnapshot(of: .scene(size: .init(width: 500, height: 500)), matching: scene, named: platform)
+      assertSnapshot(of: .scene(size: .init(width: 500, height: 500)), matching: scene, named: platform)
+    }
     #endif
   }
 
