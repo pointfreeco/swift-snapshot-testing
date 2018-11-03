@@ -117,13 +117,46 @@ class SnapshotTestingTests: SnapshotTestCase {
     #if os(iOS) || os(macOS)
     let fixtureUrl = URL(fileURLWithPath: String(#file))
       .deletingLastPathComponent()
-      .appendingPathComponent("fixture.html")
+      .appendingPathComponent("__Fixtures__/pointfree.html")
     let html = try String(contentsOf: fixtureUrl)
     let webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 800, height: 600))
     webView.loadHTMLString(html, baseURL: nil)
     if #available(macOS 10.14, *) {
       assertSnapshot(matching: webView, named: platform)
     }
+    #endif
+  }
+
+  func testSCNView() {
+    #if os(iOS) || os(macOS)
+    let scene = SCNScene()
+
+    let sphereGeometry = SCNSphere(radius: 3)
+    sphereGeometry.segmentCount = 200
+    let sphereNode = SCNNode(geometry: sphereGeometry)
+    sphereNode.position = SCNVector3Zero
+    scene.rootNode.addChildNode(sphereNode)
+
+    sphereGeometry.firstMaterial?.diffuse.contents = URL(fileURLWithPath: String(#file))
+      .deletingLastPathComponent()
+      .appendingPathComponent("__Fixtures__/earth.png")
+
+    let cameraNode = SCNNode()
+    cameraNode.camera = SCNCamera()
+    cameraNode.position = SCNVector3Make(0, 0, 8)
+    scene.rootNode.addChildNode(cameraNode)
+
+    let omniLight = SCNLight()
+    omniLight.type = .omni
+    let omniLightNode = SCNNode()
+    omniLightNode.light = omniLight
+    omniLightNode.position = SCNVector3Make(10, 10, 10)
+    scene.rootNode.addChildNode(omniLightNode)
+
+    let view = SCNView(frame: .init(x: 0, y: 0, width: 500, height: 500))
+    view.scene = scene
+
+    assertSnapshot(matching: view, named: platform)
     #endif
   }
 
@@ -159,6 +192,7 @@ extension SnapshotTestingTests {
       ("testNamedAssertion", testNamedAssertion),
       ("testNSView", testNSView),
       ("testPrecision", testPrecision),
+      ("testSCNView", testSCNView),
       ("testUIView", testUIView),
       ("testWebView", testWebView),
       ("testWithAny", testWithAny),
