@@ -46,11 +46,13 @@ extension Strategy where A == UIView, B == UIImage {
   }
 
   public static func view(precision: Float) -> Strategy {
-    return Strategy<CALayer, UIImage>.layer(precision: precision).asyncPullback { view in
-      Async { callback in
+    return SimpleStrategy<UIImage>.image(precision: precision).asyncPullback { view in
+      view.snapshot ?? Async { callback in
         addImagesForRenderedViews(view).sequence().run { views in
-          callback(view.layer)
-          views.forEach { $0.removeFromSuperview() }
+          Strategy<CALayer, UIImage>.layer.snapshotToDiffable(view.layer).run { image in
+            callback(image)
+            views.forEach { $0.removeFromSuperview() }
+          }
         }
       }
     }
@@ -110,7 +112,7 @@ private func addImagesForRenderedViews(_ view: View) -> [Async<View>] {
 fileprivate extension View {
   var snapshot: Async<Image>? {
     #if os(iOS) || os(tvOS) || os(watchOS)
-    if let glkView = view as? GLKView {
+    if let glkView = self as? GLKView {
       return Async(value: glkView.snapshot)
     }
     #endif
