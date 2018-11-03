@@ -111,10 +111,7 @@ private func diff(_ old: NSImage, _ new: NSImage) -> NSImage {
     width: max(old.size.width, new.size.width),
     height: max(old.size.height, new.size.height)
   )
-  let differenceCiImage = differenceFilter.outputImage!
-  let invertFilter = CIFilter(name: "CIColorInvert")!
-  invertFilter.setValue(differenceCiImage, forKey: kCIInputImageKey)
-  let rep = NSCIImageRep(ciImage: invertFilter.outputImage!)
+  let rep = NSCIImageRep(ciImage: differenceFilter.outputImage!)
   let difference = NSImage(size: maxSize)
   difference.addRepresentation(rep)
   return difference

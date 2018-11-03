@@ -104,9 +104,6 @@ private func diff(_ old: UIImage, _ new: UIImage) -> UIImage {
   differenceFilter.setValue(oldCiImage, forKey: kCIInputImageKey)
   differenceFilter.setValue(newCiImage, forKey: kCIInputBackgroundImageKey)
   let differenceCiImage = differenceFilter.outputImage!
-//  let invertFilter = CIFilter(name: "CIColorInvert")!
-//  invertFilter.setValue(differenceCiImage, forKey: kCIInputImageKey)
-//  let invertCiImage = invertFilter.outputImage!
   let context = CIContext()
   let differenceCgImage = context.createCGImage(differenceCiImage, from: differenceCiImage.extent)!
   return UIImage(cgImage: differenceCgImage)
