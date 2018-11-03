@@ -119,7 +119,7 @@ fileprivate extension View {
     if let scnView = self as? SCNView {
       return Async(value: scnView.snapshot())
     } else if let skView = self as? SKView {
-      if #available(OSX 10.11, *) {
+      if #available(macOS 10.11, *) {
         let cgImage = skView.texture(from: skView.scene!)!.cgImage()
         #if os(macOS)
         let image = Image(cgImage: cgImage, size: skView.bounds.size)
@@ -128,7 +128,7 @@ fileprivate extension View {
         #endif
         return Async(value: image)
       } else {
-        fatalError()
+        fatalError("Taking SKView snapshots requires macOS 10.11 or greater")
       }
     } else if let wkWebView = self as? WKWebView {
       return Async<Image> { callback in
@@ -143,13 +143,13 @@ fileprivate extension View {
           }
           #endif
 
-          if #available(OSX 10.13, *) {
+          if #available(macOS 10.13, *) {
             wkWebView.takeSnapshot(with: nil) { image, _ in
               _ = delegate
               callback(image!)
             }
           } else {
-            fatalError()
+            fatalError("Taking WKWebView snapshots requires macOS 10.13 or greater")
           }
         }
 
