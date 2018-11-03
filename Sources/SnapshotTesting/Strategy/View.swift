@@ -3,6 +3,11 @@ import SceneKit
 import SpriteKit
 import WebKit
 import WKSnapshotConfigurationShim
+#if os(macOS)
+import Cocoa
+#elseif os(iOS) || os(tvOS) || os(watchOS)
+import UIKit
+#endif
 
 #if os(macOS)
 extension Strategy where A == NSView, B == NSImage {
@@ -73,18 +78,6 @@ extension Strategy where A == UIView, B == String {
 extension UIView: DefaultDiffable {
   public static let defaultStrategy: Strategy<UIView, UIImage> = .view
 }
-#endif
-
-#if os(macOS)
-import Cocoa
-private typealias Image = NSImage
-private typealias ImageView = NSImageView
-private typealias View = NSView
-#elseif os(iOS) || os(tvOS) || os(watchOS)
-import UIKit
-private typealias Image = UIImage
-private typealias ImageView = UIImageView
-private typealias View = UIView
 #endif
 
 private func addImagesForRenderedViews(_ view: View) -> [Async<View>] {

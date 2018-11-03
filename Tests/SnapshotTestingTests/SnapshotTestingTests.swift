@@ -153,10 +153,22 @@ class SnapshotTestingTests: SnapshotTestCase {
     omniLightNode.position = SCNVector3Make(10, 10, 10)
     scene.rootNode.addChildNode(omniLightNode)
 
-    let view = SCNView(frame: .init(x: 0, y: 0, width: 500, height: 500))
-    view.scene = scene
+    assertSnapshot(of: .scene(size: .init(width: 500, height: 500)), matching: scene, named: platform)
+    #endif
+  }
 
-    assertSnapshot(matching: view, named: platform)
+  func testSKView() {
+    #if os(macOS) || os(iOS)
+    // NB: CircleCI crashes while trying to instantiate SKView
+    if #available(macOS 10.14, *) {
+      let scene = SKScene(size: .init(width: 50, height: 50))
+      let node = SKShapeNode(circleOfRadius: 15)
+      node.fillColor = .red
+      node.position = .init(x: 25, y: 25)
+      scene.addChild(node)
+
+      assertSnapshot(of: .scene(size: .init(width: 50, height: 50)), matching: scene, named: platform)
+    }
     #endif
   }
 
@@ -193,6 +205,7 @@ extension SnapshotTestingTests {
       ("testNSView", testNSView),
       ("testPrecision", testPrecision),
       ("testSCNView", testSCNView),
+      ("testSKView", testSKView),
       ("testUIView", testUIView),
       ("testWebView", testWebView),
       ("testWithAny", testWithAny),

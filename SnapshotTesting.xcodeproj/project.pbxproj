@@ -21,6 +21,9 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		805A1CBA218DF87500372EFD /* Internal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 805A1CB9218DF87500372EFD /* Internal.swift */; };
+		805A1CBC218DF8B100372EFD /* SceneKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 805A1CBB218DF8B100372EFD /* SceneKit.swift */; };
+		805A1CBE218DF9F500372EFD /* SpriteKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 805A1CBD218DF9F500372EFD /* SpriteKit.swift */; };
 		OBJ_102 /* WKSnapshotConfigurationShim.m in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_11 /* WKSnapshotConfigurationShim.m */; };
 		OBJ_104 /* WKSnapshotConfigurationShim.h in Headers */ = {isa = PBXBuildFile; fileRef = OBJ_13 /* WKSnapshotConfigurationShim.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		OBJ_46 /* Diff.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_32 /* Diff.swift */; };
@@ -94,6 +97,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		805A1CB9218DF87500372EFD /* Internal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Internal.swift; sourceTree = "<group>"; };
+		805A1CBB218DF8B100372EFD /* SceneKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneKit.swift; sourceTree = "<group>"; };
+		805A1CBD218DF9F500372EFD /* SpriteKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpriteKit.swift; sourceTree = "<group>"; };
 		OBJ_11 /* WKSnapshotConfigurationShim.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WKSnapshotConfigurationShim.m; sourceTree = "<group>"; };
 		OBJ_13 /* WKSnapshotConfigurationShim.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WKSnapshotConfigurationShim.h; sourceTree = "<group>"; };
 		OBJ_15 /* Async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Async.swift; sourceTree = "<group>"; };
@@ -182,6 +188,7 @@
 				OBJ_15 /* Async.swift */,
 				OBJ_16 /* Attachment.swift */,
 				OBJ_17 /* Diffable.swift */,
+				805A1CB9218DF87500372EFD /* Internal.swift */,
 				OBJ_18 /* SnapshotTestCase.swift */,
 				OBJ_19 /* Strategy.swift */,
 				OBJ_20 /* Strategy */,
@@ -199,7 +206,9 @@
 				OBJ_24 /* Data.swift */,
 				OBJ_25 /* NSImage.swift */,
 				OBJ_26 /* NSViewController.swift */,
+				805A1CBB218DF8B100372EFD /* SceneKit.swift */,
 				OBJ_27 /* String.swift */,
+				805A1CBD218DF9F500372EFD /* SpriteKit.swift */,
 				OBJ_28 /* UIImage.swift */,
 				OBJ_29 /* UIViewController.swift */,
 				OBJ_30 /* View.swift */,
@@ -244,7 +253,7 @@
 			name = Products;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		OBJ_5 /*  */ = {
+		OBJ_5 = {
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
@@ -253,7 +262,6 @@
 				OBJ_33 /* Tests */,
 				OBJ_36 /* Products */,
 			);
-			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_7 /* Configs */ = {
@@ -387,7 +395,7 @@
 			knownRegions = (
 				en,
 			);
-			mainGroup = OBJ_5 /*  */;
+			mainGroup = OBJ_5;
 			productRefGroup = OBJ_36 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -427,8 +435,10 @@
 				OBJ_54 /* Attachment.swift in Sources */,
 				OBJ_55 /* Diffable.swift in Sources */,
 				OBJ_56 /* SnapshotTestCase.swift in Sources */,
+				805A1CBC218DF8B100372EFD /* SceneKit.swift in Sources */,
 				OBJ_57 /* Strategy.swift in Sources */,
 				OBJ_58 /* Any.swift in Sources */,
+				805A1CBA218DF87500372EFD /* Internal.swift in Sources */,
 				OBJ_59 /* CALayer.swift in Sources */,
 				OBJ_60 /* Codable.swift in Sources */,
 				OBJ_61 /* Data.swift in Sources */,
@@ -438,6 +448,7 @@
 				OBJ_65 /* UIImage.swift in Sources */,
 				OBJ_66 /* UIViewController.swift in Sources */,
 				OBJ_67 /* View.swift in Sources */,
+				805A1CBE218DF9F500372EFD /* SpriteKit.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
