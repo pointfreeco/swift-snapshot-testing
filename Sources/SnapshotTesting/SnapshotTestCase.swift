@@ -97,6 +97,7 @@ open class SnapshotTestCase: XCTestCase {
       let artifactsUrl = URL(
         fileURLWithPath: ProcessInfo.processInfo.environment["SNAPSHOT_ARTIFACTS"] ?? NSTemporaryDirectory()
       )
+      print(artifactsUrl)
       try fileManager.createDirectory(at: artifactsUrl, withIntermediateDirectories: true)
       let failedSnapshotFileUrl = artifactsUrl.appendingPathComponent(snapshotFileUrl.lastPathComponent)
       try strategy.diffable.to(diffable).write(to: failedSnapshotFileUrl)
