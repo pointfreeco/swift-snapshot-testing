@@ -50,7 +50,7 @@ class SnapshotTestingTests: SnapshotTestCase {
     struct User: Encodable { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
 
-    if #available(OSX 10.13, *) {
+    if #available(macOS 10.13, *) {
       assertSnapshot(of: .json, matching: user)
 
       #if !os(Linux)
@@ -93,7 +93,9 @@ class SnapshotTestingTests: SnapshotTestCase {
     view.addSubview(webView)
     view.addSubview(skView)
 
-    assertSnapshot(matching: view, named: platform)
+    if #available(macOS 10.14, *) {
+      assertSnapshot(matching: view, named: platform)
+    }
     #endif
   }
 
@@ -103,8 +105,10 @@ class SnapshotTestingTests: SnapshotTestCase {
     button.bezelStyle = .rounded
     button.title = "Push Me"
     button.sizeToFit()
-    assertSnapshot(matching: button)
-    assertSnapshot(of: .recursiveDescription, matching: button)
+    if #available(macOS 10.14, *) {
+      assertSnapshot(matching: button)
+      assertSnapshot(of: .recursiveDescription, matching: button)
+    }
     #endif
   }
 
@@ -116,7 +120,9 @@ class SnapshotTestingTests: SnapshotTestCase {
     let html = try String(contentsOf: fixtureUrl)
     let webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 800, height: 600))
     webView.loadHTMLString(html, baseURL: nil)
-    assertSnapshot(matching: webView, named: platform)
+    if #available(macOS 10.14, *) {
+      assertSnapshot(matching: webView, named: platform)
+    }
     #endif
   }
 
@@ -133,10 +139,12 @@ class SnapshotTestingTests: SnapshotTestCase {
     label.isBezeled = false
     label.isEditable = false
     #endif
-    label.text = "Hello."
-    assertSnapshot(of: .view(precision: 0.9), matching: label, named: platform)
-    label.text = "Hello"
-    assertSnapshot(of: .view(precision: 0.9), matching: label, named: platform)
+    if #available(macOS 10.14, *) {
+      label.text = "Hello."
+      assertSnapshot(of: .view(precision: 0.9), matching: label, named: platform)
+      label.text = "Hello"
+      assertSnapshot(of: .view(precision: 0.9), matching: label, named: platform)
+    }
     #endif
   }
 }
