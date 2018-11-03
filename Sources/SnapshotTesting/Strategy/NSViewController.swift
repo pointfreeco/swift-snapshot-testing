@@ -12,13 +12,8 @@ extension Strategy where A == NSViewController, B == NSImage {
 }
 
 extension Strategy where A == NSViewController, B == String {
-  public static var recursiveDescription: Strategy<NSView, String> {
-    return SimpleStrategy<String>.lines.pullback { view in
-      return purgePointers(
-        view.perform(Selector(("_subtreeDescription"))).retain().takeUnretainedValue()
-          as! String
-      )
-    }
+  public static var recursiveDescription: Strategy {
+    return Strategy<NSView, String>.recursiveDescription.pullback { $0.view }
   }
 }
 
