@@ -9,7 +9,7 @@ jobs:
       - checkout
 
       - run:
-          name: Mac Info
+          name: Mac info
           command: system_profiler SPSoftwareDataType
 
       - run:
@@ -20,16 +20,19 @@ jobs:
           name: Run iOS tests
           command: make test-ios
           environment:
-            SNAPSHOT_ARTIFACTS: $CIRCLE_ARTIFACTS
+            SNAPSHOT_ARTIFACTS: /tmp/__SnapshotArtifacts__
 
       - run:
           name: Run macOS tests
           command: make test-macos
           environment:
-            SNAPSHOT_ARTIFACTS: $CIRCLE_ARTIFACTS
+            SNAPSHOT_ARTIFACTS: /tmp/__SnapshotArtifacts__
 
       - run:
           name: Run Swift tests
           command: make test-swift
           environment:
-            SNAPSHOT_ARTIFACTS: $CIRCLE_ARTIFACTS
+            SNAPSHOT_ARTIFACTS: /tmp/__SnapshotArtifacts__
+
+      - store_artifacts:
+          path: /tmp/__SnapshotArtifacts__

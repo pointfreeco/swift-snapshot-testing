@@ -1,8 +1,8 @@
 import Foundation
 
-extension Strategy {
-  public static var any: Strategy<A, String> {
-    return Strategy.lines.pullback { snap($0) }
+extension Strategy where B == String {
+  public static var any: Strategy {
+    return SimpleStrategy<String>.lines.pullback { snap($0) }
   }
 }
 
@@ -26,8 +26,10 @@ private func snap<T>(_ value: T, name: String? = nil, indent: Int = 0) -> String
     let subjectType = String(describing: mirror.subjectType)
       .replacingOccurrences(of: " #\\d+", with: "", options: .regularExpression)
     description = count == 0 ? "\(subjectType).none" : "\(subjectType)"
-  case (let value as SnapshotStringConvertible, _):
+  case (let value as AnySnapshotStringConvertible, _) where type(of: value).renderChildren:
     description = value.snapshotDescription
+  case (let value as AnySnapshotStringConvertible, _):
+    return "\(indentation)- \(name.map { "\($0): " } ?? "")\(value.snapshotDescription)\n"
   case (let value as CustomDebugStringConvertible, _):
     description = value.debugDescription
   case (let value as CustomStringConvertible, _):
@@ -49,19 +51,38 @@ private func snap<T>(_ value: T, name: String? = nil, indent: Int = 0) -> String
   return lines.joined()
 }
 
-public protocol SnapshotStringConvertible {
+public protocol AnySnapshotStringConvertible {
+  static var renderChildren: Bool { get }
   var snapshotDescription: String { get }
 }
 
-extension Date: SnapshotStringConvertible {
+extension AnySnapshotStringConvertible {
+  public static var renderChildren: Bool {
+    return false
+  }
+}
+
+extension Data: AnySnapshotStringConvertible {
+  public var snapshotDescription: String {
+    return self.debugDescription
+  }
+}
+
+extension Date: AnySnapshotStringConvertible {
   public var snapshotDescription: String {
     return snapshotDateFormatter.string(from: self)
   }
 }
 
-extension NSObject: SnapshotStringConvertible {
+extension NSObject: AnySnapshotStringConvertible {
   public var snapshotDescription: String {
     return purgePointers(self.debugDescription)
+  }
+}
+
+extension URL: AnySnapshotStringConvertible {
+  public var snapshotDescription: String {
+    return self.debugDescription
   }
 }
 

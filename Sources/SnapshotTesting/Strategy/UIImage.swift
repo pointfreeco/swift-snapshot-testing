@@ -11,12 +11,12 @@ extension Attachment {
   }
 }
 
-extension Strategy {
-  static var image: SimpleStrategy<UIImage> {
+extension Strategy where A == UIImage, B == UIImage {
+  static var image: Strategy {
     return .image(precision: 1)
   }
 
-  static func image(precision: Float) -> SimpleStrategy<UIImage> {
+  static func image(precision: Float) -> Strategy {
     return .init(
       pathExtension: "png",
       diffable: .init(
@@ -104,11 +104,8 @@ private func diff(_ old: UIImage, _ new: UIImage) -> UIImage {
   differenceFilter.setValue(oldCiImage, forKey: kCIInputImageKey)
   differenceFilter.setValue(newCiImage, forKey: kCIInputBackgroundImageKey)
   let differenceCiImage = differenceFilter.outputImage!
-  let invertFilter = CIFilter(name: "CIColorInvert")!
-  invertFilter.setValue(differenceCiImage, forKey: kCIInputImageKey)
-  let invertCiImage = invertFilter.outputImage!
   let context = CIContext()
-  let invertCgImage = context.createCGImage(invertCiImage, from: invertCiImage.extent)!
-  return UIImage(cgImage: invertCgImage)
+  let differenceCgImage = context.createCGImage(differenceCiImage, from: differenceCiImage.extent)!
+  return UIImage(cgImage: differenceCgImage)
 }
 #endif

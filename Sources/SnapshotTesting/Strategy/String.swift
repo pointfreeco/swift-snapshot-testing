@@ -1,10 +1,8 @@
 import Diff
 import Foundation
 
-extension Strategy {
-  public static var lines: SimpleStrategy<String> {
-    return .init(pathExtension: "txt", diffable: .lines)
-  }
+extension Strategy where A == String, B == String {
+  public static let lines = Strategy(pathExtension: "txt", diffable: .lines)
 }
 
 extension String: DefaultDiffable {

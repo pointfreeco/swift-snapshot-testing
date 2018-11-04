@@ -11,12 +11,12 @@ extension Attachment {
   }
 }
 
-extension Strategy {
-  public static var image: SimpleStrategy<NSImage> {
+extension Strategy where A == NSImage, B == NSImage {
+  public static var image: Strategy {
     return .image(precision: 1)
   }
 
-  public static func image(precision: Float) -> SimpleStrategy<NSImage> {
+  public static func image(precision: Float) -> Strategy {
     return .init(
       pathExtension: "png",
       diffable: .init(
@@ -111,10 +111,7 @@ private func diff(_ old: NSImage, _ new: NSImage) -> NSImage {
     width: max(old.size.width, new.size.width),
     height: max(old.size.height, new.size.height)
   )
-  let differenceCiImage = differenceFilter.outputImage!
-  let invertFilter = CIFilter(name: "CIColorInvert")!
-  invertFilter.setValue(differenceCiImage, forKey: kCIInputImageKey)
-  let rep = NSCIImageRep(ciImage: invertFilter.outputImage!)
+  let rep = NSCIImageRep(ciImage: differenceFilter.outputImage!)
   let difference = NSImage(size: maxSize)
   difference.addRepresentation(rep)
   return difference
