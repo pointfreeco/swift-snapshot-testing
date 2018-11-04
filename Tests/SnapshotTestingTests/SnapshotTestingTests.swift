@@ -7,10 +7,8 @@ import SpriteKit
 import WebKit
 
 #if os(iOS)
-typealias View = UIView
 let platform = "ios"
 #elseif os(macOS)
-typealias View = NSView
 let platform = "macos"
 extension NSTextField {
   var text: String {
