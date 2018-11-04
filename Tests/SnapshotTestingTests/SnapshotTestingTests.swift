@@ -127,7 +127,7 @@ class SnapshotTestingTests: SnapshotTestCase {
 
   func testSCNView() {
     #if os(iOS) || os(macOS)
-    // NB: CircleCI crashes while trying to instantiate SKView
+    // NB: CircleCI crashes while trying to instantiate SCNView
     if #available(macOS 10.14, *) {
       let scene = SCNScene()
 
