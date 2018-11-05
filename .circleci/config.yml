@@ -13,10 +13,6 @@ jobs:
           command: system_profiler SPSoftwareDataType
 
       - run:
-          name: Generate Xcode project file
-          command: swift package generate-xcodeproj
-
-      - run:
           name: Run iOS tests
           command: make test-ios
           environment:
