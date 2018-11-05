@@ -1,10 +1,9 @@
+#if os(iOS) || os(macOS) || os(tvOS)
 #if os(macOS)
 import Cocoa
 #endif
-#if os(iOS) || os(macOS) || os(tvOS)
 import SceneKit
 import SpriteKit
-#endif
 #if os(iOS) || os(tvOS)
 import UIKit
 #endif
@@ -215,3 +214,4 @@ fileprivate extension Array {
     }
   }
 }
+#endif

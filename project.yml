@@ -9,8 +9,8 @@ targets:
     platform: [macOS, iOS, tvOS]
     settings:
       FRAMEWORK_SEARCH_PATHS: $(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks
-      OSX_DEPLOYMENT_TARGET: 10.6
       IPHONEOS_DEPLOYMENT_TARGET: 10.0
+      OSX_DEPLOYMENT_TARGET: 10.6
       TVOS_DEPLOYMENT_TARGET: 10.0
     scheme:
       testTargets: [SnapshotTestingTests_$platform]
