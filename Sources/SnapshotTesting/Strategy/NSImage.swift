@@ -38,7 +38,7 @@ extension Strategy where A == NSImage, B == NSImage {
 }
 
 extension NSImage: DefaultDiffable {
-  public static let defaultStrategy: SimpleStrategy<NSImage> = .image
+  public static let defaultStrategy: SimpleStrategy = .image
 }
 
 private func NSImagePNGRepresentation(_ image: NSImage) -> Data? {
