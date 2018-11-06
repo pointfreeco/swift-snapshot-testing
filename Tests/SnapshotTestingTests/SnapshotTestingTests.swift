@@ -19,10 +19,10 @@ extension NSTextField {
 }
 #endif
 
-class SnapshotTestingTests: SnapshotTestCase {
+class SnapshotTestingTests: XCTestCase {
   override func setUp() {
     super.setUp()
-    self.diffTool = "ksdiff"
+    diffTool = "ksdiff"
 //    record = true
   }
 
