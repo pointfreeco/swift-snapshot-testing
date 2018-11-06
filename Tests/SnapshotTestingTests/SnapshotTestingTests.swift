@@ -29,19 +29,19 @@ class SnapshotTestingTests: SnapshotTestCase {
   func testWithAny() {
     struct User { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
-    assertSnapshot(of: .any, matching: user)
-    assertSnapshot(of: .any, matching: Data("Hello, world!".utf8))
-    assertSnapshot(of: .any, matching: URL(string: "https://www.pointfree.co")!)
+    assertSnapshot(matching: user, as: .dump)
+    assertSnapshot(matching: Data("Hello, world!".utf8), as: .dump)
+    assertSnapshot(matching: URL(string: "https://www.pointfree.co")!, as: .dump)
   }
 
   func testNamedAssertion() {
     struct User { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
-    assertSnapshot(of: .any, matching: user, named: "named")
+    assertSnapshot(matching: user, as: .dump, named: "named")
   }
 
   func testWithDate() {
-    assertSnapshot(of: .any, matching: Date(timeIntervalSinceReferenceDate: 0))
+    assertSnapshot(matching: Date(timeIntervalSinceReferenceDate: 0), as: .dump)
   }
 
   func testWithEncodable() {
@@ -49,28 +49,28 @@ class SnapshotTestingTests: SnapshotTestCase {
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
 
     if #available(macOS 10.13, *) {
-      assertSnapshot(of: .json, matching: user)
+      assertSnapshot(matching: user, as: .json)
 
       #if !os(Linux)
-      assertSnapshot(of: .plist, matching: user)
+      assertSnapshot(matching: user, as: .plist)
       #endif
     }
   }
 
   func testWithNSObject() {
-    assertSnapshot(of: .any, matching: NSObject())
+    assertSnapshot(matching: NSObject(), as: .dump)
   }
 
   func testMultipleSnapshots() {
-    assertSnapshot(of: .any, matching: [1])
-    assertSnapshot(of: .any, matching: [1, 2])
+    assertSnapshot(matching: [1], as: .dump)
+    assertSnapshot(matching: [1, 2], as: .dump)
   }
 
   func testUIView() {
     #if os(iOS)
     let view = UIButton(type: .contactAdd)
     assertSnapshot(matching: view)
-    assertSnapshot(of: .recursiveDescription, matching: view)
+    assertSnapshot(matching: view, as: .recursiveDescription)
     #endif
   }
 
@@ -106,7 +106,7 @@ class SnapshotTestingTests: SnapshotTestCase {
     button.sizeToFit()
     if #available(macOS 10.14, *) {
       assertSnapshot(matching: button)
-      assertSnapshot(of: .recursiveDescription, matching: button)
+      assertSnapshot(matching: button, as: .recursiveDescription)
     }
     #endif
   }
@@ -153,7 +153,11 @@ class SnapshotTestingTests: SnapshotTestCase {
       omniLightNode.position = SCNVector3Make(10, 10, 10)
       scene.rootNode.addChildNode(omniLightNode)
 
-      assertSnapshot(of: .scene(size: .init(width: 500, height: 500)), matching: scene, named: platform)
+      assertSnapshot(
+        matching: scene,
+        as: .image(size: .init(width: 500, height: 500)),
+        named: platform
+      )
     }
     #endif
   }
@@ -168,7 +172,11 @@ class SnapshotTestingTests: SnapshotTestCase {
       node.position = .init(x: 25, y: 25)
       scene.addChild(node)
 
-      assertSnapshot(of: .scene(size: .init(width: 50, height: 50)), matching: scene, named: platform)
+      assertSnapshot(
+        matching: scene,
+        as: .image(size: .init(width: 50, height: 50)),
+        named: platform
+      )
     }
     #endif
   }
@@ -188,9 +196,9 @@ class SnapshotTestingTests: SnapshotTestCase {
     #endif
     if #available(macOS 10.14, *) {
       label.text = "Hello."
-      assertSnapshot(of: .view(precision: 0.9), matching: label, named: platform)
+      assertSnapshot(matching: label, as: .image(precision: 0.9), named: platform)
       label.text = "Hello"
-      assertSnapshot(of: .view(precision: 0.9), matching: label, named: platform)
+      assertSnapshot(matching: label, as: .image(precision: 0.9), named: platform)
     }
     #endif
   }
