@@ -1,10 +1,11 @@
 @testable import SnapshotTesting
 import XCTest
 
-#if os(macOS) || os(iOS)
+#if os(iOS) || os(macOS)
 import SceneKit
 import SpriteKit
 import WebKit
+#endif
 
 #if os(iOS)
 let platform = "ios"
@@ -16,7 +17,6 @@ extension NSTextField {
     set { self.stringValue = newValue }
   }
 }
-#endif
 #endif
 
 class SnapshotTestingTests: SnapshotTestCase {
@@ -75,7 +75,7 @@ class SnapshotTestingTests: SnapshotTestCase {
   }
 
   func testMixedViews() {
-    #if os(macOS) || os(iOS)
+    #if os(iOS) || os(macOS)
     // NB: CircleCI crashes while trying to instantiate SKView
     if #available(macOS 10.14, *) {
       let webView = WKWebView(frame: .init(x: 0, y: 0, width: 50, height: 50))
@@ -159,7 +159,7 @@ class SnapshotTestingTests: SnapshotTestCase {
   }
 
   func testSKView() {
-    #if os(macOS) || os(iOS)
+    #if os(iOS) || os(macOS)
     // NB: CircleCI crashes while trying to instantiate SKView
     if #available(macOS 10.14, *) {
       let scene = SKScene(size: .init(width: 50, height: 50))

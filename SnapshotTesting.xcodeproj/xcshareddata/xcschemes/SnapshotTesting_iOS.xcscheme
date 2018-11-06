@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "9999"
+   LastUpgradeVersion = "1000"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,37 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "SnapshotTesting::Diff"
-               BuildableName = "Diff.framework"
-               BlueprintName = "Diff"
-               ReferencedContainer = "container:SnapshotTesting.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "SnapshotTesting::WKSnapshotConfigurationShim"
-               BuildableName = "WKSnapshotConfigurationShim.framework"
-               BlueprintName = "WKSnapshotConfigurationShim"
-               ReferencedContainer = "container:SnapshotTesting.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "SnapshotTesting::SnapshotTesting"
+               BlueprintIdentifier = "NT_E1FAA066576312BD4B5DB23882D1278B"
                BuildableName = "SnapshotTesting.framework"
-               BlueprintName = "SnapshotTesting"
+               BlueprintName = "SnapshotTesting_iOS"
                ReferencedContainer = "container:SnapshotTesting.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -60,13 +32,24 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "SnapshotTesting::SnapshotTestingTests"
+               BlueprintIdentifier = "NT_3F877242DE1996BA0322ABCB069FB3D9"
                BuildableName = "SnapshotTestingTests.xctest"
-               BlueprintName = "SnapshotTestingTests"
+               BlueprintName = "SnapshotTestingTests_iOS"
                ReferencedContainer = "container:SnapshotTesting.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "NT_E1FAA066576312BD4B5DB23882D1278B"
+            BuildableName = "SnapshotTesting.framework"
+            BlueprintName = "SnapshotTesting_iOS"
+            ReferencedContainer = "container:SnapshotTesting.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
+      <CommandLineArguments>
+      </CommandLineArguments>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>
@@ -83,12 +66,14 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "SnapshotTesting::Diff"
-            BuildableName = "Diff.framework"
-            BlueprintName = "Diff"
+            BlueprintIdentifier = "NT_E1FAA066576312BD4B5DB23882D1278B"
+            BuildableName = "SnapshotTesting.framework"
+            BlueprintName = "SnapshotTesting_iOS"
             ReferencedContainer = "container:SnapshotTesting.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
+      <CommandLineArguments>
+      </CommandLineArguments>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
@@ -98,6 +83,18 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "NT_E1FAA066576312BD4B5DB23882D1278B"
+            BuildableName = "SnapshotTesting.framework"
+            BlueprintName = "SnapshotTesting_iOS"
+            ReferencedContainer = "container:SnapshotTesting.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
+      <CommandLineArguments>
+      </CommandLineArguments>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

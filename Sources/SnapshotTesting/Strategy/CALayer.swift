@@ -7,7 +7,7 @@ extension Strategy where A == CALayer, B == NSImage {
   }
 
   public static func layer(precision: Float) -> Strategy {
-    return SimpleStrategy<NSImage>.image(precision: precision).pullback { layer in
+    return SimpleStrategy.image(precision: precision).pullback { layer in
       let image = NSImage(size: layer.bounds.size)
       image.lockFocus()
       let context = NSGraphicsContext.current!.cgContext
@@ -21,7 +21,7 @@ extension Strategy where A == CALayer, B == NSImage {
 extension CALayer: DefaultDiffable {
   public static let defaultStrategy: Strategy<CALayer, NSImage> = .layer
 }
-#elseif os(iOS) || os(tvOS) || os(watchOS)
+#elseif os(iOS) || os(tvOS)
 import UIKit
 
 extension Strategy where A == CALayer, B == UIImage {
@@ -30,7 +30,7 @@ extension Strategy where A == CALayer, B == UIImage {
   }
 
   public static func layer(precision: Float) -> Strategy {
-    return SimpleStrategy<UIImage>.image(precision: precision).pullback { layer in
+    return SimpleStrategy.image(precision: precision).pullback { layer in
       UIGraphicsImageRenderer(size: layer.bounds.size).image { context in
         layer.render(in: context.cgContext)
       }

@@ -1,4 +1,4 @@
-#if os(iOS) || os(tvOS) || os(watchOS)
+#if os(iOS) || os(tvOS)
 import UIKit
 import XCTest
 
@@ -20,7 +20,7 @@ extension Strategy where A == UIImage, B == UIImage {
     return .init(
       pathExtension: "png",
       diffable: .init(
-        to: { UIImagePNGRepresentation($0)! },
+        to: { $0.pngData()! },
         fro: { UIImage(data: $0, scale: UIScreen.main.scale)! }
       ) { old, new in
         guard !compare(old, new, precision: precision) else { return nil }
@@ -42,7 +42,7 @@ extension Strategy where A == UIImage, B == UIImage {
 }
 
 extension UIImage: DefaultDiffable {
-  public static let defaultStrategy: SimpleStrategy<UIImage> = .image
+  public static let defaultStrategy: SimpleStrategy = .image
 }
 
 private func compare(_ old: UIImage, _ new: UIImage, precision: Float) -> Bool {
@@ -61,7 +61,7 @@ private func compare(_ old: UIImage, _ new: UIImage, precision: Float) -> Bool {
   guard let oldData = oldContext.data else { return false }
   guard let newData = newContext.data else { return false }
   if memcmp(oldData, newData, byteCount) == 0 { return true }
-  let newer = UIImage(data: UIImagePNGRepresentation(new)!)!
+  let newer = UIImage(data: new.pngData()!)!
   guard let newerCgImage = newer.cgImage else { return false }
   var newerBytes = [UInt8](repeating: 0, count: byteCount)
   guard let newerContext = context(for: newerCgImage, data: &newerBytes) else { return false }

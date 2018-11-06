@@ -1,8 +1,8 @@
-#if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
+#if os(iOS) || os(macOS) || os(tvOS)
 import SpriteKit
 #if os(macOS)
 import Cocoa
-#elseif os(iOS) || os(tvOS) || os(watchOS)
+#elseif os(iOS) || os(tvOS)
 import UIKit
 #endif
 
@@ -12,7 +12,7 @@ extension Strategy where A == SKScene, B == NSImage {
     return .skScene(size: size, precision: precision)
   }
 }
-#elseif os(iOS) || os(tvOS) || os(watchOS)
+#elseif os(iOS) || os(tvOS)
 extension Strategy where A == SKScene, B == UIImage {
   public static func scene(size: CGSize, precision: Float = 1) -> Strategy {
     return .skScene(size: size, precision: precision)

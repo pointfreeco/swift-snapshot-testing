@@ -2,7 +2,7 @@ import Foundation
 
 extension Strategy where B == String {
   public static var any: Strategy {
-    return SimpleStrategy<String>.lines.pullback { snap($0) }
+    return SimpleStrategy.lines.pullback { snap($0) }
   }
 }
 

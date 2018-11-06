@@ -6,861 +6,937 @@
 	objectVersion = 46;
 	objects = {
 
-/* Begin PBXAggregateTarget section */
-		"SnapshotTesting::SnapshotTestingPackageTests::ProductTarget" /* SnapshotTestingPackageTests */ = {
-			isa = PBXAggregateTarget;
-			buildConfigurationList = OBJ_81 /* Build configuration list for PBXAggregateTarget "SnapshotTestingPackageTests" */;
-			buildPhases = (
-			);
-			dependencies = (
-				OBJ_84 /* PBXTargetDependency */,
-			);
-			name = SnapshotTestingPackageTests;
-			productName = SnapshotTestingPackageTests;
-		};
-/* End PBXAggregateTarget section */
-
 /* Begin PBXBuildFile section */
-		805A1CBA218DF87500372EFD /* Internal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 805A1CB9218DF87500372EFD /* Internal.swift */; };
-		805A1CBC218DF8B100372EFD /* SceneKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 805A1CBB218DF8B100372EFD /* SceneKit.swift */; };
-		805A1CBE218DF9F500372EFD /* SpriteKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 805A1CBD218DF9F500372EFD /* SpriteKit.swift */; };
-		OBJ_102 /* WKSnapshotConfigurationShim.m in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_11 /* WKSnapshotConfigurationShim.m */; };
-		OBJ_104 /* WKSnapshotConfigurationShim.h in Headers */ = {isa = PBXBuildFile; fileRef = OBJ_13 /* WKSnapshotConfigurationShim.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		OBJ_46 /* Diff.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_32 /* Diff.swift */; };
-		OBJ_53 /* Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_15 /* Async.swift */; };
-		OBJ_54 /* Attachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_16 /* Attachment.swift */; };
-		OBJ_55 /* Diffable.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_17 /* Diffable.swift */; };
-		OBJ_56 /* SnapshotTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_18 /* SnapshotTestCase.swift */; };
-		OBJ_57 /* Strategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_19 /* Strategy.swift */; };
-		OBJ_58 /* Any.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_21 /* Any.swift */; };
-		OBJ_59 /* CALayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_22 /* CALayer.swift */; };
-		OBJ_60 /* Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_23 /* Codable.swift */; };
-		OBJ_61 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_24 /* Data.swift */; };
-		OBJ_62 /* NSImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_25 /* NSImage.swift */; };
-		OBJ_63 /* NSViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_26 /* NSViewController.swift */; };
-		OBJ_64 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_27 /* String.swift */; };
-		OBJ_65 /* UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_28 /* UIImage.swift */; };
-		OBJ_66 /* UIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_29 /* UIViewController.swift */; };
-		OBJ_67 /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_30 /* View.swift */; };
-		OBJ_69 /* WKSnapshotConfigurationShim.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "SnapshotTesting::WKSnapshotConfigurationShim::Product" /* WKSnapshotConfigurationShim.framework */; };
-		OBJ_70 /* Diff.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "SnapshotTesting::Diff::Product" /* Diff.framework */; };
-		OBJ_79 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_6 /* Package.swift */; };
-		OBJ_90 /* SnapshotTestingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_35 /* SnapshotTestingTests.swift */; };
-		OBJ_92 /* SnapshotTesting.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "SnapshotTesting::SnapshotTesting::Product" /* SnapshotTesting.framework */; };
-		OBJ_93 /* WKSnapshotConfigurationShim.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "SnapshotTesting::WKSnapshotConfigurationShim::Product" /* WKSnapshotConfigurationShim.framework */; };
-		OBJ_94 /* Diff.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "SnapshotTesting::Diff::Product" /* Diff.framework */; };
+		BF_0C5543D04B4212AA57DCF0E1E594CAF6 /* Diffable.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_CFB0F28F5A19E32576377C817456E15A /* Diffable.swift */; };
+		BF_1092D6738E4E10DA749423711942C04C /* Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_8EB55DE46F77C40F38DC441C396C2AA2 /* Async.swift */; };
+		BF_126B68C59C12F7E7D78393BF1E0341B7 /* SnapshotTesting.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FR_55C12DE66D3E4C2C5F02C60546270EBB /* SnapshotTesting.framework */; };
+		BF_164C58C92E656FCD7C25A1CB034600A2 /* CALayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_02D2BA628CE5C87E6299836CA06DA5AE /* CALayer.swift */; };
+		BF_1BF868397B24F68E388CCD9DF81E6765 /* SnapshotTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_C8995DA5A1D0CF67499F936B6684ABA6 /* SnapshotTestCase.swift */; };
+		BF_1CA9FBF0BD084E3C63F61E9D8A80DDB7 /* CALayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_02D2BA628CE5C87E6299836CA06DA5AE /* CALayer.swift */; };
+		BF_1F9B48C978B79ADDC70074F90A45D20C /* SceneKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_E0227C47E0FB67F70EF0493E8A4CDB60 /* SceneKit.swift */; };
+		BF_290BB77E2401937E6400555C3B0F9A7A /* Diffable.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_CFB0F28F5A19E32576377C817456E15A /* Diffable.swift */; };
+		BF_2A6009E29732718FAE9B1F03806A09AB /* Diff.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_FE1535B3F5372A6ADD6A0D18184766D4 /* Diff.swift */; };
+		BF_2B65A04C3797B3384DE1EF00E75CB156 /* Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_8F443AA3F4613D29624A1150E5B9DAD3 /* Codable.swift */; };
+		BF_2D2A2BF95DCB4EA423BA781B1EFD0468 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_57CD93B71031FCD6FBC58D8D945A1706 /* Data.swift */; };
+		BF_3D2DDCCA45890CB683DEA43B49FB3BDB /* SnapshotTestingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_F39B10E11A6859EA2B509E83A84B7165 /* SnapshotTestingTests.swift */; };
+		BF_40D093DDC81931CB9C7AF616AA544ACD /* Strategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_F4BEBF5A6DA36EF79ADD87917E32ED3F /* Strategy.swift */; };
+		BF_4ED719B4EDFE89C534E149526F1CF32D /* Attachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_DA79344382FCF4D2344547FD4A26D563 /* Attachment.swift */; };
+		BF_51479BC7C87FC0B4B8FBFD68EEBD3726 /* Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_8EB55DE46F77C40F38DC441C396C2AA2 /* Async.swift */; };
+		BF_51CBA76089B764B80A36E06290128424 /* SpriteKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_C3CB0C1274CC8D510653228157C66A77 /* SpriteKit.swift */; };
+		BF_52C03ADE3CE2F4B24C881FA97769A932 /* Internal.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_DA918B3B1103A0D0109E994D775523A0 /* Internal.swift */; };
+		BF_53DB80D3F2E4A1CCBCD825099B3CAC00 /* SnapshotTesting.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = FR_55C12DE66D3E4C2C5F02C60546270EBB /* SnapshotTesting.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		BF_59377B307FB813153ABE7260E51EF2DC /* Strategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_F4BEBF5A6DA36EF79ADD87917E32ED3F /* Strategy.swift */; };
+		BF_5DAE3B8B31BE6E64B85F1601D0A8787C /* SnapshotTestingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_F39B10E11A6859EA2B509E83A84B7165 /* SnapshotTestingTests.swift */; };
+		BF_6730D650367B8168D8FAF10C99C95360 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_57CD93B71031FCD6FBC58D8D945A1706 /* Data.swift */; };
+		BF_710776DC175BE3B689292A550887305B /* SpriteKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_C3CB0C1274CC8D510653228157C66A77 /* SpriteKit.swift */; };
+		BF_72466A7E649A558E008143205CEF096D /* SnapshotTestingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_F39B10E11A6859EA2B509E83A84B7165 /* SnapshotTestingTests.swift */; };
+		BF_74313FA8B719956E8ACCE111B99B0960 /* NSImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_E1FA8A193FE7DFA170568A78289DE2EC /* NSImage.swift */; };
+		BF_789B4F0099192F5B0F33B18AAA94E2DF /* NSImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_E1FA8A193FE7DFA170568A78289DE2EC /* NSImage.swift */; };
+		BF_7E7082D5B949259D7A1CFBAC2154780D /* Strategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_F4BEBF5A6DA36EF79ADD87917E32ED3F /* Strategy.swift */; };
+		BF_7E8D15FC52F92B4ED7A461509A28656D /* UIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_011F41E7CBD5C3AAB887E8F70A792A28 /* UIViewController.swift */; };
+		BF_7F3F7303ACF94F86C88C54673EC31E8B /* NSViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_5BC9AA7F156EEE27E2A2442640AE1D4A /* NSViewController.swift */; };
+		BF_83708276954D3F092729DEE9CEC26B33 /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_0E7771DB39A0AA5788034ACA524B7EE3 /* View.swift */; };
+		BF_8926855A85FB3CA85B95CC37D335AEFB /* NSViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_5BC9AA7F156EEE27E2A2442640AE1D4A /* NSViewController.swift */; };
+		BF_92DFFE207E23D176E2A83025F6F2C2CE /* SpriteKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_C3CB0C1274CC8D510653228157C66A77 /* SpriteKit.swift */; };
+		BF_93A3D38E590AB05BAFFEEBC75C601A4D /* UIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_011F41E7CBD5C3AAB887E8F70A792A28 /* UIViewController.swift */; };
+		BF_94A6AD59B8E19AF997B915EC79497934 /* Internal.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_DA918B3B1103A0D0109E994D775523A0 /* Internal.swift */; };
+		BF_97AA84D478C020B4F7906D46DA4D0C15 /* Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_8EB55DE46F77C40F38DC441C396C2AA2 /* Async.swift */; };
+		BF_9A01810940759397231DF86801A1FC13 /* Diff.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_FE1535B3F5372A6ADD6A0D18184766D4 /* Diff.swift */; };
+		BF_9A2990DD11DFB5675D43F262CBCDA265 /* SnapshotTesting.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FR_92D59F3FEA61DC16FFDB7B1F5FCA57D2 /* SnapshotTesting.framework */; };
+		BF_A0F4C67288741E22E3F0C1B450A2A4FD /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_AF8C7D84EDECC0C7A6CD2D9054107398 /* String.swift */; };
+		BF_A9C5B5783E101E35CF7D52DEE6EABE2A /* SnapshotTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_C8995DA5A1D0CF67499F936B6684ABA6 /* SnapshotTestCase.swift */; };
+		BF_ACD752E9B5D43698661C2566F6E1A967 /* Diff.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_FE1535B3F5372A6ADD6A0D18184766D4 /* Diff.swift */; };
+		BF_B0F6BF49CFBAF5371BFD659F8A815654 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_57CD93B71031FCD6FBC58D8D945A1706 /* Data.swift */; };
+		BF_B39F8354D2B15959F80C015C02B62643 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_AF8C7D84EDECC0C7A6CD2D9054107398 /* String.swift */; };
+		BF_B8082ECBCA07EA977AE482DDFCA9C33D /* Attachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_DA79344382FCF4D2344547FD4A26D563 /* Attachment.swift */; };
+		BF_B9820C8451945985651EFB670E948805 /* CALayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_02D2BA628CE5C87E6299836CA06DA5AE /* CALayer.swift */; };
+		BF_C0A0EBBFEC968B768537F848916C49FF /* Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_8F443AA3F4613D29624A1150E5B9DAD3 /* Codable.swift */; };
+		BF_C3D63AFD027E9A50F37244CBABCE9A43 /* UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_D3724FEFC0FF50CACCC23652F2C7578C /* UIImage.swift */; };
+		BF_C4BF7CA4316C2FED85F74B888BADE302 /* Attachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_DA79344382FCF4D2344547FD4A26D563 /* Attachment.swift */; };
+		BF_C7D2E87F47E2F7457AD3FC9DAF5F77A5 /* UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_D3724FEFC0FF50CACCC23652F2C7578C /* UIImage.swift */; };
+		BF_CC119FC0B912C972DF70BD2720AA3D0F /* Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_8F443AA3F4613D29624A1150E5B9DAD3 /* Codable.swift */; };
+		BF_CCCDB80BDBD37BE3C37DADBEE79C93C2 /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_0E7771DB39A0AA5788034ACA524B7EE3 /* View.swift */; };
+		BF_D2846774B6AFB8FFC427EFF98FEF2F4E /* Any.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_0B0CF16A9771EB5B0F72DBCE2128CD6D /* Any.swift */; };
+		BF_D2A5B4A58EC4C3A365649B29EDFF85EA /* Any.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_0B0CF16A9771EB5B0F72DBCE2128CD6D /* Any.swift */; };
+		BF_D47F0D75CBD0E92EF35FB311E64B3987 /* SnapshotTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_C8995DA5A1D0CF67499F936B6684ABA6 /* SnapshotTestCase.swift */; };
+		BF_D47F465982998AC68EA9D14E475D5FD5 /* UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_D3724FEFC0FF50CACCC23652F2C7578C /* UIImage.swift */; };
+		BF_D61CA12AF5EEB8437A53C9411C1640B1 /* Internal.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_DA918B3B1103A0D0109E994D775523A0 /* Internal.swift */; };
+		BF_D7A00145585CD613CBB42CC425762D03 /* SnapshotTesting.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FR_1C0F0F9D1E3946C22AB189D75CBFA00A /* SnapshotTesting.framework */; };
+		BF_D862704C2CB88B4373E8A6D043400D49 /* Diffable.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_CFB0F28F5A19E32576377C817456E15A /* Diffable.swift */; };
+		BF_E191776B50B9EDF01CFD68F196203961 /* Any.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_0B0CF16A9771EB5B0F72DBCE2128CD6D /* Any.swift */; };
+		BF_E4CBA0F3DF322EEA1F69E255A2C76D7F /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_0E7771DB39A0AA5788034ACA524B7EE3 /* View.swift */; };
+		BF_E55DFEDCE649B588C7BAB7225324890D /* UIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_011F41E7CBD5C3AAB887E8F70A792A28 /* UIViewController.swift */; };
+		BF_E9D5B4126225F0CDC4A083DB8D3EB9C7 /* SnapshotTesting.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = FR_1C0F0F9D1E3946C22AB189D75CBFA00A /* SnapshotTesting.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		BF_EA93AC0D72E1311A8135CFC7CBF332C1 /* NSViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_5BC9AA7F156EEE27E2A2442640AE1D4A /* NSViewController.swift */; };
+		BF_EDB8AB781A3D51A987BE3755EE57EBE9 /* SnapshotTesting.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = FR_92D59F3FEA61DC16FFDB7B1F5FCA57D2 /* SnapshotTesting.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		BF_F054D35C1F281F57EA2B9622EFEEF7FB /* SceneKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_E0227C47E0FB67F70EF0493E8A4CDB60 /* SceneKit.swift */; };
+		BF_F515927ECBA692381ECE1DBB73161FCF /* SceneKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_E0227C47E0FB67F70EF0493E8A4CDB60 /* SceneKit.swift */; };
+		BF_F7AA48A29F4220B2A19CDC41C83E1D06 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_AF8C7D84EDECC0C7A6CD2D9054107398 /* String.swift */; };
+		BF_FCC64D190E241971E8DC9818EBC50E75 /* NSImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_E1FA8A193FE7DFA170568A78289DE2EC /* NSImage.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		80B19C4D218D1BF300910016 /* PBXContainerItemProxy */ = {
+		CIP_53654BECB816A866C116E1DC1CDBA587 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = OBJ_1 /* Project object */;
+			containerPortal = P_BD50B510D7318790CE5F349329E8ADEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = "SnapshotTesting::WKSnapshotConfigurationShim";
-			remoteInfo = WKSnapshotConfigurationShim;
+			remoteGlobalIDString = NT_E1FAA066576312BD4B5DB23882D1278B;
+			remoteInfo = SnapshotTesting_iOS;
 		};
-		80B19C4E218D1BF300910016 /* PBXContainerItemProxy */ = {
+		CIP_7C8251DE7A712A2DE6D1B3A121213CA0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = OBJ_1 /* Project object */;
+			containerPortal = P_BD50B510D7318790CE5F349329E8ADEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = "SnapshotTesting::Diff";
-			remoteInfo = Diff;
+			remoteGlobalIDString = NT_EFB00F39C5351E0984C1B0E093A05904;
+			remoteInfo = SnapshotTesting_macOS;
 		};
-		80B19C4F218D1BF300910016 /* PBXContainerItemProxy */ = {
+		CIP_CD9253F8F5036C73CE8FC16D153C7DFF /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = OBJ_1 /* Project object */;
+			containerPortal = P_BD50B510D7318790CE5F349329E8ADEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = "SnapshotTesting::SnapshotTesting";
-			remoteInfo = SnapshotTesting;
-		};
-		80B19C50218D1BF300910016 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = OBJ_1 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = "SnapshotTesting::WKSnapshotConfigurationShim";
-			remoteInfo = WKSnapshotConfigurationShim;
-		};
-		80B19C51218D1BF300910016 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = OBJ_1 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = "SnapshotTesting::Diff";
-			remoteInfo = Diff;
-		};
-		80B19C52218D1BF600910016 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = OBJ_1 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = "SnapshotTesting::SnapshotTestingTests";
-			remoteInfo = SnapshotTestingTests;
+			remoteGlobalIDString = NT_693A6A5632B0A32E6E52A4DDD822E69E;
+			remoteInfo = SnapshotTesting_tvOS;
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		CFBP_2BFDE42C24301A10833C60D641A06290 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				BF_53DB80D3F2E4A1CCBCD825099B3CAC00 /* SnapshotTesting.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CFBP_3F78DBB95718B0C00F236464A7D885B9 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				BF_EDB8AB781A3D51A987BE3755EE57EBE9 /* SnapshotTesting.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CFBP_EF5DD188EEF7EE5BCB66EA772F7E1D89 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				BF_E9D5B4126225F0CDC4A083DB8D3EB9C7 /* SnapshotTesting.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
-		805A1CB9218DF87500372EFD /* Internal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Internal.swift; sourceTree = "<group>"; };
-		805A1CBB218DF8B100372EFD /* SceneKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneKit.swift; sourceTree = "<group>"; };
-		805A1CBD218DF9F500372EFD /* SpriteKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpriteKit.swift; sourceTree = "<group>"; };
-		OBJ_11 /* WKSnapshotConfigurationShim.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WKSnapshotConfigurationShim.m; sourceTree = "<group>"; };
-		OBJ_13 /* WKSnapshotConfigurationShim.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WKSnapshotConfigurationShim.h; sourceTree = "<group>"; };
-		OBJ_15 /* Async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Async.swift; sourceTree = "<group>"; };
-		OBJ_16 /* Attachment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Attachment.swift; sourceTree = "<group>"; };
-		OBJ_17 /* Diffable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diffable.swift; sourceTree = "<group>"; };
-		OBJ_18 /* SnapshotTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotTestCase.swift; sourceTree = "<group>"; };
-		OBJ_19 /* Strategy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Strategy.swift; sourceTree = "<group>"; };
-		OBJ_21 /* Any.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Any.swift; sourceTree = "<group>"; };
-		OBJ_22 /* CALayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CALayer.swift; sourceTree = "<group>"; };
-		OBJ_23 /* Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Codable.swift; sourceTree = "<group>"; };
-		OBJ_24 /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
-		OBJ_25 /* NSImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSImage.swift; sourceTree = "<group>"; };
-		OBJ_26 /* NSViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSViewController.swift; sourceTree = "<group>"; };
-		OBJ_27 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
-		OBJ_28 /* UIImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImage.swift; sourceTree = "<group>"; };
-		OBJ_29 /* UIViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewController.swift; sourceTree = "<group>"; };
-		OBJ_30 /* View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = View.swift; sourceTree = "<group>"; };
-		OBJ_32 /* Diff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diff.swift; sourceTree = "<group>"; };
-		OBJ_35 /* SnapshotTestingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotTestingTests.swift; sourceTree = "<group>"; };
-		OBJ_6 /* Package.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
-		OBJ_8 /* Development.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Development.xcconfig; sourceTree = "<group>"; };
-		"SnapshotTesting::Diff::Product" /* Diff.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Diff.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		"SnapshotTesting::SnapshotTesting::Product" /* SnapshotTesting.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SnapshotTesting.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		"SnapshotTesting::SnapshotTestingTests::Product" /* SnapshotTestingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = SnapshotTestingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		"SnapshotTesting::WKSnapshotConfigurationShim::Product" /* WKSnapshotConfigurationShim.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = WKSnapshotConfigurationShim.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		FR_011F41E7CBD5C3AAB887E8F70A792A28 /* UIViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewController.swift; sourceTree = "<group>"; };
+		FR_02D2BA628CE5C87E6299836CA06DA5AE /* CALayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CALayer.swift; sourceTree = "<group>"; };
+		FR_0B0CF16A9771EB5B0F72DBCE2128CD6D /* Any.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Any.swift; sourceTree = "<group>"; };
+		FR_0E7771DB39A0AA5788034ACA524B7EE3 /* View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = View.swift; sourceTree = "<group>"; };
+		FR_1C0F0F9D1E3946C22AB189D75CBFA00A /* SnapshotTesting.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SnapshotTesting.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		FR_249284F48787C8FEC6C4C3B317A68737 /* SnapshotTestingTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SnapshotTestingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		FR_3F75F013FD55B116C9AECB84C5DA414D /* SnapshotTestingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SnapshotTestingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		FR_55C12DE66D3E4C2C5F02C60546270EBB /* SnapshotTesting.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SnapshotTesting.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		FR_57CD93B71031FCD6FBC58D8D945A1706 /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
+		FR_5BC9AA7F156EEE27E2A2442640AE1D4A /* NSViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSViewController.swift; sourceTree = "<group>"; };
+		FR_8EB55DE46F77C40F38DC441C396C2AA2 /* Async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Async.swift; sourceTree = "<group>"; };
+		FR_8F443AA3F4613D29624A1150E5B9DAD3 /* Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Codable.swift; sourceTree = "<group>"; };
+		FR_92D59F3FEA61DC16FFDB7B1F5FCA57D2 /* SnapshotTesting.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SnapshotTesting.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		FR_A20A3E696FD8F5FE1E8B1E8945A0BE1D /* SnapshotTestingTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SnapshotTestingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		FR_AF8C7D84EDECC0C7A6CD2D9054107398 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
+		FR_C3CB0C1274CC8D510653228157C66A77 /* SpriteKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpriteKit.swift; sourceTree = "<group>"; };
+		FR_C8995DA5A1D0CF67499F936B6684ABA6 /* SnapshotTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotTestCase.swift; sourceTree = "<group>"; };
+		FR_CFB0F28F5A19E32576377C817456E15A /* Diffable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diffable.swift; sourceTree = "<group>"; };
+		FR_D3724FEFC0FF50CACCC23652F2C7578C /* UIImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImage.swift; sourceTree = "<group>"; };
+		FR_D5D376EA4272E52E149D537CC1C63DBB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FR_DA79344382FCF4D2344547FD4A26D563 /* Attachment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Attachment.swift; sourceTree = "<group>"; };
+		FR_DA918B3B1103A0D0109E994D775523A0 /* Internal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Internal.swift; sourceTree = "<group>"; };
+		FR_E0227C47E0FB67F70EF0493E8A4CDB60 /* SceneKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneKit.swift; sourceTree = "<group>"; };
+		FR_E1FA8A193FE7DFA170568A78289DE2EC /* NSImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSImage.swift; sourceTree = "<group>"; };
+		FR_EC6E1105596F1605A6894299A0A6F517 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FR_F39B10E11A6859EA2B509E83A84B7165 /* SnapshotTestingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotTestingTests.swift; sourceTree = "<group>"; };
+		FR_F4BEBF5A6DA36EF79ADD87917E32ED3F /* Strategy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Strategy.swift; sourceTree = "<group>"; };
+		FR_FE1535B3F5372A6ADD6A0D18184766D4 /* Diff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diff.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		OBJ_105 /* Frameworks */ = {
+		FBP_AC71D4B5D91397192DA899B6FBA0436A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 0;
+			buildActionMask = 2147483647;
 			files = (
+				BF_D7A00145585CD613CBB42CC425762D03 /* SnapshotTesting.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_47 /* Frameworks */ = {
+		FBP_C4E2F10036A06EDD4E120B435B451FBF /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 0;
+			buildActionMask = 2147483647;
 			files = (
+				BF_126B68C59C12F7E7D78393BF1E0341B7 /* SnapshotTesting.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_68 /* Frameworks */ = {
+		FBP_C8F6609231686101338FD77137F2A81A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 0;
+			buildActionMask = 2147483647;
 			files = (
-				OBJ_69 /* WKSnapshotConfigurationShim.framework in Frameworks */,
-				OBJ_70 /* Diff.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		OBJ_91 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 0;
-			files = (
-				OBJ_92 /* SnapshotTesting.framework in Frameworks */,
-				OBJ_93 /* WKSnapshotConfigurationShim.framework in Frameworks */,
-				OBJ_94 /* Diff.framework in Frameworks */,
+				BF_9A2990DD11DFB5675D43F262CBCDA265 /* SnapshotTesting.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		OBJ_10 /* WKSnapshotConfigurationShim */ = {
+		G_03280A288B92DFD200F5B431BFB7A5D8 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_11 /* WKSnapshotConfigurationShim.m */,
-				OBJ_12 /* include */,
+				FR_D5D376EA4272E52E149D537CC1C63DBB /* Info.plist */,
+				G_3FAEF9F83BDC388F0D183DAFC3969FF4 /* SnapshotTestingTests */,
 			);
-			name = WKSnapshotConfigurationShim;
-			path = Sources/WKSnapshotConfigurationShim;
-			sourceTree = SOURCE_ROOT;
-		};
-		OBJ_12 /* include */ = {
-			isa = PBXGroup;
-			children = (
-				OBJ_13 /* WKSnapshotConfigurationShim.h */,
-			);
-			path = include;
+			path = Tests;
 			sourceTree = "<group>";
 		};
-		OBJ_14 /* SnapshotTesting */ = {
+		G_0BB643DF0937778F9EFD8638718195CA /* Strategy */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_15 /* Async.swift */,
-				OBJ_16 /* Attachment.swift */,
-				OBJ_17 /* Diffable.swift */,
-				805A1CB9218DF87500372EFD /* Internal.swift */,
-				OBJ_18 /* SnapshotTestCase.swift */,
-				OBJ_19 /* Strategy.swift */,
-				OBJ_20 /* Strategy */,
-			);
-			name = SnapshotTesting;
-			path = Sources/SnapshotTesting;
-			sourceTree = SOURCE_ROOT;
-		};
-		OBJ_20 /* Strategy */ = {
-			isa = PBXGroup;
-			children = (
-				OBJ_21 /* Any.swift */,
-				OBJ_22 /* CALayer.swift */,
-				OBJ_23 /* Codable.swift */,
-				OBJ_24 /* Data.swift */,
-				OBJ_25 /* NSImage.swift */,
-				OBJ_26 /* NSViewController.swift */,
-				805A1CBB218DF8B100372EFD /* SceneKit.swift */,
-				OBJ_27 /* String.swift */,
-				805A1CBD218DF9F500372EFD /* SpriteKit.swift */,
-				OBJ_28 /* UIImage.swift */,
-				OBJ_29 /* UIViewController.swift */,
-				OBJ_30 /* View.swift */,
+				FR_0B0CF16A9771EB5B0F72DBCE2128CD6D /* Any.swift */,
+				FR_02D2BA628CE5C87E6299836CA06DA5AE /* CALayer.swift */,
+				FR_8F443AA3F4613D29624A1150E5B9DAD3 /* Codable.swift */,
+				FR_57CD93B71031FCD6FBC58D8D945A1706 /* Data.swift */,
+				FR_E1FA8A193FE7DFA170568A78289DE2EC /* NSImage.swift */,
+				FR_5BC9AA7F156EEE27E2A2442640AE1D4A /* NSViewController.swift */,
+				FR_E0227C47E0FB67F70EF0493E8A4CDB60 /* SceneKit.swift */,
+				FR_C3CB0C1274CC8D510653228157C66A77 /* SpriteKit.swift */,
+				FR_AF8C7D84EDECC0C7A6CD2D9054107398 /* String.swift */,
+				FR_D3724FEFC0FF50CACCC23652F2C7578C /* UIImage.swift */,
+				FR_011F41E7CBD5C3AAB887E8F70A792A28 /* UIViewController.swift */,
+				FR_0E7771DB39A0AA5788034ACA524B7EE3 /* View.swift */,
 			);
 			path = Strategy;
 			sourceTree = "<group>";
 		};
-		OBJ_31 /* Diff */ = {
+		G_348E8026F1D1281A7211A92E03FFB347 = {
 			isa = PBXGroup;
 			children = (
-				OBJ_32 /* Diff.swift */,
+				G_A9348074E86F3EA62DBB3E5F3740E381 /* Sources */,
+				G_03280A288B92DFD200F5B431BFB7A5D8 /* Tests */,
+				G_988EA74DE67B8A6DBA79A4A04A59865E /* Products */,
 			);
-			name = Diff;
-			path = Sources/Diff;
-			sourceTree = SOURCE_ROOT;
+			indentWidth = 2;
+			sourceTree = "<group>";
+			tabWidth = 2;
+			usesTabs = 0;
 		};
-		OBJ_33 /* Tests */ = {
+		G_3866EE32428D3DBEF6E65D218594DDC4 /* SnapshotTesting */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_34 /* SnapshotTestingTests */,
+				FR_8EB55DE46F77C40F38DC441C396C2AA2 /* Async.swift */,
+				FR_DA79344382FCF4D2344547FD4A26D563 /* Attachment.swift */,
+				FR_FE1535B3F5372A6ADD6A0D18184766D4 /* Diff.swift */,
+				FR_CFB0F28F5A19E32576377C817456E15A /* Diffable.swift */,
+				FR_DA918B3B1103A0D0109E994D775523A0 /* Internal.swift */,
+				FR_C8995DA5A1D0CF67499F936B6684ABA6 /* SnapshotTestCase.swift */,
+				FR_F4BEBF5A6DA36EF79ADD87917E32ED3F /* Strategy.swift */,
+				G_0BB643DF0937778F9EFD8638718195CA /* Strategy */,
 			);
-			name = Tests;
-			sourceTree = SOURCE_ROOT;
+			path = SnapshotTesting;
+			sourceTree = "<group>";
 		};
-		OBJ_34 /* SnapshotTestingTests */ = {
+		G_3FAEF9F83BDC388F0D183DAFC3969FF4 /* SnapshotTestingTests */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_35 /* SnapshotTestingTests.swift */,
+				FR_F39B10E11A6859EA2B509E83A84B7165 /* SnapshotTestingTests.swift */,
 			);
-			name = SnapshotTestingTests;
-			path = Tests/SnapshotTestingTests;
-			sourceTree = SOURCE_ROOT;
+			path = SnapshotTestingTests;
+			sourceTree = "<group>";
 		};
-		OBJ_36 /* Products */ = {
+		G_988EA74DE67B8A6DBA79A4A04A59865E /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				"SnapshotTesting::SnapshotTesting::Product" /* SnapshotTesting.framework */,
-				"SnapshotTesting::SnapshotTestingTests::Product" /* SnapshotTestingTests.xctest */,
-				"SnapshotTesting::WKSnapshotConfigurationShim::Product" /* WKSnapshotConfigurationShim.framework */,
-				"SnapshotTesting::Diff::Product" /* Diff.framework */,
+				FR_1C0F0F9D1E3946C22AB189D75CBFA00A /* SnapshotTesting.framework */,
+				FR_55C12DE66D3E4C2C5F02C60546270EBB /* SnapshotTesting.framework */,
+				FR_92D59F3FEA61DC16FFDB7B1F5FCA57D2 /* SnapshotTesting.framework */,
+				FR_249284F48787C8FEC6C4C3B317A68737 /* SnapshotTestingTests.xctest */,
+				FR_3F75F013FD55B116C9AECB84C5DA414D /* SnapshotTestingTests.xctest */,
+				FR_A20A3E696FD8F5FE1E8B1E8945A0BE1D /* SnapshotTestingTests.xctest */,
 			);
 			name = Products;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		OBJ_5 = {
-			isa = PBXGroup;
-			children = (
-				OBJ_6 /* Package.swift */,
-				OBJ_7 /* Configs */,
-				OBJ_9 /* Sources */,
-				OBJ_33 /* Tests */,
-				OBJ_36 /* Products */,
-			);
 			sourceTree = "<group>";
 		};
-		OBJ_7 /* Configs */ = {
+		G_A9348074E86F3EA62DBB3E5F3740E381 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_8 /* Development.xcconfig */,
+				FR_EC6E1105596F1605A6894299A0A6F517 /* Info.plist */,
+				G_3866EE32428D3DBEF6E65D218594DDC4 /* SnapshotTesting */,
 			);
-			name = Configs;
+			path = Sources;
 			sourceTree = "<group>";
-		};
-		OBJ_9 /* Sources */ = {
-			isa = PBXGroup;
-			children = (
-				OBJ_10 /* WKSnapshotConfigurationShim */,
-				OBJ_14 /* SnapshotTesting */,
-				OBJ_31 /* Diff */,
-			);
-			name = Sources;
-			sourceTree = SOURCE_ROOT;
 		};
 /* End PBXGroup section */
 
-/* Begin PBXHeadersBuildPhase section */
-		OBJ_103 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 0;
-			files = (
-				OBJ_104 /* WKSnapshotConfigurationShim.h in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXHeadersBuildPhase section */
-
 /* Begin PBXNativeTarget section */
-		"SnapshotTesting::Diff" /* Diff */ = {
+		NT_0640DAF50FBD76E0169F38B530ABB4E3 /* SnapshotTestingTests_macOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = OBJ_42 /* Build configuration list for PBXNativeTarget "Diff" */;
+			buildConfigurationList = CL_B04189E6554B2315622918CA274007A8 /* Build configuration list for PBXNativeTarget "SnapshotTestingTests_macOS" */;
 			buildPhases = (
-				OBJ_45 /* Sources */,
-				OBJ_47 /* Frameworks */,
+				SBP_EAE957686933FAB3762177E0DCAA848C /* Sources */,
+				FBP_C4E2F10036A06EDD4E120B435B451FBF /* Frameworks */,
+				CFBP_2BFDE42C24301A10833C60D641A06290 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				TD_DDA802D9002493FC2129924A9B65AA7B /* PBXTargetDependency */,
 			);
-			name = Diff;
-			productName = Diff;
-			productReference = "SnapshotTesting::Diff::Product" /* Diff.framework */;
-			productType = "com.apple.product-type.framework";
-		};
-		"SnapshotTesting::SnapshotTesting" /* SnapshotTesting */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = OBJ_49 /* Build configuration list for PBXNativeTarget "SnapshotTesting" */;
-			buildPhases = (
-				OBJ_52 /* Sources */,
-				OBJ_68 /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				OBJ_71 /* PBXTargetDependency */,
-				OBJ_73 /* PBXTargetDependency */,
-			);
-			name = SnapshotTesting;
-			productName = SnapshotTesting;
-			productReference = "SnapshotTesting::SnapshotTesting::Product" /* SnapshotTesting.framework */;
-			productType = "com.apple.product-type.framework";
-		};
-		"SnapshotTesting::SnapshotTestingTests" /* SnapshotTestingTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = OBJ_86 /* Build configuration list for PBXNativeTarget "SnapshotTestingTests" */;
-			buildPhases = (
-				OBJ_89 /* Sources */,
-				OBJ_91 /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				OBJ_95 /* PBXTargetDependency */,
-				OBJ_96 /* PBXTargetDependency */,
-				OBJ_97 /* PBXTargetDependency */,
-			);
-			name = SnapshotTestingTests;
-			productName = SnapshotTestingTests;
-			productReference = "SnapshotTesting::SnapshotTestingTests::Product" /* SnapshotTestingTests.xctest */;
+			name = SnapshotTestingTests_macOS;
+			productName = SnapshotTestingTests_macOS;
+			productReference = FR_3F75F013FD55B116C9AECB84C5DA414D /* SnapshotTestingTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		"SnapshotTesting::SwiftPMPackageDescription" /* SnapshotTestingPackageDescription */ = {
+		NT_3F877242DE1996BA0322ABCB069FB3D9 /* SnapshotTestingTests_iOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = OBJ_75 /* Build configuration list for PBXNativeTarget "SnapshotTestingPackageDescription" */;
+			buildConfigurationList = CL_BF004D8F224951C54DB553B4AD3FD263 /* Build configuration list for PBXNativeTarget "SnapshotTestingTests_iOS" */;
 			buildPhases = (
-				OBJ_78 /* Sources */,
+				SBP_9D87FF08C642C25789055D8E115B6CC0 /* Sources */,
+				FBP_AC71D4B5D91397192DA899B6FBA0436A /* Frameworks */,
+				CFBP_EF5DD188EEF7EE5BCB66EA772F7E1D89 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				TD_247BD48A7B382F86C07BF1B9A75F86D3 /* PBXTargetDependency */,
+			);
+			name = SnapshotTestingTests_iOS;
+			productName = SnapshotTestingTests_iOS;
+			productReference = FR_249284F48787C8FEC6C4C3B317A68737 /* SnapshotTestingTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		NT_693A6A5632B0A32E6E52A4DDD822E69E /* SnapshotTesting_tvOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CL_A46FA635969E5A8BB5B277FD3DB42B32 /* Build configuration list for PBXNativeTarget "SnapshotTesting_tvOS" */;
+			buildPhases = (
+				SBP_70D7663B570D398A0479DE86F86DA113 /* Sources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = SnapshotTestingPackageDescription;
-			productName = SnapshotTestingPackageDescription;
+			name = SnapshotTesting_tvOS;
+			productName = SnapshotTesting_tvOS;
+			productReference = FR_92D59F3FEA61DC16FFDB7B1F5FCA57D2 /* SnapshotTesting.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		"SnapshotTesting::WKSnapshotConfigurationShim" /* WKSnapshotConfigurationShim */ = {
+		NT_E1FAA066576312BD4B5DB23882D1278B /* SnapshotTesting_iOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = OBJ_98 /* Build configuration list for PBXNativeTarget "WKSnapshotConfigurationShim" */;
+			buildConfigurationList = CL_9DB4D6636DF887555D39B5590EDC70C8 /* Build configuration list for PBXNativeTarget "SnapshotTesting_iOS" */;
 			buildPhases = (
-				OBJ_101 /* Sources */,
-				OBJ_103 /* Headers */,
-				OBJ_105 /* Frameworks */,
+				SBP_35B50DDC56A7E59BABBBB7FC66999CEC /* Sources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = WKSnapshotConfigurationShim;
-			productName = WKSnapshotConfigurationShim;
-			productReference = "SnapshotTesting::WKSnapshotConfigurationShim::Product" /* WKSnapshotConfigurationShim.framework */;
+			name = SnapshotTesting_iOS;
+			productName = SnapshotTesting_iOS;
+			productReference = FR_1C0F0F9D1E3946C22AB189D75CBFA00A /* SnapshotTesting.framework */;
 			productType = "com.apple.product-type.framework";
+		};
+		NT_EFB00F39C5351E0984C1B0E093A05904 /* SnapshotTesting_macOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CL_9662E659C2B4042406603B6EBDC33BBF /* Build configuration list for PBXNativeTarget "SnapshotTesting_macOS" */;
+			buildPhases = (
+				SBP_38396314766D25C599AECD079967E978 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SnapshotTesting_macOS;
+			productName = SnapshotTesting_macOS;
+			productReference = FR_55C12DE66D3E4C2C5F02C60546270EBB /* SnapshotTesting.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		NT_F155FA762896640C78950B0027F9917D /* SnapshotTestingTests_tvOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CL_4E04597E4AF8E55CAE7984C36F58D0EA /* Build configuration list for PBXNativeTarget "SnapshotTestingTests_tvOS" */;
+			buildPhases = (
+				SBP_73EA193E503A4A60978D815F40E1AB16 /* Sources */,
+				FBP_C8F6609231686101338FD77137F2A81A /* Frameworks */,
+				CFBP_3F78DBB95718B0C00F236464A7D885B9 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				TD_74AB3FD23C245CB8A76E4283D72800D1 /* PBXTargetDependency */,
+			);
+			name = SnapshotTestingTests_tvOS;
+			productName = SnapshotTestingTests_tvOS;
+			productReference = FR_A20A3E696FD8F5FE1E8B1E8945A0BE1D /* SnapshotTestingTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		OBJ_1 /* Project object */ = {
+		P_BD50B510D7318790CE5F349329E8ADEA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 9999;
+				LastUpgradeCheck = 1000;
 			};
-			buildConfigurationList = OBJ_2 /* Build configuration list for PBXProject "SnapshotTesting" */;
+			buildConfigurationList = CL_E20DB76EDF6FD0317130238989C7AE72 /* Build configuration list for PBXProject "SnapshotTesting" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 			);
-			mainGroup = OBJ_5;
-			productRefGroup = OBJ_36 /* Products */;
+			mainGroup = G_348E8026F1D1281A7211A92E03FFB347;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				"SnapshotTesting::Diff" /* Diff */,
-				"SnapshotTesting::SnapshotTesting" /* SnapshotTesting */,
-				"SnapshotTesting::SwiftPMPackageDescription" /* SnapshotTestingPackageDescription */,
-				"SnapshotTesting::SnapshotTestingPackageTests::ProductTarget" /* SnapshotTestingPackageTests */,
-				"SnapshotTesting::SnapshotTestingTests" /* SnapshotTestingTests */,
-				"SnapshotTesting::WKSnapshotConfigurationShim" /* WKSnapshotConfigurationShim */,
+				NT_3F877242DE1996BA0322ABCB069FB3D9 /* SnapshotTestingTests_iOS */,
+				NT_0640DAF50FBD76E0169F38B530ABB4E3 /* SnapshotTestingTests_macOS */,
+				NT_F155FA762896640C78950B0027F9917D /* SnapshotTestingTests_tvOS */,
+				NT_E1FAA066576312BD4B5DB23882D1278B /* SnapshotTesting_iOS */,
+				NT_EFB00F39C5351E0984C1B0E093A05904 /* SnapshotTesting_macOS */,
+				NT_693A6A5632B0A32E6E52A4DDD822E69E /* SnapshotTesting_tvOS */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
-		OBJ_101 /* Sources */ = {
+		SBP_35B50DDC56A7E59BABBBB7FC66999CEC /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
-			buildActionMask = 0;
+			buildActionMask = 2147483647;
 			files = (
-				OBJ_102 /* WKSnapshotConfigurationShim.m in Sources */,
+				BF_D2846774B6AFB8FFC427EFF98FEF2F4E /* Any.swift in Sources */,
+				BF_1092D6738E4E10DA749423711942C04C /* Async.swift in Sources */,
+				BF_C4BF7CA4316C2FED85F74B888BADE302 /* Attachment.swift in Sources */,
+				BF_B9820C8451945985651EFB670E948805 /* CALayer.swift in Sources */,
+				BF_C0A0EBBFEC968B768537F848916C49FF /* Codable.swift in Sources */,
+				BF_2D2A2BF95DCB4EA423BA781B1EFD0468 /* Data.swift in Sources */,
+				BF_ACD752E9B5D43698661C2566F6E1A967 /* Diff.swift in Sources */,
+				BF_0C5543D04B4212AA57DCF0E1E594CAF6 /* Diffable.swift in Sources */,
+				BF_52C03ADE3CE2F4B24C881FA97769A932 /* Internal.swift in Sources */,
+				BF_789B4F0099192F5B0F33B18AAA94E2DF /* NSImage.swift in Sources */,
+				BF_7F3F7303ACF94F86C88C54673EC31E8B /* NSViewController.swift in Sources */,
+				BF_1F9B48C978B79ADDC70074F90A45D20C /* SceneKit.swift in Sources */,
+				BF_D47F0D75CBD0E92EF35FB311E64B3987 /* SnapshotTestCase.swift in Sources */,
+				BF_92DFFE207E23D176E2A83025F6F2C2CE /* SpriteKit.swift in Sources */,
+				BF_7E7082D5B949259D7A1CFBAC2154780D /* Strategy.swift in Sources */,
+				BF_B39F8354D2B15959F80C015C02B62643 /* String.swift in Sources */,
+				BF_C3D63AFD027E9A50F37244CBABCE9A43 /* UIImage.swift in Sources */,
+				BF_93A3D38E590AB05BAFFEEBC75C601A4D /* UIViewController.swift in Sources */,
+				BF_E4CBA0F3DF322EEA1F69E255A2C76D7F /* View.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_45 /* Sources */ = {
+		SBP_38396314766D25C599AECD079967E978 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
-			buildActionMask = 0;
+			buildActionMask = 2147483647;
 			files = (
-				OBJ_46 /* Diff.swift in Sources */,
+				BF_D2A5B4A58EC4C3A365649B29EDFF85EA /* Any.swift in Sources */,
+				BF_97AA84D478C020B4F7906D46DA4D0C15 /* Async.swift in Sources */,
+				BF_4ED719B4EDFE89C534E149526F1CF32D /* Attachment.swift in Sources */,
+				BF_1CA9FBF0BD084E3C63F61E9D8A80DDB7 /* CALayer.swift in Sources */,
+				BF_CC119FC0B912C972DF70BD2720AA3D0F /* Codable.swift in Sources */,
+				BF_B0F6BF49CFBAF5371BFD659F8A815654 /* Data.swift in Sources */,
+				BF_9A01810940759397231DF86801A1FC13 /* Diff.swift in Sources */,
+				BF_290BB77E2401937E6400555C3B0F9A7A /* Diffable.swift in Sources */,
+				BF_94A6AD59B8E19AF997B915EC79497934 /* Internal.swift in Sources */,
+				BF_FCC64D190E241971E8DC9818EBC50E75 /* NSImage.swift in Sources */,
+				BF_8926855A85FB3CA85B95CC37D335AEFB /* NSViewController.swift in Sources */,
+				BF_F054D35C1F281F57EA2B9622EFEEF7FB /* SceneKit.swift in Sources */,
+				BF_A9C5B5783E101E35CF7D52DEE6EABE2A /* SnapshotTestCase.swift in Sources */,
+				BF_51CBA76089B764B80A36E06290128424 /* SpriteKit.swift in Sources */,
+				BF_40D093DDC81931CB9C7AF616AA544ACD /* Strategy.swift in Sources */,
+				BF_F7AA48A29F4220B2A19CDC41C83E1D06 /* String.swift in Sources */,
+				BF_D47F465982998AC68EA9D14E475D5FD5 /* UIImage.swift in Sources */,
+				BF_7E8D15FC52F92B4ED7A461509A28656D /* UIViewController.swift in Sources */,
+				BF_83708276954D3F092729DEE9CEC26B33 /* View.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_52 /* Sources */ = {
+		SBP_70D7663B570D398A0479DE86F86DA113 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
-			buildActionMask = 0;
+			buildActionMask = 2147483647;
 			files = (
-				OBJ_53 /* Async.swift in Sources */,
-				OBJ_54 /* Attachment.swift in Sources */,
-				OBJ_55 /* Diffable.swift in Sources */,
-				OBJ_56 /* SnapshotTestCase.swift in Sources */,
-				805A1CBC218DF8B100372EFD /* SceneKit.swift in Sources */,
-				OBJ_57 /* Strategy.swift in Sources */,
-				OBJ_58 /* Any.swift in Sources */,
-				805A1CBA218DF87500372EFD /* Internal.swift in Sources */,
-				OBJ_59 /* CALayer.swift in Sources */,
-				OBJ_60 /* Codable.swift in Sources */,
-				OBJ_61 /* Data.swift in Sources */,
-				OBJ_62 /* NSImage.swift in Sources */,
-				OBJ_63 /* NSViewController.swift in Sources */,
-				OBJ_64 /* String.swift in Sources */,
-				OBJ_65 /* UIImage.swift in Sources */,
-				OBJ_66 /* UIViewController.swift in Sources */,
-				OBJ_67 /* View.swift in Sources */,
-				805A1CBE218DF9F500372EFD /* SpriteKit.swift in Sources */,
+				BF_E191776B50B9EDF01CFD68F196203961 /* Any.swift in Sources */,
+				BF_51479BC7C87FC0B4B8FBFD68EEBD3726 /* Async.swift in Sources */,
+				BF_B8082ECBCA07EA977AE482DDFCA9C33D /* Attachment.swift in Sources */,
+				BF_164C58C92E656FCD7C25A1CB034600A2 /* CALayer.swift in Sources */,
+				BF_2B65A04C3797B3384DE1EF00E75CB156 /* Codable.swift in Sources */,
+				BF_6730D650367B8168D8FAF10C99C95360 /* Data.swift in Sources */,
+				BF_2A6009E29732718FAE9B1F03806A09AB /* Diff.swift in Sources */,
+				BF_D862704C2CB88B4373E8A6D043400D49 /* Diffable.swift in Sources */,
+				BF_D61CA12AF5EEB8437A53C9411C1640B1 /* Internal.swift in Sources */,
+				BF_74313FA8B719956E8ACCE111B99B0960 /* NSImage.swift in Sources */,
+				BF_EA93AC0D72E1311A8135CFC7CBF332C1 /* NSViewController.swift in Sources */,
+				BF_F515927ECBA692381ECE1DBB73161FCF /* SceneKit.swift in Sources */,
+				BF_1BF868397B24F68E388CCD9DF81E6765 /* SnapshotTestCase.swift in Sources */,
+				BF_710776DC175BE3B689292A550887305B /* SpriteKit.swift in Sources */,
+				BF_59377B307FB813153ABE7260E51EF2DC /* Strategy.swift in Sources */,
+				BF_A0F4C67288741E22E3F0C1B450A2A4FD /* String.swift in Sources */,
+				BF_C7D2E87F47E2F7457AD3FC9DAF5F77A5 /* UIImage.swift in Sources */,
+				BF_E55DFEDCE649B588C7BAB7225324890D /* UIViewController.swift in Sources */,
+				BF_CCCDB80BDBD37BE3C37DADBEE79C93C2 /* View.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_78 /* Sources */ = {
+		SBP_73EA193E503A4A60978D815F40E1AB16 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
-			buildActionMask = 0;
+			buildActionMask = 2147483647;
 			files = (
-				OBJ_79 /* Package.swift in Sources */,
+				BF_5DAE3B8B31BE6E64B85F1601D0A8787C /* SnapshotTestingTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_89 /* Sources */ = {
+		SBP_9D87FF08C642C25789055D8E115B6CC0 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
-			buildActionMask = 0;
+			buildActionMask = 2147483647;
 			files = (
-				OBJ_90 /* SnapshotTestingTests.swift in Sources */,
+				BF_3D2DDCCA45890CB683DEA43B49FB3BDB /* SnapshotTestingTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		SBP_EAE957686933FAB3762177E0DCAA848C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BF_72466A7E649A558E008143205CEF096D /* SnapshotTestingTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		OBJ_71 /* PBXTargetDependency */ = {
+		TD_247BD48A7B382F86C07BF1B9A75F86D3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = "SnapshotTesting::WKSnapshotConfigurationShim" /* WKSnapshotConfigurationShim */;
-			targetProxy = 80B19C4D218D1BF300910016 /* PBXContainerItemProxy */;
+			target = NT_E1FAA066576312BD4B5DB23882D1278B /* SnapshotTesting_iOS */;
+			targetProxy = CIP_53654BECB816A866C116E1DC1CDBA587 /* PBXContainerItemProxy */;
 		};
-		OBJ_73 /* PBXTargetDependency */ = {
+		TD_74AB3FD23C245CB8A76E4283D72800D1 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = "SnapshotTesting::Diff" /* Diff */;
-			targetProxy = 80B19C4E218D1BF300910016 /* PBXContainerItemProxy */;
+			target = NT_693A6A5632B0A32E6E52A4DDD822E69E /* SnapshotTesting_tvOS */;
+			targetProxy = CIP_CD9253F8F5036C73CE8FC16D153C7DFF /* PBXContainerItemProxy */;
 		};
-		OBJ_84 /* PBXTargetDependency */ = {
+		TD_DDA802D9002493FC2129924A9B65AA7B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = "SnapshotTesting::SnapshotTestingTests" /* SnapshotTestingTests */;
-			targetProxy = 80B19C52218D1BF600910016 /* PBXContainerItemProxy */;
-		};
-		OBJ_95 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = "SnapshotTesting::SnapshotTesting" /* SnapshotTesting */;
-			targetProxy = 80B19C4F218D1BF300910016 /* PBXContainerItemProxy */;
-		};
-		OBJ_96 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = "SnapshotTesting::WKSnapshotConfigurationShim" /* WKSnapshotConfigurationShim */;
-			targetProxy = 80B19C50218D1BF300910016 /* PBXContainerItemProxy */;
-		};
-		OBJ_97 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = "SnapshotTesting::Diff" /* Diff */;
-			targetProxy = 80B19C51218D1BF300910016 /* PBXContainerItemProxy */;
+			target = NT_EFB00F39C5351E0984C1B0E093A05904 /* SnapshotTesting_macOS */;
+			targetProxy = CIP_7C8251DE7A712A2DE6D1B3A121213CA0 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		OBJ_100 /* Release */ = {
+		BC_3A531D2FA2EBC9FC2F49840DF4B53E84 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = OBJ_8 /* Development.xcconfig */;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
-				DEFINES_MODULE = YES;
-				ENABLE_TESTABILITY = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
-				);
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(SRCROOT)/Sources/WKSnapshotConfigurationShim/include",
-				);
-				INFOPLIST_FILE = SnapshotTesting.xcodeproj/WKSnapshotConfigurationShim_Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) $(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
-				OTHER_CFLAGS = "$(inherited)";
-				OTHER_LDFLAGS = "$(inherited)";
-				OTHER_SWIFT_FLAGS = "$(inherited)";
-				PRODUCT_BUNDLE_IDENTIFIER = WKSnapshotConfigurationShim;
-				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
-				TARGET_NAME = WKSnapshotConfigurationShim;
-			};
-			name = Release;
-		};
-		OBJ_3 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = YES;
-				COMBINE_HIDPI_IMAGES = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_NS_ASSERTIONS = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
 					"DEBUG=1",
-					"$(inherited)",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				OTHER_SWIFT_FLAGS = "-DXcode";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SUPPORTED_PLATFORMS = "macosx iphoneos iphonesimulator appletvos appletvsimulator watchos watchsimulator";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "SWIFT_PACKAGE DEBUG";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				USE_HEADERMAP = NO;
+				SWIFT_VERSION = 4.2;
 			};
 			name = Debug;
 		};
-		OBJ_4 /* Release */ = {
+		BC_418EDB2AF93D91D1CB73CA1ECC7D71AA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GCC_OPTIMIZATION_LEVEL = s;
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
-				OTHER_SWIFT_FLAGS = "-DXcode";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SUPPORTED_PLATFORMS = "macosx iphoneos iphonesimulator appletvos appletvsimulator watchos watchsimulator";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = SWIFT_PACKAGE;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				USE_HEADERMAP = NO;
-			};
-			name = Release;
-		};
-		OBJ_43 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = OBJ_8 /* Development.xcconfig */;
-			buildSettings = {
-				ENABLE_TESTABILITY = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
-				);
-				HEADER_SEARCH_PATHS = "$(inherited)";
-				INFOPLIST_FILE = SnapshotTesting.xcodeproj/Diff_Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) $(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
-				OTHER_CFLAGS = "$(inherited)";
-				OTHER_LDFLAGS = "$(inherited)";
-				OTHER_SWIFT_FLAGS = "$(inherited)";
-				PRODUCT_BUNDLE_IDENTIFIER = Diff;
-				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
-				SWIFT_VERSION = 4.0;
-				TARGET_NAME = Diff;
-			};
-			name = Debug;
-		};
-		OBJ_44 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = OBJ_8 /* Development.xcconfig */;
-			buildSettings = {
-				ENABLE_TESTABILITY = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
-				);
-				HEADER_SEARCH_PATHS = "$(inherited)";
-				INFOPLIST_FILE = SnapshotTesting.xcodeproj/Diff_Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) $(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
-				OTHER_CFLAGS = "$(inherited)";
-				OTHER_LDFLAGS = "$(inherited)";
-				OTHER_SWIFT_FLAGS = "$(inherited)";
-				PRODUCT_BUNDLE_IDENTIFIER = Diff;
-				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
-				SWIFT_VERSION = 4.0;
-				TARGET_NAME = Diff;
-			};
-			name = Release;
-		};
-		OBJ_50 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = OBJ_8 /* Development.xcconfig */;
-			buildSettings = {
-				ENABLE_TESTABILITY = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
-				);
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(SRCROOT)/Sources/WKSnapshotConfigurationShim/include",
-				);
-				INFOPLIST_FILE = SnapshotTesting.xcodeproj/SnapshotTesting_Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) $(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
-				OTHER_CFLAGS = "$(inherited)";
-				OTHER_LDFLAGS = "$(inherited)";
-				OTHER_SWIFT_FLAGS = "$(inherited)";
-				PRODUCT_BUNDLE_IDENTIFIER = SnapshotTesting;
-				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
-				SWIFT_VERSION = 4.0;
-				TARGET_NAME = SnapshotTesting;
-			};
-			name = Debug;
-		};
-		OBJ_51 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = OBJ_8 /* Development.xcconfig */;
-			buildSettings = {
-				ENABLE_TESTABILITY = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
-				);
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(SRCROOT)/Sources/WKSnapshotConfigurationShim/include",
-				);
-				INFOPLIST_FILE = SnapshotTesting.xcodeproj/SnapshotTesting_Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) $(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
-				OTHER_CFLAGS = "$(inherited)";
-				OTHER_LDFLAGS = "$(inherited)";
-				OTHER_SWIFT_FLAGS = "$(inherited)";
-				PRODUCT_BUNDLE_IDENTIFIER = SnapshotTesting;
-				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
-				SWIFT_VERSION = 4.0;
-				TARGET_NAME = SnapshotTesting;
-			};
-			name = Release;
-		};
-		OBJ_76 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				LD = /usr/bin/true;
-				OTHER_SWIFT_FLAGS = "-swift-version 4 -I $(TOOLCHAIN_DIR)/usr/lib/swift/pm/4 -target x86_64-apple-macosx10.10 -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk";
-				SWIFT_VERSION = 4.0;
-			};
-			name = Debug;
-		};
-		OBJ_77 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				LD = /usr/bin/true;
-				OTHER_SWIFT_FLAGS = "-swift-version 4 -I $(TOOLCHAIN_DIR)/usr/lib/swift/pm/4 -target x86_64-apple-macosx10.10 -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk";
-				SWIFT_VERSION = 4.0;
-			};
-			name = Release;
-		};
-		OBJ_82 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-			};
-			name = Debug;
-		};
-		OBJ_83 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-			};
-			name = Release;
-		};
-		OBJ_87 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = OBJ_8 /* Development.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_MODULES = YES;
-				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
-				);
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(SRCROOT)/Sources/WKSnapshotConfigurationShim/include",
-				);
-				INFOPLIST_FILE = SnapshotTesting.xcodeproj/SnapshotTestingTests_Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @loader_path/../Frameworks @loader_path/Frameworks";
-				OTHER_CFLAGS = "$(inherited)";
-				OTHER_LDFLAGS = "$(inherited)";
-				OTHER_SWIFT_FLAGS = "$(inherited)";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
-				SWIFT_VERSION = 4.0;
-				TARGET_NAME = SnapshotTestingTests;
-			};
-			name = Debug;
-		};
-		OBJ_88 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = OBJ_8 /* Development.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_MODULES = YES;
-				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
-				);
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(SRCROOT)/Sources/WKSnapshotConfigurationShim/include",
-				);
-				INFOPLIST_FILE = SnapshotTesting.xcodeproj/SnapshotTestingTests_Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @loader_path/../Frameworks @loader_path/Frameworks";
-				OTHER_CFLAGS = "$(inherited)";
-				OTHER_LDFLAGS = "$(inherited)";
-				OTHER_SWIFT_FLAGS = "$(inherited)";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
-				SWIFT_VERSION = 4.0;
-				TARGET_NAME = SnapshotTestingTests;
-			};
-			name = Release;
-		};
-		OBJ_99 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = OBJ_8 /* Development.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_MODULES = YES;
+				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				ENABLE_TESTABILITY = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
-				);
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(SRCROOT)/Sources/WKSnapshotConfigurationShim/include",
-				);
-				INFOPLIST_FILE = SnapshotTesting.xcodeproj/WKSnapshotConfigurationShim_Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) $(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
-				OTHER_CFLAGS = "$(inherited)";
-				OTHER_LDFLAGS = "$(inherited)";
-				OTHER_SWIFT_FLAGS = "$(inherited)";
-				PRODUCT_BUNDLE_IDENTIFIER = WKSnapshotConfigurationShim;
-				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = "$(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks";
+				INFOPLIST_FILE = Sources/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				OSX_DEPLOYMENT_TARGET = 10.6;
+				PRODUCT_BUNDLE_IDENTIFIER = "co.pointfree.SnapshotTesting-macOS";
+				PRODUCT_NAME = SnapshotTesting;
+				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
-				TARGET_NAME = WKSnapshotConfigurationShim;
+				TVOS_DEPLOYMENT_TARGET = 10.0;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Release;
+		};
+		BC_54181700E2F8759FBDE7AF6D5D88E9C5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = "$(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks";
+				INFOPLIST_FILE = Sources/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				OSX_DEPLOYMENT_TARGET = 10.6;
+				PRODUCT_BUNDLE_IDENTIFIER = "co.pointfree.SnapshotTesting-macOS";
+				PRODUCT_NAME = SnapshotTesting;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				TVOS_DEPLOYMENT_TARGET = 10.0;
+				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
+		};
+		BC_719B090AF5E0DDA078DF7AC42873DF38 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = "$(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks";
+				INFOPLIST_FILE = Sources/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				OSX_DEPLOYMENT_TARGET = 10.6;
+				PRODUCT_BUNDLE_IDENTIFIER = "co.pointfree.SnapshotTesting-iOS";
+				PRODUCT_NAME = SnapshotTesting;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TVOS_DEPLOYMENT_TARGET = 10.0;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Debug;
+		};
+		BC_9FADC1FA8447FC3F83C92D7469D6EA54 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = Tests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "co.pointfree.SnapshotTestingTests-tvOS";
+				PRODUCT_NAME = SnapshotTestingTests;
+				SDKROOT = appletvos;
+				TARGETED_DEVICE_FAMILY = 3;
+			};
+			name = Debug;
+		};
+		BC_A257B2ED0D8DE9DADF192F5976D46896 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 4.2;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		BC_A731DC3F2FEF1436B54B900714222264 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Tests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "co.pointfree.SnapshotTestingTests-macOS";
+				PRODUCT_NAME = SnapshotTestingTests;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		BC_A93E951819B616E8686401726388D845 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Tests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "co.pointfree.SnapshotTestingTests-macOS";
+				PRODUCT_NAME = SnapshotTestingTests;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		BC_B6AF5917EF37E649EAC662EC96A97A45 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = "$(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks";
+				INFOPLIST_FILE = Sources/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				OSX_DEPLOYMENT_TARGET = 10.6;
+				PRODUCT_BUNDLE_IDENTIFIER = "co.pointfree.SnapshotTesting-iOS";
+				PRODUCT_NAME = SnapshotTesting;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TVOS_DEPLOYMENT_TARGET = 10.0;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Release;
+		};
+		BC_C072C107E0C3E2300243FE26E8287ACE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = "$(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks";
+				INFOPLIST_FILE = Sources/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				OSX_DEPLOYMENT_TARGET = 10.6;
+				PRODUCT_BUNDLE_IDENTIFIER = "co.pointfree.SnapshotTesting-tvOS";
+				PRODUCT_NAME = SnapshotTesting;
+				SDKROOT = appletvos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 10.0;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Release;
+		};
+		BC_D679A1AA90CA0F8F22D91BAFF91EFBC0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = Tests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "co.pointfree.SnapshotTestingTests-iOS";
+				PRODUCT_NAME = SnapshotTestingTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		BC_E4801E72B12A24AACF7008D7950E3452 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = Tests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "co.pointfree.SnapshotTestingTests-tvOS";
+				PRODUCT_NAME = SnapshotTestingTests;
+				SDKROOT = appletvos;
+				TARGETED_DEVICE_FAMILY = 3;
+			};
+			name = Release;
+		};
+		BC_F14B5A5F21F7DF5CCE86D45339E45D65 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = "$(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks";
+				INFOPLIST_FILE = Sources/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				OSX_DEPLOYMENT_TARGET = 10.6;
+				PRODUCT_BUNDLE_IDENTIFIER = "co.pointfree.SnapshotTesting-tvOS";
+				PRODUCT_NAME = SnapshotTesting;
+				SDKROOT = appletvos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 10.0;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Debug;
+		};
+		BC_FCB1B173C0795EB459A2697314FDA96A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = Tests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "co.pointfree.SnapshotTestingTests-iOS";
+				PRODUCT_NAME = SnapshotTestingTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		OBJ_2 /* Build configuration list for PBXProject "SnapshotTesting" */ = {
+		CL_4E04597E4AF8E55CAE7984C36F58D0EA /* Build configuration list for PBXNativeTarget "SnapshotTestingTests_tvOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				OBJ_3 /* Debug */,
-				OBJ_4 /* Release */,
+				BC_9FADC1FA8447FC3F83C92D7469D6EA54 /* Debug */,
+				BC_E4801E72B12A24AACF7008D7950E3452 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = "";
 		};
-		OBJ_42 /* Build configuration list for PBXNativeTarget "Diff" */ = {
+		CL_9662E659C2B4042406603B6EBDC33BBF /* Build configuration list for PBXNativeTarget "SnapshotTesting_macOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				OBJ_43 /* Debug */,
-				OBJ_44 /* Release */,
+				BC_54181700E2F8759FBDE7AF6D5D88E9C5 /* Debug */,
+				BC_418EDB2AF93D91D1CB73CA1ECC7D71AA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = "";
 		};
-		OBJ_49 /* Build configuration list for PBXNativeTarget "SnapshotTesting" */ = {
+		CL_9DB4D6636DF887555D39B5590EDC70C8 /* Build configuration list for PBXNativeTarget "SnapshotTesting_iOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				OBJ_50 /* Debug */,
-				OBJ_51 /* Release */,
+				BC_719B090AF5E0DDA078DF7AC42873DF38 /* Debug */,
+				BC_B6AF5917EF37E649EAC662EC96A97A45 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = "";
 		};
-		OBJ_75 /* Build configuration list for PBXNativeTarget "SnapshotTestingPackageDescription" */ = {
+		CL_A46FA635969E5A8BB5B277FD3DB42B32 /* Build configuration list for PBXNativeTarget "SnapshotTesting_tvOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				OBJ_76 /* Debug */,
-				OBJ_77 /* Release */,
+				BC_F14B5A5F21F7DF5CCE86D45339E45D65 /* Debug */,
+				BC_C072C107E0C3E2300243FE26E8287ACE /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = "";
 		};
-		OBJ_81 /* Build configuration list for PBXAggregateTarget "SnapshotTestingPackageTests" */ = {
+		CL_B04189E6554B2315622918CA274007A8 /* Build configuration list for PBXNativeTarget "SnapshotTestingTests_macOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				OBJ_82 /* Debug */,
-				OBJ_83 /* Release */,
+				BC_A731DC3F2FEF1436B54B900714222264 /* Debug */,
+				BC_A93E951819B616E8686401726388D845 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = "";
 		};
-		OBJ_86 /* Build configuration list for PBXNativeTarget "SnapshotTestingTests" */ = {
+		CL_BF004D8F224951C54DB553B4AD3FD263 /* Build configuration list for PBXNativeTarget "SnapshotTestingTests_iOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				OBJ_87 /* Debug */,
-				OBJ_88 /* Release */,
+				BC_D679A1AA90CA0F8F22D91BAFF91EFBC0 /* Debug */,
+				BC_FCB1B173C0795EB459A2697314FDA96A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = "";
 		};
-		OBJ_98 /* Build configuration list for PBXNativeTarget "WKSnapshotConfigurationShim" */ = {
+		CL_E20DB76EDF6FD0317130238989C7AE72 /* Build configuration list for PBXProject "SnapshotTesting" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				OBJ_99 /* Debug */,
-				OBJ_100 /* Release */,
+				BC_3A531D2FA2EBC9FC2F49840DF4B53E84 /* Debug */,
+				BC_A257B2ED0D8DE9DADF192F5976D46896 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = OBJ_1 /* Project object */;
+	rootObject = P_BD50B510D7318790CE5F349329E8ADEA /* Project object */;
 }
