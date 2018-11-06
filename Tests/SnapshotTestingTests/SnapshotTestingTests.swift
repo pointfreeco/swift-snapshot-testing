@@ -106,7 +106,7 @@ class SnapshotTestingTests: SnapshotTestCase {
     button.sizeToFit()
     if #available(macOS 10.14, *) {
       assertSnapshot(matching: button)
-      assertSnapshot(of: .recursiveDescription, matching: button)
+      assertSnapshot(matching: button, as: .recursiveDescription)
     }
     #endif
   }
