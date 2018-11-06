@@ -2,16 +2,22 @@
 import UIKit
 
 extension Strategy where A == UIViewController, B == UIImage {
-  public static var uiViewController: Strategy {
-    return .uiViewController(precision: 1)
+  public static var image: Strategy {
+    return .image(precision: 1)
   }
 
-  public static func uiViewController(precision: Float) -> Strategy {
-    return Strategy<UIView, UIImage>.view(precision: precision).pullback { $0.view }
+  public static func image(precision: Float) -> Strategy {
+    return Strategy<UIView, UIImage>.image(precision: precision).pullback { $0.view }
+  }
+}
+
+extension Strategy where A == UIViewController, B == String {
+  public static var recursiveDescription: Strategy {
+    return Strategy<UIView, String>.recursiveDescription.pullback { $0.view }
   }
 }
 
 extension UIViewController: DefaultDiffable {
-  public static let defaultStrategy: Strategy<UIViewController, UIImage> = .uiViewController
+  public static let defaultStrategy: Strategy<UIViewController, UIImage> = .image
 }
 #endif
