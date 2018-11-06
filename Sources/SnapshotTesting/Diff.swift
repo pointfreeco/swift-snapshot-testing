@@ -1,17 +1,17 @@
 import Foundation
 
-public struct Difference<A> {
-  public enum Which {
+struct Difference<A> {
+  enum Which {
     case first
     case second
     case both
   }
 
-  public let elements: [A]
-  public let which: Which
+  let elements: [A]
+  let which: Which
 }
 
-public func diff<A: Hashable>(_ fst: [A], _ snd: [A]) -> [Difference<A>] {
+func diff<A: Hashable>(_ fst: [A], _ snd: [A]) -> [Difference<A>] {
   var idxsOf = [A: [Int]]()
   fst.enumerated().forEach { idxsOf[$1, default: []].append($0) }
 
@@ -42,18 +42,18 @@ public func diff<A: Hashable>(_ fst: [A], _ snd: [A]) -> [Difference<A>] {
   }
 }
 
-public let minus = "−"
-public let plus = "+"
+let minus = "−"
+let plus = "+"
 private let figureSpace = "\u{2007}"
 
-public struct Hunk {
-  public let fstIdx: Int
-  public let fstLen: Int
-  public let sndIdx: Int
-  public let sndLen: Int
-  public let lines: [String]
+struct Hunk {
+  let fstIdx: Int
+  let fstLen: Int
+  let sndIdx: Int
+  let sndLen: Int
+  let lines: [String]
 
-  public var patchMark: String {
+  var patchMark: String {
     let fstMark = "\(minus)\(fstIdx + 1),\(fstLen)"
     let sndMark = "\(plus)\(sndIdx + 1),\(sndLen)"
     return "@@ \(fstMark) \(sndMark) @@"
@@ -61,7 +61,7 @@ public struct Hunk {
 
   // Semigroup
 
-  public static func +(lhs: Hunk, rhs: Hunk) -> Hunk {
+  static func +(lhs: Hunk, rhs: Hunk) -> Hunk {
     return Hunk(
       fstIdx: lhs.fstIdx + rhs.fstIdx,
       fstLen: lhs.fstLen + rhs.fstLen,
@@ -73,7 +73,7 @@ public struct Hunk {
 
   // Monoid
 
-  public init(fstIdx: Int = 0, fstLen: Int = 0, sndIdx: Int = 0, sndLen: Int = 0, lines: [String] = []) {
+  init(fstIdx: Int = 0, fstLen: Int = 0, sndIdx: Int = 0, sndLen: Int = 0, lines: [String] = []) {
     self.fstIdx = fstIdx
     self.fstLen = fstLen
     self.sndIdx = sndIdx
@@ -81,12 +81,12 @@ public struct Hunk {
     self.lines = lines
   }
 
-  public init(idx: Int = 0, len: Int = 0, lines: [String] = []) {
+  init(idx: Int = 0, len: Int = 0, lines: [String] = []) {
     self.init(fstIdx: idx, fstLen: len, sndIdx: idx, sndLen: len, lines: lines)
   }
 }
 
-public func chunk(diff diffs: [Difference<String>], context ctx: Int = 4) -> [Hunk] {
+func chunk(diff diffs: [Difference<String>], context ctx: Int = 4) -> [Hunk] {
   func prepending(_ prefix: String) -> (String) -> String {
     return { prefix + $0 + ($0.hasSuffix(" ") ? "¬" : "") }
   }

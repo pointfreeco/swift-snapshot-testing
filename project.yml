@@ -1,0 +1,28 @@
+name: SnapshotTesting
+options:
+  bundleIdPrefix: co.pointfree
+  indentWidth: 2
+  tabWidth: 2
+  usesTabs: false
+targets:
+  SnapshotTesting:
+    platform: [macOS, iOS, tvOS]
+    settings:
+      FRAMEWORK_SEARCH_PATHS: $(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks
+      IPHONEOS_DEPLOYMENT_TARGET: 10.0
+      OSX_DEPLOYMENT_TARGET: 10.6
+      TVOS_DEPLOYMENT_TARGET: 10.0
+    scheme:
+      testTargets: [SnapshotTestingTests_$platform]
+    sources: [Sources]
+    type: framework
+  SnapshotTestingTests:
+    dependencies: [{target: SnapshotTesting_$platform}]
+    platform: [macOS, iOS, tvOS]
+    sources:
+      - path: Tests
+        excludes:
+          - LinuxMain.swift
+          - '**/__Fixtures__'
+          - '**/__Snapshots__'
+    type: bundle.unit-test

@@ -1,8 +1,8 @@
 import Foundation
 
 extension Strategy where B == String {
-  public static var any: Strategy {
-    return SimpleStrategy<String>.lines.pullback { snap($0) }
+  public static var dump: Strategy {
+    return SimpleStrategy.lines.pullback { snap($0) }
   }
 }
 

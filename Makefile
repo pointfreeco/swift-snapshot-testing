@@ -1,5 +1,5 @@
 xcodeproj:
-	swift package generate-xcodeproj --xcconfig-overrides=Development.xcconfig
+	xcodegen
 
 test-linux:
 	docker build --tag snapshot-testing . \
@@ -8,13 +8,13 @@ test-linux:
 test-macos:
 	set -o pipefail && \
 	xcodebuild test \
-		-scheme SnapshotTesting-Package \
+		-scheme SnapshotTesting_macOS \
 		-destination platform="macOS" \
 
 test-ios:
 	set -o pipefail && \
 	xcodebuild test \
-		-scheme SnapshotTesting-Package \
+		-scheme SnapshotTesting_iOS \
 		-destination platform="iOS Simulator,name=iPhone XR,OS=12.0" \
 
 test-swift:

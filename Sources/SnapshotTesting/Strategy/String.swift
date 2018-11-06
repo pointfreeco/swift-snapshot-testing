@@ -1,4 +1,3 @@
-import Diff
 import Foundation
 
 extension Strategy where A == String, B == String {
@@ -6,7 +5,7 @@ extension Strategy where A == String, B == String {
 }
 
 extension String: DefaultDiffable {
-  public static let defaultStrategy: SimpleStrategy<String> = .lines
+  public static let defaultStrategy: SimpleStrategy = .lines
 }
 
 extension Diffable where A == String {
@@ -15,7 +14,7 @@ extension Diffable where A == String {
     fro: { String(decoding: $0, as: UTF8.self) }
   ) { old, new in
     guard old != new else { return nil }
-    let hunks = chunk(diff: Diff.diff(
+    let hunks = chunk(diff: SnapshotTesting.diff(
       old.split(separator: "\n", omittingEmptySubsequences: false).map(String.init),
       new.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
     ))

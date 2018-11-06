@@ -26,5 +26,5 @@ extension Strategy where A == Data, B == Data {
 }
 
 extension Data: DefaultDiffable {
-  public static let defaultStrategy: SimpleStrategy<Data> = .data
+  public static let defaultStrategy: SimpleStrategy = .data
 }

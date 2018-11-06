@@ -1,4 +1,3 @@
-import Diff
 import XCTest
 
 open class SnapshotTestCase: XCTestCase {
@@ -17,8 +16,8 @@ open class SnapshotTestCase: XCTestCase {
     where A.A == A
   {
     return assertSnapshot(
-      of: A.defaultStrategy,
       matching: snapshot,
+      as: A.defaultStrategy,
       named: name,
       record: recording,
       timeout: timeout,
@@ -29,8 +28,8 @@ open class SnapshotTestCase: XCTestCase {
   }
 
   public func assertSnapshot<A, B>(
-    of strategy: Strategy<A, B>,
     matching value: A,
+    as strategy: Strategy<A, B>,
     named name: String? = nil,
     record recording: Bool = false,
     timeout: TimeInterval = 5,
@@ -113,7 +112,7 @@ open class SnapshotTestCase: XCTestCase {
 
       let diffMessage = self.diffTool
         .map { "\($0) \"\(snapshotFileUrl.path)\" \"\(failedSnapshotFileUrl.path)\"" }
-        ?? "@\(Diff.minus)\n\"\(snapshotFileUrl.path)\"\n@\(Diff.plus)\n\"\(failedSnapshotFileUrl.path)\""
+        ?? "@\(minus)\n\"\(snapshotFileUrl.path)\"\n@\(plus)\n\"\(failedSnapshotFileUrl.path)\""
       let message = """
 \(failure.trimmingCharacters(in: .whitespacesAndNewlines))
 

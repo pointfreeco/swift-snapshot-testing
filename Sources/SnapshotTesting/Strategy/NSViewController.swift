@@ -2,12 +2,12 @@
 import Cocoa
 
 extension Strategy where A == NSViewController, B == NSImage {
-  public static var viewController: Strategy {
-    return .viewController(precision: 1)
+  public static var image: Strategy {
+    return .image(precision: 1)
   }
 
-  public static func viewController(precision: Float) -> Strategy {
-    return Strategy<NSView, NSImage>.view(precision: precision).pullback { $0.view }
+  public static func image(precision: Float) -> Strategy {
+    return Strategy<NSView, NSImage>.image(precision: precision).pullback { $0.view }
   }
 }
 
@@ -18,6 +18,6 @@ extension Strategy where A == NSViewController, B == String {
 }
 
 extension NSViewController: DefaultDiffable {
-  public static let defaultStrategy: Strategy<NSViewController, NSImage> = .viewController
+  public static let defaultStrategy: Strategy<NSViewController, NSImage> = .image
 }
 #endif
