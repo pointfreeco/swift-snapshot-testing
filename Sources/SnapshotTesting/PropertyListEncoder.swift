@@ -1,4 +1,3 @@
-#if os(Linux)
 import Foundation
 
 extension DecodingError {
@@ -1824,4 +1823,3 @@ fileprivate struct _PlistKey : CodingKey {
 
     fileprivate static let `super` = _PlistKey(stringValue: "super")!
 }
-#endif
