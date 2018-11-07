@@ -58,7 +58,7 @@ extension Strategy where Snapshottable == Format {
   }
 }
 
-public protocol DefaultDiffable {
+public protocol DefaultSnapshottable {
   associatedtype Snapshottable = Self
   associatedtype Format
   static var defaultStrategy: Strategy<Snapshottable, Format> { get }

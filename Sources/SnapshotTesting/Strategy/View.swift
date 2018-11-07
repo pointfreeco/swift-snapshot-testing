@@ -42,7 +42,7 @@ extension Strategy where Snapshottable == NSView, Format == String {
   }
 }
 
-extension NSView: DefaultDiffable {
+extension NSView: DefaultSnapshottable {
   public static let defaultStrategy: Strategy<NSView, NSImage> = .image
 }
 #elseif os(iOS) || os(tvOS)
@@ -76,7 +76,7 @@ extension Strategy where Snapshottable == UIView, Format == String {
   }
 }
 
-extension UIView: DefaultDiffable {
+extension UIView: DefaultSnapshottable {
   public static let defaultStrategy: Strategy<UIView, UIImage> = .image
 }
 #endif

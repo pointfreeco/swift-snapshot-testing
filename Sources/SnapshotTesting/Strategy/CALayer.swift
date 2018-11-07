@@ -18,7 +18,7 @@ extension Strategy where Snapshottable == CALayer, Format == NSImage {
   }
 }
 
-extension CALayer: DefaultDiffable {
+extension CALayer: DefaultSnapshottable {
   public static let defaultStrategy: Strategy<CALayer, NSImage> = .image
 }
 #elseif os(iOS) || os(tvOS)
@@ -38,7 +38,7 @@ extension Strategy where Snapshottable == CALayer, Format == UIImage {
   }
 }
 
-extension CALayer: DefaultDiffable {
+extension CALayer: DefaultSnapshottable {
   public static let defaultStrategy: Strategy<CALayer, UIImage> = .image
 }
 #endif

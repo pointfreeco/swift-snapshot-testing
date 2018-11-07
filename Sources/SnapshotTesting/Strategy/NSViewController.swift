@@ -17,7 +17,7 @@ extension Strategy where Snapshottable == NSViewController, Format == String {
   }
 }
 
-extension NSViewController: DefaultDiffable {
+extension NSViewController: DefaultSnapshottable {
   public static let defaultStrategy: Strategy<NSViewController, NSImage> = .image
 }
 #endif

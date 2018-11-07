@@ -41,7 +41,7 @@ extension Strategy where Snapshottable == UIImage, Format == UIImage {
   }
 }
 
-extension UIImage: DefaultDiffable {
+extension UIImage: DefaultSnapshottable {
   public static let defaultStrategy: SimpleStrategy = .image
 }
 

@@ -6,7 +6,7 @@ open class SnapshotTestCase: XCTestCase {
   open var record = false
   open var diffTool: String? = nil
 
-  public func assertSnapshot<Snapshottable: DefaultDiffable>(
+  public func assertSnapshot<Snapshottable: DefaultSnapshottable>(
     matching snapshot: Snapshottable,
     named name: String? = nil,
     record recording: Bool = false,
