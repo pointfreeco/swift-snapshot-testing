@@ -191,8 +191,8 @@ class SnapshotTestCaseTests: TestCase {
 }
 
 #if os(Linux)
-extension SnapshotTestingTests {
-  static var allTests : [(String, (SnapshotTestingTests) -> () throws -> Void)] {
+extension SnapshotTestCaseTests {
+  static var allTests : [(String, (SnapshotTestCaseTests) -> () throws -> Void)] {
     return [
       ("testMixedViews", testMixedViews),
       ("testMultipleSnapshots", testMultipleSnapshots),
