@@ -1,3 +1,4 @@
+#if os(Linux)
 import XCTest
 
 open class SnapshotTestCase: XCTestCase {
@@ -124,3 +125,4 @@ open class SnapshotTestCase: XCTestCase {
     }
   }
 }
+#endif
