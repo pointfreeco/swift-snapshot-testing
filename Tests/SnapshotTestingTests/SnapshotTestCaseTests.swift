@@ -7,22 +7,16 @@ import SpriteKit
 import WebKit
 #endif
 
-#if os(iOS)
-let platform = "ios"
-#elseif os(macOS)
-let platform = "macos"
-extension NSTextField {
-  var text: String {
-    get { return self.stringValue }
-    set { self.stringValue = newValue }
-  }
-}
+#if os(Linux)
+typealias TestCase = SnapshotTestCase
+#else
+typealias TestCase = XCTestCase
 #endif
 
-class SnapshotTestingTests: SnapshotTestCase {
+class SnapshotTestCaseTests: TestCase {
   override func setUp() {
     super.setUp()
-    self.diffTool = "ksdiff"
+    diffTool = "ksdiff"
 //    record = true
   }
 
@@ -153,11 +147,7 @@ class SnapshotTestingTests: SnapshotTestCase {
       omniLightNode.position = SCNVector3Make(10, 10, 10)
       scene.rootNode.addChildNode(omniLightNode)
 
-      assertSnapshot(
-        matching: scene,
-        as: .image(size: .init(width: 500, height: 500)),
-        named: platform
-      )
+      assertSnapshot(matching: scene, as: .image(size: .init(width: 500, height: 500)), named: platform)
     }
     #endif
   }
@@ -172,11 +162,7 @@ class SnapshotTestingTests: SnapshotTestCase {
       node.position = .init(x: 25, y: 25)
       scene.addChild(node)
 
-      assertSnapshot(
-        matching: scene,
-        as: .image(size: .init(width: 50, height: 50)),
-        named: platform
-      )
+      assertSnapshot(matching: scene, as: .image(size: .init(width: 50, height: 50)), named: platform)
     }
     #endif
   }
@@ -205,8 +191,8 @@ class SnapshotTestingTests: SnapshotTestCase {
 }
 
 #if os(Linux)
-extension SnapshotTestingTests {
-  static var allTests : [(String, (SnapshotTestingTests) -> () throws -> Void)] {
+extension SnapshotTestCaseTests {
+  static var allTests : [(String, (SnapshotTestCaseTests) -> () throws -> Void)] {
     return [
       ("testMixedViews", testMixedViews),
       ("testMultipleSnapshots", testMultipleSnapshots),

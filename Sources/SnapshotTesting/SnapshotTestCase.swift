@@ -1,3 +1,4 @@
+#if os(Linux)
 import XCTest
 
 open class SnapshotTestCase: XCTestCase {
@@ -114,13 +115,14 @@ open class SnapshotTestCase: XCTestCase {
         .map { "\($0) \"\(snapshotFileUrl.path)\" \"\(failedSnapshotFileUrl.path)\"" }
         ?? "@\(minus)\n\"\(snapshotFileUrl.path)\"\n@\(plus)\n\"\(failedSnapshotFileUrl.path)\""
       let message = """
-\(failure.trimmingCharacters(in: .whitespacesAndNewlines))
+      \(failure.trimmingCharacters(in: .whitespacesAndNewlines))
 
-\(diffMessage)
-"""
+      \(diffMessage)
+      """
       XCTFail(message, file: file, line: line)
     } catch {
       XCTFail(error.localizedDescription, file: file, line: line)
     }
   }
 }
+#endif
