@@ -1,7 +1,7 @@
 #if os(iOS) || os(tvOS)
 import UIKit
 
-extension Strategy where A == UIViewController, B == UIImage {
+extension Strategy where Snapshottable == UIViewController, Format == UIImage {
   public static var image: Strategy {
     return .image(precision: 1)
   }
@@ -11,7 +11,7 @@ extension Strategy where A == UIViewController, B == UIImage {
   }
 }
 
-extension Strategy where A == UIViewController, B == String {
+extension Strategy where Snapshottable == UIViewController, Format == String {
   public static var recursiveDescription: Strategy {
     return Strategy<UIView, String>.recursiveDescription.pullback { $0.view }
   }

@@ -12,7 +12,7 @@ public func assertSnapshot<A: DefaultDiffable>(
   file: StaticString = #file,
   function: String = #function,
   line: UInt = #line)
-  where A.A == A
+  where A.Snapshottable == A
 {
   return assertSnapshot(
     matching: snapshot,

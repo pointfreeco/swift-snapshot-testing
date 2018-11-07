@@ -7,20 +7,20 @@ import UIKit
 #endif
 
 #if os(macOS)
-extension Strategy where A == SKScene, B == NSImage {
+extension Strategy where Snapshottable == SKScene, Format == NSImage {
   public static func image(size: CGSize, precision: Float = 1) -> Strategy {
     return .skScene(size: size, precision: precision)
   }
 }
 #elseif os(iOS) || os(tvOS)
-extension Strategy where A == SKScene, B == UIImage {
+extension Strategy where Snapshottable == SKScene, Format == UIImage {
   public static func image(size: CGSize, precision: Float = 1) -> Strategy {
     return .skScene(size: size, precision: precision)
   }
 }
 #endif
 
-fileprivate extension Strategy where A == SKScene, B == Image {
+fileprivate extension Strategy where Snapshottable == SKScene, Format == Image {
   static func skScene(size: CGSize, precision: Float) -> Strategy {
     return Strategy<View, Image>.image(precision: precision).pullback { scene in
       let view = SKView(frame: .init(x: 0, y: 0, width: size.width, height: size.height))

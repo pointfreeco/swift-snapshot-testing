@@ -6,19 +6,19 @@ open class SnapshotTestCase: XCTestCase {
   open var record = false
   open var diffTool: String? = nil
 
-  public func assertSnapshot<A: DefaultDiffable>(
-    matching snapshot: A,
+  public func assertSnapshot<Snapshottable: DefaultDiffable>(
+    matching snapshot: Snapshottable,
     named name: String? = nil,
     record recording: Bool = false,
     timeout: TimeInterval = 5,
     file: StaticString = #file,
     function: String = #function,
     line: UInt = #line)
-    where A.A == A
+    where Snapshottable.Snapshottable == Snapshottable
   {
     return assertSnapshot(
       matching: snapshot,
-      as: A.defaultStrategy,
+      as: Snapshottable.defaultStrategy,
       named: name,
       record: recording,
       timeout: timeout,
@@ -28,9 +28,9 @@ open class SnapshotTestCase: XCTestCase {
     )
   }
 
-  public func assertSnapshot<A, B>(
-    matching value: A,
-    as strategy: Strategy<A, B>,
+  public func assertSnapshot<Snapshottable, Format>(
+    matching value: Snapshottable,
+    as strategy: Strategy<Snapshottable, Format>,
     named name: String? = nil,
     record recording: Bool = false,
     timeout: TimeInterval = 5,
@@ -65,7 +65,7 @@ open class SnapshotTestCase: XCTestCase {
       try fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
 
       let tookSnapshot = self.expectation(description: "Took snapshot")
-      var optionalDiffable: B?
+      var optionalDiffable: Format?
       strategy.snapshotToDiffable(value).run { b in
         optionalDiffable = b
         tookSnapshot.fulfill()

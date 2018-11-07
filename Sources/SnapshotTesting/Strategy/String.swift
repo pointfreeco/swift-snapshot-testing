@@ -1,6 +1,6 @@
 import Foundation
 
-extension Strategy where A == String, B == String {
+extension Strategy where Snapshottable == String, Format == String {
   public static let lines = Strategy(pathExtension: "txt", diffable: .lines)
 }
 

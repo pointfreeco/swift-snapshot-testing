@@ -11,7 +11,7 @@ extension Attachment {
   }
 }
 
-extension Strategy where A == NSImage, B == NSImage {
+extension Strategy where Snapshottable == NSImage, Format == NSImage {
   public static var image: Strategy {
     return .image(precision: 1)
   }
