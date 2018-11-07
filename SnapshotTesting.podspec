@@ -28,5 +28,7 @@ Pod::Spec.new do |s|
   s.osx.deployment_target = "10.9"
   s.tvos.deployment_target = "9.0"
 
+  s.frameworks = 'XCTest'
+
   s.source_files  = "Sources", "Sources/**/*.swift"
 end
