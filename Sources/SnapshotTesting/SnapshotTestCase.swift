@@ -18,7 +18,7 @@ open class SnapshotTestCase: XCTestCase {
   {
     return assertSnapshot(
       matching: snapshot,
-      as: Snapshottable.defaultStrategy,
+      as: A.defaultStrategy,
       named: name,
       record: recording,
       timeout: timeout,
