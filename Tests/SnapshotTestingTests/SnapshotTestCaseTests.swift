@@ -7,19 +7,7 @@ import SpriteKit
 import WebKit
 #endif
 
-#if os(iOS)
-let platform = "ios"
-#elseif os(macOS)
-let platform = "macos"
-extension NSTextField {
-  var text: String {
-    get { return self.stringValue }
-    set { self.stringValue = newValue }
-  }
-}
-#endif
-
-class SnapshotTestingTests: XCTestCase {
+class SnapshotTestCaseTests: SnapshotTestCase {
   override func setUp() {
     super.setUp()
     diffTool = "ksdiff"
@@ -29,19 +17,19 @@ class SnapshotTestingTests: XCTestCase {
   func testWithAny() {
     struct User { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
-    assertSnapshot(of: .any, matching: user)
-    assertSnapshot(of: .any, matching: Data("Hello, world!".utf8))
-    assertSnapshot(of: .any, matching: URL(string: "https://www.pointfree.co")!)
+    assertSnapshot(matching: user, as: .any)
+    assertSnapshot(matching: Data("Hello, world!".utf8), as: .any)
+    assertSnapshot(matching: URL(string: "https://www.pointfree.co")!, as: .any)
   }
 
   func testNamedAssertion() {
     struct User { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
-    assertSnapshot(of: .any, matching: user, named: "named")
+    assertSnapshot(matching: user, as: .any, named: "named")
   }
 
   func testWithDate() {
-    assertSnapshot(of: .any, matching: Date(timeIntervalSinceReferenceDate: 0))
+    assertSnapshot(matching: Date(timeIntervalSinceReferenceDate: 0), as: .any)
   }
 
   func testWithEncodable() {
@@ -49,28 +37,28 @@ class SnapshotTestingTests: XCTestCase {
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
 
     if #available(macOS 10.13, *) {
-      assertSnapshot(of: .json, matching: user)
+      assertSnapshot(matching: user, as: .json)
 
       #if !os(Linux)
-      assertSnapshot(of: .plist, matching: user)
+      assertSnapshot(matching: user, as: .plist)
       #endif
     }
   }
 
   func testWithNSObject() {
-    assertSnapshot(of: .any, matching: NSObject())
+    assertSnapshot(matching: NSObject(), as: .any)
   }
 
   func testMultipleSnapshots() {
-    assertSnapshot(of: .any, matching: [1])
-    assertSnapshot(of: .any, matching: [1, 2])
+    assertSnapshot(matching: [1], as: .any)
+    assertSnapshot(matching: [1, 2], as: .any)
   }
 
   func testUIView() {
     #if os(iOS)
     let view = UIButton(type: .contactAdd)
     assertSnapshot(matching: view)
-    assertSnapshot(of: .recursiveDescription, matching: view)
+    assertSnapshot(matching: view, as: .recursiveDescription)
     #endif
   }
 
@@ -106,7 +94,7 @@ class SnapshotTestingTests: XCTestCase {
     button.sizeToFit()
     if #available(macOS 10.14, *) {
       assertSnapshot(matching: button)
-      assertSnapshot(of: .recursiveDescription, matching: button)
+      assertSnapshot(matching: button, as: .recursiveDescription)
     }
     #endif
   }
@@ -153,7 +141,7 @@ class SnapshotTestingTests: XCTestCase {
       omniLightNode.position = SCNVector3Make(10, 10, 10)
       scene.rootNode.addChildNode(omniLightNode)
 
-      assertSnapshot(of: .scene(size: .init(width: 500, height: 500)), matching: scene, named: platform)
+      assertSnapshot(matching: scene, as: .scene(size: .init(width: 500, height: 500)), named: platform)
     }
     #endif
   }
@@ -168,7 +156,7 @@ class SnapshotTestingTests: XCTestCase {
       node.position = .init(x: 25, y: 25)
       scene.addChild(node)
 
-      assertSnapshot(of: .scene(size: .init(width: 50, height: 50)), matching: scene, named: platform)
+      assertSnapshot(matching: scene, as: .scene(size: .init(width: 50, height: 50)), named: platform)
     }
     #endif
   }
@@ -188,9 +176,9 @@ class SnapshotTestingTests: XCTestCase {
     #endif
     if #available(macOS 10.14, *) {
       label.text = "Hello."
-      assertSnapshot(of: .view(precision: 0.9), matching: label, named: platform)
+      assertSnapshot(matching: label, as: .view(precision: 0.9), named: platform)
       label.text = "Hello"
-      assertSnapshot(of: .view(precision: 0.9), matching: label, named: platform)
+      assertSnapshot(matching: label, as: .view(precision: 0.9), named: platform)
     }
     #endif
   }
