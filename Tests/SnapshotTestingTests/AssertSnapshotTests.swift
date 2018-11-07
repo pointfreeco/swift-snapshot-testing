@@ -1,3 +1,4 @@
+#if !os(Linux)
 @testable import SnapshotTesting
 import XCTest
 
@@ -189,27 +190,6 @@ class AssertSnapshotTests: XCTestCase {
       assertSnapshot(matching: label, as: .image(precision: 0.9), named: platform)
     }
     #endif
-  }
-}
-
-#if os(Linux)
-extension SnapshotTestingTests {
-  static var allTests : [(String, (SnapshotTestingTests) -> () throws -> Void)] {
-    return [
-      ("testMixedViews", testMixedViews),
-      ("testMultipleSnapshots", testMultipleSnapshots),
-      ("testNamedAssertion", testNamedAssertion),
-      ("testNSView", testNSView),
-      ("testPrecision", testPrecision),
-      ("testSCNView", testSCNView),
-      ("testSKView", testSKView),
-      ("testUIView", testUIView),
-      ("testWebView", testWebView),
-      ("testWithAny", testWithAny),
-      ("testWithDate", testWithDate),
-      ("testWithEncodable", testWithEncodable),
-      ("testWithNSObject", testWithNSObject),
-    ]
   }
 }
 #endif
