@@ -26,8 +26,8 @@ public struct Strategy<Snapshottable, Format> {
     }
   }
 
-  public func asyncPullback<A0>(_ transform: @escaping (A0) -> Async<Snapshottable>) -> Strategy<A0, Format> {
-    return Strategy<A0, Format>(
+  public func asyncPullback<A>(_ transform: @escaping (A) -> Async<Snapshottable>) -> Strategy<A, Format> {
+    return Strategy<A, Format>(
       pathExtension: self.pathExtension,
       diffable: self.diffable
     ) { a0 in
@@ -41,7 +41,7 @@ public struct Strategy<Snapshottable, Format> {
     }
   }
 
-  public func pullback<A0>(_ transform: @escaping (A0) -> Snapshottable) -> Strategy<A0, Format> {
+  public func pullback<A>(_ transform: @escaping (A) -> Snapshottable) -> Strategy<A, Format> {
     return self.asyncPullback { Async(value: transform($0)) }
   }
 }
