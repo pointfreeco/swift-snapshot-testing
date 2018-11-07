@@ -7,20 +7,20 @@ import UIKit
 #endif
 
 #if os(macOS)
-extension Strategy where A == SCNScene, B == NSImage {
+extension Strategy where Snapshottable == SCNScene, Format == NSImage {
   public static func image(size: CGSize, precision: Float = 1) -> Strategy {
     return .scnScene(size: size, precision: precision)
   }
 }
 #elseif os(iOS) || os(tvOS)
-extension Strategy where A == SCNScene, B == UIImage {
+extension Strategy where Snapshottable == SCNScene, Format == UIImage {
   public static func image(size: CGSize, precision: Float = 1) -> Strategy {
     return .scnScene(size: size, precision: precision)
   }
 }
 #endif
 
-fileprivate extension Strategy where A == SCNScene, B == Image {
+fileprivate extension Strategy where Snapshottable == SCNScene, Format == Image {
   static func scnScene(size: CGSize, precision: Float) -> Strategy {
     return Strategy<View, Image>.image(precision: precision).pullback { scene in
       let view = SCNView(frame: .init(x: 0, y: 0, width: size.width, height: size.height))

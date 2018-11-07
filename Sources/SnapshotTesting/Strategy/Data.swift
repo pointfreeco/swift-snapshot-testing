@@ -10,7 +10,7 @@ extension Attachment {
   }
 }
 
-extension Strategy where A == Data, B == Data {
+extension Strategy where Snapshottable == Data, Format == Data {
   static var data: Strategy {
     return .init(
       pathExtension: nil,
@@ -25,6 +25,6 @@ extension Strategy where A == Data, B == Data {
   }
 }
 
-extension Data: DefaultDiffable {
+extension Data: DefaultSnapshottable {
   public static let defaultStrategy: SimpleStrategy = .data
 }

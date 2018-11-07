@@ -12,7 +12,7 @@ import WebKit
 #endif
 
 #if os(macOS)
-extension Strategy where A == NSView, B == NSImage {
+extension Strategy where Snapshottable == NSView, Format == NSImage {
   public static var image: Strategy {
     return .image(precision: 1)
   }
@@ -31,7 +31,7 @@ extension Strategy where A == NSView, B == NSImage {
   }
 }
 
-extension Strategy where A == NSView, B == String {
+extension Strategy where Snapshottable == NSView, Format == String {
   public static var recursiveDescription: Strategy<NSView, String> {
     return SimpleStrategy.lines.pullback { view in
       return purgePointers(
@@ -42,11 +42,11 @@ extension Strategy where A == NSView, B == String {
   }
 }
 
-extension NSView: DefaultDiffable {
+extension NSView: DefaultSnapshottable {
   public static let defaultStrategy: Strategy<NSView, NSImage> = .image
 }
 #elseif os(iOS) || os(tvOS)
-extension Strategy where A == UIView, B == UIImage {
+extension Strategy where Snapshottable == UIView, Format == UIImage {
   public static var image: Strategy {
     return .image(precision: 1)
   }
@@ -65,7 +65,7 @@ extension Strategy where A == UIView, B == UIImage {
   }
 }
 
-extension Strategy where A == UIView, B == String {
+extension Strategy where Snapshottable == UIView, Format == String {
   public static var recursiveDescription: Strategy<UIView, String> {
     return SimpleStrategy.lines.pullback { view in
       return purgePointers(
@@ -76,7 +76,7 @@ extension Strategy where A == UIView, B == String {
   }
 }
 
-extension UIView: DefaultDiffable {
+extension UIView: DefaultSnapshottable {
   public static let defaultStrategy: Strategy<UIView, UIImage> = .image
 }
 #endif

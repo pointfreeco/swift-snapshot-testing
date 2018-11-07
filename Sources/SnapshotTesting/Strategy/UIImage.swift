@@ -11,7 +11,7 @@ extension Attachment {
   }
 }
 
-extension Strategy where A == UIImage, B == UIImage {
+extension Strategy where Snapshottable == UIImage, Format == UIImage {
   static var image: Strategy {
     return .image(precision: 1)
   }
@@ -41,7 +41,7 @@ extension Strategy where A == UIImage, B == UIImage {
   }
 }
 
-extension UIImage: DefaultDiffable {
+extension UIImage: DefaultSnapshottable {
   public static let defaultStrategy: SimpleStrategy = .image
 }
 

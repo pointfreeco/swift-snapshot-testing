@@ -1,7 +1,7 @@
 #if os(macOS)
 import Cocoa
 
-extension Strategy where A == CALayer, B == NSImage {
+extension Strategy where Snapshottable == CALayer, Format == NSImage {
   public static var image: Strategy {
     return .image(precision: 1)
   }
@@ -18,13 +18,13 @@ extension Strategy where A == CALayer, B == NSImage {
   }
 }
 
-extension CALayer: DefaultDiffable {
+extension CALayer: DefaultSnapshottable {
   public static let defaultStrategy: Strategy<CALayer, NSImage> = .image
 }
 #elseif os(iOS) || os(tvOS)
 import UIKit
 
-extension Strategy where A == CALayer, B == UIImage {
+extension Strategy where Snapshottable == CALayer, Format == UIImage {
   public static var image: Strategy {
     return .image(precision: 1)
   }
@@ -38,7 +38,7 @@ extension Strategy where A == CALayer, B == UIImage {
   }
 }
 
-extension CALayer: DefaultDiffable {
+extension CALayer: DefaultSnapshottable {
   public static let defaultStrategy: Strategy<CALayer, UIImage> = .image
 }
 #endif

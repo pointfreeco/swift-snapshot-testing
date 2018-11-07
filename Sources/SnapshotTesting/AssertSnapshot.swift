@@ -4,7 +4,7 @@ import XCTest
 public var diffTool: String? = nil
 public var record = false
 
-public func assertSnapshot<A: DefaultDiffable>(
+public func assertSnapshot<A: DefaultSnapshottable>(
   matching snapshot: A,
   named name: String? = nil,
   record recording: Bool = false,
@@ -12,7 +12,7 @@ public func assertSnapshot<A: DefaultDiffable>(
   file: StaticString = #file,
   function: String = #function,
   line: UInt = #line)
-  where A.A == A
+  where A.Snapshottable == A
 {
   return assertSnapshot(
     matching: snapshot,

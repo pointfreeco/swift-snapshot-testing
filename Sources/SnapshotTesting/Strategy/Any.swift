@@ -1,6 +1,6 @@
 import Foundation
 
-extension Strategy where B == String {
+extension Strategy where Format == String {
   public static var dump: Strategy {
     return SimpleStrategy.lines.pullback { snap($0) }
   }
