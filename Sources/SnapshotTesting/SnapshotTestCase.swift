@@ -1,3 +1,4 @@
+#if os(Linux)
 import XCTest
 
 open class SnapshotTestCase: XCTestCase {
@@ -5,7 +6,7 @@ open class SnapshotTestCase: XCTestCase {
   open var record = false
   open var diffTool: String? = nil
 
-  public func assertSnapshot<A: DefaultDiffable>(
+  public func assertSnapshot<A: DefaultSnapshottable>(
     matching snapshot: A,
     named name: String? = nil,
     record recording: Bool = false,
@@ -13,7 +14,7 @@ open class SnapshotTestCase: XCTestCase {
     file: StaticString = #file,
     function: String = #function,
     line: UInt = #line)
-    where A.A == A
+    where A.Snapshottable == A
   {
     return assertSnapshot(
       matching: snapshot,
@@ -27,9 +28,9 @@ open class SnapshotTestCase: XCTestCase {
     )
   }
 
-  public func assertSnapshot<A, B>(
-    matching value: A,
-    as strategy: Strategy<A, B>,
+  public func assertSnapshot<Snapshottable, Format>(
+    matching value: Snapshottable,
+    as strategy: Strategy<Snapshottable, Format>,
     named name: String? = nil,
     record recording: Bool = false,
     timeout: TimeInterval = 5,
@@ -64,7 +65,7 @@ open class SnapshotTestCase: XCTestCase {
       try fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
 
       let tookSnapshot = self.expectation(description: "Took snapshot")
-      var optionalDiffable: B?
+      var optionalDiffable: Format?
       strategy.snapshotToDiffable(value).run { b in
         optionalDiffable = b
         tookSnapshot.fulfill()
@@ -114,13 +115,14 @@ open class SnapshotTestCase: XCTestCase {
         .map { "\($0) \"\(snapshotFileUrl.path)\" \"\(failedSnapshotFileUrl.path)\"" }
         ?? "@\(minus)\n\"\(snapshotFileUrl.path)\"\n@\(plus)\n\"\(failedSnapshotFileUrl.path)\""
       let message = """
-\(failure.trimmingCharacters(in: .whitespacesAndNewlines))
+      \(failure.trimmingCharacters(in: .whitespacesAndNewlines))
 
-\(diffMessage)
-"""
+      \(diffMessage)
+      """
       XCTFail(message, file: file, line: line)
     } catch {
       XCTFail(error.localizedDescription, file: file, line: line)
     }
   }
 }
+#endif
