@@ -13,11 +13,11 @@ import WebKit
 
 #if os(macOS)
 extension Strategy where A == NSView, B == NSImage {
-  public static var view: Strategy {
-    return .view(precision: 1)
+  public static var image: Strategy {
+    return .image(precision: 1)
   }
 
-  public static func view(precision: Float) -> Strategy {
+  public static func image(precision: Float) -> Strategy {
     return Strategy<NSImage, NSImage>.image(precision: precision).asyncPullback { view in
       view.snapshot ?? Async { callback in
         addImagesForRenderedViews(view).sequence().run { views in
@@ -43,19 +43,19 @@ extension Strategy where A == NSView, B == String {
 }
 
 extension NSView: DefaultDiffable {
-  public static let defaultStrategy: Strategy<NSView, NSImage> = .view
+  public static let defaultStrategy: Strategy<NSView, NSImage> = .image
 }
 #elseif os(iOS) || os(tvOS)
 extension Strategy where A == UIView, B == UIImage {
-  public static var view: Strategy {
-    return self.view(precision: 1)
+  public static var image: Strategy {
+    return .image(precision: 1)
   }
 
-  public static func view(precision: Float) -> Strategy {
+  public static func image(precision: Float) -> Strategy {
     return SimpleStrategy.image(precision: precision).asyncPullback { view in
       view.snapshot ?? Async { callback in
         addImagesForRenderedViews(view).sequence().run { views in
-          Strategy<CALayer, UIImage>.layer.snapshotToDiffable(view.layer).run { image in
+          Strategy<CALayer, UIImage>.image.snapshotToDiffable(view.layer).run { image in
             callback(image)
             views.forEach { $0.removeFromSuperview() }
           }
@@ -77,7 +77,7 @@ extension Strategy where A == UIView, B == String {
 }
 
 extension UIView: DefaultDiffable {
-  public static let defaultStrategy: Strategy<UIView, UIImage> = .view
+  public static let defaultStrategy: Strategy<UIView, UIImage> = .image
 }
 #endif
 

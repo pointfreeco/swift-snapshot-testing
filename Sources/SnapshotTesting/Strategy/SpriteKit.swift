@@ -8,13 +8,13 @@ import UIKit
 
 #if os(macOS)
 extension Strategy where A == SKScene, B == NSImage {
-  public static func scene(size: CGSize, precision: Float = 1) -> Strategy {
+  public static func image(size: CGSize, precision: Float = 1) -> Strategy {
     return .skScene(size: size, precision: precision)
   }
 }
 #elseif os(iOS) || os(tvOS)
 extension Strategy where A == SKScene, B == UIImage {
-  public static func scene(size: CGSize, precision: Float = 1) -> Strategy {
+  public static func image(size: CGSize, precision: Float = 1) -> Strategy {
     return .skScene(size: size, precision: precision)
   }
 }
@@ -22,7 +22,7 @@ extension Strategy where A == SKScene, B == UIImage {
 
 fileprivate extension Strategy where A == SKScene, B == Image {
   static func skScene(size: CGSize, precision: Float) -> Strategy {
-    return Strategy<View, Image>.view(precision: precision).pullback { scene in
+    return Strategy<View, Image>.image(precision: precision).pullback { scene in
       let view = SKView(frame: .init(x: 0, y: 0, width: size.width, height: size.height))
       view.presentScene(scene)
       return view

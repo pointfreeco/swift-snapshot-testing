@@ -14,6 +14,8 @@ This library should be considered alpha, and not stable. Breaking changes will h
 
 ## Installation
 
+### Swift Package Manager
+
 ```swift
 import PackageDescription
 
@@ -22,6 +24,14 @@ let package = Package(
     .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", .branch("master")),
   ]
 )
+```
+
+### Cocoapods
+
+```ruby
+target 'Tests' do
+  pod 'SnapshotTesting', :git => 'https://github.com/pointfreeco/swift-snapshot-testing.git'
+end
 ```
 
 ## Usage

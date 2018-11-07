@@ -17,19 +17,19 @@ class AssertSnapshotTests: XCTestCase {
   func testWithAny() {
     struct User { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
-    assertSnapshot(matching: user, as: .any)
-    assertSnapshot(matching: Data("Hello, world!".utf8), as: .any)
-    assertSnapshot(matching: URL(string: "https://www.pointfree.co")!, as: .any)
+    assertSnapshot(matching: user, as: .dump)
+    assertSnapshot(matching: Data("Hello, world!".utf8), as: .dump)
+    assertSnapshot(matching: URL(string: "https://www.pointfree.co")!, as: .dump)
   }
 
   func testNamedAssertion() {
     struct User { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
-    assertSnapshot(matching: user, as: .any, named: "named")
+    assertSnapshot(matching: user, as: .dump, named: "named")
   }
 
   func testWithDate() {
-    assertSnapshot(matching: Date(timeIntervalSinceReferenceDate: 0), as: .any)
+    assertSnapshot(matching: Date(timeIntervalSinceReferenceDate: 0), as: .dump)
   }
 
   func testWithEncodable() {
@@ -46,12 +46,12 @@ class AssertSnapshotTests: XCTestCase {
   }
 
   func testWithNSObject() {
-    assertSnapshot(matching: NSObject(), as: .any)
+    assertSnapshot(matching: NSObject(), as: .dump)
   }
 
   func testMultipleSnapshots() {
-    assertSnapshot(matching: [1], as: .any)
-    assertSnapshot(matching: [1, 2], as: .any)
+    assertSnapshot(matching: [1], as: .dump)
+    assertSnapshot(matching: [1, 2], as: .dump)
   }
 
   func testUIView() {
@@ -141,7 +141,11 @@ class AssertSnapshotTests: XCTestCase {
       omniLightNode.position = SCNVector3Make(10, 10, 10)
       scene.rootNode.addChildNode(omniLightNode)
 
-      assertSnapshot(matching: scene, as: .scene(size: .init(width: 500, height: 500)), named: platform)
+      assertSnapshot(
+        matching: scene,
+        as: .image(size: .init(width: 500, height: 500)),
+        named: platform
+      )
     }
     #endif
   }
@@ -156,7 +160,11 @@ class AssertSnapshotTests: XCTestCase {
       node.position = .init(x: 25, y: 25)
       scene.addChild(node)
 
-      assertSnapshot(matching: scene, as: .scene(size: .init(width: 50, height: 50)), named: platform)
+      assertSnapshot(
+        matching: scene,
+        as: .image(size: .init(width: 50, height: 50)),
+        named: platform
+      )
     }
     #endif
   }
@@ -176,9 +184,9 @@ class AssertSnapshotTests: XCTestCase {
     #endif
     if #available(macOS 10.14, *) {
       label.text = "Hello."
-      assertSnapshot(matching: label, as: .view(precision: 0.9), named: platform)
+      assertSnapshot(matching: label, as: .image(precision: 0.9), named: platform)
       label.text = "Hello"
-      assertSnapshot(matching: label, as: .view(precision: 0.9), named: platform)
+      assertSnapshot(matching: label, as: .image(precision: 0.9), named: platform)
     }
     #endif
   }
