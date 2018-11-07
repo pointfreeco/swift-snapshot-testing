@@ -6,15 +6,15 @@ open class SnapshotTestCase: XCTestCase {
   open var record = false
   open var diffTool: String? = nil
 
-  public func assertSnapshot<Snapshottable: DefaultSnapshottable>(
-    matching snapshot: Snapshottable,
+  public func assertSnapshot<A: DefaultSnapshottable>(
+    matching snapshot: A,
     named name: String? = nil,
     record recording: Bool = false,
     timeout: TimeInterval = 5,
     file: StaticString = #file,
     function: String = #function,
     line: UInt = #line)
-    where Snapshottable.Snapshottable == Snapshottable
+    where A.Snapshottable == A
   {
     return assertSnapshot(
       matching: snapshot,
