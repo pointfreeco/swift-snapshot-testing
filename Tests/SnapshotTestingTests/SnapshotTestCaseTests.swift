@@ -44,10 +44,7 @@ class SnapshotTestCaseTests: TestCase {
 
     if #available(macOS 10.13, *) {
       assertSnapshot(matching: user, as: .json)
-
-      #if !os(Linux)
       assertSnapshot(matching: user, as: .plist)
-      #endif
     }
   }
 

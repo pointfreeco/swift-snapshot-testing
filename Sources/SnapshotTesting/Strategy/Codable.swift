@@ -16,7 +16,6 @@ extension Strategy where Snapshottable: Encodable, Format == String {
     return strategy
   }
 
-  #if !os(Linux)
   public static var plist: Strategy {
     let encoder = PropertyListEncoder()
     encoder.outputFormat = .xml
@@ -30,5 +29,4 @@ extension Strategy where Snapshottable: Encodable, Format == String {
     strategy.pathExtension = "plist"
     return strategy
   }
-  #endif
 }
