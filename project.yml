@@ -11,7 +11,7 @@ targets:
       FRAMEWORK_SEARCH_PATHS: $(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks
       IPHONEOS_DEPLOYMENT_TARGET: 10.0
       MACOSX_DEPLOYMENT_TARGET: '10.10'
-      SWIFT_VERSION: '4.0'
+      SWIFT_VERSION: 4.1
       TVOS_DEPLOYMENT_TARGET: 10.0
     scheme:
       testTargets: [SnapshotTestingTests_$platform]
