@@ -19,11 +19,13 @@
 		BF_2B65A04C3797B3384DE1EF00E75CB156 /* Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_8F443AA3F4613D29624A1150E5B9DAD3 /* Codable.swift */; };
 		BF_2D2A2BF95DCB4EA423BA781B1EFD0468 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_57CD93B71031FCD6FBC58D8D945A1706 /* Data.swift */; };
 		BF_40D093DDC81931CB9C7AF616AA544ACD /* Strategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_F4BEBF5A6DA36EF79ADD87917E32ED3F /* Strategy.swift */; };
+		BF_41FAA06E937486BD5CE3F3D4E812B1BA /* PropertyListEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_26BC946CB572B86A384E7AE28765BD49 /* PropertyListEncoder.swift */; };
 		BF_4ED719B4EDFE89C534E149526F1CF32D /* Attachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_DA79344382FCF4D2344547FD4A26D563 /* Attachment.swift */; };
 		BF_51479BC7C87FC0B4B8FBFD68EEBD3726 /* Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_8EB55DE46F77C40F38DC441C396C2AA2 /* Async.swift */; };
 		BF_51CBA76089B764B80A36E06290128424 /* SpriteKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_C3CB0C1274CC8D510653228157C66A77 /* SpriteKit.swift */; };
 		BF_52C03ADE3CE2F4B24C881FA97769A932 /* Internal.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_DA918B3B1103A0D0109E994D775523A0 /* Internal.swift */; };
 		BF_53DB80D3F2E4A1CCBCD825099B3CAC00 /* SnapshotTesting.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = FR_55C12DE66D3E4C2C5F02C60546270EBB /* SnapshotTesting.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		BF_563500F7C0C0341867406C92198864C4 /* PropertyListEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_26BC946CB572B86A384E7AE28765BD49 /* PropertyListEncoder.swift */; };
 		BF_59377B307FB813153ABE7260E51EF2DC /* Strategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_F4BEBF5A6DA36EF79ADD87917E32ED3F /* Strategy.swift */; };
 		BF_60E780A5566C14D1B9C49FE1213C005F /* AssertSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_DC773049D04465475F91599CF4255908 /* AssertSnapshot.swift */; };
 		BF_648357B9D8AC52A0B669F20912A54C9F /* TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_F2CC1556DBF7DA98E98C593438525BA4 /* TestHelpers.swift */; };
@@ -65,6 +67,7 @@
 		BF_D47F0D75CBD0E92EF35FB311E64B3987 /* SnapshotTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_C8995DA5A1D0CF67499F936B6684ABA6 /* SnapshotTestCase.swift */; };
 		BF_D47F465982998AC68EA9D14E475D5FD5 /* UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_D3724FEFC0FF50CACCC23652F2C7578C /* UIImage.swift */; };
 		BF_D61CA12AF5EEB8437A53C9411C1640B1 /* Internal.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_DA918B3B1103A0D0109E994D775523A0 /* Internal.swift */; };
+		BF_D712B33D096E86F34953E92E0A1051C2 /* PropertyListEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_26BC946CB572B86A384E7AE28765BD49 /* PropertyListEncoder.swift */; };
 		BF_D7A00145585CD613CBB42CC425762D03 /* SnapshotTesting.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FR_1C0F0F9D1E3946C22AB189D75CBFA00A /* SnapshotTesting.framework */; };
 		BF_D862704C2CB88B4373E8A6D043400D49 /* Diffable.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_CFB0F28F5A19E32576377C817456E15A /* Diffable.swift */; };
 		BF_E191776B50B9EDF01CFD68F196203961 /* Any.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_0B0CF16A9771EB5B0F72DBCE2128CD6D /* Any.swift */; };
@@ -148,6 +151,7 @@
 		FR_0E7771DB39A0AA5788034ACA524B7EE3 /* View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = View.swift; sourceTree = "<group>"; };
 		FR_1C0F0F9D1E3946C22AB189D75CBFA00A /* SnapshotTesting.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SnapshotTesting.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FR_249284F48787C8FEC6C4C3B317A68737 /* SnapshotTestingTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SnapshotTestingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		FR_26BC946CB572B86A384E7AE28765BD49 /* PropertyListEncoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PropertyListEncoder.swift; sourceTree = "<group>"; };
 		FR_3F75F013FD55B116C9AECB84C5DA414D /* SnapshotTestingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SnapshotTestingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FR_55C12DE66D3E4C2C5F02C60546270EBB /* SnapshotTesting.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SnapshotTesting.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FR_57CD93B71031FCD6FBC58D8D945A1706 /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
@@ -251,6 +255,7 @@
 				FR_FE1535B3F5372A6ADD6A0D18184766D4 /* Diff.swift */,
 				FR_CFB0F28F5A19E32576377C817456E15A /* Diffable.swift */,
 				FR_DA918B3B1103A0D0109E994D775523A0 /* Internal.swift */,
+				FR_26BC946CB572B86A384E7AE28765BD49 /* PropertyListEncoder.swift */,
 				FR_C8995DA5A1D0CF67499F936B6684ABA6 /* SnapshotTestCase.swift */,
 				FR_F4BEBF5A6DA36EF79ADD87917E32ED3F /* Strategy.swift */,
 				G_0BB643DF0937778F9EFD8638718195CA /* Strategy */,
@@ -437,6 +442,7 @@
 				BF_52C03ADE3CE2F4B24C881FA97769A932 /* Internal.swift in Sources */,
 				BF_789B4F0099192F5B0F33B18AAA94E2DF /* NSImage.swift in Sources */,
 				BF_7F3F7303ACF94F86C88C54673EC31E8B /* NSViewController.swift in Sources */,
+				BF_41FAA06E937486BD5CE3F3D4E812B1BA /* PropertyListEncoder.swift in Sources */,
 				BF_1F9B48C978B79ADDC70074F90A45D20C /* SceneKit.swift in Sources */,
 				BF_D47F0D75CBD0E92EF35FB311E64B3987 /* SnapshotTestCase.swift in Sources */,
 				BF_92DFFE207E23D176E2A83025F6F2C2CE /* SpriteKit.swift in Sources */,
@@ -464,6 +470,7 @@
 				BF_94A6AD59B8E19AF997B915EC79497934 /* Internal.swift in Sources */,
 				BF_FCC64D190E241971E8DC9818EBC50E75 /* NSImage.swift in Sources */,
 				BF_8926855A85FB3CA85B95CC37D335AEFB /* NSViewController.swift in Sources */,
+				BF_563500F7C0C0341867406C92198864C4 /* PropertyListEncoder.swift in Sources */,
 				BF_F054D35C1F281F57EA2B9622EFEEF7FB /* SceneKit.swift in Sources */,
 				BF_A9C5B5783E101E35CF7D52DEE6EABE2A /* SnapshotTestCase.swift in Sources */,
 				BF_51CBA76089B764B80A36E06290128424 /* SpriteKit.swift in Sources */,
@@ -491,6 +498,7 @@
 				BF_D61CA12AF5EEB8437A53C9411C1640B1 /* Internal.swift in Sources */,
 				BF_74313FA8B719956E8ACCE111B99B0960 /* NSImage.swift in Sources */,
 				BF_EA93AC0D72E1311A8135CFC7CBF332C1 /* NSViewController.swift in Sources */,
+				BF_D712B33D096E86F34953E92E0A1051C2 /* PropertyListEncoder.swift in Sources */,
 				BF_F515927ECBA692381ECE1DBB73161FCF /* SceneKit.swift in Sources */,
 				BF_1BF868397B24F68E388CCD9DF81E6765 /* SnapshotTestCase.swift in Sources */,
 				BF_710776DC175BE3B689292A550887305B /* SpriteKit.swift in Sources */,
@@ -628,6 +636,7 @@
 				PRODUCT_NAME = SnapshotTesting;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.0;
 				TVOS_DEPLOYMENT_TARGET = 10.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -653,6 +662,7 @@
 				PRODUCT_NAME = SnapshotTesting;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.0;
 				TVOS_DEPLOYMENT_TARGET = 10.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -677,6 +687,7 @@
 				PRODUCT_NAME = SnapshotTesting;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TVOS_DEPLOYMENT_TARGET = 10.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -791,6 +802,7 @@
 				PRODUCT_NAME = SnapshotTesting;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TVOS_DEPLOYMENT_TARGET = 10.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -816,6 +828,7 @@
 				PRODUCT_NAME = SnapshotTesting;
 				SDKROOT = appletvos;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = 3;
 				TVOS_DEPLOYMENT_TARGET = 10.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -867,6 +880,7 @@
 				PRODUCT_NAME = SnapshotTesting;
 				SDKROOT = appletvos;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = 3;
 				TVOS_DEPLOYMENT_TARGET = 10.0;
 				VERSIONING_SYSTEM = "apple-generic";
