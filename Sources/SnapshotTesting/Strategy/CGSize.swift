@@ -1,6 +1,5 @@
 #if os(iOS) || os(macOS) || os(tvOS)
 import CoreGraphics
-#endif
 
 public enum Orientation {
   case horizontal
@@ -86,3 +85,4 @@ extension CGSize {
     return .iPadPro12_9(.horizontal)
   }
 }
+#endif
