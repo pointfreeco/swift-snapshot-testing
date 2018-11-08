@@ -19,7 +19,10 @@ extension Strategy where Snapshottable == NSView, Format == NSImage {
 
   public static func image(precision: Float) -> Strategy {
     return Strategy<NSImage, NSImage>.image(precision: precision).asyncPullback { view in
-      view.snapshot ?? Async { callback in
+      guard view.frame.width > 0, view.frame.height > 0 else {
+        fatalError("View not renderable to image at size \(view.frame.size)")
+      }
+      return view.snapshot ?? Async { callback in
         addImagesForRenderedViews(view).sequence().run { views in
           let image = NSImage(data: view.dataWithPDF(inside: view.bounds))!
           image.size = .init(width: image.size.width, height: image.size.height)
@@ -53,7 +56,10 @@ extension Strategy where Snapshottable == UIView, Format == UIImage {
 
   public static func image(precision: Float) -> Strategy {
     return SimpleStrategy.image(precision: precision).asyncPullback { view in
-      view.snapshot ?? Async { callback in
+      guard view.frame.width > 0, view.frame.height > 0 else {
+        fatalError("View not renderable to image at size \(view.frame.size)")
+      }
+      return view.snapshot ?? Async { callback in
         addImagesForRenderedViews(view).sequence().run { views in
           Strategy<CALayer, UIImage>.image.snapshotToDiffable(view.layer).run { image in
             callback(image)
