@@ -68,6 +68,8 @@ extension Strategy where Snapshottable == UIView, Format == UIImage {
 extension Strategy where Snapshottable == UIView, Format == String {
   public static var recursiveDescription: Strategy<UIView, String> {
     return SimpleStrategy.lines.pullback { view in
+      view.setNeedsLayout()
+      view.layoutIfNeeded()
       return purgePointers(
         view.perform(Selector(("recursiveDescription"))).retain().takeUnretainedValue()
           as! String
@@ -149,7 +151,11 @@ fileprivate extension View {
               }
             }
           } else {
+            #if os(iOS)
+            fatalError("Taking WKWebView snapshots requires iOS 11.0 or greater")
+            #elseif os(macOS)
             fatalError("Taking WKWebView snapshots requires macOS 10.13 or greater")
+            #endif
           }
         }
 
@@ -175,12 +181,7 @@ private final class NavigationDelegate: NSObject, WKNavigationDelegate {
   }
 
   func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-    webView.evaluateJavaScript("[document.body.clientWidth, document.body.clientHeight]") { result, error in
-      if let xs = result as? [Int] {
-        webView.frame.size = .init(width: xs[0], height: xs[1])
-      }
-      self.didFinish()
-    }
+    self.didFinish()
   }
 }
 #endif
