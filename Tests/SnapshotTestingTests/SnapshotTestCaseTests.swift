@@ -62,6 +62,13 @@ class SnapshotTestCaseTests: TestCase {
     let view = UIButton(type: .contactAdd)
     assertSnapshot(matching: view)
     assertSnapshot(matching: view, as: .recursiveDescription)
+
+    assertSnapshot(matching: view, as: .image(size: .iPadMini))
+    assertSnapshot(matching: view, as: .image(size: .iPadPro10_5))
+    assertSnapshot(matching: view, as: .image(size: .iPadPro12_9))
+    assertSnapshot(matching: view, as: .image(size: .iPhone8))
+    assertSnapshot(matching: view, as: .image(size: .iPhone8Plus))
+    assertSnapshot(matching: view, as: .image(size: .iPhoneSe))
     #endif
   }
 

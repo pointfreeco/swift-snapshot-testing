@@ -7,6 +7,14 @@ extension Strategy where Snapshottable == NSViewController, Format == NSImage {
   }
 
   public static func image(precision: Float) -> Strategy {
+    return .image(precision: precision, size: nil)
+  }
+
+  public static func image(precision: Float = 1, size: CGSize) -> Strategy {
+    return .image(precision: precision, size: .some(size))
+  }
+
+  private static func image(precision: Float, size: CGSize?) -> Strategy {
     return Strategy<NSView, NSImage>.image(precision: precision).pullback { $0.view }
   }
 }

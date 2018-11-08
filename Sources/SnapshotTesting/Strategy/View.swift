@@ -14,11 +14,20 @@ import WebKit
 #if os(macOS)
 extension Strategy where Snapshottable == NSView, Format == NSImage {
   public static var image: Strategy {
-    return .image(precision: 1)
+    return .image(precision: 1, size: nil)
   }
 
   public static func image(precision: Float) -> Strategy {
+    return .image(precision: precision, size: nil)
+  }
+
+  public static func image(precision: Float = 1, size: CGSize) -> Strategy {
+    return .image(precision: precision, size: .some(size))
+  }
+
+  private static func image(precision: Float, size: CGSize?) -> Strategy {
     return Strategy<NSImage, NSImage>.image(precision: precision).asyncPullback { view in
+      if let size = size { view.frame.size = size }
       guard view.frame.width > 0, view.frame.height > 0 else {
         fatalError("View not renderable to image at size \(view.frame.size)")
       }
@@ -51,11 +60,20 @@ extension NSView: DefaultSnapshottable {
 #elseif os(iOS) || os(tvOS)
 extension Strategy where Snapshottable == UIView, Format == UIImage {
   public static var image: Strategy {
-    return .image(precision: 1)
+    return .image(precision: 1, size: nil)
   }
 
   public static func image(precision: Float) -> Strategy {
+    return .image(precision: precision, size: nil)
+  }
+
+  public static func image(precision: Float = 1, size: CGSize) -> Strategy {
+    return .image(precision: precision, size: .some(size))
+  }
+
+  private static func image(precision: Float, size: CGSize?) -> Strategy {
     return SimpleStrategy.image(precision: precision).asyncPullback { view in
+      if let size = size { view.frame.size = size }
       guard view.frame.width > 0, view.frame.height > 0 else {
         fatalError("View not renderable to image at size \(view.frame.size)")
       }

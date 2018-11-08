@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		80BF98502193E53500108569 /* CGSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80BF984F2193E53500108569 /* CGSize.swift */; };
+		80BF98512193E53500108569 /* CGSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80BF984F2193E53500108569 /* CGSize.swift */; };
+		80BF98522193E53500108569 /* CGSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80BF984F2193E53500108569 /* CGSize.swift */; };
 		BF_0C5543D04B4212AA57DCF0E1E594CAF6 /* Diffable.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_CFB0F28F5A19E32576377C817456E15A /* Diffable.swift */; };
 		BF_1092D6738E4E10DA749423711942C04C /* Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_8EB55DE46F77C40F38DC441C396C2AA2 /* Async.swift */; };
 		BF_126B68C59C12F7E7D78393BF1E0341B7 /* SnapshotTesting.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FR_55C12DE66D3E4C2C5F02C60546270EBB /* SnapshotTesting.framework */; };
@@ -142,6 +145,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		80BF984F2193E53500108569 /* CGSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGSize.swift; sourceTree = "<group>"; };
 		FR_011F41E7CBD5C3AAB887E8F70A792A28 /* UIViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewController.swift; sourceTree = "<group>"; };
 		FR_02D2BA628CE5C87E6299836CA06DA5AE /* CALayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CALayer.swift; sourceTree = "<group>"; };
 		FR_0B0CF16A9771EB5B0F72DBCE2128CD6D /* Any.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Any.swift; sourceTree = "<group>"; };
@@ -216,6 +220,7 @@
 			children = (
 				FR_0B0CF16A9771EB5B0F72DBCE2128CD6D /* Any.swift */,
 				FR_02D2BA628CE5C87E6299836CA06DA5AE /* CALayer.swift */,
+				80BF984F2193E53500108569 /* CGSize.swift */,
 				FR_8F443AA3F4613D29624A1150E5B9DAD3 /* Codable.swift */,
 				FR_57CD93B71031FCD6FBC58D8D945A1706 /* Data.swift */,
 				FR_E1FA8A193FE7DFA170568A78289DE2EC /* NSImage.swift */,
@@ -435,6 +440,7 @@
 				BF_ACD752E9B5D43698661C2566F6E1A967 /* Diff.swift in Sources */,
 				BF_0C5543D04B4212AA57DCF0E1E594CAF6 /* Diffable.swift in Sources */,
 				BF_52C03ADE3CE2F4B24C881FA97769A932 /* Internal.swift in Sources */,
+				80BF98502193E53500108569 /* CGSize.swift in Sources */,
 				BF_789B4F0099192F5B0F33B18AAA94E2DF /* NSImage.swift in Sources */,
 				BF_7F3F7303ACF94F86C88C54673EC31E8B /* NSViewController.swift in Sources */,
 				BF_1F9B48C978B79ADDC70074F90A45D20C /* SceneKit.swift in Sources */,
@@ -462,6 +468,7 @@
 				BF_9A01810940759397231DF86801A1FC13 /* Diff.swift in Sources */,
 				BF_290BB77E2401937E6400555C3B0F9A7A /* Diffable.swift in Sources */,
 				BF_94A6AD59B8E19AF997B915EC79497934 /* Internal.swift in Sources */,
+				80BF98512193E53500108569 /* CGSize.swift in Sources */,
 				BF_FCC64D190E241971E8DC9818EBC50E75 /* NSImage.swift in Sources */,
 				BF_8926855A85FB3CA85B95CC37D335AEFB /* NSViewController.swift in Sources */,
 				BF_F054D35C1F281F57EA2B9622EFEEF7FB /* SceneKit.swift in Sources */,
@@ -489,6 +496,7 @@
 				BF_2A6009E29732718FAE9B1F03806A09AB /* Diff.swift in Sources */,
 				BF_D862704C2CB88B4373E8A6D043400D49 /* Diffable.swift in Sources */,
 				BF_D61CA12AF5EEB8437A53C9411C1640B1 /* Internal.swift in Sources */,
+				80BF98522193E53500108569 /* CGSize.swift in Sources */,
 				BF_74313FA8B719956E8ACCE111B99B0960 /* NSImage.swift in Sources */,
 				BF_EA93AC0D72E1311A8135CFC7CBF332C1 /* NSViewController.swift in Sources */,
 				BF_F515927ECBA692381ECE1DBB73161FCF /* SceneKit.swift in Sources */,
@@ -618,7 +626,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				FRAMEWORK_SEARCH_PATHS = "$(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
 				INFOPLIST_FILE = Sources/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
@@ -643,7 +654,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				FRAMEWORK_SEARCH_PATHS = "$(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
 				INFOPLIST_FILE = Sources/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
@@ -667,7 +681,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				FRAMEWORK_SEARCH_PATHS = "$(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
 				INFOPLIST_FILE = Sources/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
@@ -781,7 +798,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				FRAMEWORK_SEARCH_PATHS = "$(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
 				INFOPLIST_FILE = Sources/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
@@ -806,7 +826,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				FRAMEWORK_SEARCH_PATHS = "$(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
 				INFOPLIST_FILE = Sources/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
@@ -857,7 +880,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				FRAMEWORK_SEARCH_PATHS = "$(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
 				INFOPLIST_FILE = Sources/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;

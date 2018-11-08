@@ -8,20 +8,20 @@ import UIKit
 
 #if os(macOS)
 extension Strategy where Snapshottable == SCNScene, Format == NSImage {
-  public static func image(size: CGSize, precision: Float = 1) -> Strategy {
-    return .scnScene(size: size, precision: precision)
+  public static func image(precision: Float = 1, size: CGSize) -> Strategy {
+    return .scnScene(precision: precision, size: size)
   }
 }
 #elseif os(iOS) || os(tvOS)
 extension Strategy where Snapshottable == SCNScene, Format == UIImage {
-  public static func image(size: CGSize, precision: Float = 1) -> Strategy {
-    return .scnScene(size: size, precision: precision)
+  public static func image(precision: Float = 1, size: CGSize) -> Strategy {
+    return .scnScene(precision: precision, size: size)
   }
 }
 #endif
 
 fileprivate extension Strategy where Snapshottable == SCNScene, Format == Image {
-  static func scnScene(size: CGSize, precision: Float) -> Strategy {
+  static func scnScene(precision: Float, size: CGSize) -> Strategy {
     return Strategy<View, Image>.image(precision: precision).pullback { scene in
       let view = SCNView(frame: .init(x: 0, y: 0, width: size.width, height: size.height))
       view.scene = scene
