@@ -25,13 +25,10 @@ extension Strategy where Snapshottable == UIViewController, Format == UIImage {
     )
     -> Strategy {
 
-      let environmentTraits = environment.device.traits(for: environment.orientation)
-      let traits = UITraitCollection(traitsFrom: [environmentTraits, traits])
-
       return .image(
         precision: precision,
-        size: environment.device.size(for: environment.orientation),
-        traits: traits
+        size: environment.size,
+        traits: UITraitCollection(traitsFrom: [environment.traits, traits])
       )
   }
 
@@ -55,14 +52,13 @@ extension UIViewController: DefaultSnapshottable {
   public static let defaultStrategy: Strategy<UIViewController, UIImage> = .image
 }
 
-#if os(iOS)
 private func traitController(
   for viewController: UIViewController,
   size: CGSize,
   traits: UITraitCollection = .init())
   -> UIViewController
 {
-  
+
   let parent = UIViewController()
   parent.view.backgroundColor = .white
   parent.view.frame.size = size
@@ -81,103 +77,125 @@ private func traitController(
 }
 
 public struct Environment {
-  fileprivate let device: Device
-  fileprivate let orientation: Orientation
+  public enum Orientation {
+    case landscape
+    case portrait
+  }
 
-  public static let iPhoneSe = Environment(device: .iPhoneSe, orientation: .portrait)
+  public let size: CGSize
+  public let traits: UITraitCollection
+
+  public init(size: CGSize, traits: UITraitCollection) {
+    self.size = size
+    self.traits = traits
+  }
+
+  public static let iPhoneSe = Environment.iPhoneSe(.portrait)
 
   public static func iPhoneSe(_ orientation: Orientation) -> Environment {
-    return Environment(device: .iPhoneSe, orientation: orientation)
-  }
-
-  public static let iPhone8 = Environment(device: .iPhone8, orientation: .portrait)
-
-  public static func iPhone8(_ orientation: Orientation) -> Environment {
-    return Environment(device: .iPhone8, orientation: orientation)
-  }
-
-  public static let iPhone8Plus = Environment(device: .iPhone8Plus, orientation: .portrait)
-
-  public static func iPhone8Plus(_ orientation: Orientation) -> Environment {
-    return Environment(device: .iPhone8Plus, orientation: orientation)
-  }
-
-  public static let iPadMini = Environment(device: .iPadMini, orientation: .landscape)
-
-  public static func iPadMini(_ orientation: Orientation) -> Environment {
-    return Environment(device: .iPadMini, orientation: orientation)
-  }
-
-  public static let iPadPro10_5 = Environment(device: .iPadPro10_5, orientation: .landscape)
-
-  public static func iPadPro10_5(_ orientation: Orientation) -> Environment {
-    return Environment(device: .iPadPro10_5, orientation: orientation)
-  }
-
-  public static let iPadPro12_9 = Environment(device: .iPadPro12_9, orientation: .landscape)
-
-  public static func iPadPro12_9(_ orientation: Orientation) -> Environment {
-    return Environment(device: .iPadPro12_9, orientation: orientation)
-  }
-}
-
-private enum Device {
-  case iPhoneSe
-  case iPhone8
-  case iPhone8Plus
-  case iPadMini
-  case iPadPro10_5
-  case iPadPro12_9
-
-  fileprivate func size(for orientation: Orientation) -> CGSize {
     switch orientation {
-    case .portrait:
-      return self.portraitSize
     case .landscape:
-      return self.landscapeSize
+      return Environment(
+        size: .init(width: 568, height: 320),
+        traits: .init(
+          traitsFrom: [
+            .init(displayScale: 2),
+            .init(horizontalSizeClass: .compact),
+            .init(verticalSizeClass: .compact),
+            .init(userInterfaceIdiom: .phone)
+          ]
+        )
+      )
+    case .portrait:
+      return Environment(
+        size: .init(width: 320, height: 568),
+        traits: .init(
+          traitsFrom: [
+            .init(displayScale: 2),
+            .init(horizontalSizeClass: .compact),
+            .init(verticalSizeClass: .regular),
+            .init(userInterfaceIdiom: .phone)
+          ]
+        )
+      )
     }
   }
 
-  fileprivate func traits(for orientation: Orientation) -> UITraitCollection {
-    switch (self, orientation) {
-    case (.iPhoneSe, .portrait), (.iPhone8, .portrait):
-      return .init(
-        traitsFrom: [
-          .init(displayScale: 2),
-          .init(horizontalSizeClass: .compact),
-          .init(verticalSizeClass: .regular),
-          .init(userInterfaceIdiom: .phone)
-        ]
+  public static let iPhone8 = Environment.iPhone8(.portrait)
+
+  public static func iPhone8(_ orientation: Orientation) -> Environment {
+    switch orientation {
+    case .landscape:
+      return Environment(
+        size: .init(width: 667, height: 375),
+        traits: .init(
+          traitsFrom: [
+            .init(displayScale: 2),
+            .init(horizontalSizeClass: .compact),
+            .init(verticalSizeClass: .compact),
+            .init(userInterfaceIdiom: .phone)
+          ]
+        )
       )
-    case (.iPhone8Plus, .portrait):
-      return .init(
-        traitsFrom: [
-          .init(displayScale: 3),
-          .init(horizontalSizeClass: .compact),
-          .init(verticalSizeClass: .regular),
-          .init(userInterfaceIdiom: .phone),
-        ]
+    case .portrait:
+      return Environment(
+        size: .init(width: 375, height: 667),
+        traits: .init(
+          traitsFrom: [
+            .init(displayScale: 2),
+            .init(horizontalSizeClass: .compact),
+            .init(verticalSizeClass: .regular),
+            .init(userInterfaceIdiom: .phone)
+          ]
+        )
       )
-    case (.iPhoneSe, .landscape), (.iPhone8, .landscape):
-      return .init(
-        traitsFrom: [
-          .init(displayScale: 2),
-          .init(horizontalSizeClass: .compact),
-          .init(verticalSizeClass: .compact),
-          .init(userInterfaceIdiom: .phone)
-        ]
+    }
+  }
+
+  public static let iPhone8Plus = Environment.iPhone8Plus(.portrait)
+
+  public static func iPhone8Plus(_ orientation: Orientation) -> Environment {
+    switch orientation {
+    case .landscape:
+      return Environment(
+        size: .init(width: 736, height: 414),
+        traits: .init(
+          traitsFrom: [
+            .init(displayScale: 3),
+            .init(horizontalSizeClass: .regular),
+            .init(verticalSizeClass: .compact),
+            .init(userInterfaceIdiom: .phone)
+          ]
+        )
       )
-    case (.iPhone8Plus, .landscape):
-      return .init(
-        traitsFrom: [
-          .init(displayScale: 3),
-          .init(horizontalSizeClass: .regular),
-          .init(verticalSizeClass: .compact),
-          .init(userInterfaceIdiom: .phone)
-        ]
+    case .portrait:
+      return Environment(
+        size: .init(width: 414, height: 736),
+        traits: .init(
+          traitsFrom: [
+            .init(displayScale: 3),
+            .init(horizontalSizeClass: .compact),
+            .init(verticalSizeClass: .regular),
+            .init(userInterfaceIdiom: .phone),
+          ]
+        )
       )
-    case (.iPadMini, _), (.iPadPro10_5, _), (.iPadPro12_9, _):
-      return .init(
+    }
+  }
+
+  public static let iPadMini = Environment.iPadMini(.landscape)
+
+  public static func iPadMini(_ orientation: Orientation) -> Environment {
+    let size: CGSize
+    switch orientation {
+    case .landscape:
+      size = .init(width: 1024, height: 768)
+    case .portrait:
+      size = .init(width: 768, height: 1024)
+    }
+    return Environment(
+      size: size,
+      traits: .init(
         traitsFrom: [
           .init(displayScale: 2),
           .init(horizontalSizeClass: .regular),
@@ -185,35 +203,53 @@ private enum Device {
           .init(userInterfaceIdiom: .pad)
         ]
       )
-    }
+    )
   }
 
-  private var portraitSize: CGSize {
-    switch self {
-    case .iPhoneSe:
-      return .init(width: 320, height: 568)
-    case .iPhone8:
-      return .init(width: 375, height: 667)
-    case .iPhone8Plus:
-      return .init(width: 414, height: 736)
-    case .iPadMini:
-      return .init(width: 768, height: 1024)
-    case .iPadPro10_5:
-      return .init(width: 834, height: 1112)
-    case .iPadPro12_9:
-      return .init(width: 1024, height: 1366)
+  public static let iPadPro10_5 = Environment.iPadPro10_5(.landscape)
+
+  public static func iPadPro10_5(_ orientation: Orientation) -> Environment {
+    let size: CGSize
+    switch orientation {
+    case .landscape:
+      size = .init(width: 1112, height: 834)
+    case .portrait:
+      size = .init(width: 834, height: 1112)
     }
+    return Environment(
+      size: size,
+      traits: .init(
+        traitsFrom: [
+          .init(displayScale: 2),
+          .init(horizontalSizeClass: .regular),
+          .init(verticalSizeClass: .regular),
+          .init(userInterfaceIdiom: .pad)
+        ]
+      )
+    )
   }
 
-  private var landscapeSize: CGSize {
-    let portraitSize = self.portraitSize
-    return .init(width: portraitSize.height, height: portraitSize.width)
+  public static let iPadPro12_9 = Environment.iPadPro12_9(.landscape)
+
+  public static func iPadPro12_9(_ orientation: Orientation) -> Environment {
+    let size: CGSize
+    switch orientation {
+    case .landscape:
+      size = .init(width: 1366, height: 1024)
+    case .portrait:
+      size = .init(width: 1024, height: 1366)
+    }
+    return Environment(
+      size: size,
+      traits: .init(
+        traitsFrom: [
+          .init(displayScale: 2),
+          .init(horizontalSizeClass: .regular),
+          .init(verticalSizeClass: .regular),
+          .init(userInterfaceIdiom: .pad)
+        ]
+      )
+    )
   }
 }
-
-public enum Orientation {
-  case portrait
-  case landscape
-}
-#endif
 #endif
