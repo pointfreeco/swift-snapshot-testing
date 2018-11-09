@@ -1,9 +1,11 @@
 @testable import SnapshotTesting
 import XCTest
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(tvOS)
 import SceneKit
 import SpriteKit
+#endif
+#if os(iOS) || os(macOS)
 import WebKit
 #endif
 
@@ -117,7 +119,7 @@ class SnapshotTestCaseTests: TestCase {
   }
 
   func testSCNView() {
-    #if os(iOS) || os(macOS)
+    #if os(iOS) || os(macOS) || os(tvOS)
     // NB: CircleCI crashes while trying to instantiate SCNView
     if #available(macOS 10.14, *) {
       let scene = SCNScene()
@@ -150,7 +152,7 @@ class SnapshotTestCaseTests: TestCase {
   }
 
   func testSKView() {
-    #if os(iOS) || os(macOS)
+    #if os(iOS) || os(macOS) || os(tvOS)
     // NB: CircleCI crashes while trying to instantiate SKView
     if #available(macOS 10.14, *) {
       let scene = SKScene(size: .init(width: 50, height: 50))
@@ -165,10 +167,14 @@ class SnapshotTestCaseTests: TestCase {
   }
 
   func testPrecision() {
-    #if os(iOS) || os(macOS)
-    #if os(iOS)
+    #if os(iOS) || os(macOS) || os(tvOS)
+    #if os(iOS) || os(tvOS)
     let label = UILabel()
+    #if os(iOS)
     label.frame = CGRect(origin: .zero, size: CGSize(width: 43.5, height: 20.5))
+    #elseif os(tvOS)
+    label.frame = CGRect(origin: .zero, size: CGSize(width: 98, height: 46))
+    #endif
     label.backgroundColor = .white
     #elseif os(macOS)
     let label = NSTextField()
