@@ -39,7 +39,6 @@
 		BF_7F3F7303ACF94F86C88C54673EC31E8B /* NSViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_5BC9AA7F156EEE27E2A2442640AE1D4A /* NSViewController.swift */; };
 		BF_83708276954D3F092729DEE9CEC26B33 /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_0E7771DB39A0AA5788034ACA524B7EE3 /* View.swift */; };
 		BF_8926855A85FB3CA85B95CC37D335AEFB /* NSViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_5BC9AA7F156EEE27E2A2442640AE1D4A /* NSViewController.swift */; };
-		BF_90BD85F6B641658DDDE9BCF417CD3331 /* CGSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_2438C07C0BCE155FBDB6761523274CAB /* CGSize.swift */; };
 		BF_92DFFE207E23D176E2A83025F6F2C2CE /* SpriteKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_C3CB0C1274CC8D510653228157C66A77 /* SpriteKit.swift */; };
 		BF_93A3D38E590AB05BAFFEEBC75C601A4D /* UIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_011F41E7CBD5C3AAB887E8F70A792A28 /* UIViewController.swift */; };
 		BF_94A6AD59B8E19AF997B915EC79497934 /* Internal.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_DA918B3B1103A0D0109E994D775523A0 /* Internal.swift */; };
@@ -52,7 +51,6 @@
 		BF_ACD752E9B5D43698661C2566F6E1A967 /* Diff.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_FE1535B3F5372A6ADD6A0D18184766D4 /* Diff.swift */; };
 		BF_B0F6BF49CFBAF5371BFD659F8A815654 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_57CD93B71031FCD6FBC58D8D945A1706 /* Data.swift */; };
 		BF_B39F8354D2B15959F80C015C02B62643 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_AF8C7D84EDECC0C7A6CD2D9054107398 /* String.swift */; };
-		BF_B6FE768B3C86CDAF804A0AC7772ECCC0 /* CGSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_2438C07C0BCE155FBDB6761523274CAB /* CGSize.swift */; };
 		BF_B8082ECBCA07EA977AE482DDFCA9C33D /* Attachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_DA79344382FCF4D2344547FD4A26D563 /* Attachment.swift */; };
 		BF_B9820C8451945985651EFB670E948805 /* CALayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_02D2BA628CE5C87E6299836CA06DA5AE /* CALayer.swift */; };
 		BF_C0A0EBBFEC968B768537F848916C49FF /* Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_8F443AA3F4613D29624A1150E5B9DAD3 /* Codable.swift */; };
@@ -78,7 +76,6 @@
 		BF_E9D5B4126225F0CDC4A083DB8D3EB9C7 /* SnapshotTesting.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = FR_1C0F0F9D1E3946C22AB189D75CBFA00A /* SnapshotTesting.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		BF_EA93AC0D72E1311A8135CFC7CBF332C1 /* NSViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_5BC9AA7F156EEE27E2A2442640AE1D4A /* NSViewController.swift */; };
 		BF_EDB8AB781A3D51A987BE3755EE57EBE9 /* SnapshotTesting.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = FR_92D59F3FEA61DC16FFDB7B1F5FCA57D2 /* SnapshotTesting.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		BF_EF7A5682A5F458B5D9C497617325DCE5 /* CGSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_2438C07C0BCE155FBDB6761523274CAB /* CGSize.swift */; };
 		BF_F054D35C1F281F57EA2B9622EFEEF7FB /* SceneKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_E0227C47E0FB67F70EF0493E8A4CDB60 /* SceneKit.swift */; };
 		BF_F515927ECBA692381ECE1DBB73161FCF /* SceneKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_E0227C47E0FB67F70EF0493E8A4CDB60 /* SceneKit.swift */; };
 		BF_F7AA48A29F4220B2A19CDC41C83E1D06 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_AF8C7D84EDECC0C7A6CD2D9054107398 /* String.swift */; };
@@ -153,7 +150,6 @@
 		FR_0B0CF16A9771EB5B0F72DBCE2128CD6D /* Any.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Any.swift; sourceTree = "<group>"; };
 		FR_0E7771DB39A0AA5788034ACA524B7EE3 /* View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = View.swift; sourceTree = "<group>"; };
 		FR_1C0F0F9D1E3946C22AB189D75CBFA00A /* SnapshotTesting.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SnapshotTesting.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		FR_2438C07C0BCE155FBDB6761523274CAB /* CGSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGSize.swift; sourceTree = "<group>"; };
 		FR_249284F48787C8FEC6C4C3B317A68737 /* SnapshotTestingTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SnapshotTestingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FR_26BC946CB572B86A384E7AE28765BD49 /* PropertyListEncoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PropertyListEncoder.swift; sourceTree = "<group>"; };
 		FR_3F75F013FD55B116C9AECB84C5DA414D /* SnapshotTestingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SnapshotTestingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -224,7 +220,6 @@
 			children = (
 				FR_0B0CF16A9771EB5B0F72DBCE2128CD6D /* Any.swift */,
 				FR_02D2BA628CE5C87E6299836CA06DA5AE /* CALayer.swift */,
-				FR_2438C07C0BCE155FBDB6761523274CAB /* CGSize.swift */,
 				FR_8F443AA3F4613D29624A1150E5B9DAD3 /* Codable.swift */,
 				FR_57CD93B71031FCD6FBC58D8D945A1706 /* Data.swift */,
 				FR_E1FA8A193FE7DFA170568A78289DE2EC /* NSImage.swift */,
@@ -440,7 +435,6 @@
 				BF_1092D6738E4E10DA749423711942C04C /* Async.swift in Sources */,
 				BF_C4BF7CA4316C2FED85F74B888BADE302 /* Attachment.swift in Sources */,
 				BF_B9820C8451945985651EFB670E948805 /* CALayer.swift in Sources */,
-				BF_90BD85F6B641658DDDE9BCF417CD3331 /* CGSize.swift in Sources */,
 				BF_C0A0EBBFEC968B768537F848916C49FF /* Codable.swift in Sources */,
 				BF_2D2A2BF95DCB4EA423BA781B1EFD0468 /* Data.swift in Sources */,
 				BF_ACD752E9B5D43698661C2566F6E1A967 /* Diff.swift in Sources */,
@@ -469,7 +463,6 @@
 				BF_97AA84D478C020B4F7906D46DA4D0C15 /* Async.swift in Sources */,
 				BF_4ED719B4EDFE89C534E149526F1CF32D /* Attachment.swift in Sources */,
 				BF_1CA9FBF0BD084E3C63F61E9D8A80DDB7 /* CALayer.swift in Sources */,
-				BF_B6FE768B3C86CDAF804A0AC7772ECCC0 /* CGSize.swift in Sources */,
 				BF_CC119FC0B912C972DF70BD2720AA3D0F /* Codable.swift in Sources */,
 				BF_B0F6BF49CFBAF5371BFD659F8A815654 /* Data.swift in Sources */,
 				BF_9A01810940759397231DF86801A1FC13 /* Diff.swift in Sources */,
@@ -498,7 +491,6 @@
 				BF_51479BC7C87FC0B4B8FBFD68EEBD3726 /* Async.swift in Sources */,
 				BF_B8082ECBCA07EA977AE482DDFCA9C33D /* Attachment.swift in Sources */,
 				BF_164C58C92E656FCD7C25A1CB034600A2 /* CALayer.swift in Sources */,
-				BF_EF7A5682A5F458B5D9C497617325DCE5 /* CGSize.swift in Sources */,
 				BF_2B65A04C3797B3384DE1EF00E75CB156 /* Codable.swift in Sources */,
 				BF_6730D650367B8168D8FAF10C99C95360 /* Data.swift in Sources */,
 				BF_2A6009E29732718FAE9B1F03806A09AB /* Diff.swift in Sources */,

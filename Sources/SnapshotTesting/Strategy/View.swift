@@ -25,8 +25,9 @@ extension Strategy where Snapshottable == NSView, Format == NSImage {
     return .image(precision: precision, size: .some(size))
   }
 
-  private static func image(precision: Float, size: CGSize?) -> Strategy {
+  static func image(precision: Float, size: CGSize?) -> Strategy {
     return Strategy<NSImage, NSImage>.image(precision: precision).asyncPullback { view in
+      let initialSize = view.frame.size
       if let size = size { view.frame.size = size }
       guard view.frame.width > 0, view.frame.height > 0 else {
         fatalError("View not renderable to image at size \(view.frame.size)")
@@ -37,6 +38,7 @@ extension Strategy where Snapshottable == NSView, Format == NSImage {
           image.size = .init(width: image.size.width, height: image.size.height)
           callback(image)
           views.forEach { $0.removeFromSuperview() }
+          view.frame.size = initialSize
         }
       }
     }
@@ -71,8 +73,9 @@ extension Strategy where Snapshottable == UIView, Format == UIImage {
     return .image(precision: precision, size: .some(size))
   }
 
-  private static func image(precision: Float, size: CGSize?) -> Strategy {
+  static func image(precision: Float, size: CGSize?) -> Strategy {
     return SimpleStrategy.image(precision: precision).asyncPullback { view in
+      let initialSize = view.frame.size
       if let size = size { view.frame.size = size }
       guard view.frame.width > 0, view.frame.height > 0 else {
         fatalError("View not renderable to image at size \(view.frame.size)")
@@ -82,6 +85,7 @@ extension Strategy where Snapshottable == UIView, Format == UIImage {
           Strategy<CALayer, UIImage>.image.snapshotToDiffable(view.layer).run { image in
             callback(image)
             views.forEach { $0.removeFromSuperview() }
+            view.frame.size = initialSize
           }
         }
       }
