@@ -30,5 +30,11 @@ jobs:
           environment:
             SNAPSHOT_ARTIFACTS: /tmp/__SnapshotArtifacts__
 
+      - run:
+          name: Run tvOS tests
+          command: make test-tvos
+          environment:
+            SNAPSHOT_ARTIFACTS: /tmp/__SnapshotArtifacts__
+
       - store_artifacts:
           path: /tmp/__SnapshotArtifacts__
