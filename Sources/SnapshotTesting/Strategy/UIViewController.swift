@@ -90,6 +90,7 @@ public struct Environment {
     self.traits = traits
   }
 
+  #if os(iOS)
   public static let iPhoneSe = Environment.iPhoneSe(.portrait)
 
   public static func iPhoneSe(_ orientation: Orientation) -> Environment {
@@ -251,5 +252,6 @@ public struct Environment {
       )
     )
   }
+  #endif
 }
 #endif
