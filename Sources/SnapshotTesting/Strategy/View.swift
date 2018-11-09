@@ -14,17 +14,31 @@ import WebKit
 #if os(macOS)
 extension Strategy where Snapshottable == NSView, Format == NSImage {
   public static var image: Strategy {
-    return .image(precision: 1)
+    return .image(precision: 1, size: nil)
   }
 
   public static func image(precision: Float) -> Strategy {
+    return .image(precision: precision, size: nil)
+  }
+
+  public static func image(precision: Float = 1, size: CGSize) -> Strategy {
+    return .image(precision: precision, size: .some(size))
+  }
+
+  static func image(precision: Float, size: CGSize?) -> Strategy {
     return Strategy<NSImage, NSImage>.image(precision: precision).asyncPullback { view in
-      view.snapshot ?? Async { callback in
+      let initialSize = view.frame.size
+      if let size = size { view.frame.size = size }
+      guard view.frame.width > 0, view.frame.height > 0 else {
+        fatalError("View not renderable to image at size \(view.frame.size)")
+      }
+      return view.snapshot ?? Async { callback in
         addImagesForRenderedViews(view).sequence().run { views in
           let image = NSImage(data: view.dataWithPDF(inside: view.bounds))!
           image.size = .init(width: image.size.width, height: image.size.height)
           callback(image)
           views.forEach { $0.removeFromSuperview() }
+          view.frame.size = initialSize
         }
       }
     }
@@ -48,16 +62,30 @@ extension NSView: DefaultSnapshottable {
 #elseif os(iOS) || os(tvOS)
 extension Strategy where Snapshottable == UIView, Format == UIImage {
   public static var image: Strategy {
-    return .image(precision: 1)
+    return .image(precision: 1, size: nil)
   }
 
   public static func image(precision: Float) -> Strategy {
+    return .image(precision: precision, size: nil)
+  }
+
+  public static func image(precision: Float = 1, size: CGSize) -> Strategy {
+    return .image(precision: precision, size: .some(size))
+  }
+
+  static func image(precision: Float, size: CGSize?) -> Strategy {
     return SimpleStrategy.image(precision: precision).asyncPullback { view in
-      view.snapshot ?? Async { callback in
+      let initialSize = view.frame.size
+      if let size = size { view.frame.size = size }
+      guard view.frame.width > 0, view.frame.height > 0 else {
+        fatalError("View not renderable to image at size \(view.frame.size)")
+      }
+      return view.snapshot ?? Async { callback in
         addImagesForRenderedViews(view).sequence().run { views in
           Strategy<CALayer, UIImage>.image.snapshotToDiffable(view.layer).run { image in
             callback(image)
             views.forEach { $0.removeFromSuperview() }
+            view.frame.size = initialSize
           }
         }
       }
