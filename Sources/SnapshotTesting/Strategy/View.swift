@@ -75,13 +75,13 @@ extension Strategy where Snapshottable == UIView, Format == UIImage {
 
   static func image(precision: Float, size: CGSize?) -> Strategy {
     return SimpleStrategy.image(precision: precision).asyncPullback { view in
-      let initialFrame = view.frame
-      view.frame.origin = CGPoint(x: .max, y: .max)
+      let initialFrame = view.frame                                                                     
       if let size = size { view.frame.size = size }
       guard view.frame.width > 0, view.frame.height > 0 else {
         fatalError("View not renderable to image at size \(view.frame.size)")
       }
       if let window = UIApplication.shared.keyWindow, window != view {
+        view.frame.origin = CGPoint(x: .max, y: .max)
         window.addSubview(view)
       }
       view.setNeedsLayout()
