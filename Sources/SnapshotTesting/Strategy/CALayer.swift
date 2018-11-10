@@ -11,6 +11,8 @@ extension Strategy where Snapshottable == CALayer, Format == NSImage {
       let image = NSImage(size: layer.bounds.size)
       image.lockFocus()
       let context = NSGraphicsContext.current!.cgContext
+      layer.setNeedsLayout()
+      layer.layoutIfNeeded()
       layer.render(in: context)
       image.unlockFocus()
       return image
@@ -32,6 +34,8 @@ extension Strategy where Snapshottable == CALayer, Format == UIImage {
   public static func image(precision: Float) -> Strategy {
     return SimpleStrategy.image(precision: precision).pullback { layer in
       UIGraphicsImageRenderer(size: layer.bounds.size).image { context in
+        layer.setNeedsLayout()
+        layer.layoutIfNeeded()
         layer.render(in: context.cgContext)
       }
     }

@@ -26,8 +26,8 @@ extension Strategy where Snapshottable == NSImage, Format == NSImage {
         guard !compare(old, new, precision: precision) else { return nil }
         let difference = diff(old, new)
         let message = new.size == old.size
-          ? "Expected images to match"
-          : "Expected image@\(new.size) to match image@\(old.size)"
+          ? "Expected snapshot to match reference"
+          : "Expected snapshot@\(new.size) to match reference@\(old.size)"
         return (
           message,
           [Attachment(image: old), Attachment(image: new), Attachment(image: difference)]

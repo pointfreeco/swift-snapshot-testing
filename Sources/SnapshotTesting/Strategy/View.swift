@@ -75,17 +75,35 @@ extension Strategy where Snapshottable == UIView, Format == UIImage {
 
   static func image(precision: Float, size: CGSize?) -> Strategy {
     return SimpleStrategy.image(precision: precision).asyncPullback { view in
-      let initialSize = view.frame.size
+      let initialFrame = view.frame
+      view.frame.origin = CGPoint(x: .max, y: .max)
       if let size = size { view.frame.size = size }
       guard view.frame.width > 0, view.frame.height > 0 else {
         fatalError("View not renderable to image at size \(view.frame.size)")
       }
+      if let window = UIApplication.shared.keyWindow, window != view {
+        window.addSubview(view)
+      }
+      view.setNeedsLayout()
+      view.layoutIfNeeded()
       return view.snapshot ?? Async { callback in
         addImagesForRenderedViews(view).sequence().run { views in
-          Strategy<CALayer, UIImage>.image.snapshotToDiffable(view.layer).run { image in
-            callback(image)
+          let cleanup = {
             views.forEach { $0.removeFromSuperview() }
-            view.frame.size = initialSize
+            view.frame = initialFrame
+          }
+          if let window = UIApplication.shared.keyWindow, window != view {
+            let image = UIGraphicsImageRenderer(size: view.bounds.size).image { context in
+              view.drawHierarchy(in: view.bounds, afterScreenUpdates: true)
+            }
+            callback(image)
+            cleanup()
+            view.removeFromSuperview()
+          } else {
+            Strategy<CALayer, UIImage>.image.snapshotToDiffable(view.layer).run { image in
+              callback(image)
+              cleanup()
+            }
           }
         }
       }
