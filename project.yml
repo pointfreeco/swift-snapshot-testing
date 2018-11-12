@@ -1,6 +1,10 @@
 name: SnapshotTesting
 options:
   bundleIdPrefix: co.pointfree
+  deploymentTarget:
+    iOS: 10.0
+    macOS: '10.10'
+    tvOS: 10.0
   indentWidth: 2
   tabWidth: 2
   usesTabs: false
@@ -9,10 +13,6 @@ targets:
     platform: [macOS, iOS, tvOS]
     settings:
       FRAMEWORK_SEARCH_PATHS: $(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks
-      IPHONEOS_DEPLOYMENT_TARGET: 10.0
-      MACOSX_DEPLOYMENT_TARGET: '10.10'
-      SWIFT_VERSION: 4.2
-      TVOS_DEPLOYMENT_TARGET: 10.0
     scheme:
       testTargets: [SnapshotTestingTests_$platform]
     sources: [Sources]
