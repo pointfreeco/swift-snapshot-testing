@@ -5,9 +5,9 @@ extension Strategy where Snapshottable: CaseIterable, Format == String  {
 
     var strategy = Strategy<String, String>.lines.asyncPullback { (f: (Snapshottable) -> A) in
 
-      Snapshottable.allCases.map { key in
-        witness.snapshotToDiffable(f(key))
-          .map { (key: key, value: $0) }
+      Snapshottable.allCases.map { input in
+        witness.snapshotToDiffable(f(input))
+          .map { (input, $0) }
         }
         .sequence()
         .map { rows in
