@@ -16,7 +16,7 @@ extension Strategy where Snapshottable: CaseIterable, Format == String  {
     }
 
     strategy.pathExtension = "csv"
-    
+
     return strategy
   }
 }
