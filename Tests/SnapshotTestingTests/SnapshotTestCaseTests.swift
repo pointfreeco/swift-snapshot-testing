@@ -44,10 +44,10 @@ class SnapshotTestCaseTests: TestCase {
     struct User: Encodable { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
 
-    if #available(macOS 10.13, *) {
+    if #available(iOS 11.0, macOS 10.13, tvOS 11.0, *) {
       assertSnapshot(matching: user, as: .json)
-      assertSnapshot(matching: user, as: .plist)
     }
+    assertSnapshot(matching: user, as: .plist)
   }
 
   func testWithNSObject() {
