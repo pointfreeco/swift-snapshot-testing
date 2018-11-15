@@ -62,34 +62,58 @@ extension NSView: DefaultSnapshottable {
 #elseif os(iOS) || os(tvOS)
 extension Strategy where Snapshottable == UIView, Format == UIImage {
   public static var image: Strategy {
-    return .image(precision: 1, size: nil)
+    return .image()
   }
 
-  public static func image(precision: Float) -> Strategy {
-    return .image(precision: precision, size: nil)
-  }
+  public static func image(
+    drawingHierarchyInKeyWindow: Bool = false,
+    precision: Float = 1,
+    size: CGSize? = nil,
+    traits: UITraitCollection = .init()
+    )
+    -> Strategy {
 
-  public static func image(precision: Float = 1, size: CGSize) -> Strategy {
-    return .image(precision: precision, size: .some(size))
-  }
+      return SimpleStrategy.image(precision: precision).asyncPullback { view in
+        let size = size ?? view.frame.size
+        guard size.width > 0, size.height > 0 else {
+          fatalError("View not renderable to image at size \(view.frame.size)")
+        }
+        view.frame.size = size
 
-  static func image(precision: Float, size: CGSize?) -> Strategy {
-    return SimpleStrategy.image(precision: precision).asyncPullback { view in
-      let initialSize = view.frame.size
-      if let size = size { view.frame.size = size }
-      guard view.frame.width > 0, view.frame.height > 0 else {
-        fatalError("View not renderable to image at size \(view.frame.size)")
-      }
-      return view.snapshot ?? Async { callback in
-        addImagesForRenderedViews(view).sequence().run { views in
-          Strategy<CALayer, UIImage>.image.snapshotToDiffable(view.layer).run { image in
-            callback(image)
-            views.forEach { $0.removeFromSuperview() }
-            view.frame.size = initialSize
+        let child = UIViewController()
+        child.view.bounds = view.bounds
+        child.view.addSubview(view)
+        let parent = traitController(for: child, size: size, traits: traits)
+
+        let initialFrame = parent.view.frame
+        if drawingHierarchyInKeyWindow, let window = UIApplication.shared.keyWindow, window != view {
+          parent.view.frame.origin = CGPoint(x: .max, y: .max)
+          window.addSubview(parent.view)
+        }
+        parent.view.setNeedsLayout()
+        parent.view.layoutIfNeeded()
+        return parent.view.snapshot ?? Async { callback in
+          addImagesForRenderedViews(parent.view).sequence().run { views in
+            let cleanup = {
+              views.forEach { $0.removeFromSuperview() }
+              view.frame = initialFrame
+            }
+            if drawingHierarchyInKeyWindow, let window = UIApplication.shared.keyWindow, window != view {
+              let image = UIGraphicsImageRenderer(size: view.bounds.size).image { context in
+                parent.view.drawHierarchy(in: parent.view.bounds, afterScreenUpdates: true)
+              }
+              callback(image)
+              cleanup()
+              parent.view.removeFromSuperview()
+            } else {
+              Strategy<CALayer, UIImage>.image.snapshotToDiffable(parent.view.layer).run { image in
+                callback(image)
+                cleanup()
+              }
+            }
           }
         }
       }
-    }
   }
 }
 
@@ -109,6 +133,214 @@ extension Strategy where Snapshottable == UIView, Format == String {
 extension UIView: DefaultSnapshottable {
   public static let defaultStrategy: Strategy<UIView, UIImage> = .image
 }
+
+func traitController(
+  for viewController: UIViewController,
+  size: CGSize,
+  traits: UITraitCollection)
+  -> UIViewController
+{
+
+  let parent = UIViewController()
+  parent.view.backgroundColor = .clear
+  parent.view.frame.size = size
+  parent.preferredContentSize = parent.view.frame.size
+  viewController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+  viewController.view.frame = parent.view.frame
+  parent.view.addSubview(viewController.view)
+  parent.addChild(viewController)
+  parent.setOverrideTraitCollection(traits, forChild: viewController)
+  viewController.didMove(toParent: parent)
+  parent.beginAppearanceTransition(true, animated: false)
+  parent.endAppearanceTransition()
+  return parent
+}
+
+extension Strategy where Snapshottable == UIViewController, Format == UIImage {
+  public struct Config {
+    public enum Orientation {
+      case landscape
+      case portrait
+    }
+
+    public let size: CGSize
+    public let traits: UITraitCollection
+
+    public init(size: CGSize, traits: UITraitCollection) {
+      self.size = size
+      self.traits = traits
+    }
+
+    #if os(iOS)
+    public static let iPhoneSe = Config.iPhoneSe(.portrait)
+
+    public static func iPhoneSe(_ orientation: Orientation) -> Config {
+      let size: CGSize
+      switch orientation {
+      case .landscape:
+        size = .init(width: 568, height: 320)
+      case .portrait:
+        size = .init(width: 320, height: 568)
+      }
+      return .init(size: size, traits: .iPhoneSe(orientation))
+    }
+
+    public static let iPhone8 = Config.iPhone8(.portrait)
+
+    public static func iPhone8(_ orientation: Orientation) -> Config {
+      let size: CGSize
+      switch orientation {
+      case .landscape:
+        size = .init(width: 667, height: 375)
+      case .portrait:
+        size = .init(width: 375, height: 667)
+      }
+      return .init(size: size, traits: .iPhone8(orientation))
+    }
+
+    public static let iPhone8Plus = Config.iPhone8Plus(.portrait)
+
+    public static func iPhone8Plus(_ orientation: Orientation) -> Config {
+      let size: CGSize
+      switch orientation {
+      case .landscape:
+        size = .init(width: 736, height: 414)
+      case .portrait:
+        size = .init(width: 414, height: 736)
+      }
+      return .init(size: size, traits: .iPhone8Plus(orientation))
+    }
+
+    public static let iPadMini = Config.iPadMini(.landscape)
+
+    public static func iPadMini(_ orientation: Orientation) -> Config {
+      let size: CGSize
+      switch orientation {
+      case .landscape:
+        size = .init(width: 1024, height: 768)
+      case .portrait:
+        size = .init(width: 768, height: 1024)
+      }
+      return .init(size: size, traits: .iPadMini)
+    }
+
+    public static let iPadPro10_5 = Config.iPadPro10_5(.landscape)
+
+    public static func iPadPro10_5(_ orientation: Orientation) -> Config {
+      let size: CGSize
+      switch orientation {
+      case .landscape:
+        size = .init(width: 1112, height: 834)
+      case .portrait:
+        size = .init(width: 834, height: 1112)
+      }
+      return .init(size: size, traits: .iPadPro10_5)
+    }
+
+    public static let iPadPro12_9 = Config.iPadPro12_9(.landscape)
+
+    public static func iPadPro12_9(_ orientation: Orientation) -> Config {
+      let size: CGSize
+      switch orientation {
+      case .landscape:
+        size = .init(width: 1366, height: 1024)
+      case .portrait:
+        size = .init(width: 1024, height: 1366)
+      }
+      return .init(size: size, traits: .iPadPro12_9)
+    }
+    #endif
+  }
+}
+
+#if os(iOS)
+extension UITraitCollection {
+  public static func iPhoneSe(_ orientation: Strategy<UIViewController, UIImage>.Config.Orientation)
+    -> UITraitCollection {
+      switch orientation {
+      case .landscape:
+        return .init(
+          traitsFrom: [
+            .init(displayScale: 2),
+            .init(horizontalSizeClass: .compact),
+            .init(verticalSizeClass: .compact),
+            .init(userInterfaceIdiom: .phone)
+          ]
+        )
+      case .portrait:
+        return .init(
+          traitsFrom: [
+            .init(displayScale: 2),
+            .init(horizontalSizeClass: .compact),
+            .init(verticalSizeClass: .regular),
+            .init(userInterfaceIdiom: .phone)
+          ]
+        )
+      }
+  }
+
+  public static func iPhone8(_ orientation: Strategy<UIViewController, UIImage>.Config.Orientation)
+    -> UITraitCollection {
+      switch orientation {
+      case .landscape:
+        return .init(
+          traitsFrom: [
+            .init(displayScale: 2),
+            .init(horizontalSizeClass: .compact),
+            .init(verticalSizeClass: .compact),
+            .init(userInterfaceIdiom: .phone)
+          ]
+        )
+      case .portrait:
+        return .init(
+          traitsFrom: [
+            .init(displayScale: 2),
+            .init(horizontalSizeClass: .compact),
+            .init(verticalSizeClass: .regular),
+            .init(userInterfaceIdiom: .phone)
+          ]
+        )
+      }
+  }
+
+  public static func iPhone8Plus(_ orientation: Strategy<UIViewController, UIImage>.Config.Orientation)
+    -> UITraitCollection {
+      switch orientation {
+      case .landscape:
+        return .init(
+          traitsFrom: [
+            .init(displayScale: 3),
+            .init(horizontalSizeClass: .regular),
+            .init(verticalSizeClass: .compact),
+            .init(userInterfaceIdiom: .phone)
+          ]
+        )
+      case .portrait:
+        return .init(
+          traitsFrom: [
+            .init(displayScale: 3),
+            .init(horizontalSizeClass: .compact),
+            .init(verticalSizeClass: .regular),
+            .init(userInterfaceIdiom: .phone)
+          ]
+        )
+      }
+  }
+
+  public static let iPadMini = iPad
+  public static let iPadPro10_5 = iPad
+  public static let iPadPro12_9 = iPad
+
+  private static let iPad = UITraitCollection(
+    traitsFrom: [
+      .init(displayScale: 2),
+      .init(horizontalSizeClass: .regular),
+      .init(verticalSizeClass: .regular),
+      .init(userInterfaceIdiom: .pad)
+    ]
+  )
+}
+#endif
 #endif
 
 private func addImagesForRenderedViews(_ view: View) -> [Async<View>] {

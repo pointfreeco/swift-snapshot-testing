@@ -26,8 +26,8 @@ extension Strategy where Snapshottable == UIImage, Format == UIImage {
         guard !compare(old, new, precision: precision) else { return nil }
         let difference = diff(old, new)
         let message = new.size == old.size
-          ? "Expected images to match"
-          : "Expected image@\(new.size) to match image@\(old.size)"
+          ? "Expected snapshot to match reference"
+          : "Expected snapshot@\(new.size) to match reference@\(old.size)"
         return (
           message,
           [
@@ -54,7 +54,8 @@ private func compare(_ old: UIImage, _ new: UIImage, precision: Float) -> Bool {
   guard oldCgImage.height != 0 else { return false }
   guard newCgImage.height != 0 else { return false }
   guard oldCgImage.height == newCgImage.height else { return false }
-  let byteCount = oldCgImage.width * oldCgImage.height * 4
+  let minBytesPerRow = min(oldCgImage.bytesPerRow, newCgImage.bytesPerRow)
+  let byteCount = minBytesPerRow * oldCgImage.height
   var oldBytes = [UInt8](repeating: 0, count: byteCount)
   guard let oldContext = context(for: oldCgImage, data: &oldBytes) else { return false }
   guard let newContext = context(for: newCgImage) else { return false }
@@ -70,11 +71,9 @@ private func compare(_ old: UIImage, _ new: UIImage, precision: Float) -> Bool {
   if precision >= 1 { return false }
   var differentPixelCount = 0
   let threshold = 1 - precision
-  for x in 0..<oldCgImage.width {
-    for y in 0..<oldCgImage.height * 4 {
-      if oldBytes[x + x * y] != newerBytes[x + x * y] { differentPixelCount += 1 }
-      if Float(differentPixelCount) / Float(byteCount) > threshold { return false}
-    }
+  for byte in 0..<byteCount {
+    if oldBytes[byte] != newerBytes[byte] { differentPixelCount += 1 }
+    if Float(differentPixelCount) / Float(byteCount) > threshold { return false}
   }
   return true
 }
