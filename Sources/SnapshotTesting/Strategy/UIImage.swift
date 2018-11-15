@@ -58,10 +58,10 @@ private func compare(_ old: UIImage, _ new: UIImage, precision: Float) -> Bool {
   let byteCount = minBytesPerRow * oldCgImage.height
   var oldBytes = [UInt8](repeating: 0, count: byteCount)
   guard let oldContext = context(for: oldCgImage, data: &oldBytes) else { return false }
-  guard let newContext = context(for: newCgImage) else { return false }
   guard let oldData = oldContext.data else { return false }
-  guard let newData = newContext.data else { return false }
-  if memcmp(oldData, newData, byteCount) == 0 { return true }
+  if let newContext = context(for: newCgImage), let newData = newContext.data {
+    if memcmp(oldData, newData, byteCount) == 0 { return true }
+  }
   let newer = UIImage(data: new.pngData()!)!
   guard let newerCgImage = newer.cgImage else { return false }
   var newerBytes = [UInt8](repeating: 0, count: byteCount)
