@@ -4,7 +4,6 @@ extension Strategy where Snapshottable: CaseIterable, Format == String  {
   public static func `func`<A>(into witness: Strategy<A, Format>) -> Strategy<(Snapshottable) -> A, Format> {
 
     var strategy = Strategy<String, String>.lines.asyncPullback { (f: (Snapshottable) -> A) in
-
       Snapshottable.allCases.map { input in
         witness.snapshotToDiffable(f(input))
           .map { (input, $0) }
@@ -17,6 +16,7 @@ extension Strategy where Snapshottable: CaseIterable, Format == String  {
     }
 
     strategy.pathExtension = "csv"
+    
     return strategy
   }
 }
