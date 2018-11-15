@@ -200,6 +200,7 @@ class SnapshotTestCaseTests: TestCase {
       override func viewDidLoad() {
         super.viewDidLoad()
 
+        self.view.backgroundColor = .white
         self.label.text = "What's the point?"
         self.label.textAlignment = .center
         self.label.translatesAutoresizingMaskIntoConstraints = false
