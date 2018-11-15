@@ -271,6 +271,25 @@ class SnapshotTestCaseTests: TestCase {
     }
     #endif
   }
+
+  func testCaseIterable() {
+    enum Direction: String, CaseIterable {
+      case up, down, left, right
+      var rotatedLeft: Direction {
+        switch self {
+        case .up:    return .left
+        case .down:  return .right
+        case .left:  return .down
+        case .right: return .up
+        }
+      }
+    }
+
+    assertSnapshot(
+      matching: { $0.rotatedLeft },
+      as: Strategy<Direction, String>.func(into: .description)
+    )
+  }
 }
 
 #if os(Linux)

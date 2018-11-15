@@ -82,6 +82,12 @@
 		BF_F896D52B8FF76B9328361A8857B4BF87 /* AssertSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_DC773049D04465475F91599CF4255908 /* AssertSnapshot.swift */; };
 		BF_FCC64D190E241971E8DC9818EBC50E75 /* NSImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_E1FA8A193FE7DFA170568A78289DE2EC /* NSImage.swift */; };
 		BF_FD3649DD2EEFCFCA73059F91255F2E95 /* SnapshotTestCaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_DC3B35D901526722EA9C57CE04B058FA /* SnapshotTestCaseTests.swift */; };
+		CA1A9620219CF94400ED197B /* CaseIterable.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA1A961E219CF93900ED197B /* CaseIterable.swift */; };
+		CA1A9621219CF94500ED197B /* CaseIterable.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA1A961E219CF93900ED197B /* CaseIterable.swift */; };
+		CA1A9622219CF94500ED197B /* CaseIterable.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA1A961E219CF93900ED197B /* CaseIterable.swift */; };
+		CA1A9625219CFFBF00ED197B /* Description.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA1A9623219CFFBB00ED197B /* Description.swift */; };
+		CA1A9626219CFFBF00ED197B /* Description.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA1A9623219CFFBB00ED197B /* Description.swift */; };
+		CA1A9627219CFFBF00ED197B /* Description.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA1A9623219CFFBB00ED197B /* Description.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -145,6 +151,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		CA1A961E219CF93900ED197B /* CaseIterable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaseIterable.swift; sourceTree = "<group>"; };
+		CA1A9623219CFFBB00ED197B /* Description.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Description.swift; sourceTree = "<group>"; };
 		FR_011F41E7CBD5C3AAB887E8F70A792A28 /* UIViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewController.swift; sourceTree = "<group>"; };
 		FR_02D2BA628CE5C87E6299836CA06DA5AE /* CALayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CALayer.swift; sourceTree = "<group>"; };
 		FR_0B0CF16A9771EB5B0F72DBCE2128CD6D /* Any.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Any.swift; sourceTree = "<group>"; };
@@ -230,6 +238,8 @@
 				FR_D3724FEFC0FF50CACCC23652F2C7578C /* UIImage.swift */,
 				FR_011F41E7CBD5C3AAB887E8F70A792A28 /* UIViewController.swift */,
 				FR_0E7771DB39A0AA5788034ACA524B7EE3 /* View.swift */,
+				CA1A961E219CF93900ED197B /* CaseIterable.swift */,
+				CA1A9623219CFFBB00ED197B /* Description.swift */,
 			);
 			path = Strategy;
 			sourceTree = "<group>";
@@ -441,8 +451,10 @@
 				BF_0C5543D04B4212AA57DCF0E1E594CAF6 /* Diffable.swift in Sources */,
 				BF_52C03ADE3CE2F4B24C881FA97769A932 /* Internal.swift in Sources */,
 				BF_789B4F0099192F5B0F33B18AAA94E2DF /* NSImage.swift in Sources */,
+				CA1A9620219CF94400ED197B /* CaseIterable.swift in Sources */,
 				BF_7F3F7303ACF94F86C88C54673EC31E8B /* NSViewController.swift in Sources */,
 				BF_41FAA06E937486BD5CE3F3D4E812B1BA /* PropertyListEncoder.swift in Sources */,
+				CA1A9625219CFFBF00ED197B /* Description.swift in Sources */,
 				BF_1F9B48C978B79ADDC70074F90A45D20C /* SceneKit.swift in Sources */,
 				BF_D47F0D75CBD0E92EF35FB311E64B3987 /* SnapshotTestCase.swift in Sources */,
 				BF_92DFFE207E23D176E2A83025F6F2C2CE /* SpriteKit.swift in Sources */,
@@ -469,8 +481,10 @@
 				BF_290BB77E2401937E6400555C3B0F9A7A /* Diffable.swift in Sources */,
 				BF_94A6AD59B8E19AF997B915EC79497934 /* Internal.swift in Sources */,
 				BF_FCC64D190E241971E8DC9818EBC50E75 /* NSImage.swift in Sources */,
+				CA1A9621219CF94500ED197B /* CaseIterable.swift in Sources */,
 				BF_8926855A85FB3CA85B95CC37D335AEFB /* NSViewController.swift in Sources */,
 				BF_563500F7C0C0341867406C92198864C4 /* PropertyListEncoder.swift in Sources */,
+				CA1A9626219CFFBF00ED197B /* Description.swift in Sources */,
 				BF_F054D35C1F281F57EA2B9622EFEEF7FB /* SceneKit.swift in Sources */,
 				BF_A9C5B5783E101E35CF7D52DEE6EABE2A /* SnapshotTestCase.swift in Sources */,
 				BF_51CBA76089B764B80A36E06290128424 /* SpriteKit.swift in Sources */,
@@ -497,8 +511,10 @@
 				BF_D862704C2CB88B4373E8A6D043400D49 /* Diffable.swift in Sources */,
 				BF_D61CA12AF5EEB8437A53C9411C1640B1 /* Internal.swift in Sources */,
 				BF_74313FA8B719956E8ACCE111B99B0960 /* NSImage.swift in Sources */,
+				CA1A9622219CF94500ED197B /* CaseIterable.swift in Sources */,
 				BF_EA93AC0D72E1311A8135CFC7CBF332C1 /* NSViewController.swift in Sources */,
 				BF_D712B33D096E86F34953E92E0A1051C2 /* PropertyListEncoder.swift in Sources */,
+				CA1A9627219CFFBF00ED197B /* Description.swift in Sources */,
 				BF_F515927ECBA692381ECE1DBB73161FCF /* SceneKit.swift in Sources */,
 				BF_1BF868397B24F68E388CCD9DF81E6765 /* SnapshotTestCase.swift in Sources */,
 				BF_710776DC175BE3B689292A550887305B /* SpriteKit.swift in Sources */,
@@ -626,7 +642,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				FRAMEWORK_SEARCH_PATHS = "$(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
 				INFOPLIST_FILE = Sources/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
@@ -652,7 +671,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				FRAMEWORK_SEARCH_PATHS = "$(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
 				INFOPLIST_FILE = Sources/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
@@ -677,7 +699,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				FRAMEWORK_SEARCH_PATHS = "$(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
 				INFOPLIST_FILE = Sources/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
@@ -792,7 +817,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				FRAMEWORK_SEARCH_PATHS = "$(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
 				INFOPLIST_FILE = Sources/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
@@ -818,7 +846,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				FRAMEWORK_SEARCH_PATHS = "$(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
 				INFOPLIST_FILE = Sources/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
@@ -870,7 +901,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				FRAMEWORK_SEARCH_PATHS = "$(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
 				INFOPLIST_FILE = Sources/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;

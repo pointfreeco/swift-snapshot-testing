@@ -224,7 +224,9 @@ fileprivate final class ScaledWindow: NSWindow {
 }
 #endif
 
-fileprivate extension Array {
+#endif
+
+extension Array {
   func sequence<A>() -> Async<[A]> where Element == Async<A> {
     guard !self.isEmpty else { return Async(value: []) }
     return Async<[A]> { callback in
@@ -243,4 +245,3 @@ fileprivate extension Array {
     }
   }
 }
-#endif

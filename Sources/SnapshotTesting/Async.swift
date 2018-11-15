@@ -8,4 +8,10 @@ public struct Async<A> {
   public init(value: A) {
     self.init { callback in callback(value) }
   }
+
+  public func map<B>(_ f: @escaping (A) -> B) -> Async<B> {
+    return Async<B> { callback in
+      self.run { a in callback(f(a)) }
+    }
+  }
 }
