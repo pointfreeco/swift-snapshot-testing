@@ -30,8 +30,6 @@ private func snap<T>(_ value: T, name: String? = nil, indent: Int = 0) -> String
     description = value.snapshotDescription
   case (let value as AnySnapshotStringConvertible, _):
     return "\(indentation)- \(name.map { "\($0): " } ?? "")\(value.snapshotDescription)\n"
-  case (let value as CustomDebugStringConvertible, _):
-    description = value.debugDescription
   case (let value as CustomStringConvertible, _):
     description = value.description
   case (_, .class?), (_, .struct?):
@@ -41,8 +39,8 @@ private func snap<T>(_ value: T, name: String? = nil, indent: Int = 0) -> String
     let subjectType = String(describing: mirror.subjectType)
       .replacingOccurrences(of: " #\\d+", with: "", options: .regularExpression)
     description = count == 0 ? "\(subjectType).\(value)" : "\(subjectType)"
-  default:
-    description = "(indescribable)"
+  case (let value, _):
+    description = String(describing: value)
   }
 
   let lines = ["\(indentation)\(bullet) \(name.map { "\($0): " } ?? "")\(description)\n"]
@@ -75,8 +73,20 @@ extension Date: AnySnapshotStringConvertible {
 }
 
 extension NSObject: AnySnapshotStringConvertible {
-  public var snapshotDescription: String {
+  #if canImport(ObjectiveC)
+  @objc open var snapshotDescription: String {
     return purgePointers(self.debugDescription)
+  }
+  #else
+  open var snapshotDescription: String {
+    return purgePointers(self.debugDescription)
+  }
+  #endif
+}
+
+extension String: AnySnapshotStringConvertible {
+  public var snapshotDescription: String {
+    return self.debugDescription
   }
 }
 
