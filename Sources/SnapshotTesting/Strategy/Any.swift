@@ -78,6 +78,12 @@ extension NSObject: AnySnapshotStringConvertible {
   }
 }
 
+extension String: AnySnapshotStringConvertible {
+  public var snapshotDescription: String {
+    return self.debugDescription
+  }
+}
+
 extension URL: AnySnapshotStringConvertible {
   public var snapshotDescription: String {
     return self.debugDescription
