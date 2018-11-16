@@ -54,8 +54,8 @@ private func compare(_ old: UIImage, _ new: UIImage, precision: Float) -> Bool {
   guard oldCgImage.height != 0 else { return false }
   guard newCgImage.height != 0 else { return false }
   guard oldCgImage.height == newCgImage.height else { return false }
-  let minBytesPerRow = min(oldCgImage.bytesPerRow, newCgImage.bytesPerRow)
-  let byteCount = minBytesPerRow * oldCgImage.height
+  let maxBytesPerRow = max(oldCgImage.bytesPerRow, newCgImage.bytesPerRow)
+  let byteCount = maxBytesPerRow * oldCgImage.height
   var oldBytes = [UInt8](repeating: 0, count: byteCount)
   guard let oldContext = context(for: oldCgImage, data: &oldBytes) else { return false }
   guard let oldData = oldContext.data else { return false }
