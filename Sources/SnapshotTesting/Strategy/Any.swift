@@ -73,9 +73,15 @@ extension Date: AnySnapshotStringConvertible {
 }
 
 extension NSObject: AnySnapshotStringConvertible {
+  #if canImport(ObjectiveC)
   @objc open var snapshotDescription: String {
     return purgePointers(self.debugDescription)
   }
+  #else
+  open var snapshotDescription: String {
+    return purgePointers(self.debugDescription)
+  }
+  #endif
 }
 
 extension String: AnySnapshotStringConvertible {
