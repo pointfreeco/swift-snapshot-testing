@@ -4,10 +4,8 @@ import XCTest
 
 extension Attachment {
   public init(image: UIImage, name: String? = nil) {
-    #if Xcode
     self.rawValue = XCTAttachment(image: image)
     self.rawValue.name = name
-    #endif
   }
 }
 

@@ -3,7 +3,7 @@ import XCTest
 
 extension Attachment {
   public init(data: Data, name: String? = nil) {
-    #if Xcode
+    #if !os(Linux)
     self.rawValue = XCTAttachment(data: data)
     self.rawValue.name = name
     #endif
