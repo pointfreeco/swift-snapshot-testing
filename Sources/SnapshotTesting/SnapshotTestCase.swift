@@ -102,7 +102,7 @@ open class SnapshotTestCase: XCTestCase {
       try strategy.diffable.to(diffable).write(to: failedSnapshotFileUrl)
 
       if !attachments.isEmpty {
-        #if Xcode
+        #if !os(Linux)
         XCTContext.runActivity(named: "Attached Failure Diff") { activity in
           attachments.forEach {
             activity.add($0.rawValue)
