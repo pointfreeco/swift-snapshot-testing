@@ -272,6 +272,16 @@ class SnapshotTestCaseTests: TestCase {
     }
     #endif
   }
+
+  func testDeterministicDictionaryAndSetSnapshots() {
+    struct Person: Hashable { let name: String }
+    struct DictionarySetContainer { let dict: [String: Int], set: Set<Person> }
+    let set = DictionarySetContainer(
+      dict: ["c": 3, "a": 1, "b": 2],
+      set: [.init(name: "Brandon"), .init(name: "Stephen")]
+    )
+    assertSnapshot(matching: set, as: .dump)
+  }
 }
 
 #if os(Linux)
