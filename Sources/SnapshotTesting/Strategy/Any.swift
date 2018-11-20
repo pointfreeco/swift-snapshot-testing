@@ -38,6 +38,7 @@ private func snap<T>(_ value: T, name: String? = nil, indent: Int = 0) -> String
   case (_, .class?), (_, .struct?):
     description = String(describing: mirror.subjectType)
       .replacingOccurrences(of: " #\\d+", with: "", options: .regularExpression)
+    children = sort(children)
   case (_, .enum?):
     let subjectType = String(describing: mirror.subjectType)
       .replacingOccurrences(of: " #\\d+", with: "", options: .regularExpression)
