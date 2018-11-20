@@ -1,0 +1,16 @@
+▿ DictionarySetContainer
+  ▿ dict: 3 key/value pairs
+    ▿ (2 elements)
+      - key: "a"
+      - value: 1
+    ▿ (2 elements)
+      - key: "b"
+      - value: 2
+    ▿ (2 elements)
+      - key: "c"
+      - value: 3
+  ▿ set: 2 members
+    ▿ Person
+      - name: "Brandon"
+    ▿ Person
+      - name: "Stephen"

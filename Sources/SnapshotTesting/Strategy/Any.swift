@@ -9,7 +9,8 @@ extension Strategy where Format == String {
 private func snap<T>(_ value: T, name: String? = nil, indent: Int = 0) -> String {
   let indentation = String(repeating: " ", count: indent)
   let mirror = Mirror(reflecting: value)
-  let count = mirror.children.count
+  var children = mirror.children
+  let count = children.count
   let bullet = count == 0 ? "-" : "▿"
 
   let description: String
@@ -18,8 +19,10 @@ private func snap<T>(_ value: T, name: String? = nil, indent: Int = 0) -> String
     description = count == 1 ? "1 element" : "\(count) elements"
   case (_, .dictionary?):
     description = count == 1 ? "1 key/value pair" : "\(count) key/value pairs"
+    children = sort(children)
   case (_, .set?):
     description = count == 1 ? "1 member" : "\(count) members"
+    children = sort(children)
   case (_, .tuple?):
     description = count == 1 ? "(1 element)" : "(\(count) elements)"
   case (_, .optional?):
@@ -35,6 +38,7 @@ private func snap<T>(_ value: T, name: String? = nil, indent: Int = 0) -> String
   case (_, .class?), (_, .struct?):
     description = String(describing: mirror.subjectType)
       .replacingOccurrences(of: " #\\d+", with: "", options: .regularExpression)
+    children = sort(children)
   case (_, .enum?):
     let subjectType = String(describing: mirror.subjectType)
       .replacingOccurrences(of: " #\\d+", with: "", options: .regularExpression)
@@ -44,9 +48,13 @@ private func snap<T>(_ value: T, name: String? = nil, indent: Int = 0) -> String
   }
 
   let lines = ["\(indentation)\(bullet) \(name.map { "\($0): " } ?? "")\(description)\n"]
-    + mirror.children.map { snap($1, name: $0, indent: indent + 2) }
+    + children.map { snap($1, name: $0, indent: indent + 2) }
 
   return lines.joined()
+}
+
+private func sort(_ children: Mirror.Children) -> Mirror.Children {
+  return .init(children.sorted { snap($0) < snap($1) })
 }
 
 public protocol AnySnapshotStringConvertible {
