@@ -12,6 +12,7 @@ targets:
   SnapshotTesting:
     platform: [macOS, iOS, tvOS]
     settings:
+      ENABLE_BITCODE: 'NO'
       FRAMEWORK_SEARCH_PATHS: $(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks
     scheme:
       testTargets: [SnapshotTestingTests_$platform]
