@@ -15,7 +15,7 @@ extension Strategy where Snapshottable == UIView, Format == UIImage {
 
       return SimpleStrategy.image(precision: precision).asyncPullback { view in
         snapshotView(
-          config: .init(safeArea: .zero, size: size ?? view.frame.size, traits: .unspecified),
+          config: .init(safeArea: .zero, size: size ?? view.frame.size, traits: .init()),
           traits: traits,
           view: view,
           viewController: .init()

@@ -31,7 +31,7 @@ extension Strategy where Snapshottable == CALayer, Format == UIImage {
     return .image()
   }
 
-  public static func image(precision: Float = 1, traits: UITraitCollection = .unspecified)
+  public static func image(precision: Float = 1, traits: UITraitCollection = .init())
     -> Strategy {
       return SimpleStrategy.image(precision: precision).pullback { layer in
         layer.image(for: traits)
@@ -42,11 +42,11 @@ extension Strategy where Snapshottable == CALayer, Format == UIImage {
 extension CALayer {
   func image(for traits: UITraitCollection, beforeRender: () -> Void = {}) -> UIImage {
     let renderer: UIGraphicsImageRenderer
-//    if #available(iOS 11.0, tvOS 11.0, *) {
-//      renderer = UIGraphicsImageRenderer(size: self.bounds.size, format: .init(for: traits))
-//    } else {
+    if #available(iOS 11.0, tvOS 11.0, *) {
+      renderer = UIGraphicsImageRenderer(size: self.bounds.size, format: .init(for: traits))
+    } else {
       renderer = UIGraphicsImageRenderer(size: self.bounds.size)
-//    }
+    }
     return renderer.image { context in
       beforeRender()
       self.setNeedsLayout()

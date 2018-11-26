@@ -25,7 +25,7 @@ public struct ViewImageConfig {
   public init(
     safeArea: UIEdgeInsets = .zero,
     size: CGSize? = nil,
-    traits: UITraitCollection = .unspecified
+    traits: UITraitCollection = .init()
     ) {
     self.safeArea = safeArea
     self.size = size
@@ -172,6 +172,216 @@ public struct ViewImageConfig {
   #endif
 }
 
+extension UITraitCollection {
+  #if os(iOS)
+  public static func iPhoneSe(_ orientation: ViewImageConfig.Orientation)
+    -> UITraitCollection {
+      let base: [UITraitCollection] = [
+        .init(displayGamut: .SRGB),
+//        .init(displayScale: 2),
+        .init(forceTouchCapability: .available),
+        .init(layoutDirection: .leftToRight),
+        .init(preferredContentSizeCategory: .medium),
+        .init(userInterfaceIdiom: .phone)
+      ]
+      switch orientation {
+      case .landscape:
+        return .init(
+          traitsFrom: base + [
+            .init(horizontalSizeClass: .compact),
+            .init(verticalSizeClass: .compact)
+          ]
+        )
+      case .portrait:
+        return .init(
+          traitsFrom: base + [
+            .init(horizontalSizeClass: .compact),
+            .init(verticalSizeClass: .regular),
+          ]
+        )
+      }
+  }
+
+  public static func iPhone8(_ orientation: ViewImageConfig.Orientation)
+    -> UITraitCollection {
+      let base: [UITraitCollection] = [
+        .init(displayGamut: .P3),
+//        .init(displayScale: 2),
+        .init(forceTouchCapability: .available),
+        .init(layoutDirection: .leftToRight),
+        .init(preferredContentSizeCategory: .medium),
+        .init(userInterfaceIdiom: .phone)
+      ]
+      switch orientation {
+      case .landscape:
+        return .init(
+          traitsFrom: base + [
+            .init(horizontalSizeClass: .compact),
+            .init(verticalSizeClass: .compact)
+          ]
+        )
+      case .portrait:
+        return .init(
+          traitsFrom: base + [
+            .init(horizontalSizeClass: .compact),
+            .init(verticalSizeClass: .regular)
+          ]
+        )
+      }
+  }
+
+  public static func iPhone8Plus(_ orientation: ViewImageConfig.Orientation)
+    -> UITraitCollection {
+      let base: [UITraitCollection] = [
+        .init(displayGamut: .P3),
+//        .init(displayScale: 3),
+        .init(forceTouchCapability: .available),
+        .init(layoutDirection: .leftToRight),
+        .init(preferredContentSizeCategory: .medium),
+        .init(userInterfaceIdiom: .phone)
+      ]
+      switch orientation {
+      case .landscape:
+        return .init(
+          traitsFrom: base + [
+            .init(horizontalSizeClass: .regular),
+            .init(verticalSizeClass: .compact)
+          ]
+        )
+      case .portrait:
+        return .init(
+          traitsFrom: base + [
+            .init(horizontalSizeClass: .compact),
+            .init(verticalSizeClass: .regular)
+          ]
+        )
+      }
+  }
+
+  public static func iPhoneX(_ orientation: ViewImageConfig.Orientation)
+    -> UITraitCollection {
+      let base: [UITraitCollection] = [
+        .init(displayGamut: .P3),
+//        .init(displayScale: 3),
+        .init(forceTouchCapability: .available),
+        .init(layoutDirection: .leftToRight),
+        .init(preferredContentSizeCategory: .medium),
+        .init(userInterfaceIdiom: .phone)
+      ]
+      switch orientation {
+      case .landscape:
+        return .init(
+          traitsFrom: base + [
+            .init(horizontalSizeClass: .compact),
+            .init(verticalSizeClass: .compact)
+          ]
+        )
+      case .portrait:
+        return .init(
+          traitsFrom: base + [
+            .init(horizontalSizeClass: .compact),
+            .init(verticalSizeClass: .regular)
+          ]
+        )
+      }
+  }
+
+  public static func iPhoneXr(_ orientation: ViewImageConfig.Orientation)
+    -> UITraitCollection {
+      let base: [UITraitCollection] = [
+        .init(displayGamut: .P3),
+//        .init(displayScale: 2),
+        .init(forceTouchCapability: .unavailable),
+        .init(layoutDirection: .leftToRight),
+        .init(preferredContentSizeCategory: .medium),
+        .init(userInterfaceIdiom: .phone)
+      ]
+      switch orientation {
+      case .landscape:
+        return .init(
+          traitsFrom: base + [
+            .init(horizontalSizeClass: .regular),
+            .init(verticalSizeClass: .compact)
+          ]
+        )
+      case .portrait:
+        return .init(
+          traitsFrom: base + [
+            .init(horizontalSizeClass: .compact),
+            .init(verticalSizeClass: .regular)
+          ]
+        )
+      }
+  }
+
+  public static func iPhoneXsMax(_ orientation: ViewImageConfig.Orientation)
+    -> UITraitCollection {
+      let base: [UITraitCollection] = [
+        .init(displayGamut: .P3),
+//        .init(displayScale: 3),
+        .init(forceTouchCapability: .available),
+        .init(layoutDirection: .leftToRight),
+        .init(preferredContentSizeCategory: .medium),
+        .init(userInterfaceIdiom: .phone)
+      ]
+      switch orientation {
+      case .landscape:
+        return .init(
+          traitsFrom: base + [
+            .init(horizontalSizeClass: .regular),
+            .init(verticalSizeClass: .compact)
+          ]
+        )
+      case .portrait:
+        return .init(
+          traitsFrom: [
+            .init(horizontalSizeClass: .compact),
+            .init(verticalSizeClass: .regular)
+          ]
+        )
+      }
+  }
+
+  public static let iPadMini = iPad
+  public static let iPadPro10_5 = iPad
+  public static let iPadPro12_9 = iPad
+
+  private static let iPad = UITraitCollection(
+    traitsFrom: [
+//      .init(displayScale: 2),
+      .init(horizontalSizeClass: .regular),
+      .init(verticalSizeClass: .regular),
+      .init(userInterfaceIdiom: .pad)
+    ]
+  )
+  #elseif os(tvOS)
+  // FIXME
+  #endif
+}
+#endif
+
+func addImagesForRenderedViews(_ view: View) -> [Async<View>] {
+  return view.snapshot
+    .map { async in
+      [
+        Async { callback in
+          async.run { image in
+            let imageView = ImageView()
+            imageView.image = image
+            imageView.frame = view.frame
+            #if os(macOS)
+            view.superview?.addSubview(imageView, positioned: .above, relativeTo: view)
+            #elseif os(iOS) || os(tvOS)
+            view.superview?.insertSubview(imageView, aboveSubview: view)
+            #endif
+            callback(imageView)
+          }
+        }
+      ]
+    }
+    ?? view.subviews.flatMap(addImagesForRenderedViews)
+}
+
 func snapshotView(
   config: ViewImageConfig,
   traits: UITraitCollection = .init(),
@@ -199,7 +409,7 @@ func snapshotView(
         views.forEach { $0.removeFromSuperview() }
         view.frame = initialFrame
       }
-  }
+    }
 }
 
 class Window: UIWindow {
@@ -244,237 +454,6 @@ class Window: UIWindow {
     if removeTopInset { return .zero }
     return self.config.safeArea
   }
-}
-
-extension UITraitCollection {
-  #if os(iOS)
-  public static let unspecified = UITraitCollection(
-    traitsFrom: [
-      .init(displayGamut: .P3),
-      .init(displayScale: 2),
-      .init(forceTouchCapability: .available),
-      .init(layoutDirection: .leftToRight),
-      .init(preferredContentSizeCategory: .medium),
-      .init(userInterfaceIdiom: .phone)
-    ]
-  )
-
-  public static func iPhoneSe(_ orientation: ViewImageConfig.Orientation)
-    -> UITraitCollection {
-      let base: [UITraitCollection] = [
-        .init(displayGamut: .SRGB),
-        .init(displayScale: 2),
-        .init(forceTouchCapability: .available),
-        .init(layoutDirection: .leftToRight),
-        .init(preferredContentSizeCategory: .medium),
-        .init(userInterfaceIdiom: .phone)
-      ]
-      switch orientation {
-      case .landscape:
-        return .init(
-          traitsFrom: base + [
-            .init(horizontalSizeClass: .compact),
-            .init(verticalSizeClass: .compact)
-          ]
-        )
-      case .portrait:
-        return .init(
-          traitsFrom: base + [
-            .init(horizontalSizeClass: .compact),
-            .init(verticalSizeClass: .regular),
-          ]
-        )
-      }
-  }
-
-  public static func iPhone8(_ orientation: ViewImageConfig.Orientation)
-    -> UITraitCollection {
-      let base: [UITraitCollection] = [
-        .init(displayGamut: .P3),
-        .init(displayScale: 2),
-        .init(forceTouchCapability: .available),
-        .init(layoutDirection: .leftToRight),
-        .init(preferredContentSizeCategory: .medium),
-        .init(userInterfaceIdiom: .phone)
-      ]
-      switch orientation {
-      case .landscape:
-        return .init(
-          traitsFrom: base + [
-            .init(horizontalSizeClass: .compact),
-            .init(verticalSizeClass: .compact)
-          ]
-        )
-      case .portrait:
-        return .init(
-          traitsFrom: base + [
-            .init(horizontalSizeClass: .compact),
-            .init(verticalSizeClass: .regular)
-          ]
-        )
-      }
-  }
-
-  public static func iPhone8Plus(_ orientation: ViewImageConfig.Orientation)
-    -> UITraitCollection {
-      let base: [UITraitCollection] = [
-        .init(displayGamut: .P3),
-        .init(displayScale: 3),
-        .init(forceTouchCapability: .available),
-        .init(layoutDirection: .leftToRight),
-        .init(preferredContentSizeCategory: .medium),
-        .init(userInterfaceIdiom: .phone)
-      ]
-      switch orientation {
-      case .landscape:
-        return .init(
-          traitsFrom: base + [
-            .init(horizontalSizeClass: .regular),
-            .init(verticalSizeClass: .compact)
-          ]
-        )
-      case .portrait:
-        return .init(
-          traitsFrom: base + [
-            .init(horizontalSizeClass: .compact),
-            .init(verticalSizeClass: .regular)
-          ]
-        )
-      }
-  }
-
-  public static func iPhoneX(_ orientation: ViewImageConfig.Orientation)
-    -> UITraitCollection {
-      let base: [UITraitCollection] = [
-        .init(displayGamut: .P3),
-        .init(displayScale: 3),
-        .init(forceTouchCapability: .available),
-        .init(layoutDirection: .leftToRight),
-        .init(preferredContentSizeCategory: .medium),
-        .init(userInterfaceIdiom: .phone)
-      ]
-      switch orientation {
-      case .landscape:
-        return .init(
-          traitsFrom: base + [
-            .init(horizontalSizeClass: .compact),
-            .init(verticalSizeClass: .compact)
-          ]
-        )
-      case .portrait:
-        return .init(
-          traitsFrom: base + [
-            .init(horizontalSizeClass: .compact),
-            .init(verticalSizeClass: .regular)
-          ]
-        )
-      }
-  }
-
-  public static func iPhoneXr(_ orientation: ViewImageConfig.Orientation)
-    -> UITraitCollection {
-      let base: [UITraitCollection] = [
-        .init(displayGamut: .P3),
-        .init(displayScale: 2),
-        .init(forceTouchCapability: .unavailable),
-        .init(layoutDirection: .leftToRight),
-        .init(preferredContentSizeCategory: .medium),
-        .init(userInterfaceIdiom: .phone)
-      ]
-      switch orientation {
-      case .landscape:
-        return .init(
-          traitsFrom: base + [
-            .init(horizontalSizeClass: .regular),
-            .init(verticalSizeClass: .compact)
-          ]
-        )
-      case .portrait:
-        return .init(
-          traitsFrom: base + [
-            .init(horizontalSizeClass: .compact),
-            .init(verticalSizeClass: .regular)
-          ]
-        )
-      }
-  }
-
-  public static func iPhoneXsMax(_ orientation: ViewImageConfig.Orientation)
-    -> UITraitCollection {
-      let base: [UITraitCollection] = [
-        .init(displayGamut: .P3),
-        .init(displayScale: 3),
-        .init(forceTouchCapability: .available),
-        .init(layoutDirection: .leftToRight),
-        .init(preferredContentSizeCategory: .medium),
-        .init(userInterfaceIdiom: .phone)
-      ]
-      switch orientation {
-      case .landscape:
-        return .init(
-          traitsFrom: base + [
-            .init(horizontalSizeClass: .regular),
-            .init(verticalSizeClass: .compact)
-          ]
-        )
-      case .portrait:
-        return .init(
-          traitsFrom: [
-            .init(horizontalSizeClass: .compact),
-            .init(verticalSizeClass: .regular)
-          ]
-        )
-      }
-  }
-
-  public static let iPadMini = iPad
-  public static let iPadPro10_5 = iPad
-  public static let iPadPro12_9 = iPad
-
-  private static let iPad = UITraitCollection(
-    traitsFrom: [
-      .init(displayScale: 2),
-      .init(horizontalSizeClass: .regular),
-      .init(verticalSizeClass: .regular),
-      .init(userInterfaceIdiom: .pad)
-    ]
-  )
-  #elseif os(tvOS)
-  // FIXME
-  public static let unspecified = UITraitCollection(
-    traitsFrom: [
-      .init(displayGamut: .P3),
-      .init(displayScale: 2),
-      .init(forceTouchCapability: .available),
-      .init(layoutDirection: .leftToRight),
-      .init(preferredContentSizeCategory: .medium),
-      .init(userInterfaceIdiom: .phone)
-    ]
-  )
-  #endif
-}
-#endif
-
-func addImagesForRenderedViews(_ view: View) -> [Async<View>] {
-  return view.snapshot
-    .map { async in
-      [
-        Async { callback in
-          async.run { image in
-            let imageView = ImageView()
-            imageView.image = image
-            imageView.frame = view.frame
-            #if os(macOS)
-            view.superview?.addSubview(imageView, positioned: .above, relativeTo: view)
-            #elseif os(iOS) || os(tvOS)
-            view.superview?.insertSubview(imageView, aboveSubview: view)
-            #endif
-            callback(imageView)
-          }
-        }
-      ]
-    }
-    ?? view.subviews.flatMap(addImagesForRenderedViews)
 }
 
 extension View {

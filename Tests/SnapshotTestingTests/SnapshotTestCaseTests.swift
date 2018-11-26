@@ -230,10 +230,11 @@ class SnapshotTestCaseTests: TestCase {
             self.topLabel.centerXAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.centerXAnchor),
             self.leadingLabel.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor),
             self.leadingLabel.trailingAnchor.constraint(lessThanOrEqualTo: self.view.safeAreaLayoutGuide.centerXAnchor),
-            self.leadingLabel.centerYAnchor.constraint(lessThanOrEqualTo: self.view.safeAreaLayoutGuide.centerYAnchor),
+//            self.leadingLabel.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.centerXAnchor),
+            self.leadingLabel.centerYAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.centerYAnchor),
             self.trailingLabel.leadingAnchor.constraint(greaterThanOrEqualTo: self.view.safeAreaLayoutGuide.centerXAnchor),
             self.trailingLabel.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor),
-            self.trailingLabel.centerYAnchor.constraint(lessThanOrEqualTo: self.view.safeAreaLayoutGuide.centerYAnchor),
+            self.trailingLabel.centerYAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.centerYAnchor),
             self.bottomLabel.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor),
             self.bottomLabel.centerXAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.centerXAnchor),
             ])
@@ -245,6 +246,8 @@ class SnapshotTestCaseTests: TestCase {
           self.leadingLabel.font = .preferredFont(forTextStyle: .body, compatibleWith: self.traitCollection)
           self.trailingLabel.font = .preferredFont(forTextStyle: .body, compatibleWith: self.traitCollection)
           self.bottomLabel.font = .preferredFont(forTextStyle: .subheadline, compatibleWith: self.traitCollection)
+          self.view.setNeedsUpdateConstraints()
+          self.view.updateConstraintsIfNeeded()
         }
       }
 
@@ -253,7 +256,6 @@ class SnapshotTestCaseTests: TestCase {
       assertSnapshot(matching: viewController, as: .image(on: .iPhoneSe), named: "iphone-se")
       assertSnapshot(matching: viewController, as: .image(on: .iPhone8), named: "iphone-8")
       assertSnapshot(matching: viewController, as: .image(on: .iPhone8Plus), named: "iphone-8-plus")
-      return
       assertSnapshot(matching: viewController, as: .image(on: .iPhoneX), named: "iphone-x")
       assertSnapshot(matching: viewController, as: .image(on: .iPhoneXr), named: "iphone-xr")
       assertSnapshot(matching: viewController, as: .image(on: .iPhoneXsMax), named: "iphone-xs-max")
