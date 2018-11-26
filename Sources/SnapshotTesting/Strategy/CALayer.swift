@@ -42,7 +42,7 @@ extension Strategy where Snapshottable == CALayer, Format == UIImage {
 extension CALayer {
   func image(for traits: UITraitCollection) -> UIImage {
     let renderer: UIGraphicsImageRenderer
-    if #available(iOS 11.0, *) {
+    if #available(iOS 11.0, tvOS 11.0, *) {
       renderer = UIGraphicsImageRenderer(size: self.bounds.size, format: .init(for: traits))
     } else {
       renderer = UIGraphicsImageRenderer(size: self.bounds.size)

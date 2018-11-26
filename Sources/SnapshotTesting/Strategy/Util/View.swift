@@ -22,7 +22,11 @@ public struct ViewImageConfig {
   public let size: CGSize?
   public let traits: UITraitCollection
 
-  public init(safeArea: UIEdgeInsets, size: CGSize?, traits: UITraitCollection) {
+  public init(
+    safeArea: UIEdgeInsets = .zero,
+    size: CGSize? = nil,
+    traits: UITraitCollection = .unspecified
+    ) {
     self.safeArea = safeArea
     self.size = size
     self.traits = traits
@@ -235,15 +239,20 @@ class Window: UIWindow {
 
   @available(iOS 11.0, *)
   override var safeAreaInsets: UIEdgeInsets {
+    let removeTopInset: Bool
+    #if os(iOS)
     let removeTopInset = self.config.safeArea == .init(top: 20, left: 0, bottom: 0, right: 0)
       && self.rootViewController?.prefersStatusBarHidden ?? false
+    #elseif os(tvOS)
+    removeTopInset = false // FIXME
+    #endif
     if removeTopInset { return .zero }
     return self.config.safeArea
   }
 }
 
-#if os(iOS)
 extension UITraitCollection {
+  #if os(iOS)
   public static let unspecified = UITraitCollection(
     traitsFrom: [
       .init(displayGamut: .P3),
@@ -435,8 +444,20 @@ extension UITraitCollection {
       .init(userInterfaceIdiom: .pad)
     ]
   )
+  #elseif os(tvOS)
+  // FIXME
+  public static let unspecified = UITraitCollection(
+    traitsFrom: [
+      .init(displayGamut: .P3),
+      .init(displayScale: 2),
+      .init(forceTouchCapability: .available),
+      .init(layoutDirection: .leftToRight),
+      .init(preferredContentSizeCategory: .medium),
+      .init(userInterfaceIdiom: .phone)
+    ]
+  )
+  #endif
 }
-#endif
 #endif
 
 func addImagesForRenderedViews(_ view: View) -> [Async<View>] {

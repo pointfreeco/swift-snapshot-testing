@@ -3,14 +3,14 @@ import UIKit
 
 extension Strategy where Snapshottable == UIViewController, Format == UIImage {
   public static var image: Strategy {
-    return .image(on: .iPhone8)
+    return .image()
   }
 
   public static func image(
     drawingHierarchyInKeyWindow: Bool = false,
-    on config: ViewImageConfig,
+    on config: ViewImageConfig = .init(),
     precision: Float = 1,
-    traits: UITraitCollection = .iPhone8(.portrait)
+    traits: UITraitCollection = .init()
     )
     -> Strategy {
 
