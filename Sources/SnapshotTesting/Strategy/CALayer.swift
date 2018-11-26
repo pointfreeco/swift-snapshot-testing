@@ -28,16 +28,29 @@ import UIKit
 
 extension Strategy where Snapshottable == CALayer, Format == UIImage {
   public static var image: Strategy {
-    return .image(precision: 1)
+    return .image()
   }
 
-  public static func image(precision: Float) -> Strategy {
-    return SimpleStrategy.image(precision: precision).pullback { layer in
-      UIGraphicsImageRenderer(size: layer.bounds.size).image { context in
-        layer.setNeedsLayout()
-        layer.layoutIfNeeded()
-        layer.render(in: context.cgContext)
+  public static func image(precision: Float = 1, traits: UITraitCollection = .unspecified)
+    -> Strategy {
+      return SimpleStrategy.image(precision: precision).pullback { layer in
+        layer.image(for: traits)
       }
+  }
+}
+
+extension CALayer {
+  func image(for traits: UITraitCollection) -> UIImage {
+    let renderer: UIGraphicsImageRenderer
+    if #available(iOS 11.0, *) {
+      renderer = UIGraphicsImageRenderer(size: self.bounds.size, format: .init(for: traits))
+    } else {
+      renderer = UIGraphicsImageRenderer(size: self.bounds.size)
+    }
+    return renderer.image { context in
+      self.setNeedsLayout()
+      self.layoutIfNeeded()
+      self.render(in: context.cgContext)
     }
   }
 }

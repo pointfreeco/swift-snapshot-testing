@@ -1,4 +1,4 @@
-# swift-snapshot-testing
+# SnapshotTesting
 
 macOS [![CircleCI](https://circleci.com/gh/pointfreeco/swift-snapshot-testing.svg?style=svg)](https://circleci.com/gh/pointfreeco/swift-snapshot-testing) Linux [![Build Status](https://travis-ci.org/pointfreeco/swift-snapshot-testing.svg)](https://travis-ci.org/pointfreeco/swift-snapshot-testing)
 

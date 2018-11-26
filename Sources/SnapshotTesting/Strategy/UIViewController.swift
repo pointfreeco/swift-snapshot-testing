@@ -3,39 +3,25 @@ import UIKit
 
 extension Strategy where Snapshottable == UIViewController, Format == UIImage {
   public static var image: Strategy {
-    return .image()
+    return .image(on: .iPhone8)
   }
 
   public static func image(
     drawingHierarchyInKeyWindow: Bool = false,
+    on config: ViewImageConfig,
     precision: Float = 1,
-    size: CGSize? = nil,
-    traits: UITraitCollection = .init()
+    traits: UITraitCollection = .iPhone8(.portrait)
     )
     -> Strategy {
 
-      return Strategy<UIView, UIImage>
-        .image(
-          drawingHierarchyInKeyWindow: drawingHierarchyInKeyWindow,
-          precision: precision,
-          size: size,
-          traits: traits
+      return SimpleStrategy.image(precision: precision).asyncPullback { viewController in
+        snapshotView(
+          config: config,
+          traits: traits,
+          view: viewController.view,
+          viewController: viewController
         )
-        .pullback { child in
-          let size = size ?? child.view.frame.size
-          let parent = traitController(for: child, size: size, traits: traits)
-          return parent.view
       }
-  }
-
-  public static func image(on environment: Config, precision: Float = 1, traits: UITraitCollection = .init())
-    -> Strategy {
-
-      return .image(
-        precision: precision,
-        size: environment.size,
-        traits: UITraitCollection(traitsFrom: [environment.traits, traits])
-      )
   }
 }
 

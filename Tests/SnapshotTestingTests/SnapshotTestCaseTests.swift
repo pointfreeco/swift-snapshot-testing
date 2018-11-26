@@ -110,10 +110,14 @@ class SnapshotTestCaseTests: TestCase {
       .deletingLastPathComponent()
       .appendingPathComponent("__Fixtures__/pointfree.html")
     let html = try String(contentsOf: fixtureUrl)
-    let webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 800, height: 600))
+    let webView = WKWebView()
     webView.loadHTMLString(html, baseURL: nil)
     if #available(macOS 10.14, *) {
-      assertSnapshot(matching: webView, named: platform)
+      assertSnapshot(
+        matching: webView,
+        as: .image(size: .init(width: 800, height: 600)),
+        named: platform
+      )
     }
     #endif
   }
@@ -194,81 +198,117 @@ class SnapshotTestCaseTests: TestCase {
 
   func testTraits() {
     #if os(iOS)
-    class MyViewController: UIViewController {
-      let label = UILabel()
+    if #available(iOS 11.0, *) {
+      class MyViewController: UIViewController {
+        let topLabel = UILabel()
+        let leadingLabel = UILabel()
+        let trailingLabel = UILabel()
+        let bottomLabel = UILabel()
 
-      override func viewDidLoad() {
-        super.viewDidLoad()
+        override func viewDidLoad() {
+          super.viewDidLoad()
 
-        self.view.backgroundColor = .white
-        self.label.text = "What's the point?"
-        self.label.textAlignment = .center
-        self.label.translatesAutoresizingMaskIntoConstraints = false
+          self.view.backgroundColor = .white
 
-        self.view.addSubview(self.label)
-        NSLayoutConstraint.activate([
-          self.view.topAnchor.constraint(equalTo: self.label.topAnchor),
-          self.view.bottomAnchor.constraint(equalTo: self.label.bottomAnchor),
-          self.view.leadingAnchor.constraint(equalTo: self.label.leadingAnchor),
-          self.view.trailingAnchor.constraint(equalTo: self.label.trailingAnchor),
-          ])
+          self.topLabel.text = "What's"
+          self.leadingLabel.text = "the"
+          self.trailingLabel.text = "point"
+          self.bottomLabel.text = "?"
+
+          self.topLabel.translatesAutoresizingMaskIntoConstraints = false
+          self.leadingLabel.translatesAutoresizingMaskIntoConstraints = false
+          self.trailingLabel.translatesAutoresizingMaskIntoConstraints = false
+          self.bottomLabel.translatesAutoresizingMaskIntoConstraints = false
+
+          self.view.addSubview(self.topLabel)
+          self.view.addSubview(self.leadingLabel)
+          self.view.addSubview(self.trailingLabel)
+          self.view.addSubview(self.bottomLabel)
+
+          NSLayoutConstraint.activate([
+            self.topLabel.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor),
+            self.topLabel.centerXAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.centerXAnchor),
+            self.leadingLabel.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor),
+            self.leadingLabel.trailingAnchor.constraint(lessThanOrEqualTo: self.view.safeAreaLayoutGuide.centerXAnchor),
+            self.leadingLabel.centerYAnchor.constraint(lessThanOrEqualTo: self.view.safeAreaLayoutGuide.centerYAnchor),
+            self.trailingLabel.leadingAnchor.constraint(greaterThanOrEqualTo: self.view.safeAreaLayoutGuide.centerXAnchor),
+            self.trailingLabel.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor),
+            self.trailingLabel.centerYAnchor.constraint(lessThanOrEqualTo: self.view.safeAreaLayoutGuide.centerYAnchor),
+            self.bottomLabel.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor),
+            self.bottomLabel.centerXAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.centerXAnchor),
+            ])
+        }
+
+        override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+          super.traitCollectionDidChange(previousTraitCollection)
+          self.topLabel.font = .preferredFont(forTextStyle: .headline, compatibleWith: self.traitCollection)
+          self.leadingLabel.font = .preferredFont(forTextStyle: .body, compatibleWith: self.traitCollection)
+          self.trailingLabel.font = .preferredFont(forTextStyle: .body, compatibleWith: self.traitCollection)
+          self.bottomLabel.font = .preferredFont(forTextStyle: .subheadline, compatibleWith: self.traitCollection)
+        }
       }
 
-      override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
+      let viewController = MyViewController()
 
-        self.label.font = .preferredFont(forTextStyle: .body, compatibleWith: self.traitCollection)
+      assertSnapshot(matching: viewController, as: .image(on: .iPhoneSe), named: "iphone-se")
+      assertSnapshot(matching: viewController, as: .image(on: .iPhone8), named: "iphone-8")
+      assertSnapshot(matching: viewController, as: .image(on: .iPhone8Plus), named: "iphone-8-plus")
+      assertSnapshot(matching: viewController, as: .image(on: .iPhoneX), named: "iphone-x")
+      assertSnapshot(matching: viewController, as: .image(on: .iPhoneXr), named: "iphone-xr")
+      assertSnapshot(matching: viewController, as: .image(on: .iPhoneXsMax), named: "iphone-xs-max")
+      assertSnapshot(matching: viewController, as: .image(on: .iPadMini), named: "ipad-mini")
+      assertSnapshot(matching: viewController, as: .image(on: .iPadPro10_5), named: "ipad-pro-10-5")
+      assertSnapshot(matching: viewController, as: .image(on: .iPadPro12_9), named: "ipad-pro-12-9")
+
+      assertSnapshot(matching: viewController, as: .image(on: .iPhoneSe(.portrait)), named: "iphone-se")
+      assertSnapshot(matching: viewController, as: .image(on: .iPhone8(.portrait)), named: "iphone-8")
+      assertSnapshot(matching: viewController, as: .image(on: .iPhone8Plus(.portrait)), named: "iphone-8-plus")
+      assertSnapshot(matching: viewController, as: .image(on: .iPhoneX(.portrait)), named: "iphone-x")
+      assertSnapshot(matching: viewController, as: .image(on: .iPhoneXr(.portrait)), named: "iphone-xr")
+      assertSnapshot(matching: viewController, as: .image(on: .iPhoneXsMax(.portrait)), named: "iphone-xs-max")
+      assertSnapshot(matching: viewController, as: .image(on: .iPadMini(.landscape)), named: "ipad-mini")
+      assertSnapshot(matching: viewController, as: .image(on: .iPadPro10_5(.landscape)), named: "ipad-pro-10-5")
+      assertSnapshot(matching: viewController, as: .image(on: .iPadPro12_9(.landscape)), named: "ipad-pro-12-9")
+
+      assertSnapshot(
+        matching: viewController, as: .image(on: .iPhoneSe(.landscape)), named: "iphone-se-alternative")
+      assertSnapshot(
+        matching: viewController, as: .image(on: .iPhone8(.landscape)), named: "iphone-8-alternative")
+      assertSnapshot(
+        matching: viewController, as: .image(on: .iPhone8Plus(.landscape)), named: "iphone-8-plus-alternative")
+      assertSnapshot(
+        matching: viewController, as: .image(on: .iPhoneX(.landscape)), named: "iphone-x-alternative")
+      assertSnapshot(
+        matching: viewController, as: .image(on: .iPhoneXr(.landscape)), named: "iphone-xr-alternative")
+      assertSnapshot(
+        matching: viewController, as: .image(on: .iPhoneXsMax(.landscape)), named: "iphone-xs-max-alternative")
+      assertSnapshot(
+        matching: viewController, as: .image(on: .iPadMini(.portrait)), named: "ipad-mini-alternative")
+      assertSnapshot(
+        matching: viewController, as: .image(on: .iPadPro10_5(.portrait)), named: "ipad-pro-10-5-alternative")
+      assertSnapshot(
+        matching: viewController, as: .image(on: .iPadPro12_9(.portrait)), named: "ipad-pro-12-9-alternative")
+
+      [
+        "extra-small": UIContentSizeCategory.extraSmall,
+        "small": .small,
+        "medium": .medium,
+        "large": .large,
+        "extra-large": .extraLarge,
+        "extra-extra-large": .extraExtraLarge,
+        "extra-extra-extra-large": .extraExtraExtraLarge,
+        "accessibility-medium": .accessibilityMedium,
+        "accessibility-large": .accessibilityLarge,
+        "accessibility-extra-large": .accessibilityExtraLarge,
+        "accessibility-extra-extra-large": .accessibilityExtraExtraLarge,
+        "accessibility-extra-extra-extra-large": .accessibilityExtraExtraExtraLarge,
+        ].forEach { name, contentSize in
+          assertSnapshot(
+            matching: viewController,
+            as: .image(on: .iPhoneSe, traits: .init(preferredContentSizeCategory: contentSize)),
+            named: "iphone-se-\(name)"
+          )
       }
-    }
-
-    let viewController = MyViewController()
-
-    assertSnapshot(matching: viewController, as: .image(on: .iPhoneSe), named: "iphone-se")
-    assertSnapshot(matching: viewController, as: .image(on: .iPhone8), named: "iphone-8")
-    assertSnapshot(matching: viewController, as: .image(on: .iPhone8Plus), named: "iphone-8-plus")
-    assertSnapshot(matching: viewController, as: .image(on: .iPadMini), named: "ipad-mini")
-    assertSnapshot(matching: viewController, as: .image(on: .iPadPro10_5), named: "ipad-pro-10-5")
-    assertSnapshot(matching: viewController, as: .image(on: .iPadPro12_9), named: "ipad-pro-12-9")
-
-    assertSnapshot(matching: viewController, as: .image(on: .iPhoneSe(.portrait)), named: "iphone-se")
-    assertSnapshot(matching: viewController, as: .image(on: .iPhone8(.portrait)), named: "iphone-8")
-    assertSnapshot(matching: viewController, as: .image(on: .iPhone8Plus(.portrait)), named: "iphone-8-plus")
-    assertSnapshot(matching: viewController, as: .image(on: .iPadMini(.landscape)), named: "ipad-mini")
-    assertSnapshot(matching: viewController, as: .image(on: .iPadPro10_5(.landscape)), named: "ipad-pro-10-5")
-    assertSnapshot(matching: viewController, as: .image(on: .iPadPro12_9(.landscape)), named: "ipad-pro-12-9")
-
-    assertSnapshot(
-      matching: viewController, as: .image(on: .iPhoneSe(.landscape)), named: "iphone-se-alternative")
-    assertSnapshot(
-      matching: viewController, as: .image(on: .iPhone8(.landscape)), named: "iphone-8-alternative")
-    assertSnapshot(
-      matching: viewController, as: .image(on: .iPhone8Plus(.landscape)), named: "iphone-8-plus-alternative")
-    assertSnapshot(
-      matching: viewController, as: .image(on: .iPadMini(.portrait)), named: "ipad-mini-alternative")
-    assertSnapshot(
-      matching: viewController, as: .image(on: .iPadPro10_5(.portrait)), named: "ipad-pro-10-5-alternative")
-    assertSnapshot(
-      matching: viewController, as: .image(on: .iPadPro12_9(.portrait)), named: "ipad-pro-12-9-alternative")
-
-    [
-      "extra-small": UIContentSizeCategory.extraSmall,
-      "small": .small,
-      "medium": .medium,
-      "large": .large,
-      "extra-large": .extraLarge,
-      "extra-extra-large": .extraExtraLarge,
-      "extra-extra-extra-large": .extraExtraExtraLarge,
-      "accessibility-medium": .accessibilityMedium,
-      "accessibility-large": .accessibilityLarge,
-      "accessibility-extra-large": .accessibilityExtraLarge,
-      "accessibility-extra-extra-large": .accessibilityExtraExtraLarge,
-      "accessibility-extra-extra-extra-large": .accessibilityExtraExtraExtraLarge,
-      ].forEach { name, contentSize in
-        assertSnapshot(
-          matching: viewController,
-          as: .image(on: .iPhoneSe, traits: .init(preferredContentSizeCategory: contentSize)),
-          named: "iphone-se-\(name)"
-        )
     }
     #endif
   }
