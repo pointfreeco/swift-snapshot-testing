@@ -241,7 +241,7 @@ class Window: UIWindow {
   override var safeAreaInsets: UIEdgeInsets {
     let removeTopInset: Bool
     #if os(iOS)
-    let removeTopInset = self.config.safeArea == .init(top: 20, left: 0, bottom: 0, right: 0)
+    removeTopInset = self.config.safeArea == .init(top: 20, left: 0, bottom: 0, right: 0)
       && self.rootViewController?.prefersStatusBarHidden ?? false
     #elseif os(tvOS)
     removeTopInset = false // FIXME
