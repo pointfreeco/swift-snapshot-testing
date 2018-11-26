@@ -434,11 +434,7 @@ fileprivate extension View {
 
 #if os(iOS) || os(macOS)
 private final class NavigationDelegate: NSObject, WKNavigationDelegate {
-  var didFinish: () -> Void
-
-  init(didFinish: @escaping () -> Void = {}) {
-    self.didFinish = didFinish
-  }
+  var didFinish: () -> Void = { }
 
   func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
     self.didFinish()
