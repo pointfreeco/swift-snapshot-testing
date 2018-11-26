@@ -7,7 +7,6 @@ extension Strategy where Snapshottable == UIView, Format == UIImage {
   }
 
   public static func image(
-    drawingHierarchyInKeyWindow: Bool = false,
     precision: Float = 1,
     size: CGSize? = nil,
     traits: UITraitCollection = .init()
