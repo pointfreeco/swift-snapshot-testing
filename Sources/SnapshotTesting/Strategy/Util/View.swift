@@ -195,14 +195,9 @@ func snapshotView(
     )
     return view.snapshot ?? Async { callback in
       addImagesForRenderedViews(view).sequence().run { views in
-        Strategy<CALayer, UIImage>
-          .image(traits: traits)
-          .snapshotToDiffable(view.layer)
-          .run { image in
-            callback(image)
-            views.forEach { $0.removeFromSuperview() }
-            view.frame = initialFrame
-        }
+        callback(view.layer.image(for: traits))
+        views.forEach { $0.removeFromSuperview() }
+        view.frame = initialFrame
       }
   }
 }
@@ -537,11 +532,9 @@ extension View {
         }
 
         if wkWebView.isLoading {
-          print("isLoading")
           delegate.didFinish = work
           wkWebView.navigationDelegate = delegate
         } else {
-          print("isntLoading")
           work()
         }
       }
