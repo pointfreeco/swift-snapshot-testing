@@ -504,6 +504,8 @@ class Window: UIWindow {
     self.config = config
     super.init(frame: .init(origin: .zero, size: size))
 
+    // NB: Safe area renders inaccurately for UI{Navigation,TabBar}Controller.
+    // Fixes welcome!
     if viewController is UINavigationController {
       self.frame.size.height -= self.config.safeArea.top
       self.config.safeArea.top = 0
@@ -529,7 +531,7 @@ class Window: UIWindow {
     rootViewController.beginAppearanceTransition(true, animated: false)
     rootViewController.endAppearanceTransition()
     self.rootViewController = rootViewController
-    //    rootViewController.view.bounds.size = self.bounds.size
+//    rootViewController.view.bounds.size = self.bounds.size
     rootViewController.view.setNeedsLayout()
     rootViewController.view.layoutIfNeeded()
     self.isHidden = false
