@@ -420,10 +420,16 @@ class Window: UIWindow {
     self.config = config
     super.init(frame: .init(origin: .zero, size: size))
 
-    if viewController is UINavigationController
-      || (viewController as? UITabBarController)?.selectedViewController is UINavigationController {
+    if viewController is UINavigationController {
       self.frame.size.height -= self.config.safeArea.top
       self.config.safeArea.top = 0
+    } else if let viewController = viewController as? UITabBarController {
+      self.frame.size.height -= self.config.safeArea.bottom
+      self.config.safeArea.bottom = 0
+      if viewController.selectedViewController is UINavigationController {
+        self.frame.size.height -= self.config.safeArea.top
+        self.config.safeArea.top = 0
+      }
     }
 
     let rootViewController = UIViewController()
