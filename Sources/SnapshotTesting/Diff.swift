@@ -42,7 +42,7 @@ func diff<A: Hashable>(_ fst: [A], _ snd: [A]) -> [Difference<A>] {
   }
 }
 
-let minus = "−"
+let minus = "-"
 let plus = "+"
 private let figureSpace = "\u{2007}"
 
