@@ -18,9 +18,9 @@ public struct ViewImageConfig {
     case portrait
   }
 
-  public let safeArea: UIEdgeInsets
-  public let size: CGSize?
-  public let traits: UITraitCollection
+  public var safeArea: UIEdgeInsets
+  public var size: CGSize?
+  public var traits: UITraitCollection
 
   public init(
     safeArea: UIEdgeInsets = .zero,
@@ -355,7 +355,7 @@ extension UITraitCollection {
     ]
   )
   #elseif os(tvOS)
-  // FIXME
+  // TODO
   #endif
 }
 #endif
@@ -413,15 +413,22 @@ func snapshotView(
 }
 
 class Window: UIWindow {
-  let config: ViewImageConfig
+  var config: ViewImageConfig
 
   init(config: ViewImageConfig, viewController: UIViewController) {
     let size = config.size ?? viewController.view.bounds.size
     self.config = config
     super.init(frame: .init(origin: .zero, size: size))
+
+    if viewController is UINavigationController
+      || (viewController as? UITabBarController)?.selectedViewController is UINavigationController {
+      self.frame.size.height -= self.config.safeArea.top
+      self.config.safeArea.top = 0
+    }
+
     let rootViewController = UIViewController()
     rootViewController.view.backgroundColor = .clear
-    rootViewController.view.frame.size = size
+    rootViewController.view.frame = self.frame
     rootViewController.preferredContentSize = rootViewController.view.frame.size
     viewController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
     viewController.view.frame = rootViewController.view.frame
@@ -432,7 +439,7 @@ class Window: UIWindow {
     rootViewController.beginAppearanceTransition(true, animated: false)
     rootViewController.endAppearanceTransition()
     self.rootViewController = rootViewController
-    rootViewController.view.bounds.size = self.bounds.size
+//    rootViewController.view.bounds.size = self.bounds.size
     rootViewController.view.setNeedsLayout()
     rootViewController.view.layoutIfNeeded()
     self.isHidden = false
