@@ -31,6 +31,7 @@ Automatically record app data into test assertions. Snapshot tests capture the e
 - **More hands-off.** New snapshots are automatically recorded.
 - **Subclass-free.** Assert from any XCTest test case or Quick spec.
 - **Device-agnostic snapshots.** Render views and view controllers for specific devices and trait collections from a single simulator.
+- **First-class Xcode support.** Image differences are captured as XCTest attachments. Text differences are rendered in error messages inline!
 - **iOS, macOS, and tvOS support.**
 - **SceneKit, SpriteKit, and WebKit support.**
 - **Test _any_ data structure.** Snap complex app state in a dependable way.
