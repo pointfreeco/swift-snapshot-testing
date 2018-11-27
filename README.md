@@ -26,16 +26,16 @@ Automatically record app data into test assertions. Snapshot tests capture the e
 
 ## Features
 
-- Snapshot test _anything_. Snapshot testing isn’t just for UI. Write snapshots against any format!
-- No configuration required. Don’t fuss with scheme settings and environment variables. Snapshots are automatically saved alongside your tests.
-- More hands-off. New snapshots are automatically recorded.
-- Subclass-free. Assert from any XCTest test case or Quick spec.
-- Device-agnostic snapshots: render views and view controllers for specific devices and trait collections from a single simulator.
-- iOS, macOS, and tvOS support.
-- SceneKit, SpriteKit, and WebKit support.
-- Test any data structure. Snap complex app state in a dependable way.
-- Codable support. Snapshot your data structures into JSON and property lists.
-- Extensible and transformable. Build your own snapshot strategies from scratch or build from existing ones.
+- **Snapshot test _anything_.** Snapshot testing isn’t just for UI. Write snapshots against any format!
+- **No configuration required.** Don’t fuss with scheme settings and environment variables. Snapshots are automatically saved alongside your tests.
+- **More hands-off.** New snapshots are automatically recorded.
+- **Subclass-free.** Assert from any XCTest test case or Quick spec.
+- **Device-agnostic snapshots.** Render views and view controllers for specific devices and trait collections from a single simulator.
+- **iOS, macOS, and tvOS support.**
+- **SceneKit, SpriteKit, and WebKit support.**
+- **Test _any_ data structure.** Snap complex app state in a dependable way.
+- **Codable support**. Snapshot your data structures into JSON and property lists.
+- **Extensible and transformable.** Build your own snapshot strategies from scratch or build from existing ones.
 
 ## Usage
 
