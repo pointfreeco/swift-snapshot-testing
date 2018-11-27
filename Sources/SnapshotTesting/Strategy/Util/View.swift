@@ -169,6 +169,12 @@ public struct ViewImageConfig {
     }
     return .init(safeArea: .init(top: 20, left: 0, bottom: 0, right: 0), size: size, traits: .iPadPro12_9)
   }
+  #elseif os(tvOS)
+  public static let tv = ViewImageConfig(
+    safeArea: .init(top: 60, left: 90, bottom: 60, right: 90),
+    size: .init(width: 1920, height: 1080),
+    traits: .init()
+  )
   #endif
 }
 
@@ -543,14 +549,11 @@ class Window: UIWindow {
 
   @available(iOS 11.0, *)
   override var safeAreaInsets: UIEdgeInsets {
-    let removeTopInset: Bool
     #if os(iOS)
-    removeTopInset = self.config.safeArea == .init(top: 20, left: 0, bottom: 0, right: 0)
+    let removeTopInset = self.config.safeArea == .init(top: 20, left: 0, bottom: 0, right: 0)
       && self.rootViewController?.prefersStatusBarHidden ?? false
-    #elseif os(tvOS)
-    removeTopInset = false // FIXME
-    #endif
     if removeTopInset { return .zero }
+    #endif
     return self.config.safeArea
   }
 }
