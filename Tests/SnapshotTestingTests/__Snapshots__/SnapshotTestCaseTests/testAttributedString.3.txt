@@ -1,0 +1,4 @@
+- Hello{
+    NSColor = "UIExtendedSRGBColorSpace 0 0 1 1";
+    NSFont = "<UICTFont> font-family: \".SFUIDisplay-Semibold\"; font-weight: bold; font-style: normal; font-size: 20.00pt";
+}

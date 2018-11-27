@@ -282,6 +282,17 @@ class SnapshotTestCaseTests: TestCase {
     )
     assertSnapshot(matching: set, as: .dump)
   }
+
+  func testAttributedString() {
+    let str = NSMutableAttributedString.init(string: "Hello")
+    str.addAttributes([NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 18), NSAttributedString.Key.foregroundColor: UIColor.blue], range: NSRange.init(location: 0, length: 5))
+
+//    record = true
+
+    assertSnapshot(matching: str, as: .image)
+    assertSnapshot(matching: str, as: .html)
+    assertSnapshot(matching: str, as: .dump)
+  }
 }
 
 #if os(Linux)
