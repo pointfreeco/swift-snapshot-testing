@@ -10,7 +10,7 @@ public func assertSnapshot<A: DefaultSnapshottable>(
   record recording: Bool = false,
   timeout: TimeInterval = 5,
   file: StaticString = #file,
-  function: String = #function,
+  testName: String = #function,
   line: UInt = #line)
   where A.Snapshottable == A
 {
@@ -21,7 +21,7 @@ public func assertSnapshot<A: DefaultSnapshottable>(
     record: recording,
     timeout: timeout,
     file: file,
-    function: function,
+    testName: testName,
     line: line
   )
 }
@@ -33,7 +33,7 @@ public func assertSnapshot<A, B>(
   record recording: Bool = false,
   timeout: TimeInterval = 5,
   file: StaticString = #file,
-  function: String = #function,
+  testName: String = #function,
   line: UInt = #line
   ) {
 
@@ -52,7 +52,7 @@ public func assertSnapshot<A, B>(
       identifier = name
     } else {
       let counter = counterQueue.sync { () -> Int in
-        let key = snapshotDirectoryUrl.appendingPathComponent(function)
+        let key = snapshotDirectoryUrl.appendingPathComponent(testName)
         counterMap[key, default: 0] += 1
         return counterMap[key]!
       }
@@ -60,7 +60,7 @@ public func assertSnapshot<A, B>(
     }
 
     let snapshotFileUrl = snapshotDirectoryUrl
-      .appendingPathComponent("\(function.dropLast(2)).\(identifier)")
+      .appendingPathComponent("\(testName.dropLast(2)).\(identifier)")
       .appendingPathExtension(strategy.pathExtension ?? "")
     let fileManager = FileManager.default
     try fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)

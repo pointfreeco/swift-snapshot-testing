@@ -12,7 +12,7 @@ open class SnapshotTestCase: XCTestCase {
     record recording: Bool = false,
     timeout: TimeInterval = 5,
     file: StaticString = #file,
-    function: String = #function,
+    testName: String = #function,
     line: UInt = #line)
     where A.Snapshottable == A
   {
@@ -23,7 +23,7 @@ open class SnapshotTestCase: XCTestCase {
       record: recording,
       timeout: timeout,
       file: file,
-      function: function,
+      testName: testName,
       line: line
     )
   }
@@ -35,7 +35,7 @@ open class SnapshotTestCase: XCTestCase {
     record recording: Bool = false,
     timeout: TimeInterval = 5,
     file: StaticString = #file,
-    function: String = #function,
+    testName: String = #function,
     line: UInt = #line
     ) {
 
@@ -58,7 +58,7 @@ open class SnapshotTestCase: XCTestCase {
       }
 
       let snapshotFileUrl = snapshotDirectoryUrl
-        .appendingPathComponent("\(function.dropLast(2)).\(identifier)")
+        .appendingPathComponent("\(testName.dropLast(2)).\(identifier)")
         .appendingPathExtension(strategy.pathExtension ?? "")
       let fileManager = FileManager.default
       try fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
