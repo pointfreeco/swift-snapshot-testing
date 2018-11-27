@@ -451,6 +451,8 @@ extension SnapshotTestCaseTests {
       ("testWithDate", testWithDate),
       ("testWithEncodable", testWithEncodable),
       ("testWithNSObject", testWithNSObject),
+      ("testTraits", testTraits),
+      ("testTraitsEmbeddedInTabNavigation", testTraitsEmbeddedInTabNavigation),
     ]
   }
 }

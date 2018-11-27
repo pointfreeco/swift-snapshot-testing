@@ -382,93 +382,6 @@ func addImagesForRenderedViews(_ view: View) -> [Async<View>] {
     ?? view.subviews.flatMap(addImagesForRenderedViews)
 }
 
-func snapshotView(
-  config: ViewImageConfig,
-  traits: UITraitCollection = .init(),
-  view: UIView,
-  viewController: UIViewController)
-  -> Async<UIImage> {
-    let size = config.size ?? viewController.view.frame.size
-    guard size.width > 0, size.height > 0 else {
-      fatalError("View not renderable to image at size \(size)")
-    }
-    let initialFrame = view.frame
-    view.frame.size = size
-    if view != viewController.view {
-      viewController.view.bounds = view.bounds
-      viewController.view.addSubview(view)
-    }
-    let traits = UITraitCollection(traitsFrom: [config.traits, traits])
-    _ = Window(
-      config: .init(safeArea: config.safeArea, size: config.size ?? size, traits: traits),
-      viewController: viewController
-    )
-    return view.snapshot ?? Async { callback in
-      addImagesForRenderedViews(view).sequence().run { views in
-        callback(view.layer.image(for: traits))
-        views.forEach { $0.removeFromSuperview() }
-        view.frame = initialFrame
-      }
-    }
-}
-
-class Window: UIWindow {
-  var config: ViewImageConfig
-
-  init(config: ViewImageConfig, viewController: UIViewController) {
-    let size = config.size ?? viewController.view.bounds.size
-    self.config = config
-    super.init(frame: .init(origin: .zero, size: size))
-
-    if viewController is UINavigationController {
-      self.frame.size.height -= self.config.safeArea.top
-      self.config.safeArea.top = 0
-    } else if let viewController = viewController as? UITabBarController {
-      self.frame.size.height -= self.config.safeArea.bottom
-      self.config.safeArea.bottom = 0
-      if viewController.selectedViewController is UINavigationController {
-        self.frame.size.height -= self.config.safeArea.top
-        self.config.safeArea.top = 0
-      }
-    }
-
-    let rootViewController = UIViewController()
-    rootViewController.view.backgroundColor = .clear
-    rootViewController.view.frame = self.frame
-    rootViewController.preferredContentSize = rootViewController.view.frame.size
-    viewController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-    viewController.view.frame = rootViewController.view.frame
-    rootViewController.view.addSubview(viewController.view)
-    rootViewController.addChild(viewController)
-    rootViewController.setOverrideTraitCollection(config.traits, forChild: viewController)
-    viewController.didMove(toParent: rootViewController)
-    rootViewController.beginAppearanceTransition(true, animated: false)
-    rootViewController.endAppearanceTransition()
-    self.rootViewController = rootViewController
-//    rootViewController.view.bounds.size = self.bounds.size
-    rootViewController.view.setNeedsLayout()
-    rootViewController.view.layoutIfNeeded()
-    self.isHidden = false
-  }
-
-  required init?(coder aDecoder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
-  }
-
-  @available(iOS 11.0, *)
-  override var safeAreaInsets: UIEdgeInsets {
-    let removeTopInset: Bool
-    #if os(iOS)
-    removeTopInset = self.config.safeArea == .init(top: 20, left: 0, bottom: 0, right: 0)
-      && self.rootViewController?.prefersStatusBarHidden ?? false
-    #elseif os(tvOS)
-    removeTopInset = false // FIXME
-    #endif
-    if removeTopInset { return .zero }
-    return self.config.safeArea
-  }
-}
-
 extension View {
   var snapshot: Async<Image>? {
     func inWindow<T>(_ perform: () -> T) -> T {
@@ -548,6 +461,95 @@ private final class NavigationDelegate: NSObject, WKNavigationDelegate {
     webView.evaluateJavaScript("document.readyState") { _, _ in
       self.didFinish()
     }
+  }
+}
+#endif
+
+#if os(iOS) || os(tvOS)
+func snapshotView(
+  config: ViewImageConfig,
+  traits: UITraitCollection = .init(),
+  view: UIView,
+  viewController: UIViewController)
+  -> Async<UIImage> {
+    let size = config.size ?? viewController.view.frame.size
+    guard size.width > 0, size.height > 0 else {
+      fatalError("View not renderable to image at size \(size)")
+    }
+    let initialFrame = view.frame
+    view.frame.size = size
+    if view != viewController.view {
+      viewController.view.bounds = view.bounds
+      viewController.view.addSubview(view)
+    }
+    let traits = UITraitCollection(traitsFrom: [config.traits, traits])
+    _ = Window(
+      config: .init(safeArea: config.safeArea, size: config.size ?? size, traits: traits),
+      viewController: viewController
+    )
+    return view.snapshot ?? Async { callback in
+      addImagesForRenderedViews(view).sequence().run { views in
+        callback(view.layer.image(for: traits))
+        views.forEach { $0.removeFromSuperview() }
+        view.frame = initialFrame
+      }
+    }
+}
+
+class Window: UIWindow {
+  var config: ViewImageConfig
+
+  init(config: ViewImageConfig, viewController: UIViewController) {
+    let size = config.size ?? viewController.view.bounds.size
+    self.config = config
+    super.init(frame: .init(origin: .zero, size: size))
+
+    if viewController is UINavigationController {
+      self.frame.size.height -= self.config.safeArea.top
+      self.config.safeArea.top = 0
+    } else if let viewController = viewController as? UITabBarController {
+      self.frame.size.height -= self.config.safeArea.bottom
+      self.config.safeArea.bottom = 0
+      if viewController.selectedViewController is UINavigationController {
+        self.frame.size.height -= self.config.safeArea.top
+        self.config.safeArea.top = 0
+      }
+    }
+
+    let rootViewController = UIViewController()
+    rootViewController.view.backgroundColor = .clear
+    rootViewController.view.frame = self.frame
+    rootViewController.preferredContentSize = rootViewController.view.frame.size
+    viewController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    viewController.view.frame = rootViewController.view.frame
+    rootViewController.view.addSubview(viewController.view)
+    rootViewController.addChild(viewController)
+    rootViewController.setOverrideTraitCollection(config.traits, forChild: viewController)
+    viewController.didMove(toParent: rootViewController)
+    rootViewController.beginAppearanceTransition(true, animated: false)
+    rootViewController.endAppearanceTransition()
+    self.rootViewController = rootViewController
+    //    rootViewController.view.bounds.size = self.bounds.size
+    rootViewController.view.setNeedsLayout()
+    rootViewController.view.layoutIfNeeded()
+    self.isHidden = false
+  }
+
+  required init?(coder aDecoder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+
+  @available(iOS 11.0, *)
+  override var safeAreaInsets: UIEdgeInsets {
+    let removeTopInset: Bool
+    #if os(iOS)
+    removeTopInset = self.config.safeArea == .init(top: 20, left: 0, bottom: 0, right: 0)
+      && self.rootViewController?.prefersStatusBarHidden ?? false
+    #elseif os(tvOS)
+    removeTopInset = false // FIXME
+    #endif
+    if removeTopInset { return .zero }
+    return self.config.safeArea
   }
 }
 #endif
