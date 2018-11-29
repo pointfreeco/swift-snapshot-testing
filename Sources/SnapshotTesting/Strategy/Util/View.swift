@@ -485,6 +485,8 @@ func snapshotView(
       fatalError("View not renderable to image at size \(size)")
     }
     let initialFrame = view.frame
+    // NB: Avoid safe area influence.
+    if config.safeArea == .zero { view.frame.origin = .init(x: offscreen, y: offscreen) }
     view.frame.size = size
     if view != viewController.view {
       viewController.view.bounds = view.bounds
@@ -510,7 +512,7 @@ func snapshotView(
         callback(
           renderer(bounds: view.bounds, for: traits).image { ctx in
             if drawHierarchyInKeyWindow {
-              view.drawHierarchy(in: view.frame, afterScreenUpdates: true)
+              view.drawHierarchy(in: view.bounds, afterScreenUpdates: true)
             } else {
               view.layer.render(in: ctx.cgContext)
             }
@@ -521,6 +523,8 @@ func snapshotView(
       }
     }
 }
+
+private let offscreen: CGFloat = 10_000
 
 func renderer(bounds: CGRect, for traits: UITraitCollection) -> UIGraphicsImageRenderer {
   let renderer: UIGraphicsImageRenderer

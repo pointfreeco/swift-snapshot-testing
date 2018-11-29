@@ -69,7 +69,7 @@ class SnapshotTestCaseTests: TestCase {
 
   func testMixedViews() {
     #if os(iOS) || os(macOS)
-    // NB: CircleCI crashes while trying to instantiate SKView
+    // NB: CircleCI crashes while trying to instantiate SKView.
     if #available(macOS 10.14, *) {
       let webView = WKWebView(frame: .init(x: 0, y: 0, width: 50, height: 50))
       webView.loadHTMLString("🌎", baseURL: nil)
@@ -131,7 +131,7 @@ class SnapshotTestCaseTests: TestCase {
 
   func testSCNView() {
     #if os(iOS) || os(macOS) || os(tvOS)
-    // NB: CircleCI crashes while trying to instantiate SCNView
+    // NB: CircleCI crashes while trying to instantiate SCNView.
     if #available(macOS 10.14, *) {
       let scene = SCNScene()
 
@@ -168,7 +168,7 @@ class SnapshotTestCaseTests: TestCase {
 
   func testSKView() {
     #if os(iOS) || os(macOS) || os(tvOS)
-    // NB: CircleCI crashes while trying to instantiate SKView
+    // NB: CircleCI crashes while trying to instantiate SKView.
     if #available(macOS 10.14, *) {
       let scene = SKScene(size: .init(width: 50, height: 50))
       let node = SKShapeNode(circleOfRadius: 15)
