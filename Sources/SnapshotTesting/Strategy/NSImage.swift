@@ -35,10 +35,6 @@ extension Strategy where Snapshottable == NSImage, Format == NSImage {
   }
 }
 
-extension NSImage: DefaultSnapshottable {
-  public static let defaultStrategy: SimpleStrategy = .image
-}
-
 private func NSImagePNGRepresentation(_ image: NSImage) -> Data? {
   guard let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else { return nil }
   let rep = NSBitmapImageRep(cgImage: cgImage)
