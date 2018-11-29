@@ -1,11 +1,27 @@
 #if !os(Linux)
 import XCTest
 
+/// Enhances failure messages with a command line expression that can be copied and pasted into a terminal.
+///
+///     diffTool = "ksdiff"
 public var diffTool: String? = nil
+
+/// Whether or not to record all new references.
 public var record = false
 
+/// Asserts that a given value matches a reference on disk.
+///
+/// - Parameters:
+///   - value: A value of to compare against a reference.
+///   - strategy: A strategy for serializing, deserializing, and comparing values.
+///   - name: An optional description of the snapshot.
+///   - recording: Whether or not to record a new reference.
+///   - timeout: The amount of time a snapshot must be generated in.
+///   - file: The file in which failure occurred. Defaults to the file name of the test case in which this function was called.
+///   - testName: The name of the test in which failure occurred. Defaults to the function name of the test case in which this function was called.
+///   - line: The line number on which failure occurred. Defaults to the line number on which this function was called.
 public func assertSnapshot<A, B>(
-  matching value: A,
+  matching value: @autoclosure () throws -> A,
   as strategy: Strategy<A, B>,
   named name: String? = nil,
   record recording: Bool = false,
@@ -27,7 +43,7 @@ public func assertSnapshot<A, B>(
 
     let identifier: String
     if let name = name {
-      identifier = name
+      identifier = sanitizePathComponent(name)
     } else {
       let counter = counterQueue.sync { () -> Int in
         let key = snapshotDirectoryUrl.appendingPathComponent(testName)
@@ -37,15 +53,16 @@ public func assertSnapshot<A, B>(
       identifier = String(counter)
     }
 
+    let testName = sanitizePathComponent(testName)
     let snapshotFileUrl = snapshotDirectoryUrl
-      .appendingPathComponent("\(testName.dropLast(2)).\(identifier)")
+      .appendingPathComponent("\(testName).\(identifier)")
       .appendingPathExtension(strategy.pathExtension ?? "")
     let fileManager = FileManager.default
     try fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
 
     let tookSnapshot = XCTestExpectation(description: "Took snapshot")
     var optionalDiffable: B?
-    strategy.snapshotToDiffable(value).run { b in
+    strategy.snapshotToDiffable(try value()).run { b in
       optionalDiffable = b
       tookSnapshot.fulfill()
     }
@@ -112,3 +129,9 @@ public func assertSnapshot<A, B>(
 private let counterQueue = DispatchQueue(label: "co.pointfree.SnapshotTesting.counter")
 private var counterMap: [URL: Int] = [:]
 #endif
+
+func sanitizePathComponent(_ string: String) -> String {
+  return string
+    .replacingOccurrences(of: "\\W+", with: "-", options: .regularExpression)
+    .replacingOccurrences(of: "^-|-$", with: "", options: .regularExpression)
+}

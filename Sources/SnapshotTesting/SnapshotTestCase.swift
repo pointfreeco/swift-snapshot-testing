@@ -2,10 +2,25 @@
 import XCTest
 
 open class SnapshotTestCase: XCTestCase {
-  private var counter = 1
+  /// Whether or not to record all new references.
   open var record = false
+
+  /// Enhances failure messages with a command line expression that can be copied and pasted into a terminal.
+  ///
+  ///     diffTool = "ksdiff"
   open var diffTool: String? = nil
 
+  /// Asserts that a given value matches a reference on disk.
+  ///
+  /// - Parameters:
+  ///   - value: A value of to compare against a reference.
+  ///   - strategy: A strategy for serializing, deserializing, and comparing values.
+  ///   - name: An optional description of the snapshot.
+  ///   - recording: Whether or not to record a new reference.
+  ///   - timeout: The amount of time a snapshot must be generated in.
+  ///   - file: The file in which failure occurred. Defaults to the file name of the test case in which this function was called.
+  ///   - testName: The name of the test in which failure occurred. Defaults to the function name of the test case in which this function was called.
+  ///   - line: The line number on which failure occurred. Defaults to the line number on which this function was called.
   public func assertSnapshot<Snapshottable, Format>(
     matching value: Snapshottable,
     as strategy: Strategy<Snapshottable, Format>,
@@ -29,14 +44,15 @@ open class SnapshotTestCase: XCTestCase {
 
       let identifier: String
       if let name = name {
-        identifier = name
+        identifier = sanitizePathComponent(name)
       } else {
         identifier = String(counter)
         counter += 1
       }
 
+      let testName = sanitizePathComponent(testName)
       let snapshotFileUrl = snapshotDirectoryUrl
-        .appendingPathComponent("\(testName.dropLast(2)).\(identifier)")
+        .appendingPathComponent("\(testName).\(identifier)")
         .appendingPathExtension(strategy.pathExtension ?? "")
       let fileManager = FileManager.default
       try fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
@@ -102,5 +118,7 @@ open class SnapshotTestCase: XCTestCase {
       XCTFail(error.localizedDescription, file: file, line: line)
     }
   }
+
+  private var counter = 1
 }
 #endif
