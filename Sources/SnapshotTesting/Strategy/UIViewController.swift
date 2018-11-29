@@ -44,8 +44,4 @@ extension Strategy where Snapshottable == UIViewController, Format == String {
     return Strategy<UIView, String>.recursiveDescription.pullback { $0.view }
   }
 }
-
-extension UIViewController: DefaultSnapshottable {
-  public static let defaultStrategy: Strategy<UIViewController, UIImage> = .image
-}
 #endif

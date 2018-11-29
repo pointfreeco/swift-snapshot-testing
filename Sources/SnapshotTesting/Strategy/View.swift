@@ -55,10 +55,6 @@ extension Strategy where Snapshottable == NSView, Format == String {
     }
   }
 }
-
-extension NSView: DefaultSnapshottable {
-  public static let defaultStrategy: Strategy<NSView, NSImage> = .image
-}
 #elseif os(iOS) || os(tvOS)
 extension Strategy where Snapshottable == UIView, Format == UIImage {
   public static var image: Strategy {
@@ -128,10 +124,6 @@ extension Strategy where Snapshottable == UIView, Format == String {
       )
     }
   }
-}
-
-extension UIView: DefaultSnapshottable {
-  public static let defaultStrategy: Strategy<UIView, UIImage> = .image
 }
 
 func traitController(
