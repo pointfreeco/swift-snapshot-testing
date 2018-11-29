@@ -39,10 +39,6 @@ extension Strategy where Snapshottable == UIImage, Format == UIImage {
   }
 }
 
-extension UIImage: DefaultSnapshottable {
-  public static let defaultStrategy: SimpleStrategy = .image
-}
-
 private func compare(_ old: UIImage, _ new: UIImage, precision: Float) -> Bool {
   guard let oldCgImage = old.cgImage else { return false }
   guard let newCgImage = new.cgImage else { return false }
