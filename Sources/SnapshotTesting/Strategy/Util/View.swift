@@ -508,9 +508,9 @@ func snapshotView(
     return view.snapshot ?? Async { callback in
       addImagesForRenderedViews(view).sequence().run { views in
         callback(
-          renderer(size: view.bounds.size, for: traits).image { ctx in
+          renderer(bounds: view.bounds, for: traits).image { ctx in
             if drawHierarchyInKeyWindow {
-              view.drawHierarchy(in: view.bounds, afterScreenUpdates: true)
+              view.drawHierarchy(in: view.frame, afterScreenUpdates: true)
             } else {
               view.layer.render(in: ctx.cgContext)
             }
@@ -522,12 +522,12 @@ func snapshotView(
     }
 }
 
-func renderer(size: CGSize, for traits: UITraitCollection) -> UIGraphicsImageRenderer {
+func renderer(bounds: CGRect, for traits: UITraitCollection) -> UIGraphicsImageRenderer {
   let renderer: UIGraphicsImageRenderer
   if #available(iOS 11.0, tvOS 11.0, *) {
-    renderer = UIGraphicsImageRenderer(size: size, format: .init(for: traits))
+    renderer = UIGraphicsImageRenderer(bounds: bounds, format: .init(for: traits))
   } else {
-    renderer = UIGraphicsImageRenderer(size: size)
+    renderer = UIGraphicsImageRenderer(bounds: bounds)
   }
   return renderer
 }

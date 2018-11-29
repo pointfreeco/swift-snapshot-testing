@@ -30,7 +30,7 @@ extension Strategy where Snapshottable == CALayer, Format == UIImage {
   public static func image(precision: Float = 1, traits: UITraitCollection = .init())
     -> Strategy {
       return SimpleStrategy.image(precision: precision).pullback { layer in
-        renderer(size: layer.bounds.size, for: traits).image { ctx in
+        renderer(bounds: layer.bounds, for: traits).image { ctx in
           layer.setNeedsLayout()
           layer.layoutIfNeeded()
           layer.render(in: ctx.cgContext)

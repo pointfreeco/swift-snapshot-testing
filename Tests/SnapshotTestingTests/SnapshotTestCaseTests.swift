@@ -104,6 +104,13 @@ class SnapshotTestCaseTests: TestCase {
     #endif
   }
 
+  func testTableViewController() {
+    #if os(iOS)
+    let tableViewController = UITableViewController()
+    assertSnapshot(matching: tableViewController, as: .image(on: .iPhoneSe))
+    #endif
+  }
+
   func testWebView() throws {
     #if os(iOS) || os(macOS)
     let fixtureUrl = URL(fileURLWithPath: String(#file))

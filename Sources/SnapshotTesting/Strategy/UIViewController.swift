@@ -9,13 +9,14 @@ extension Strategy where Snapshottable == UIViewController, Format == UIImage {
   public static func image(
     on config: ViewImageConfig,
     precision: Float = 1,
+    size: CGSize? = nil,
     traits: UITraitCollection = .init()
     )
     -> Strategy {
 
       return SimpleStrategy.image(precision: precision).asyncPullback { viewController in
         snapshotView(
-          config: config,
+          config: size.map { .init(safeArea: config.safeArea, size: $0, traits: config.traits) } ?? config,
           drawHierarchyInKeyWindow: false,
           traits: traits,
           view: viewController.view,
