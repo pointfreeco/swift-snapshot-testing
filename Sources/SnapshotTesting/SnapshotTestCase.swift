@@ -6,28 +6,6 @@ open class SnapshotTestCase: XCTestCase {
   open var record = false
   open var diffTool: String? = nil
 
-  public func assertSnapshot<A: DefaultSnapshottable>(
-    matching snapshot: A,
-    named name: String? = nil,
-    record recording: Bool = false,
-    timeout: TimeInterval = 5,
-    file: StaticString = #file,
-    testName: String = #function,
-    line: UInt = #line)
-    where A.Snapshottable == A
-  {
-    return assertSnapshot(
-      matching: snapshot,
-      as: A.defaultStrategy,
-      named: name,
-      record: recording,
-      timeout: timeout,
-      file: file,
-      testName: testName,
-      line: line
-    )
-  }
-
   public func assertSnapshot<Snapshottable, Format>(
     matching value: Snapshottable,
     as strategy: Strategy<Snapshottable, Format>,

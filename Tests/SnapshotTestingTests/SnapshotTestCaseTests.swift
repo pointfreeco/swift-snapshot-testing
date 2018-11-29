@@ -62,7 +62,7 @@ class SnapshotTestCaseTests: TestCase {
   func testUIView() {
     #if os(iOS)
     let view = UIButton(type: .contactAdd)
-    assertSnapshot(matching: view)
+    assertSnapshot(matching: view, as: .image)
     assertSnapshot(matching: view, as: .recursiveDescription)
     #endif
   }
@@ -86,7 +86,7 @@ class SnapshotTestCaseTests: TestCase {
       view.addSubview(webView)
       view.addSubview(skView)
 
-      assertSnapshot(matching: view, named: platform)
+      assertSnapshot(matching: view, as: .image, named: platform)
     }
     #endif
   }
@@ -98,7 +98,7 @@ class SnapshotTestCaseTests: TestCase {
     button.title = "Push Me"
     button.sizeToFit()
     if #available(macOS 10.14, *) {
-      assertSnapshot(matching: button)
+      assertSnapshot(matching: button, as: .image)
       assertSnapshot(matching: button, as: .recursiveDescription)
     }
     #endif
@@ -150,7 +150,11 @@ class SnapshotTestCaseTests: TestCase {
       omniLightNode.position = SCNVector3Make(10, 10, 10)
       scene.rootNode.addChildNode(omniLightNode)
 
-      assertSnapshot(matching: scene, as: .image(size: .init(width: 500, height: 500)), named: platform)
+      assertSnapshot(
+        matching: scene,
+        as: .image(size: .init(width: 500, height: 500)),
+        named: platform
+      )
     }
     #endif
   }
@@ -165,7 +169,11 @@ class SnapshotTestCaseTests: TestCase {
       node.position = .init(x: 25, y: 25)
       scene.addChild(node)
 
-      assertSnapshot(matching: scene, as: .image(size: .init(width: 50, height: 50)), named: platform)
+      assertSnapshot(
+        matching: scene,
+        as: .image(size: .init(width: 50, height: 50)),
+        named: platform
+      )
     }
     #endif
   }

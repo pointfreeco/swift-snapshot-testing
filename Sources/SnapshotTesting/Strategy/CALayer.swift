@@ -19,10 +19,6 @@ extension Strategy where Snapshottable == CALayer, Format == NSImage {
     }
   }
 }
-
-extension CALayer: DefaultSnapshottable {
-  public static let defaultStrategy: Strategy<CALayer, NSImage> = .image
-}
 #elseif os(iOS) || os(tvOS)
 import UIKit
 
@@ -54,9 +50,5 @@ extension CALayer {
       self.render(in: context.cgContext)
     }
   }
-}
-
-extension CALayer: DefaultSnapshottable {
-  public static let defaultStrategy: Strategy<CALayer, UIImage> = .image
 }
 #endif

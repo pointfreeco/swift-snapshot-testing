@@ -24,7 +24,3 @@ extension Strategy where Snapshottable == Data, Format == Data {
     )
   }
 }
-
-extension Data: DefaultSnapshottable {
-  public static let defaultStrategy: SimpleStrategy = .data
-}

@@ -36,8 +36,4 @@ extension Strategy where Snapshottable == NSView, Format == String {
     }
   }
 }
-
-extension NSView: DefaultSnapshottable {
-  public static let defaultStrategy: Strategy<NSView, NSImage> = .image
-}
 #endif

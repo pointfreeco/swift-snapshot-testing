@@ -4,10 +4,6 @@ extension Strategy where Snapshottable == String, Format == String {
   public static let lines = Strategy(pathExtension: "txt", diffable: .lines)
 }
 
-extension String: DefaultSnapshottable {
-  public static let defaultStrategy: SimpleStrategy = .lines
-}
-
 extension Diffable where A == String {
   public static let lines = Diffable(
     to: { Data($0.utf8) },
