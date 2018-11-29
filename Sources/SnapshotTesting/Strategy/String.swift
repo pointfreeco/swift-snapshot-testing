@@ -1,10 +1,12 @@
 import Foundation
 
 extension Strategy where Snapshottable == String, Format == String {
+  /// A snapshot strategy for comparing strings based on equality.
   public static let lines = Strategy(pathExtension: "txt", diffable: .lines)
 }
 
 extension Diffable where Value == String {
+  /// A line-diffing strategy for UTF-8 text.
   public static let lines = Diffable(
     to: { Data($0.utf8) },
     fro: { String(decoding: $0, as: UTF8.self) }

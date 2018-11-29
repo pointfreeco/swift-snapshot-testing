@@ -1,6 +1,7 @@
 #if os(Linux)
 import XCTest
 
+/// An XCTest subclass that provides snaphot testing helpers.
 open class SnapshotTestCase: XCTestCase {
   /// Whether or not to record all new references.
   open var record = false
