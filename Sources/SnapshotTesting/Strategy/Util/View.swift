@@ -474,9 +474,11 @@ private final class NavigationDelegate: NSObject, WKNavigationDelegate {
 #if os(iOS) || os(tvOS)
 func snapshotView(
   config: ViewImageConfig,
-  traits: UITraitCollection = .init(),
+  drawHierarchyInKeyWindow: Bool,
+  traits: UITraitCollection,
   view: UIView,
-  viewController: UIViewController)
+  viewController: UIViewController
+  )
   -> Async<UIImage> {
     let size = config.size ?? viewController.view.frame.size
     guard size.width > 0, size.height > 0 else {
@@ -489,20 +491,66 @@ func snapshotView(
       viewController.view.addSubview(view)
     }
     let traits = UITraitCollection(traitsFrom: [config.traits, traits])
-    _ = Window(
-      config: .init(safeArea: config.safeArea, size: config.size ?? size, traits: traits),
-      viewController: viewController
-    )
+    let window: UIWindow
+    if drawHierarchyInKeyWindow {
+      guard let keyWindow = UIApplication.shared.keyWindow else {
+        fatalError("'drawHierarchyInKeyWindow' requires tests to be run in a host application")
+      }
+      window = keyWindow
+      window.frame.size = size
+    } else {
+      window = Window(
+        config: .init(safeArea: config.safeArea, size: config.size ?? size, traits: traits),
+        viewController: viewController
+      )
+    }
+    add(traits: traits, viewController: viewController, to: window)
     return view.snapshot ?? Async { callback in
       addImagesForRenderedViews(view).sequence().run { views in
-        callback(view.layer.image(for: traits))
+        callback(
+          renderer(size: view.bounds.size, for: traits).image { ctx in
+            if drawHierarchyInKeyWindow {
+              view.drawHierarchy(in: view.bounds, afterScreenUpdates: true)
+            } else {
+              view.layer.draw(in: ctx.cgContext)
+            }
+          }
+        )
         views.forEach { $0.removeFromSuperview() }
         view.frame = initialFrame
       }
     }
 }
 
-class Window: UIWindow {
+func renderer(size: CGSize, for traits: UITraitCollection) -> UIGraphicsImageRenderer {
+  let renderer: UIGraphicsImageRenderer
+  if #available(iOS 11.0, tvOS 11.0, *) {
+    renderer = UIGraphicsImageRenderer(size: size, format: .init(for: traits))
+  } else {
+    renderer = UIGraphicsImageRenderer(size: size)
+  }
+  return renderer
+}
+
+private func add(traits: UITraitCollection, viewController: UIViewController, to window: UIWindow) {
+  let rootViewController = UIViewController()
+  rootViewController.view.backgroundColor = .clear
+  rootViewController.view.frame = window.frame
+  rootViewController.preferredContentSize = rootViewController.view.frame.size
+  viewController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+  viewController.view.frame = rootViewController.view.frame
+  rootViewController.view.addSubview(viewController.view)
+  rootViewController.addChild(viewController)
+  rootViewController.setOverrideTraitCollection(traits, forChild: viewController)
+  viewController.didMove(toParent: rootViewController)
+  rootViewController.beginAppearanceTransition(true, animated: false)
+  rootViewController.endAppearanceTransition()
+  window.rootViewController = rootViewController
+  rootViewController.view.setNeedsLayout()
+  rootViewController.view.layoutIfNeeded()
+}
+
+private class Window: UIWindow {
   var config: ViewImageConfig
 
   init(config: ViewImageConfig, viewController: UIViewController) {
@@ -523,23 +571,6 @@ class Window: UIWindow {
         self.config.safeArea.top = 0
       }
     }
-
-    let rootViewController = UIViewController()
-    rootViewController.view.backgroundColor = .clear
-    rootViewController.view.frame = self.frame
-    rootViewController.preferredContentSize = rootViewController.view.frame.size
-    viewController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-    viewController.view.frame = rootViewController.view.frame
-    rootViewController.view.addSubview(viewController.view)
-    rootViewController.addChild(viewController)
-    rootViewController.setOverrideTraitCollection(config.traits, forChild: viewController)
-    viewController.didMove(toParent: rootViewController)
-    rootViewController.beginAppearanceTransition(true, animated: false)
-    rootViewController.endAppearanceTransition()
-    self.rootViewController = rootViewController
-//    rootViewController.view.bounds.size = self.bounds.size
-    rootViewController.view.setNeedsLayout()
-    rootViewController.view.layoutIfNeeded()
     self.isHidden = false
   }
 
@@ -562,7 +593,7 @@ class Window: UIWindow {
 #if os(macOS)
 import Cocoa
 
-fileprivate final class ScaledWindow: NSWindow {
+private final class ScaledWindow: NSWindow {
   override var backingScaleFactor: CGFloat {
     return 2
   }

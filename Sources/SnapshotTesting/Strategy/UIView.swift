@@ -7,6 +7,7 @@ extension Strategy where Snapshottable == UIView, Format == UIImage {
   }
 
   public static func image(
+    drawHierarchyInKeyWindow: Bool = false,
     precision: Float = 1,
     size: CGSize? = nil,
     traits: UITraitCollection = .init()
@@ -16,6 +17,7 @@ extension Strategy where Snapshottable == UIView, Format == UIImage {
       return SimpleStrategy.image(precision: precision).asyncPullback { view in
         snapshotView(
           config: .init(safeArea: .zero, size: size ?? view.frame.size, traits: .init()),
+          drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
           traits: traits,
           view: view,
           viewController: .init()
