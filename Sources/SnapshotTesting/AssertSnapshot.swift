@@ -100,7 +100,7 @@ public func verifySnapshot<A, B>(
 
       let tookSnapshot = XCTestExpectation(description: "Took snapshot")
       var optionalDiffable: B?
-      strategy.snapshotToDiffable(try value()).run { b in
+      strategy.snapshot(try value()).run { b in
         optionalDiffable = b
         tookSnapshot.fulfill()
       }

@@ -60,7 +60,7 @@ open class SnapshotTestCase: XCTestCase {
 
       let tookSnapshot = self.expectation(description: "Took snapshot")
       var optionalDiffable: Format?
-      strategy.snapshotToDiffable(value).run { b in
+      strategy.snapshot(value).run { b in
         optionalDiffable = b
         tookSnapshot.fulfill()
       }

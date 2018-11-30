@@ -9,24 +9,24 @@ public struct Strategy<Snapshottable, Format> {
   /// How the snapshot format is diffed and converted to and from data.
   public let diffable: Diffable<Format>
 
-  /// How a snapshot is transformed to a diffable format.
-  public let snapshotToDiffable: (Snapshottable) -> Async<Format>
+  /// How a value is transformed into a diffable snapshot format.
+  public let snapshot: (Snapshottable) -> Async<Format>
 
   /// Creates a snapshot strategy.
   ///
   /// - Parameters:
   ///   - pathExtension: The path extension applied to references saved to disk.
   ///   - diffable: How to diff and convert the snapshot format to and from data.
-  ///   - snapshotToDiffable: An asynchronous transform function from a snapshot into a diffable format.
+  ///   - snapshot: An asynchronous transform function from a snapshot into a diffable format.
   ///   - value: A snapshot value to be converted.
   public init(
     pathExtension: String?,
     diffable: Diffable<Format>,
-    snapshotToDiffable: @escaping (_ value: Snapshottable) -> Async<Format>
+    snapshot: @escaping (_ value: Snapshottable) -> Async<Format>
     ) {
     self.pathExtension = pathExtension
     self.diffable = diffable
-    self.snapshotToDiffable = snapshotToDiffable
+    self.snapshot = snapshot
   }
 
   /// Creates a snapshot strategy.
@@ -34,15 +34,15 @@ public struct Strategy<Snapshottable, Format> {
   /// - Parameters:
   ///   - pathExtension: The path extension applied to references saved to disk.
   ///   - diffable: How to diff and convert the snapshot format to and from data.
-  ///   - snapshotToDiffable: A transform function from a snapshot into a diffable format.
+  ///   - snapshot: A transform function from a snapshot into a diffable format.
   ///   - value: A snapshot value to be converted.
   public init(
     pathExtension: String?,
     diffable: Diffable<Format>,
-    snapshotToDiffable: @escaping (_ value: Snapshottable) -> Format
+    snapshot: @escaping (_ value: Snapshottable) -> Format
     ) {
     self.init(pathExtension: pathExtension, diffable: diffable) {
-      Async(value: snapshotToDiffable($0))
+      Async(value: snapshot($0))
     }
   }
 
@@ -56,7 +56,7 @@ public struct Strategy<Snapshottable, Format> {
     ) { a0 in
       return .init { callback in
         transform(a0).run { a in
-          self.snapshotToDiffable(a).run { b in
+          self.snapshot(a).run { b in
             callback(b)
           }
         }
@@ -80,7 +80,7 @@ extension Strategy where Snapshottable == Format {
     self.init(
       pathExtension: pathExtension,
       diffable: diffable,
-      snapshotToDiffable: { $0 }
+      snapshot: { $0 }
     )
   }
 }
