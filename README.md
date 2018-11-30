@@ -53,7 +53,7 @@ TODO
 If you use [Carthage](https://github.com/Carthage/Carthage), you can add the following dependency to your `Cartfile`:
 
 ``` ruby
-github "pointfreeco/swift-validated" "master"
+github "pointfreeco/swift-snapshot-testing" "master"
 ```
 
 ### CocoaPods
