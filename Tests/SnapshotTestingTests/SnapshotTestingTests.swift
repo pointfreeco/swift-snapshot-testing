@@ -15,14 +15,14 @@ typealias TestCase = SnapshotTestCase
 typealias TestCase = XCTestCase
 #endif
 
-class SnapshotTestCaseTests: TestCase {
+class SnapshotTestingTests: TestCase {
   override func setUp() {
     super.setUp()
     diffTool = "ksdiff"
 //    record = true
   }
 
-  func testWithAny() {
+  func testAny() {
     struct User { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
     assertSnapshot(matching: user, as: .dump)
@@ -30,17 +30,21 @@ class SnapshotTestCaseTests: TestCase {
     assertSnapshot(matching: URL(string: "https://www.pointfree.co")!, as: .dump)
   }
 
-  func testNamedAssertion() {
-    struct User { let id: Int, name: String, bio: String }
-    let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
-    assertSnapshot(matching: user, as: .dump, named: "named")
-  }
-
-  func testWithDate() {
+  func testDate() {
     assertSnapshot(matching: Date(timeIntervalSinceReferenceDate: 0), as: .dump)
   }
 
-  func testWithEncodable() {
+  func testDeterministicDictionaryAndSetSnapshots() {
+    struct Person: Hashable { let name: String }
+    struct DictionarySetContainer { let dict: [String: Int], set: Set<Person> }
+    let set = DictionarySetContainer(
+      dict: ["c": 3, "a": 1, "b": 2],
+      set: [.init(name: "Brandon"), .init(name: "Stephen")]
+    )
+    assertSnapshot(matching: set, as: .dump)
+  }
+
+  func testEncodable() {
     struct User: Encodable { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
 
@@ -48,23 +52,6 @@ class SnapshotTestCaseTests: TestCase {
       assertSnapshot(matching: user, as: .json)
     }
     assertSnapshot(matching: user, as: .plist)
-  }
-
-  func testWithNSObject() {
-    assertSnapshot(matching: NSObject(), as: .dump)
-  }
-
-  func testMultipleSnapshots() {
-    assertSnapshot(matching: [1], as: .dump)
-    assertSnapshot(matching: [1, 2], as: .dump)
-  }
-
-  func testUIView() {
-    #if os(iOS)
-    let view = UIButton(type: .contactAdd)
-    assertSnapshot(matching: view, as: .image)
-    assertSnapshot(matching: view, as: .recursiveDescription)
-    #endif
   }
 
   func testMixedViews() {
@@ -91,6 +78,21 @@ class SnapshotTestCaseTests: TestCase {
     #endif
   }
 
+  func testMultipleSnapshots() {
+    assertSnapshot(matching: [1], as: .dump)
+    assertSnapshot(matching: [1, 2], as: .dump)
+  }
+
+  func testNamedAssertion() {
+    struct User { let id: Int, name: String, bio: String }
+    let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
+    assertSnapshot(matching: user, as: .dump, named: "named")
+  }
+
+  func testNSObject() {
+    assertSnapshot(matching: NSObject(), as: .dump)
+  }
+
   func testNSView() {
     #if os(macOS)
     let button = NSButton()
@@ -104,27 +106,28 @@ class SnapshotTestCaseTests: TestCase {
     #endif
   }
 
-  func testTableViewController() {
+  func testPrecision() {
+    #if os(iOS) || os(macOS) || os(tvOS)
+    #if os(iOS) || os(tvOS)
+    let label = UILabel()
     #if os(iOS)
-    let tableViewController = UITableViewController()
-    assertSnapshot(matching: tableViewController, as: .image(on: .iPhoneSe))
+    label.frame = CGRect(origin: .zero, size: CGSize(width: 43.5, height: 20.5))
+    #elseif os(tvOS)
+    label.frame = CGRect(origin: .zero, size: CGSize(width: 98, height: 46))
     #endif
-  }
-
-  func testWebView() throws {
-    #if os(iOS) || os(macOS)
-    let fixtureUrl = URL(fileURLWithPath: String(#file))
-      .deletingLastPathComponent()
-      .appendingPathComponent("__Fixtures__/pointfree.html")
-    let html = try String(contentsOf: fixtureUrl)
-    let webView = WKWebView()
-    webView.loadHTMLString(html, baseURL: nil)
+    label.backgroundColor = .white
+    #elseif os(macOS)
+    let label = NSTextField()
+    label.frame = CGRect(origin: .zero, size: CGSize(width: 37, height: 16))
+    label.backgroundColor = .white
+    label.isBezeled = false
+    label.isEditable = false
+    #endif
     if #available(macOS 10.14, *) {
-      assertSnapshot(
-        matching: webView,
-        as: .image(size: .init(width: 800, height: 600)),
-        named: platform
-      )
+      label.text = "Hello."
+      assertSnapshot(matching: label, as: .image(precision: 0.9), named: platform)
+      label.text = "Hello"
+      assertSnapshot(matching: label, as: .image(precision: 0.9), named: platform)
     }
     #endif
   }
@@ -185,35 +188,16 @@ class SnapshotTestCaseTests: TestCase {
     #endif
   }
 
-  func testPrecision() {
-    #if os(iOS) || os(macOS) || os(tvOS)
-    #if os(iOS) || os(tvOS)
-    let label = UILabel()
+  func testTableViewController() {
     #if os(iOS)
-    label.frame = CGRect(origin: .zero, size: CGSize(width: 43.5, height: 20.5))
-    #elseif os(tvOS)
-    label.frame = CGRect(origin: .zero, size: CGSize(width: 98, height: 46))
-    #endif
-    label.backgroundColor = .white
-    #elseif os(macOS)
-    let label = NSTextField()
-    label.frame = CGRect(origin: .zero, size: CGSize(width: 37, height: 16))
-    label.backgroundColor = .white
-    label.isBezeled = false
-    label.isEditable = false
-    #endif
-    if #available(macOS 10.14, *) {
-      label.text = "Hello."
-      assertSnapshot(matching: label, as: .image(precision: 0.9), named: platform)
-      label.text = "Hello"
-      assertSnapshot(matching: label, as: .image(precision: 0.9), named: platform)
-    }
+    let tableViewController = UITableViewController()
+    assertSnapshot(matching: tableViewController, as: .image(on: .iPhoneSe))
     #endif
   }
 
   func testTraits() {
-    #if os(iOS)
-    if #available(iOS 11.0, *) {
+    #if os(iOS) || os(tvOS)
+    if #available(iOS 11.0, tvOS 11.0, *) {
       class MyViewController: UIViewController {
         let topLabel = UILabel()
         let leadingLabel = UILabel()
@@ -270,6 +254,7 @@ class SnapshotTestCaseTests: TestCase {
 
       let viewController = MyViewController()
 
+      #if os(iOS)
       assertSnapshot(matching: viewController, as: .image(on: .iPhoneSe), named: "iphone-se")
       assertSnapshot(matching: viewController, as: .image(on: .iPhone8), named: "iphone-8")
       assertSnapshot(matching: viewController, as: .image(on: .iPhone8Plus), named: "iphone-8-plus")
@@ -329,6 +314,10 @@ class SnapshotTestCaseTests: TestCase {
             named: "iphone-se-\(name)"
           )
       }
+      #elseif os(tvOS)
+      assertSnapshot(
+        matching: viewController, as: .image(on: .tv), named: "tv")
+      #endif
     }
     #endif
   }
@@ -369,7 +358,7 @@ class SnapshotTestCaseTests: TestCase {
             self.topLabel.centerXAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.centerXAnchor),
             self.leadingLabel.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor),
             self.leadingLabel.trailingAnchor.constraint(lessThanOrEqualTo: self.view.safeAreaLayoutGuide.centerXAnchor),
-            //            self.leadingLabel.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.centerXAnchor),
+//            self.leadingLabel.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.centerXAnchor),
             self.leadingLabel.centerYAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.centerYAnchor),
             self.trailingLabel.leadingAnchor.constraint(greaterThanOrEqualTo: self.view.safeAreaLayoutGuide.centerXAnchor),
             self.trailingLabel.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor),
@@ -437,37 +426,53 @@ class SnapshotTestCaseTests: TestCase {
     #endif
   }
 
+  func testUIView() {
+    #if os(iOS)
+    let view = UIButton(type: .contactAdd)
+    assertSnapshot(matching: view, as: .image)
+    assertSnapshot(matching: view, as: .recursiveDescription)
+    #endif
+  }
 
-  func testDeterministicDictionaryAndSetSnapshots() {
-    struct Person: Hashable { let name: String }
-    struct DictionarySetContainer { let dict: [String: Int], set: Set<Person> }
-    let set = DictionarySetContainer(
-      dict: ["c": 3, "a": 1, "b": 2],
-      set: [.init(name: "Brandon"), .init(name: "Stephen")]
-    )
-    assertSnapshot(matching: set, as: .dump)
+  func testWebView() throws {
+    #if os(iOS) || os(macOS)
+    let fixtureUrl = URL(fileURLWithPath: String(#file))
+      .deletingLastPathComponent()
+      .appendingPathComponent("__Fixtures__/pointfree.html")
+    let html = try String(contentsOf: fixtureUrl)
+    let webView = WKWebView()
+    webView.loadHTMLString(html, baseURL: nil)
+    if #available(macOS 10.14, *) {
+      assertSnapshot(
+        matching: webView,
+        as: .image(size: .init(width: 800, height: 600)),
+        named: platform
+      )
+    }
+    #endif
   }
 }
 
 #if os(Linux)
-extension SnapshotTestCaseTests {
-  static var allTests : [(String, (SnapshotTestCaseTests) -> () throws -> Void)] {
+extension SnapshotTestingTests {
+  static var allTests : [(String, (SnapshotTestingTests) -> () throws -> Void)] {
     return [
+      ("testAny", testAny),
+      ("testDate", testDate),
+      ("testDeterministicDictionaryAndSetSnapshots", testDeterministicDictionaryAndSetSnapshots),
+      ("testEncodable", testEncodable),
       ("testMixedViews", testMixedViews),
       ("testMultipleSnapshots", testMultipleSnapshots),
       ("testNamedAssertion", testNamedAssertion),
-      ("testNSView", testNSView),
+      ("testNSObject", testNSObject),
       ("testPrecision", testPrecision),
       ("testSCNView", testSCNView),
       ("testSKView", testSKView),
-      ("testUIView", testUIView),
-      ("testWebView", testWebView),
-      ("testWithAny", testWithAny),
-      ("testWithDate", testWithDate),
-      ("testWithEncodable", testWithEncodable),
-      ("testWithNSObject", testWithNSObject),
+      ("testTableViewController", testTableViewController),
       ("testTraits", testTraits),
       ("testTraitsEmbeddedInTabNavigation", testTraitsEmbeddedInTabNavigation),
+      ("testUIView", testUIView),
+      ("testWebView", testWebView),
     ]
   }
 }
