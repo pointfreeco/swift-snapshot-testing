@@ -17,8 +17,8 @@ public struct Strategy<Snapshottable, Format> {
   /// - Parameters:
   ///   - pathExtension: The path extension applied to references saved to disk.
   ///   - diffable: How to diff and convert the snapshot format to and from data.
-  ///   - snapshot: An asynchronous transform function from a snapshot into a diffable format.
-  ///   - value: A snapshot value to be converted.
+  ///   - snapshot: An asynchronous transform function from a value into a diffable snapshot format.
+  ///   - value: A value to be converted.
   public init(
     pathExtension: String?,
     diffable: Diffable<Format>,
@@ -34,7 +34,7 @@ public struct Strategy<Snapshottable, Format> {
   /// - Parameters:
   ///   - pathExtension: The path extension applied to references saved to disk.
   ///   - diffable: How to diff and convert the snapshot format to and from data.
-  ///   - snapshot: A transform function from a snapshot into a diffable format.
+  ///   - snapshot: A transform function from a value into a diffable snapshot format.
   ///   - value: A snapshot value to be converted.
   public init(
     pathExtension: String?,
