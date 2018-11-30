@@ -40,9 +40,11 @@ record = true
 assertSnapshot(matching: vc, as: .image)
 ```
 
+<!--
 ## Configuration
 
 TODO
+-->
 
 ## Installation
 
