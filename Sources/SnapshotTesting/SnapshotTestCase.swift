@@ -14,7 +14,7 @@ open class SnapshotTestCase: XCTestCase {
   /// Asserts that a given value matches a reference on disk.
   ///
   /// - Parameters:
-  ///   - value: A value of to compare against a reference.
+  ///   - value: A value to compare against a reference.
   ///   - strategy: A strategy for serializing, deserializing, and comparing values.
   ///   - name: An optional description of the snapshot.
   ///   - recording: Whether or not to record a new reference.
