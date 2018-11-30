@@ -434,6 +434,20 @@ class SnapshotTestingTests: TestCase {
     #endif
   }
 
+  func testURLRequest() {
+    var get = URLRequest(url: URL(string: "https://www.pointfree.co/")!)
+    get.addValue("pf_session={}", forHTTPHeaderField: "Cookie")
+    get.addValue("text/html", forHTTPHeaderField: "Accept")
+    assertSnapshot(matching: get, as: .raw, named: "get")
+
+    var post = URLRequest(url: URL(string: "https://www.pointfree.co/subscribe")!)
+    post.httpMethod = "POST"
+    post.addValue("pf_session={\"user_id\":\"0\"}", forHTTPHeaderField: "Cookie")
+    post.addValue("text/html", forHTTPHeaderField: "Accept")
+    post.httpBody = Data("pricing[billing]=monthly&pricing[lane]=individual".utf8)
+    assertSnapshot(matching: post, as: .raw, named: "post")
+  }
+
   func testWebView() throws {
     #if os(iOS) || os(macOS)
     let fixtureUrl = URL(fileURLWithPath: String(#file))
@@ -472,6 +486,7 @@ extension SnapshotTestingTests {
       ("testTraits", testTraits),
       ("testTraitsEmbeddedInTabNavigation", testTraitsEmbeddedInTabNavigation),
       ("testUIView", testUIView),
+      ("testURLRequest", testURLRequest),
       ("testWebView", testWebView),
     ]
   }
