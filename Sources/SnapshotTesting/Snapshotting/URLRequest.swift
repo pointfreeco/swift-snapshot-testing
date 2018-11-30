@@ -13,6 +13,6 @@ extension Snapshotting where Value == URLRequest, Format == String {
       .map { ["\n\(String(decoding: $0, as: UTF8.self))"] }
       ?? []
 
-    return ([status] + headers + body).joined(separator: "\n")
+    return ([method] + headers + body).joined(separator: "\n")
   }
 }
