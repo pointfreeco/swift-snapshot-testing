@@ -1,9 +1,9 @@
 import Foundation
 
-extension Strategy where Format == String {
+extension Snapshotting where Format == String {
   /// A snapshot strategy for comparing any structure based on a sanitized text dump.
-  public static var dump: Strategy {
-    return SimpleStrategy.lines.pullback { snap($0) }
+  public static var dump: Snapshotting {
+    return SimplySnapshotting.lines.pullback { snap($0) }
   }
 }
 

@@ -1,9 +1,9 @@
 #if os(iOS) || os(tvOS)
 import UIKit
 
-extension Strategy where Snapshottable == UIView, Format == UIImage {
+extension Snapshotting where Value == UIView, Format == UIImage {
   /// A snapshot strategy for comparing views based on pixel equality.
-  public static var image: Strategy {
+  public static var image: Snapshotting {
     return .image()
   }
 
@@ -20,9 +20,9 @@ extension Strategy where Snapshottable == UIView, Format == UIImage {
     size: CGSize? = nil,
     traits: UITraitCollection = .init()
     )
-    -> Strategy {
+    -> Snapshotting {
 
-      return SimpleStrategy.image(precision: precision).asyncPullback { view in
+      return SimplySnapshotting.image(precision: precision).asyncPullback { view in
         snapshotView(
           config: .init(safeArea: .zero, size: size ?? view.frame.size, traits: .init()),
           drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
@@ -34,10 +34,10 @@ extension Strategy where Snapshottable == UIView, Format == UIImage {
   }
 }
 
-extension Strategy where Snapshottable == UIView, Format == String {
+extension Snapshotting where Value == UIView, Format == String {
   /// A snapshot strategy for comparing views based on a recursive description of their properties and hierarchies.
-  public static var recursiveDescription: Strategy<UIView, String> {
-    return SimpleStrategy.lines.pullback { view in
+  public static var recursiveDescription: Snapshotting<UIView, String> {
+    return SimplySnapshotting.lines.pullback { view in
       view.setNeedsLayout()
       view.layoutIfNeeded()
       return purgePointers(

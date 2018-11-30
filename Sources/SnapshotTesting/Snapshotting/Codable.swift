@@ -1,9 +1,9 @@
 import Foundation
 
-extension Strategy where Snapshottable: Encodable, Format == String {
+extension Snapshotting where Value: Encodable, Format == String {
   /// A snapshot strategy for comparing encodable structures based on their JSON representation.
   @available(iOS 11.0, macOS 10.13, tvOS 11.0, *)
-  public static var json: Strategy {
+  public static var json: Snapshotting {
     let encoder = JSONEncoder()
     encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
     return .json(encoder)
@@ -12,8 +12,8 @@ extension Strategy where Snapshottable: Encodable, Format == String {
   /// A snapshot strategy for comparing encodable structures based on their JSON representation.
   ///
   /// - Parameter encoder: A JSON encoder.
-  public static func json(_ encoder: JSONEncoder) -> Strategy {
-    var strategy = SimpleStrategy.lines.pullback { (encodable: Snapshottable) in
+  public static func json(_ encoder: JSONEncoder) -> Snapshotting {
+    var strategy = SimplySnapshotting.lines.pullback { (encodable: Value) in
       try! String(decoding: encoder.encode(encodable), as: UTF8.self)
     }
     strategy.pathExtension = "json"
@@ -21,7 +21,7 @@ extension Strategy where Snapshottable: Encodable, Format == String {
   }
 
   /// A snapshot strategy for comparing encodable structures based on their property list representation.
-  public static var plist: Strategy {
+  public static var plist: Snapshotting {
     let encoder = PropertyListEncoder()
     encoder.outputFormat = .xml
     return .plist(encoder)
@@ -30,8 +30,8 @@ extension Strategy where Snapshottable: Encodable, Format == String {
   /// A snapshot strategy for comparing encodable structures based on their property list representation.
   ///
   /// - Parameter encoder: A property list encoder.
-  public static func plist(_ encoder: PropertyListEncoder) -> Strategy {
-    var strategy = SimpleStrategy.lines.pullback { (encodable: Snapshottable) in
+  public static func plist(_ encoder: PropertyListEncoder) -> Snapshotting {
+    var strategy = SimplySnapshotting.lines.pullback { (encodable: Value) in
       try! String(decoding: encoder.encode(encodable), as: UTF8.self)
     }
     strategy.pathExtension = "plist"

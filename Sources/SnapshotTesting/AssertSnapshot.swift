@@ -13,7 +13,7 @@ public var record = false
 ///
 /// - Parameters:
 ///   - value: A value to compare against a reference.
-///   - strategy: A strategy for serializing, deserializing, and comparing values.
+///   - snapshotting: A strategy for serializing, deserializing, and comparing values.
 ///   - name: An optional description of the snapshot.
 ///   - recording: Whether or not to record a new reference.
 ///   - timeout: The amount of time a snapshot must be generated in.
@@ -22,7 +22,7 @@ public var record = false
 ///   - line: The line number on which failure occurred. Defaults to the line number on which this function was called.
 public func assertSnapshot<A, B>(
   matching value: @autoclosure () throws -> A,
-  as strategy: Strategy<A, B>,
+  as snapshotting: Snapshotting<A, B>,
   named name: String? = nil,
   record recording: Bool = false,
   timeout: TimeInterval = 5,
@@ -33,7 +33,7 @@ public func assertSnapshot<A, B>(
 
   let failure = verifySnapshot(
     matching: value,
-    as: strategy,
+    as: snapshotting,
     named: name,
     record: recording,
     timeout: timeout,
@@ -49,7 +49,7 @@ public func assertSnapshot<A, B>(
 ///
 /// - Parameters:
 ///   - value: A value to compare against a reference.
-///   - strategy: A strategy for serializing, deserializing, and comparing values.
+///   - snapshotting: A strategy for serializing, deserializing, and comparing values.
 ///   - name: An optional description of the snapshot.
 ///   - recording: Whether or not to record a new reference.
 ///   - timeout: The amount of time a snapshot must be generated in.
@@ -59,7 +59,7 @@ public func assertSnapshot<A, B>(
 /// - Returns: A failure message or, if the value matches, nil.
 public func verifySnapshot<A, B>(
   matching value: @autoclosure () throws -> A,
-  as strategy: Strategy<A, B>,
+  as snapshotting: Snapshotting<A, B>,
   named name: String? = nil,
   record recording: Bool = false,
   timeout: TimeInterval = 5,
@@ -94,13 +94,13 @@ public func verifySnapshot<A, B>(
       let testName = sanitizePathComponent(testName)
       let snapshotFileUrl = snapshotDirectoryUrl
         .appendingPathComponent("\(testName).\(identifier)")
-        .appendingPathExtension(strategy.pathExtension ?? "")
+        .appendingPathExtension(snapshotting.pathExtension ?? "")
       let fileManager = FileManager.default
       try fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
 
       let tookSnapshot = XCTestExpectation(description: "Took snapshot")
       var optionalDiffable: B?
-      strategy.snapshot(try value()).run { b in
+      snapshotting.snapshot(try value()).run { b in
         optionalDiffable = b
         tookSnapshot.fulfill()
       }
@@ -119,14 +119,14 @@ public func verifySnapshot<A, B>(
       }
 
       guard !recording, fileManager.fileExists(atPath: snapshotFileUrl.path) else {
-        try strategy.diffable.toData(diffable).write(to: snapshotFileUrl)
+        try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)
         return "Recorded snapshot: …\n\n\"\(snapshotFileUrl.path)\""
       }
 
       let data = try Data(contentsOf: snapshotFileUrl)
-      let reference = strategy.diffable.fromData(data)
+      let reference = snapshotting.diffing.fromData(data)
 
-      guard let (failure, attachments) = strategy.diffable.diff(reference, diffable) else {
+      guard let (failure, attachments) = snapshotting.diffing.diff(reference, diffable) else {
         return nil
       }
 
@@ -136,7 +136,7 @@ public func verifySnapshot<A, B>(
       let artifactsSubUrl = artifactsUrl.appendingPathComponent(fileName)
       try fileManager.createDirectory(at: artifactsSubUrl, withIntermediateDirectories: true)
       let failedSnapshotFileUrl = artifactsSubUrl.appendingPathComponent(snapshotFileUrl.lastPathComponent)
-      try strategy.diffable.toData(diffable).write(to: failedSnapshotFileUrl)
+      try snapshotting.diffing.toData(diffable).write(to: failedSnapshotFileUrl)
 
       if !attachments.isEmpty {
         #if !os(Linux)

@@ -1,9 +1,9 @@
 #if os(macOS)
 import Cocoa
 
-extension Strategy where Snapshottable == NSView, Format == NSImage {
+extension Snapshotting where Value == NSView, Format == NSImage {
   /// A snapshot strategy for comparing views based on pixel equality.
-  public static var image: Strategy {
+  public static var image: Snapshotting {
     return .image()
   }
 
@@ -12,7 +12,7 @@ extension Strategy where Snapshottable == NSView, Format == NSImage {
   /// - Parameters:
   ///   - precision: The percentage of pixels that must match.
   ///   - size: A view size override.
-  public static func image(precision: Float = 1, size: CGSize? = nil) -> Strategy {
+  public static func image(precision: Float = 1, size: CGSize? = nil) -> Snapshotting {
     return Strategy<NSImage, NSImage>.image(precision: precision).asyncPullback { view in
       let initialSize = view.frame.size
       if let size = size { view.frame.size = size }
@@ -32,10 +32,10 @@ extension Strategy where Snapshottable == NSView, Format == NSImage {
   }
 }
 
-extension Strategy where Snapshottable == NSView, Format == String {
+extension Snapshotting where Value == NSView, Format == String {
   /// A snapshot strategy for comparing views based on a recursive description of their properties and hierarchies.
-  public static var recursiveDescription: Strategy<NSView, String> {
-    return SimpleStrategy.lines.pullback { view in
+  public static var recursiveDescription: Snapshotting<NSView, String> {
+    return SimplySnapshotting.lines.pullback { view in
       return purgePointers(
         view.perform(Selector(("_subtreeDescription"))).retain().takeUnretainedValue()
           as! String

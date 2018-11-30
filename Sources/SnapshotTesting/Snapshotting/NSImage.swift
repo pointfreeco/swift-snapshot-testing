@@ -9,19 +9,19 @@ extension Attachment {
   }
 }
 
-extension Strategy where Snapshottable == NSImage, Format == NSImage {
+extension Snapshotting where Value == NSImage, Format == NSImage {
   /// A snapshot strategy for comparing images based on pixel equality.
-  public static var image: Strategy {
+  public static var image: Snapshotting {
     return .image(precision: 1)
   }
 
   /// A snapshot strategy for comparing images based on pixel equality.
   ///
   /// - Parameter precision: The percentage of pixels that must match.
-  public static func image(precision: Float) -> Strategy {
+  public static func image(precision: Float) -> Snapshotting {
     return .init(
       pathExtension: "png",
-      diffable: .init(
+      diffing: .init(
         toData: { NSImagePNGRepresentation($0)! },
         fromData: { NSImage(data: $0)! }
       ) { old, new in

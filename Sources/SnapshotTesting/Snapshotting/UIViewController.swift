@@ -1,9 +1,9 @@
 #if os(iOS) || os(tvOS)
 import UIKit
 
-extension Strategy where Snapshottable == UIViewController, Format == UIImage {
+extension Snapshotting where Value == UIViewController, Format == UIImage {
   /// A snapshot strategy for comparing view controller views based on pixel equality.
-  public static var image: Strategy {
+  public static var image: Snapshotting {
     return .image()
   }
 
@@ -20,9 +20,9 @@ extension Strategy where Snapshottable == UIViewController, Format == UIImage {
     size: CGSize? = nil,
     traits: UITraitCollection = .init()
     )
-    -> Strategy {
+    -> Snapshotting {
 
-      return SimpleStrategy.image(precision: precision).asyncPullback { viewController in
+      return SimplySnapshotting.image(precision: precision).asyncPullback { viewController in
         snapshotView(
           config: size.map { .init(safeArea: config.safeArea, size: $0, traits: config.traits) } ?? config,
           drawHierarchyInKeyWindow: false,
@@ -46,9 +46,9 @@ extension Strategy where Snapshottable == UIViewController, Format == UIImage {
     size: CGSize? = nil,
     traits: UITraitCollection = .init()
     )
-    -> Strategy {
+    -> Snapshotting {
 
-      return SimpleStrategy.image(precision: precision).asyncPullback { viewController in
+      return SimplySnapshotting.image(precision: precision).asyncPullback { viewController in
         snapshotView(
           config: .init(safeArea: .zero, size: size, traits: traits),
           drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
@@ -60,10 +60,10 @@ extension Strategy where Snapshottable == UIViewController, Format == UIImage {
   }
 }
 
-extension Strategy where Snapshottable == UIViewController, Format == String {
+extension Snapshotting where Value == UIViewController, Format == String {
   /// A snapshot strategy for comparing view controller views based on a recursive description of their properties and hierarchies.
-  public static var recursiveDescription: Strategy {
-    return Strategy<UIView, String>.recursiveDescription.pullback { $0.view }
+  public static var recursiveDescription: Snapshotting {
+    return Snapshotting<UIView, String>.recursiveDescription.pullback { $0.view }
   }
 }
 #endif

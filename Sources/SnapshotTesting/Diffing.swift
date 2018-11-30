@@ -1,7 +1,7 @@
 import Foundation
 
 /// The ability to compare `Value`s and convert them to and from `Data`.
-public struct Diffable<Value> {
+public struct Diffing<Value> {
   /// Converts a value _to_ data.
   public let toData: (Value) -> Data
 
@@ -11,7 +11,7 @@ public struct Diffable<Value> {
   /// Compares two values. If the values do not match, returns a failure message and artifacts describing the failure.
   public let diff: (Value, Value) -> (String, [Attachment])?
 
-  /// Creates a new `Diffable`.
+  /// Creates a new `Diffing` on `Value`.
   ///
   /// - Parameters:
   ///   - to: A function used to convert a value _to_ data.

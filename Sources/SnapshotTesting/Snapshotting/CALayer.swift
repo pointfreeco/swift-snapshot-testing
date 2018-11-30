@@ -1,17 +1,17 @@
 #if os(macOS)
 import Cocoa
 
-extension Strategy where Snapshottable == CALayer, Format == NSImage {
+extension Snapshotting where Value == CALayer, Format == NSImage {
   /// A snapshot strategy for comparing layers based on pixel equality.
-  public static var image: Strategy {
+  public static var image: Snapshotting {
     return .image(precision: 1)
   }
 
   /// A snapshot strategy for comparing layers based on pixel equality.
   ///
   /// - Parameter precision: The percentage of pixels that must match.
-  public static func image(precision: Float) -> Strategy {
-    return SimpleStrategy.image(precision: precision).pullback { layer in
+  public static func image(precision: Float) -> Snapshotting {
+    return SimplySnapshotting.image(precision: precision).pullback { layer in
       let image = NSImage(size: layer.bounds.size)
       image.lockFocus()
       let context = NSGraphicsContext.current!.cgContext
@@ -26,9 +26,9 @@ extension Strategy where Snapshottable == CALayer, Format == NSImage {
 #elseif os(iOS) || os(tvOS)
 import UIKit
 
-extension Strategy where Snapshottable == CALayer, Format == UIImage {
+extension Snapshotting where Value == CALayer, Format == UIImage {
   /// A snapshot strategy for comparing layers based on pixel equality.
-  public static var image: Strategy {
+  public static var image: Snapshotting {
     return .image()
   }
 
@@ -36,8 +36,8 @@ extension Strategy where Snapshottable == CALayer, Format == UIImage {
   ///
   /// - Parameter precision: The percentage of pixels that must match.
   public static func image(precision: Float = 1, traits: UITraitCollection = .init())
-    -> Strategy {
-      return SimpleStrategy.image(precision: precision).pullback { layer in
+    -> Snapshotting {
+      return SimplySnapshotting.image(precision: precision).pullback { layer in
         renderer(bounds: layer.bounds, for: traits).image { ctx in
           layer.setNeedsLayout()
           layer.layoutIfNeeded()
