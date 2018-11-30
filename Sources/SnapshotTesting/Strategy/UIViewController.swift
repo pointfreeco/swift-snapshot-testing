@@ -36,7 +36,7 @@ extension Strategy where Snapshottable == UIViewController, Format == UIImage {
   /// A snapshot strategy for comparing view controller views based on pixel equality.
   ///
   /// - Parameters:
-  ///   - drawHierarchyInKeyWindow: Utilize the simulator's key window in order to properly render `UIAppearance` and `UIVisualEffect`s.
+  ///   - drawHierarchyInKeyWindow: Utilize the simulator's key window in order to render `UIAppearance` and `UIVisualEffect`s. This option requires a host application for your tests and will _not_ work for framework test targets.
   ///   - precision: The percentage of pixels that must match.
   ///   - size: A view size override.
   ///   - traits: A trait collection override.
