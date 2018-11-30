@@ -10,11 +10,11 @@ extension Attachment {
 }
 
 extension Strategy where Snapshottable == UIImage, Format == UIImage {
-  static var image: Strategy {
+  public static var image: Strategy {
     return .image(precision: 1)
   }
 
-  static func image(precision: Float) -> Strategy {
+  public static func image(precision: Float) -> Strategy {
     return .init(
       pathExtension: "png",
       diffable: .init(

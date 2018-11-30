@@ -7,35 +7,41 @@ extension Strategy where Snapshottable == UIViewController, Format == UIImage {
   }
 
   public static func image(
-    drawingHierarchyInKeyWindow: Bool = false,
+    on config: ViewImageConfig,
     precision: Float = 1,
     size: CGSize? = nil,
     traits: UITraitCollection = .init()
     )
     -> Strategy {
 
-      return Strategy<UIView, UIImage>
-        .image(
-          drawingHierarchyInKeyWindow: drawingHierarchyInKeyWindow,
-          precision: precision,
-          size: size,
-          traits: traits
+      return SimpleStrategy.image(precision: precision).asyncPullback { viewController in
+        snapshotView(
+          config: size.map { .init(safeArea: config.safeArea, size: $0, traits: config.traits) } ?? config,
+          drawHierarchyInKeyWindow: false,
+          traits: traits,
+          view: viewController.view,
+          viewController: viewController
         )
-        .pullback { child in
-          let size = size ?? child.view.frame.size
-          let parent = traitController(for: child, size: size, traits: traits)
-          return parent.view
       }
   }
 
-  public static func image(on environment: Config, precision: Float = 1, traits: UITraitCollection = .init())
+  public static func image(
+    drawHierarchyInKeyWindow: Bool = false,
+    precision: Float = 1,
+    size: CGSize? = nil,
+    traits: UITraitCollection = .init()
+    )
     -> Strategy {
 
-      return .image(
-        precision: precision,
-        size: environment.size,
-        traits: UITraitCollection(traitsFrom: [environment.traits, traits])
-      )
+      return SimpleStrategy.image(precision: precision).asyncPullback { viewController in
+        snapshotView(
+          config: .init(safeArea: .zero, size: size, traits: traits),
+          drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+          traits: .init(),
+          view: viewController.view,
+          viewController: viewController
+        )
+      }
   }
 }
 

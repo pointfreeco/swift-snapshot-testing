@@ -13,6 +13,7 @@
 		BF_164C58C92E656FCD7C25A1CB034600A2 /* CALayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_02D2BA628CE5C87E6299836CA06DA5AE /* CALayer.swift */; };
 		BF_1BF868397B24F68E388CCD9DF81E6765 /* SnapshotTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_C8995DA5A1D0CF67499F936B6684ABA6 /* SnapshotTestCase.swift */; };
 		BF_1CA9FBF0BD084E3C63F61E9D8A80DDB7 /* CALayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_02D2BA628CE5C87E6299836CA06DA5AE /* CALayer.swift */; };
+		BF_1D0B021EA8FBF7817E793FB56BAB58AD /* UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_3B4CB7F1A41505CC82073245179DBB14 /* UIView.swift */; };
 		BF_1F9B48C978B79ADDC70074F90A45D20C /* SceneKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_E0227C47E0FB67F70EF0493E8A4CDB60 /* SceneKit.swift */; };
 		BF_290BB77E2401937E6400555C3B0F9A7A /* Diffable.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_CFB0F28F5A19E32576377C817456E15A /* Diffable.swift */; };
 		BF_2A6009E29732718FAE9B1F03806A09AB /* Diff.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_FE1535B3F5372A6ADD6A0D18184766D4 /* Diff.swift */; };
@@ -28,16 +29,18 @@
 		BF_563500F7C0C0341867406C92198864C4 /* PropertyListEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_26BC946CB572B86A384E7AE28765BD49 /* PropertyListEncoder.swift */; };
 		BF_59377B307FB813153ABE7260E51EF2DC /* Strategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_F4BEBF5A6DA36EF79ADD87917E32ED3F /* Strategy.swift */; };
 		BF_60E780A5566C14D1B9C49FE1213C005F /* AssertSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_DC773049D04465475F91599CF4255908 /* AssertSnapshot.swift */; };
+		BF_6246DD99D5E533905EB3B4FDA93C84F0 /* UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_3B4CB7F1A41505CC82073245179DBB14 /* UIView.swift */; };
 		BF_648357B9D8AC52A0B669F20912A54C9F /* TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_F2CC1556DBF7DA98E98C593438525BA4 /* TestHelpers.swift */; };
 		BF_6730D650367B8168D8FAF10C99C95360 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_57CD93B71031FCD6FBC58D8D945A1706 /* Data.swift */; };
 		BF_710776DC175BE3B689292A550887305B /* SpriteKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_C3CB0C1274CC8D510653228157C66A77 /* SpriteKit.swift */; };
+		BF_73ECDE45490E98169AEDDF43A9B0D7DD /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_41442A81CC107DF7CC8A85A38F60FE4F /* View.swift */; };
 		BF_74313FA8B719956E8ACCE111B99B0960 /* NSImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_E1FA8A193FE7DFA170568A78289DE2EC /* NSImage.swift */; };
 		BF_789B4F0099192F5B0F33B18AAA94E2DF /* NSImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_E1FA8A193FE7DFA170568A78289DE2EC /* NSImage.swift */; };
+		BF_7B68ABF0B6CB414F0467F3118896E81D /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_41442A81CC107DF7CC8A85A38F60FE4F /* View.swift */; };
 		BF_7CC34D12C057EBEE510F15C938C01644 /* SnapshotTestCaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_DC3B35D901526722EA9C57CE04B058FA /* SnapshotTestCaseTests.swift */; };
 		BF_7E7082D5B949259D7A1CFBAC2154780D /* Strategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_F4BEBF5A6DA36EF79ADD87917E32ED3F /* Strategy.swift */; };
 		BF_7E8D15FC52F92B4ED7A461509A28656D /* UIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_011F41E7CBD5C3AAB887E8F70A792A28 /* UIViewController.swift */; };
 		BF_7F3F7303ACF94F86C88C54673EC31E8B /* NSViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_5BC9AA7F156EEE27E2A2442640AE1D4A /* NSViewController.swift */; };
-		BF_83708276954D3F092729DEE9CEC26B33 /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_0E7771DB39A0AA5788034ACA524B7EE3 /* View.swift */; };
 		BF_8926855A85FB3CA85B95CC37D335AEFB /* NSViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_5BC9AA7F156EEE27E2A2442640AE1D4A /* NSViewController.swift */; };
 		BF_92DFFE207E23D176E2A83025F6F2C2CE /* SpriteKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_C3CB0C1274CC8D510653228157C66A77 /* SpriteKit.swift */; };
 		BF_93A3D38E590AB05BAFFEEBC75C601A4D /* UIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_011F41E7CBD5C3AAB887E8F70A792A28 /* UIViewController.swift */; };
@@ -53,13 +56,14 @@
 		BF_B39F8354D2B15959F80C015C02B62643 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_AF8C7D84EDECC0C7A6CD2D9054107398 /* String.swift */; };
 		BF_B8082ECBCA07EA977AE482DDFCA9C33D /* Attachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_DA79344382FCF4D2344547FD4A26D563 /* Attachment.swift */; };
 		BF_B9820C8451945985651EFB670E948805 /* CALayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_02D2BA628CE5C87E6299836CA06DA5AE /* CALayer.swift */; };
+		BF_BAD94EE4EE3D29F25798561CFCE08759 /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_41442A81CC107DF7CC8A85A38F60FE4F /* View.swift */; };
 		BF_C0A0EBBFEC968B768537F848916C49FF /* Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_8F443AA3F4613D29624A1150E5B9DAD3 /* Codable.swift */; };
 		BF_C0DE7B46A4BF5F017625A1F337F7410E /* SnapshotTestCaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_DC3B35D901526722EA9C57CE04B058FA /* SnapshotTestCaseTests.swift */; };
 		BF_C3D63AFD027E9A50F37244CBABCE9A43 /* UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_D3724FEFC0FF50CACCC23652F2C7578C /* UIImage.swift */; };
 		BF_C4BF7CA4316C2FED85F74B888BADE302 /* Attachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_DA79344382FCF4D2344547FD4A26D563 /* Attachment.swift */; };
 		BF_C7D2E87F47E2F7457AD3FC9DAF5F77A5 /* UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_D3724FEFC0FF50CACCC23652F2C7578C /* UIImage.swift */; };
 		BF_CC119FC0B912C972DF70BD2720AA3D0F /* Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_8F443AA3F4613D29624A1150E5B9DAD3 /* Codable.swift */; };
-		BF_CCCDB80BDBD37BE3C37DADBEE79C93C2 /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_0E7771DB39A0AA5788034ACA524B7EE3 /* View.swift */; };
+		BF_CD12FB83D3ACBEB763DEE9BCD61090FB /* UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_3B4CB7F1A41505CC82073245179DBB14 /* UIView.swift */; };
 		BF_CEA78BD0477B1745D042FAE6049A5B73 /* AssertSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_DC773049D04465475F91599CF4255908 /* AssertSnapshot.swift */; };
 		BF_D26E99EBDBAD9E49A7C110D888DA2640 /* TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_F2CC1556DBF7DA98E98C593438525BA4 /* TestHelpers.swift */; };
 		BF_D2846774B6AFB8FFC427EFF98FEF2F4E /* Any.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_0B0CF16A9771EB5B0F72DBCE2128CD6D /* Any.swift */; };
@@ -70,13 +74,15 @@
 		BF_D712B33D096E86F34953E92E0A1051C2 /* PropertyListEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_26BC946CB572B86A384E7AE28765BD49 /* PropertyListEncoder.swift */; };
 		BF_D7A00145585CD613CBB42CC425762D03 /* SnapshotTesting.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FR_1C0F0F9D1E3946C22AB189D75CBFA00A /* SnapshotTesting.framework */; };
 		BF_D862704C2CB88B4373E8A6D043400D49 /* Diffable.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_CFB0F28F5A19E32576377C817456E15A /* Diffable.swift */; };
+		BF_DCCE6F19982D0B92015D4AFF11B08F0A /* NSView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_5A6BFFFA99CC16373DFB43123F078D0E /* NSView.swift */; };
 		BF_E191776B50B9EDF01CFD68F196203961 /* Any.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_0B0CF16A9771EB5B0F72DBCE2128CD6D /* Any.swift */; };
-		BF_E4CBA0F3DF322EEA1F69E255A2C76D7F /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_0E7771DB39A0AA5788034ACA524B7EE3 /* View.swift */; };
+		BF_E2414722FB45939BE69D1A28F2A8E127 /* NSView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_5A6BFFFA99CC16373DFB43123F078D0E /* NSView.swift */; };
 		BF_E55DFEDCE649B588C7BAB7225324890D /* UIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_011F41E7CBD5C3AAB887E8F70A792A28 /* UIViewController.swift */; };
 		BF_E9D5B4126225F0CDC4A083DB8D3EB9C7 /* SnapshotTesting.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = FR_1C0F0F9D1E3946C22AB189D75CBFA00A /* SnapshotTesting.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		BF_EA93AC0D72E1311A8135CFC7CBF332C1 /* NSViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_5BC9AA7F156EEE27E2A2442640AE1D4A /* NSViewController.swift */; };
 		BF_EDB8AB781A3D51A987BE3755EE57EBE9 /* SnapshotTesting.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = FR_92D59F3FEA61DC16FFDB7B1F5FCA57D2 /* SnapshotTesting.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		BF_F054D35C1F281F57EA2B9622EFEEF7FB /* SceneKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_E0227C47E0FB67F70EF0493E8A4CDB60 /* SceneKit.swift */; };
+		BF_F1BAD4984AF3B1915BD9A6FD709A52B9 /* NSView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_5A6BFFFA99CC16373DFB43123F078D0E /* NSView.swift */; };
 		BF_F515927ECBA692381ECE1DBB73161FCF /* SceneKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_E0227C47E0FB67F70EF0493E8A4CDB60 /* SceneKit.swift */; };
 		BF_F7AA48A29F4220B2A19CDC41C83E1D06 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_AF8C7D84EDECC0C7A6CD2D9054107398 /* String.swift */; };
 		BF_F896D52B8FF76B9328361A8857B4BF87 /* AssertSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_DC773049D04465475F91599CF4255908 /* AssertSnapshot.swift */; };
@@ -148,13 +154,15 @@
 		FR_011F41E7CBD5C3AAB887E8F70A792A28 /* UIViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewController.swift; sourceTree = "<group>"; };
 		FR_02D2BA628CE5C87E6299836CA06DA5AE /* CALayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CALayer.swift; sourceTree = "<group>"; };
 		FR_0B0CF16A9771EB5B0F72DBCE2128CD6D /* Any.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Any.swift; sourceTree = "<group>"; };
-		FR_0E7771DB39A0AA5788034ACA524B7EE3 /* View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = View.swift; sourceTree = "<group>"; };
 		FR_1C0F0F9D1E3946C22AB189D75CBFA00A /* SnapshotTesting.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SnapshotTesting.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FR_249284F48787C8FEC6C4C3B317A68737 /* SnapshotTestingTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SnapshotTestingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FR_26BC946CB572B86A384E7AE28765BD49 /* PropertyListEncoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PropertyListEncoder.swift; sourceTree = "<group>"; };
+		FR_3B4CB7F1A41505CC82073245179DBB14 /* UIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIView.swift; sourceTree = "<group>"; };
 		FR_3F75F013FD55B116C9AECB84C5DA414D /* SnapshotTestingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SnapshotTestingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		FR_41442A81CC107DF7CC8A85A38F60FE4F /* View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = View.swift; sourceTree = "<group>"; };
 		FR_55C12DE66D3E4C2C5F02C60546270EBB /* SnapshotTesting.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SnapshotTesting.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FR_57CD93B71031FCD6FBC58D8D945A1706 /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
+		FR_5A6BFFFA99CC16373DFB43123F078D0E /* NSView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSView.swift; sourceTree = "<group>"; };
 		FR_5BC9AA7F156EEE27E2A2442640AE1D4A /* NSViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSViewController.swift; sourceTree = "<group>"; };
 		FR_8EB55DE46F77C40F38DC441C396C2AA2 /* Async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Async.swift; sourceTree = "<group>"; };
 		FR_8F443AA3F4613D29624A1150E5B9DAD3 /* Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Codable.swift; sourceTree = "<group>"; };
@@ -223,13 +231,15 @@
 				FR_8F443AA3F4613D29624A1150E5B9DAD3 /* Codable.swift */,
 				FR_57CD93B71031FCD6FBC58D8D945A1706 /* Data.swift */,
 				FR_E1FA8A193FE7DFA170568A78289DE2EC /* NSImage.swift */,
+				FR_5A6BFFFA99CC16373DFB43123F078D0E /* NSView.swift */,
 				FR_5BC9AA7F156EEE27E2A2442640AE1D4A /* NSViewController.swift */,
 				FR_E0227C47E0FB67F70EF0493E8A4CDB60 /* SceneKit.swift */,
 				FR_C3CB0C1274CC8D510653228157C66A77 /* SpriteKit.swift */,
 				FR_AF8C7D84EDECC0C7A6CD2D9054107398 /* String.swift */,
 				FR_D3724FEFC0FF50CACCC23652F2C7578C /* UIImage.swift */,
+				FR_3B4CB7F1A41505CC82073245179DBB14 /* UIView.swift */,
 				FR_011F41E7CBD5C3AAB887E8F70A792A28 /* UIViewController.swift */,
-				FR_0E7771DB39A0AA5788034ACA524B7EE3 /* View.swift */,
+				G_F7C9EB9E4996634CBFEBE12428276D0C /* Util */,
 			);
 			path = Strategy;
 			sourceTree = "<group>";
@@ -292,6 +302,14 @@
 				G_3866EE32428D3DBEF6E65D218594DDC4 /* SnapshotTesting */,
 			);
 			path = Sources;
+			sourceTree = "<group>";
+		};
+		G_F7C9EB9E4996634CBFEBE12428276D0C /* Util */ = {
+			isa = PBXGroup;
+			children = (
+				FR_41442A81CC107DF7CC8A85A38F60FE4F /* View.swift */,
+			);
+			path = Util;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -441,6 +459,7 @@
 				BF_0C5543D04B4212AA57DCF0E1E594CAF6 /* Diffable.swift in Sources */,
 				BF_52C03ADE3CE2F4B24C881FA97769A932 /* Internal.swift in Sources */,
 				BF_789B4F0099192F5B0F33B18AAA94E2DF /* NSImage.swift in Sources */,
+				BF_DCCE6F19982D0B92015D4AFF11B08F0A /* NSView.swift in Sources */,
 				BF_7F3F7303ACF94F86C88C54673EC31E8B /* NSViewController.swift in Sources */,
 				BF_41FAA06E937486BD5CE3F3D4E812B1BA /* PropertyListEncoder.swift in Sources */,
 				BF_1F9B48C978B79ADDC70074F90A45D20C /* SceneKit.swift in Sources */,
@@ -449,8 +468,9 @@
 				BF_7E7082D5B949259D7A1CFBAC2154780D /* Strategy.swift in Sources */,
 				BF_B39F8354D2B15959F80C015C02B62643 /* String.swift in Sources */,
 				BF_C3D63AFD027E9A50F37244CBABCE9A43 /* UIImage.swift in Sources */,
+				BF_1D0B021EA8FBF7817E793FB56BAB58AD /* UIView.swift in Sources */,
 				BF_93A3D38E590AB05BAFFEEBC75C601A4D /* UIViewController.swift in Sources */,
-				BF_E4CBA0F3DF322EEA1F69E255A2C76D7F /* View.swift in Sources */,
+				BF_BAD94EE4EE3D29F25798561CFCE08759 /* View.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -469,6 +489,7 @@
 				BF_290BB77E2401937E6400555C3B0F9A7A /* Diffable.swift in Sources */,
 				BF_94A6AD59B8E19AF997B915EC79497934 /* Internal.swift in Sources */,
 				BF_FCC64D190E241971E8DC9818EBC50E75 /* NSImage.swift in Sources */,
+				BF_F1BAD4984AF3B1915BD9A6FD709A52B9 /* NSView.swift in Sources */,
 				BF_8926855A85FB3CA85B95CC37D335AEFB /* NSViewController.swift in Sources */,
 				BF_563500F7C0C0341867406C92198864C4 /* PropertyListEncoder.swift in Sources */,
 				BF_F054D35C1F281F57EA2B9622EFEEF7FB /* SceneKit.swift in Sources */,
@@ -477,8 +498,9 @@
 				BF_40D093DDC81931CB9C7AF616AA544ACD /* Strategy.swift in Sources */,
 				BF_F7AA48A29F4220B2A19CDC41C83E1D06 /* String.swift in Sources */,
 				BF_D47F465982998AC68EA9D14E475D5FD5 /* UIImage.swift in Sources */,
+				BF_6246DD99D5E533905EB3B4FDA93C84F0 /* UIView.swift in Sources */,
 				BF_7E8D15FC52F92B4ED7A461509A28656D /* UIViewController.swift in Sources */,
-				BF_83708276954D3F092729DEE9CEC26B33 /* View.swift in Sources */,
+				BF_7B68ABF0B6CB414F0467F3118896E81D /* View.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -497,6 +519,7 @@
 				BF_D862704C2CB88B4373E8A6D043400D49 /* Diffable.swift in Sources */,
 				BF_D61CA12AF5EEB8437A53C9411C1640B1 /* Internal.swift in Sources */,
 				BF_74313FA8B719956E8ACCE111B99B0960 /* NSImage.swift in Sources */,
+				BF_E2414722FB45939BE69D1A28F2A8E127 /* NSView.swift in Sources */,
 				BF_EA93AC0D72E1311A8135CFC7CBF332C1 /* NSViewController.swift in Sources */,
 				BF_D712B33D096E86F34953E92E0A1051C2 /* PropertyListEncoder.swift in Sources */,
 				BF_F515927ECBA692381ECE1DBB73161FCF /* SceneKit.swift in Sources */,
@@ -505,8 +528,9 @@
 				BF_59377B307FB813153ABE7260E51EF2DC /* Strategy.swift in Sources */,
 				BF_A0F4C67288741E22E3F0C1B450A2A4FD /* String.swift in Sources */,
 				BF_C7D2E87F47E2F7457AD3FC9DAF5F77A5 /* UIImage.swift in Sources */,
+				BF_CD12FB83D3ACBEB763DEE9BCD61090FB /* UIView.swift in Sources */,
 				BF_E55DFEDCE649B588C7BAB7225324890D /* UIViewController.swift in Sources */,
-				BF_CCCDB80BDBD37BE3C37DADBEE79C93C2 /* View.swift in Sources */,
+				BF_73ECDE45490E98169AEDDF43A9B0D7DD /* View.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
