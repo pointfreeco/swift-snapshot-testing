@@ -105,6 +105,12 @@ extension String: AnySnapshotStringConvertible {
   }
 }
 
+extension Substring: AnySnapshotStringConvertible {
+  public var snapshotDescription: String {
+    return self.debugDescription
+  }
+}
+
 extension URL: AnySnapshotStringConvertible {
   public var snapshotDescription: String {
     return self.debugDescription
