@@ -1,7 +1,7 @@
 #if !os(Linux)
 import XCTest
 
-/// Enhances failure messages with a command line expression that can be copied and pasted into a terminal.
+/// Enhances failure messages with a command line diff tool expression that can be copied and pasted into a terminal.
 ///
 ///     diffTool = "ksdiff"
 public var diffTool: String? = nil
