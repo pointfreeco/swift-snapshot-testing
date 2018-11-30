@@ -1,3 +1,6 @@
+// NB: This file is copied from Swift to make available to Linux Swift 4.2 and below.
+//
+// https://github.com/apple/swift/blob/master/stdlib/public/SDK/Foundation/PlistEncoder.swift
 import Foundation
 
 extension DecodingError {
