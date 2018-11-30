@@ -56,22 +56,22 @@ github "pointfreeco/swift-validated" "master"
 
 ### CocoaPods
 
+If your project uses [CocoaPods](https://cocoapods.org), add the pod to any applicable test targets in your `Podfile`:
+
 ```ruby
-target 'Tests' do
+target 'MyAppTests' do
   pod 'SnapshotTesting', :git => 'https://github.com/pointfreeco/swift-snapshot-testing.git'
 end
 ```
 
 ### Swift Package Manager
 
-```swift
-import PackageDescription
+If you want to use SnapshotTesting in a project that uses [SwiftPM](https://swift.org/package-manager/), add the package as a dependency in `Package.swift`:
 
-let package = Package(
-  dependencies: [
-    .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", .branch("master")),
-  ]
-)
+```swift
+dependencies: [
+  .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", .branch("master")),
+]
 ```
 
 ## Usage
