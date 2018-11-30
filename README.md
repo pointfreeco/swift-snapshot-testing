@@ -1,37 +1,79 @@
 # SnapshotTesting
 
-macOS [![CircleCI](https://circleci.com/gh/pointfreeco/swift-snapshot-testing.svg?style=svg)](https://circleci.com/gh/pointfreeco/swift-snapshot-testing) Linux [![Build Status](https://travis-ci.org/pointfreeco/swift-snapshot-testing.svg)](https://travis-ci.org/pointfreeco/swift-snapshot-testing)
+[![Swift 4.2](https://img.shields.io/badge/swift-4.2-ED523F.svg?style=flat)](https://swift.org/download/) [![iOS/macOS CI](https://img.shields.io/circleci/project/github/pointfreeco/swift-snapshot-testing/master.svg?label=ios/macos)](https://circleci.com/gh/pointfreeco/swift-snapshot-testing) [![Linux CI](https://img.shields.io/travis/pointfreeco/swift-snapshot-testing/master.svg?label=linux)](https://travis-ci.org/pointfreeco/swift-nonempty) [![@pointfreeco](https://img.shields.io/badge/contact-@pointfreeco-5AA9E7.svg?style=flat)](https://twitter.com/pointfreeco)
 
-Automatically record app data into test assertions. Snapshot tests capture the entirety of a data structure and cover far more surface area than a typical unit test.
+Snapshot testing for views, data, and more!
 
-The design of this library has been covered in "[Snapshot Testing in Swift](http://www.stephencelis.com/2017/09/snapshot-testing-in-swift)".
+## Getting Started
 
-![An example of a snapshot failure in Xcode.](.github/snapshot-test.png)
+Once the library [is installed](#installation), no additional configuration is required. You can import the `SnapshotTesting` module into a test and pass a value to the `assertSnapshot` function.
 
-## Stability
+``` swift
+import SnapshotTesting
+import XCTest
 
-This library should be considered alpha, and not stable. Breaking changes will happen often.
+class MyViewControllerTests: XCTestCase {
+  func testMyViewController() {
+    let vc = MyViewController()
+
+    assertSnapshot(matching: vc, as: .image)
+  }
+}
+```
+
+When the test first runs, a snapshot is recorded automatically to disk and the test will fail and print out the file path of the reference.
+
+> 🛑 failed - Recorded: …
+>
+> "…/MyAppTests/\_\_Snapshots\_\_/MyViewControllerTests/testMyViewController.png"
+
+Repeat test runs will load this reference for comparison. If the images don't match, the test will fail and print out the file path of each image for further inspection.
+
+You can record a new reference by setting `record` mode to `true` on the assertion or globally.
+
+``` swift
+assertSnapshot(matching: vc, as: .image, record: true)
+
+// or globally
+
+record = true
+assertSnapshot(matching: vc, as: .image)
+```
+
+<!--
+## Configuration
+
+TODO
+-->
 
 ## Installation
 
-### Swift Package Manager
+### Carthage
 
-```swift
-import PackageDescription
+If you use [Carthage](https://github.com/Carthage/Carthage), you can add the following dependency to your `Cartfile`:
 
-let package = Package(
-  dependencies: [
-    .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", .branch("master")),
-  ]
-)
+``` ruby
+github "pointfreeco/swift-validated" "master"
 ```
 
-### Cocoapods
+### CocoaPods
+
+If your project uses [CocoaPods](https://cocoapods.org), add the pod to any applicable test targets in your `Podfile`:
 
 ```ruby
-target 'Tests' do
+target 'MyAppTests' do
   pod 'SnapshotTesting', :git => 'https://github.com/pointfreeco/swift-snapshot-testing.git'
 end
+```
+
+### Swift Package Manager
+
+If you want to use SnapshotTesting in a project that uses [SwiftPM](https://swift.org/package-manager/), add the package as a dependency in `Package.swift`:
+
+```swift
+dependencies: [
+  .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", .branch("master")),
+]
 ```
 
 ## Usage

@@ -1,14 +1,30 @@
 #if os(Linux)
 import XCTest
 
+/// An XCTest subclass that provides snaphot testing helpers.
 open class SnapshotTestCase: XCTestCase {
-  private var counter = 1
+  /// Whether or not to record all new references.
   open var record = false
+
+  /// Enhances failure messages with a command line expression that can be copied and pasted into a terminal.
+  ///
+  ///     diffTool = "ksdiff"
   open var diffTool: String? = nil
 
-  public func assertSnapshot<Snapshottable, Format>(
-    matching value: Snapshottable,
-    as strategy: Strategy<Snapshottable, Format>,
+  /// Asserts that a given value matches a reference on disk.
+  ///
+  /// - Parameters:
+  ///   - value: A value to compare against a reference.
+  ///   - snapshotting: A strategy for serializing, deserializing, and comparing values.
+  ///   - name: An optional description of the snapshot.
+  ///   - recording: Whether or not to record a new reference.
+  ///   - timeout: The amount of time a snapshot must be generated in.
+  ///   - file: The file in which failure occurred. Defaults to the file name of the test case in which this function was called.
+  ///   - testName: The name of the test in which failure occurred. Defaults to the function name of the test case in which this function was called.
+  ///   - line: The line number on which failure occurred. Defaults to the line number on which this function was called.
+  public func assertSnapshot<Value, Format>(
+    matching value: Value,
+    as snapshotting: Snapshotting<Value, Format>,
     named name: String? = nil,
     record recording: Bool = false,
     timeout: TimeInterval = 5,
@@ -29,21 +45,22 @@ open class SnapshotTestCase: XCTestCase {
 
       let identifier: String
       if let name = name {
-        identifier = name
+        identifier = sanitizePathComponent(name)
       } else {
         identifier = String(counter)
         counter += 1
       }
 
+      let testName = sanitizePathComponent(testName)
       let snapshotFileUrl = snapshotDirectoryUrl
-        .appendingPathComponent("\(testName.dropLast(2)).\(identifier)")
-        .appendingPathExtension(strategy.pathExtension ?? "")
+        .appendingPathComponent("\(testName).\(identifier)")
+        .appendingPathExtension(snapshotting.pathExtension ?? "")
       let fileManager = FileManager.default
       try fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
 
       let tookSnapshot = self.expectation(description: "Took snapshot")
       var optionalDiffable: Format?
-      strategy.snapshotToDiffable(value).run { b in
+      snapshotting.snapshot(value).run { b in
         optionalDiffable = b
         tookSnapshot.fulfill()
       }
@@ -53,21 +70,21 @@ open class SnapshotTestCase: XCTestCase {
       self.wait(for: [tookSnapshot], timeout: timeout)
       #endif
 
-      guard let diffable = optionalDiffable else {
+      guard let diffing = optionalDiffable else {
         XCTFail("Couldn't snapshot value", file: file, line: line)
         return
       }
 
       guard !recording, fileManager.fileExists(atPath: snapshotFileUrl.path) else {
-        try strategy.diffable.to(diffable).write(to: snapshotFileUrl)
+        try snapshotting.diffing.toData(diffing).write(to: snapshotFileUrl)
         XCTFail("Recorded snapshot: …\n\n\"\(snapshotFileUrl.path)\"", file: file, line: line)
         return
       }
 
       let data = try Data(contentsOf: snapshotFileUrl)
-      let reference = strategy.diffable.fro(data)
+      let reference = snapshotting.diffing.fromData(data)
 
-      guard let (failure, attachments) = strategy.diffable.diff(reference, diffable) else {
+      guard let (failure, attachments) = snapshotting.diffing.diff(reference, diffing) else {
         return
       }
 
@@ -77,7 +94,7 @@ open class SnapshotTestCase: XCTestCase {
       let artifactsSubUrl = artifactsUrl.appendingPathComponent(fileName)
       try fileManager.createDirectory(at: artifactsSubUrl, withIntermediateDirectories: true)
       let failedSnapshotFileUrl = artifactsSubUrl.appendingPathComponent(snapshotFileUrl.lastPathComponent)
-      try strategy.diffable.to(diffable).write(to: failedSnapshotFileUrl)
+      try snapshotting.diffing.toData(diffing).write(to: failedSnapshotFileUrl)
 
       if !attachments.isEmpty {
         #if !os(Linux)
@@ -102,5 +119,7 @@ open class SnapshotTestCase: XCTestCase {
       XCTFail(error.localizedDescription, file: file, line: line)
     }
   }
+
+  private var counter = 1
 }
 #endif

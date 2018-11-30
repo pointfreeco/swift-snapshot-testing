@@ -1,12 +1,28 @@
 #if !os(Linux)
 import XCTest
 
+/// Enhances failure messages with a command line diff tool expression that can be copied and pasted into a terminal.
+///
+///     diffTool = "ksdiff"
 public var diffTool: String? = nil
+
+/// Whether or not to record all new references.
 public var record = false
 
+/// Asserts that a given value matches a reference on disk.
+///
+/// - Parameters:
+///   - value: A value to compare against a reference.
+///   - snapshotting: A strategy for serializing, deserializing, and comparing values.
+///   - name: An optional description of the snapshot.
+///   - recording: Whether or not to record a new reference.
+///   - timeout: The amount of time a snapshot must be generated in.
+///   - file: The file in which failure occurred. Defaults to the file name of the test case in which this function was called.
+///   - testName: The name of the test in which failure occurred. Defaults to the function name of the test case in which this function was called.
+///   - line: The line number on which failure occurred. Defaults to the line number on which this function was called.
 public func assertSnapshot<A, B>(
-  matching value: A,
-  as strategy: Strategy<A, B>,
+  matching value: @autoclosure () throws -> A,
+  as snapshotting: Snapshotting<A, B>,
   named name: String? = nil,
   record recording: Bool = false,
   timeout: TimeInterval = 5,
@@ -17,7 +33,7 @@ public func assertSnapshot<A, B>(
 
   let failure = verifySnapshot(
     matching: value,
-    as: strategy,
+    as: snapshotting,
     named: name,
     record: recording,
     timeout: timeout,
@@ -29,9 +45,21 @@ public func assertSnapshot<A, B>(
   XCTFail(message, file: file, line: line)
 }
 
+/// Verifies that a given value matches a reference on disk.
+///
+/// - Parameters:
+///   - value: A value to compare against a reference.
+///   - snapshotting: A strategy for serializing, deserializing, and comparing values.
+///   - name: An optional description of the snapshot.
+///   - recording: Whether or not to record a new reference.
+///   - timeout: The amount of time a snapshot must be generated in.
+///   - file: The file in which failure occurred. Defaults to the file name of the test case in which this function was called.
+///   - testName: The name of the test in which failure occurred. Defaults to the function name of the test case in which this function was called.
+///   - line: The line number on which failure occurred. Defaults to the line number on which this function was called.
+/// - Returns: A failure message or, if the value matches, nil.
 public func verifySnapshot<A, B>(
-  matching value: A,
-  as strategy: Strategy<A, B>,
+  matching value: @autoclosure () throws -> A,
+  as snapshotting: Snapshotting<A, B>,
   named name: String? = nil,
   record recording: Bool = false,
   timeout: TimeInterval = 5,
@@ -53,7 +81,7 @@ public func verifySnapshot<A, B>(
 
       let identifier: String
       if let name = name {
-        identifier = name
+        identifier = sanitizePathComponent(name)
       } else {
         let counter = counterQueue.sync { () -> Int in
           let key = snapshotDirectoryUrl.appendingPathComponent(testName)
@@ -63,15 +91,16 @@ public func verifySnapshot<A, B>(
         identifier = String(counter)
       }
 
+      let testName = sanitizePathComponent(testName)
       let snapshotFileUrl = snapshotDirectoryUrl
-        .appendingPathComponent("\(testName.dropLast(2)).\(identifier)")
-        .appendingPathExtension(strategy.pathExtension ?? "")
+        .appendingPathComponent("\(testName).\(identifier)")
+        .appendingPathExtension(snapshotting.pathExtension ?? "")
       let fileManager = FileManager.default
       try fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
 
       let tookSnapshot = XCTestExpectation(description: "Took snapshot")
       var optionalDiffable: B?
-      strategy.snapshotToDiffable(value).run { b in
+      snapshotting.snapshot(try value()).run { b in
         optionalDiffable = b
         tookSnapshot.fulfill()
       }
@@ -90,14 +119,14 @@ public func verifySnapshot<A, B>(
       }
 
       guard !recording, fileManager.fileExists(atPath: snapshotFileUrl.path) else {
-        try strategy.diffable.to(diffable).write(to: snapshotFileUrl)
+        try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)
         return "Recorded snapshot: …\n\n\"\(snapshotFileUrl.path)\""
       }
 
       let data = try Data(contentsOf: snapshotFileUrl)
-      let reference = strategy.diffable.fro(data)
+      let reference = snapshotting.diffing.fromData(data)
 
-      guard let (failure, attachments) = strategy.diffable.diff(reference, diffable) else {
+      guard let (failure, attachments) = snapshotting.diffing.diff(reference, diffable) else {
         return nil
       }
 
@@ -107,7 +136,7 @@ public func verifySnapshot<A, B>(
       let artifactsSubUrl = artifactsUrl.appendingPathComponent(fileName)
       try fileManager.createDirectory(at: artifactsSubUrl, withIntermediateDirectories: true)
       let failedSnapshotFileUrl = artifactsSubUrl.appendingPathComponent(snapshotFileUrl.lastPathComponent)
-      try strategy.diffable.to(diffable).write(to: failedSnapshotFileUrl)
+      try snapshotting.diffing.toData(diffable).write(to: failedSnapshotFileUrl)
 
       if !attachments.isEmpty {
         #if !os(Linux)
@@ -135,3 +164,9 @@ public func verifySnapshot<A, B>(
 private let counterQueue = DispatchQueue(label: "co.pointfree.SnapshotTesting.counter")
 private var counterMap: [URL: Int] = [:]
 #endif
+
+func sanitizePathComponent(_ string: String) -> String {
+  return string
+    .replacingOccurrences(of: "\\W+", with: "-", options: .regularExpression)
+    .replacingOccurrences(of: "^-|-$", with: "", options: .regularExpression)
+}
