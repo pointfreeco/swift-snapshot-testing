@@ -13,11 +13,11 @@ extension Snapshotting where Value: Encodable, Format == String {
   ///
   /// - Parameter encoder: A JSON encoder.
   public static func json(_ encoder: JSONEncoder) -> Snapshotting {
-    var strategy = SimplySnapshotting.lines.pullback { (encodable: Value) in
+    var snapshotting = SimplySnapshotting.lines.pullback { (encodable: Value) in
       try! String(decoding: encoder.encode(encodable), as: UTF8.self)
     }
-    strategy.pathExtension = "json"
-    return strategy
+    snapshotting.pathExtension = "json"
+    return snapshotting
   }
 
   /// A snapshot strategy for comparing encodable structures based on their property list representation.
@@ -31,10 +31,10 @@ extension Snapshotting where Value: Encodable, Format == String {
   ///
   /// - Parameter encoder: A property list encoder.
   public static func plist(_ encoder: PropertyListEncoder) -> Snapshotting {
-    var strategy = SimplySnapshotting.lines.pullback { (encodable: Value) in
+    var snapshotting = SimplySnapshotting.lines.pullback { (encodable: Value) in
       try! String(decoding: encoder.encode(encodable), as: UTF8.self)
     }
-    strategy.pathExtension = "plist"
-    return strategy
+    snapshotting.pathExtension = "plist"
+    return snapshotting
   }
 }
