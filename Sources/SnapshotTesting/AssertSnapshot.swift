@@ -119,12 +119,12 @@ public func verifySnapshot<A, B>(
       }
 
       guard !recording, fileManager.fileExists(atPath: snapshotFileUrl.path) else {
-        try strategy.diffable.to(diffable).write(to: snapshotFileUrl)
+        try strategy.diffable.toData(diffable).write(to: snapshotFileUrl)
         return "Recorded snapshot: …\n\n\"\(snapshotFileUrl.path)\""
       }
 
       let data = try Data(contentsOf: snapshotFileUrl)
-      let reference = strategy.diffable.fro(data)
+      let reference = strategy.diffable.fromData(data)
 
       guard let (failure, attachments) = strategy.diffable.diff(reference, diffable) else {
         return nil
@@ -136,7 +136,7 @@ public func verifySnapshot<A, B>(
       let artifactsSubUrl = artifactsUrl.appendingPathComponent(fileName)
       try fileManager.createDirectory(at: artifactsSubUrl, withIntermediateDirectories: true)
       let failedSnapshotFileUrl = artifactsSubUrl.appendingPathComponent(snapshotFileUrl.lastPathComponent)
-      try strategy.diffable.to(diffable).write(to: failedSnapshotFileUrl)
+      try strategy.diffable.toData(diffable).write(to: failedSnapshotFileUrl)
 
       if !attachments.isEmpty {
         #if !os(Linux)

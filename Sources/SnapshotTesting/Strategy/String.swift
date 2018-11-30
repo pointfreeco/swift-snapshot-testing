@@ -8,8 +8,8 @@ extension Strategy where Snapshottable == String, Format == String {
 extension Diffable where Value == String {
   /// A line-diffing strategy for UTF-8 text.
   public static let lines = Diffable(
-    to: { Data($0.utf8) },
-    fro: { String(decoding: $0, as: UTF8.self) }
+    toData: { Data($0.utf8) },
+    fromData: { String(decoding: $0, as: UTF8.self) }
   ) { old, new in
     guard old != new else { return nil }
     let hunks = chunk(diff: SnapshotTesting.diff(

@@ -22,8 +22,8 @@ extension Strategy where Snapshottable == NSImage, Format == NSImage {
     return .init(
       pathExtension: "png",
       diffable: .init(
-        to: { NSImagePNGRepresentation($0)! },
-        fro: { NSImage(data: $0)! }
+        toData: { NSImagePNGRepresentation($0)! },
+        fromData: { NSImage(data: $0)! }
       ) { old, new in
         guard !compare(old, new, precision: precision) else { return nil }
         let difference = diff(old, new)

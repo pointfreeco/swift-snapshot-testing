@@ -14,7 +14,7 @@ extension Strategy where Snapshottable == Data, Format == Data {
   static var data: Strategy {
     return .init(
       pathExtension: nil,
-      diffable: .init(to: { $0 }, fro: { $0 }) { old, new in
+      diffable: .init(toData: { $0 }, fromData: { $0 }) { old, new in
         guard old != new else { return nil }
         let message = old.count == new.count
           ? "Expected data to match"

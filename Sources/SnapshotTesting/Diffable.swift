@@ -3,10 +3,10 @@ import Foundation
 /// The ability to compare `Value`s and convert them to and from `Data`.
 public struct Diffable<Value> {
   /// Converts a value _to_ data.
-  public let to: (Value) -> Data
+  public let toData: (Value) -> Data
 
   /// Produces a value _from_ data.
-  public let fro: (Data) -> Value
+  public let fromData: (Data) -> Value
 
   /// Compares two values. If the values do not match, returns a failure message and artifacts describing the failure.
   public let diff: (Value, Value) -> (String, [Attachment])?
@@ -22,12 +22,12 @@ public struct Diffable<Value> {
   ///   - lhs: A value to compare.
   ///   - rhs: Another value to compare.
   public init(
-    to: @escaping (_ value: Value) -> Data,
-    fro: @escaping (_ data: Data) -> Value,
+    toData: @escaping (_ value: Value) -> Data,
+    fromData: @escaping (_ data: Data) -> Value,
     diff: @escaping (_ lhs: Value, _ rhs: Value) -> (String, [Attachment])?
     ) {
-    self.to = to
-    self.fro = fro
+    self.toData = toData
+    self.fromData = fromData
     self.diff = diff
   }
 }

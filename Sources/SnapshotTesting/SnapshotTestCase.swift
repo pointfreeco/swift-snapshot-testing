@@ -76,13 +76,13 @@ open class SnapshotTestCase: XCTestCase {
       }
 
       guard !recording, fileManager.fileExists(atPath: snapshotFileUrl.path) else {
-        try strategy.diffable.to(diffable).write(to: snapshotFileUrl)
+        try strategy.diffable.toData(diffable).write(to: snapshotFileUrl)
         XCTFail("Recorded snapshot: …\n\n\"\(snapshotFileUrl.path)\"", file: file, line: line)
         return
       }
 
       let data = try Data(contentsOf: snapshotFileUrl)
-      let reference = strategy.diffable.fro(data)
+      let reference = strategy.diffable.fromData(data)
 
       guard let (failure, attachments) = strategy.diffable.diff(reference, diffable) else {
         return
@@ -94,7 +94,7 @@ open class SnapshotTestCase: XCTestCase {
       let artifactsSubUrl = artifactsUrl.appendingPathComponent(fileName)
       try fileManager.createDirectory(at: artifactsSubUrl, withIntermediateDirectories: true)
       let failedSnapshotFileUrl = artifactsSubUrl.appendingPathComponent(snapshotFileUrl.lastPathComponent)
-      try strategy.diffable.to(diffable).write(to: failedSnapshotFileUrl)
+      try strategy.diffable.toData(diffable).write(to: failedSnapshotFileUrl)
 
       if !attachments.isEmpty {
         #if !os(Linux)
