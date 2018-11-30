@@ -11,14 +11,14 @@ extension Attachment {
 
 extension Strategy where Snapshottable == UIImage, Format == UIImage {
   /// A snapshot strategy for comparing images based on pixel equality.
-  static var image: Strategy {
+  public static var image: Strategy {
     return .image(precision: 1)
   }
 
   /// A snapshot strategy for comparing images based on pixel equality.
   ///
   /// - Parameter precision: The percentage of pixels that must match.
-  static func image(precision: Float) -> Strategy {
+  public static func image(precision: Float) -> Strategy {
     return .init(
       pathExtension: "png",
       diffable: .init(

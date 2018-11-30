@@ -3,7 +3,7 @@ version: 2
 jobs:
   build:
     macos:
-      xcode: "10.0.0"
+      xcode: "10.1.0"
 
     steps:
       - checkout
@@ -15,14 +15,10 @@ jobs:
       - run:
           name: Run iOS tests
           command: make test-ios
-          environment:
-            SNAPSHOT_ARTIFACTS: /tmp/__SnapshotArtifacts__
 
       - run:
           name: Run macOS tests
           command: make test-macos
-          environment:
-            SNAPSHOT_ARTIFACTS: /tmp/__SnapshotArtifacts__
 
       - run:
           name: Run Swift tests
@@ -33,8 +29,6 @@ jobs:
       - run:
           name: Run tvOS tests
           command: make test-tvos
-          environment:
-            SNAPSHOT_ARTIFACTS: /tmp/__SnapshotArtifacts__
 
       - store_artifacts:
           path: /tmp/__SnapshotArtifacts__

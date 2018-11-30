@@ -29,20 +29,22 @@ import UIKit
 extension Strategy where Snapshottable == CALayer, Format == UIImage {
   /// A snapshot strategy for comparing layers based on pixel equality.
   public static var image: Strategy {
-    return .image(precision: 1)
+    return .image()
   }
 
+<<<<<<< HEAD
   /// A snapshot strategy for comparing layers based on pixel equality.
   ///
   /// - Parameter precision: The percentage of pixels that must match.
-  public static func image(precision: Float) -> Strategy {
-    return SimpleStrategy.image(precision: precision).pullback { layer in
-      UIGraphicsImageRenderer(size: layer.bounds.size).image { context in
-        layer.setNeedsLayout()
-        layer.layoutIfNeeded()
-        layer.render(in: context.cgContext)
+  public static func image(precision: Float = 1, traits: UITraitCollection = .init())
+    -> Strategy {
+      return SimpleStrategy.image(precision: precision).pullback { layer in
+        renderer(bounds: layer.bounds, for: traits).image { ctx in
+          layer.setNeedsLayout()
+          layer.layoutIfNeeded()
+          layer.render(in: ctx.cgContext)
+        }
       }
-    }
   }
 }
 #endif
