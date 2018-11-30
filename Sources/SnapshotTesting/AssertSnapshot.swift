@@ -93,7 +93,7 @@ public func verifySnapshot<A, B>(
 
       let testName = sanitizePathComponent(testName)
       let snapshotFileUrl = snapshotDirectoryUrl
-        .appendingPathComponent("\(testName.dropLast(2)).\(identifier)")
+        .appendingPathComponent("\(testName).\(identifier)")
         .appendingPathExtension(strategy.pathExtension ?? "")
       let fileManager = FileManager.default
       try fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
