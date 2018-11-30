@@ -22,8 +22,7 @@ public func assertSnapshot<A, B>(
     record: recording,
     timeout: timeout,
     file: file,
-    testName: testName,
-    line: line
+    testName: testName
   )
   guard let message = failure else { return }
   XCTFail(message, file: file, line: line)
@@ -36,8 +35,7 @@ public func verifySnapshot<A, B>(
   record recording: Bool = false,
   timeout: TimeInterval = 5,
   file: StaticString = #file,
-  testName: String = #function,
-  line: UInt = #line
+  testName: String = #function
   )
   -> String? {
 
@@ -50,6 +48,7 @@ public func verifySnapshot<A, B>(
       let snapshotDirectoryUrl: URL = directoryUrl
         .appendingPathComponent("__Snapshots__")
         .appendingPathComponent(fileName)
+      let testName = testName.hasSuffix("()") ? String(testName.dropLast(2)) : testName
 
       let identifier: String
       if let name = name {
@@ -64,7 +63,7 @@ public func verifySnapshot<A, B>(
       }
 
       let snapshotFileUrl = snapshotDirectoryUrl
-        .appendingPathComponent("\(testName.dropLast(2)).\(identifier)")
+        .appendingPathComponent("\(testName).\(identifier)")
         .appendingPathExtension(strategy.pathExtension ?? "")
       let fileManager = FileManager.default
       try fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
