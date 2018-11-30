@@ -32,7 +32,6 @@ extension Strategy where Snapshottable == CALayer, Format == UIImage {
     return .image()
   }
 
-<<<<<<< HEAD
   /// A snapshot strategy for comparing layers based on pixel equality.
   ///
   /// - Parameter precision: The percentage of pixels that must match.
