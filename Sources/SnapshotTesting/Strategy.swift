@@ -46,9 +46,11 @@ public struct Strategy<Snapshottable, Format> {
     }
   }
 
-  /// Produces a brand new snapshot strategy from an existing one by pulling it back over another type that can be asynchronously transformed into the existing strategy's `Snapshottable`.
+  /// Transforms a strategy on `Value`s into a strategy on `A`s through a function `(A) -> Async<Value>`.
   ///
-  /// - Parameter transform: A transform function into `Value`.
+  /// - Parameters:
+  ///   - transform: A transform function from `A` into `Async<Value>`.
+  ///   - otherValue: A value to be transformed.
   public func asyncPullback<A>(_ transform: @escaping (_ otherValue: A) -> Async<Snapshottable>) -> Strategy<A, Format> {
     return Strategy<A, Format>(
       pathExtension: self.pathExtension,
@@ -64,15 +66,17 @@ public struct Strategy<Snapshottable, Format> {
     }
   }
 
-  /// Produces a brand new snapshot strategy from an existing one by pulling it back over another type that can be transformed into the existing strategy's `Snapshottable`.
+  /// Transforms a strategy on `Value`s into a strategy on `A`s through a function `(A) -> Value`.
   ///
-  /// - Parameter transform: A transform function into `Value`.
+  /// - Parameters:
+  ///   - transform: A transform function from `A` into `Value`.
+  ///   - otherValue: A value to be transformed.
   public func pullback<A>(_ transform: @escaping (_ otherValue: A) -> Snapshottable) -> Strategy<A, Format> {
     return self.asyncPullback { Async(value: transform($0)) }
   }
 }
 
-/// A snapshot strategy with a snapshot format that is diffable.
+/// A snapshot strategy where the type being snapshot is also a diffable type.
 public typealias SimpleStrategy<A> = Strategy<A, A>
 
 extension Strategy where Snapshottable == Format {
