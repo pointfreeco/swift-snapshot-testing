@@ -1,6 +1,7 @@
 import Foundation
 
 extension Strategy where Format == String {
+  /// A snapshot strategy for comparing any structure based on a sanitized text dump.
   public static var dump: Strategy {
     return SimpleStrategy.lines.pullback { snap($0) }
   }

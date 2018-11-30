@@ -8,12 +8,22 @@ import UIKit
 
 #if os(macOS)
 extension Strategy where Snapshottable == SCNScene, Format == NSImage {
+  /// A snapshot strategy for comparing SceneKit scenes based on pixel equality.
+  ///
+  /// - Parameters:
+  ///   - precision: The percentage of pixels that must match.
+  ///   - size: The size of the scene.
   public static func image(precision: Float = 1, size: CGSize) -> Strategy {
     return .scnScene(precision: precision, size: size)
   }
 }
 #elseif os(iOS) || os(tvOS)
 extension Strategy where Snapshottable == SCNScene, Format == UIImage {
+  /// A snapshot strategy for comparing SceneKit scenes based on pixel equality.
+  ///
+  /// - Parameters:
+  ///   - precision: The percentage of pixels that must match.
+  ///   - size: The size of the scene.
   public static func image(precision: Float = 1, size: CGSize) -> Strategy {
     return .scnScene(precision: precision, size: size)
   }

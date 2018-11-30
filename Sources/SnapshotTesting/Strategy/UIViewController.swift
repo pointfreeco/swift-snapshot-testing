@@ -2,10 +2,18 @@
 import UIKit
 
 extension Strategy where Snapshottable == UIViewController, Format == UIImage {
+  /// A snapshot strategy for comparing view controller views based on pixel equality.
   public static var image: Strategy {
     return .image()
   }
 
+  /// A snapshot strategy for comparing view controller views based on pixel equality.
+  ///
+  /// - Parameters:
+  ///   - config: A set of device configuration settings.
+  ///   - precision: The percentage of pixels that must match.
+  ///   - size: A view size override.
+  ///   - traits: A trait collection override.
   public static func image(
     on config: ViewImageConfig,
     precision: Float = 1,
@@ -25,6 +33,13 @@ extension Strategy where Snapshottable == UIViewController, Format == UIImage {
       }
   }
 
+  /// A snapshot strategy for comparing view controller views based on pixel equality.
+  ///
+  /// - Parameters:
+  ///   - drawHierarchyInKeyWindow: Utilize the simulator's key window in order to properly render `UIAppearance` and `UIVisualEffect`s.
+  ///   - precision: The percentage of pixels that must match.
+  ///   - size: A view size override.
+  ///   - traits: A trait collection override.
   public static func image(
     drawHierarchyInKeyWindow: Bool = false,
     precision: Float = 1,
@@ -46,6 +61,7 @@ extension Strategy where Snapshottable == UIViewController, Format == UIImage {
 }
 
 extension Strategy where Snapshottable == UIViewController, Format == String {
+  /// A snapshot strategy for comparing view controller views based on a recursive description of their properties and hierarchies.
   public static var recursiveDescription: Strategy {
     return Strategy<UIView, String>.recursiveDescription.pullback { $0.view }
   }

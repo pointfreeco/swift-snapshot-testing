@@ -2,10 +2,16 @@
 import Cocoa
 
 extension Strategy where Snapshottable == NSView, Format == NSImage {
+  /// A snapshot strategy for comparing views based on pixel equality.
   public static var image: Strategy {
     return .image()
   }
 
+  /// A snapshot strategy for comparing views based on pixel equality.
+  ///
+  /// - Parameters:
+  ///   - precision: The percentage of pixels that must match.
+  ///   - size: A view size override.
   public static func image(precision: Float = 1, size: CGSize? = nil) -> Strategy {
     return Strategy<NSImage, NSImage>.image(precision: precision).asyncPullback { view in
       let initialSize = view.frame.size
@@ -27,6 +33,7 @@ extension Strategy where Snapshottable == NSView, Format == NSImage {
 }
 
 extension Strategy where Snapshottable == NSView, Format == String {
+  /// A snapshot strategy for comparing views based on a recursive description of their properties and hierarchies.
   public static var recursiveDescription: Strategy<NSView, String> {
     return SimpleStrategy.lines.pullback { view in
       return purgePointers(

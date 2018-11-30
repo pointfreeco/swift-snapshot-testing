@@ -1,6 +1,7 @@
 import Foundation
 
 extension Strategy where Snapshottable: Encodable, Format == String {
+  /// A snapshot strategy for comparing encodable structures based on their JSON representation.
   @available(iOS 11.0, macOS 10.13, tvOS 11.0, *)
   public static var json: Strategy {
     let encoder = JSONEncoder()
@@ -8,6 +9,9 @@ extension Strategy where Snapshottable: Encodable, Format == String {
     return .json(encoder)
   }
 
+  /// A snapshot strategy for comparing encodable structures based on their JSON representation.
+  ///
+  /// - Parameter encoder: A JSON encoder.
   public static func json(_ encoder: JSONEncoder) -> Strategy {
     var strategy = SimpleStrategy.lines.pullback { (encodable: Snapshottable) in
       try! String(decoding: encoder.encode(encodable), as: UTF8.self)
@@ -16,12 +20,16 @@ extension Strategy where Snapshottable: Encodable, Format == String {
     return strategy
   }
 
+  /// A snapshot strategy for comparing encodable structures based on their property list representation.
   public static var plist: Strategy {
     let encoder = PropertyListEncoder()
     encoder.outputFormat = .xml
     return .plist(encoder)
   }
 
+  /// A snapshot strategy for comparing encodable structures based on their property list representation.
+  ///
+  /// - Parameter encoder: A property list encoder.
   public static func plist(_ encoder: PropertyListEncoder) -> Strategy {
     var strategy = SimpleStrategy.lines.pullback { (encodable: Snapshottable) in
       try! String(decoding: encoder.encode(encodable), as: UTF8.self)
