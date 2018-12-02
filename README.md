@@ -1,11 +1,84 @@
-# swift-snapshot-testing
+# 📸 SnapshotTesting
 
-macOS [![CircleCI](https://circleci.com/gh/pointfreeco/swift-snapshot-testing.svg?style=svg)](https://circleci.com/gh/pointfreeco/swift-snapshot-testing) Linux [![Build Status](https://travis-ci.org/pointfreeco/swift-snapshot-testing.svg)](https://travis-ci.org/pointfreeco/swift-snapshot-testing)
+[![Swift 4.2](https://img.shields.io/badge/swift-4.2-ED523F.svg?style=flat)](https://swift.org/download/) [![iOS/macOS/tvOS CI](https://img.shields.io/circleci/project/github/pointfreeco/swift-snapshot-testing/master.svg?label=ios/macos/tvos)](https://circleci.com/gh/pointfreeco/swift-snapshot-testing) [![Linux CI](https://img.shields.io/travis/pointfreeco/swift-snapshot-testing/master.svg?label=linux)](https://travis-ci.org/pointfreeco/swift-nonempty) [![@pointfreeco](https://img.shields.io/badge/contact-@pointfreeco-5AA9E7.svg?style=flat)](https://twitter.com/pointfreeco)
 
-Automatically record app data into test assertions. Snapshot tests capture the entirety of a data structure and cover far more surface area than a typical unit test.
+Delightful Swift snapshot testing.
 
+<!--
 ![An example of a snapshot failure in Xcode.](.github/snapshot-test-1.png)
+-->
 
+## Usage
+
+Once the library [is installed](#installation), _no additional configuration is required_. You can import the `SnapshotTesting` module into a test and pass a value to the `assertSnapshot` function.
+
+``` swift
+import SnapshotTesting
+import XCTest
+
+class MyViewControllerTests: XCTestCase {
+  func testMyViewController() {
+    let vc = MyViewController()
+
+    assertSnapshot(matching: vc, as: .image)
+  }
+}
+```
+
+When the test first runs, a snapshot is recorded automatically to disk and the test will fail and print out the file path of the reference.
+
+> 🛑 failed - Recorded: …
+>
+> "…/MyAppTests/\_\_Snapshots\_\_/MyViewControllerTests/testMyViewController.png"
+
+Repeat test runs will load this reference for comparison. If the images don't match, the test will fail and print out the file path of each image for further inspection.
+
+You can record a new reference by setting `record` mode to `true` on the assertion or globally.
+
+``` swift
+assertSnapshot(matching: vc, as: .image, record: true)
+
+// or globally
+
+record = true
+assertSnapshot(matching: vc, as: .image)
+```
+
+## Snapshot Strategies
+
+
+
+## Defining Your Own Strategies
+
+## Installation
+
+### Carthage
+
+If you use [Carthage](https://github.com/Carthage/Carthage), you can add the following dependency to your `Cartfile`:
+
+``` ruby
+github "pointfreeco/swift-snapshot-testing" "master"
+```
+
+### CocoaPods
+
+If your project uses [CocoaPods](https://cocoapods.org), add the pod to any applicable test targets in your `Podfile`:
+
+```ruby
+target 'MyAppTests' do
+  pod 'SnapshotTesting', :git => 'https://github.com/pointfreeco/swift-snapshot-testing.git'
+end
+```
+
+### Swift Package Manager
+
+If you want to use SnapshotTesting in a project that uses [SwiftPM](https://swift.org/package-manager/), add the package as a dependency in `Package.swift`:
+
+```swift
+dependencies: [
+  .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", .branch("master")),
+]
+```
 # Contents
 
 * [Features](#features)
@@ -26,12 +99,12 @@ Automatically record app data into test assertions. Snapshot tests capture the e
 
 ## Features
 
-- **Snapshot test _anything_.** Snapshot testing isn’t just for UI. Write snapshots against any format!
+- **Snapshot test _anything_.** Snapshot testing isn’t just for UI. Write snapshots against _any_ format.
 - **No configuration required.** Don’t fuss with scheme settings and environment variables. Snapshots are automatically saved alongside your tests.
 - **More hands-off.** New snapshots are automatically recorded.
 - **Subclass-free.** Assert from any XCTest test case or Quick spec.
 - **Device-agnostic snapshots.** Render views and view controllers for specific devices and trait collections from a single simulator.
-- **First-class Xcode support.** Image differences are captured as XCTest attachments. Text differences are rendered in error messages inline!
+- **First-class Xcode support.** Image differences are captured as XCTest attachments. Text differences are rendered in inline error messages.
 - **iOS, macOS, and tvOS support.**
 - **SceneKit, SpriteKit, and WebKit support.**
 - **Test _any_ data structure.** Snap complex app state in a dependable way.
@@ -49,14 +122,14 @@ Suppose you had an `ApiService` that creates properly formatted URL requests to 
 ```swift
 import SnapshotTesting
 import XCTest
- 
+
 class ApiServiceTests: XCTestCase {
   func testUrlRequestPreparation() {
     let service = ApiService()
     let request = service
       .prepare(endpoint: .createArticle("Hello, world!"))
- 
-    assertSnapshot(matching: request)
+
+    assertSnapshot(matching: request, as: .raw)
   }
 }
 ```
@@ -76,10 +149,10 @@ Subsequent test runs will generate a new snapshot and assert it against the cont
 ```diff
 -POST https://api.site.com/articles?oauth_token=deadbeef
 +GET https://api.site.com/articles?oauth_token=deadbeef
-User-Agent: iOS/BlobApp 1.0
-X-App-Version: 42
-
-title=Hello%20World
+ User-Agent: iOS/BlobApp 1.0
+ X-App-Version: 42
+ 
+ title=Hello%20World
 ```
 
 ### Snapshot strategies
@@ -221,43 +294,6 @@ This library is released under the MIT license. See [LICENSE](LICENSE) for detai
 
 
 
----
-
-# swift-snapshot-testing
-
-macOS [![CircleCI](https://circleci.com/gh/pointfreeco/swift-snapshot-testing.svg?style=svg)](https://circleci.com/gh/pointfreeco/swift-snapshot-testing) Linux [![Build Status](https://travis-ci.org/pointfreeco/swift-snapshot-testing.svg)](https://travis-ci.org/pointfreeco/swift-snapshot-testing)
-
-Automatically record app data into test assertions. Snapshot tests capture the entirety of a data structure and cover far more surface area than a typical unit test.
-
-The design of this library has been covered in "[Snapshot Testing in Swift](http://www.stephencelis.com/2017/09/snapshot-testing-in-swift)".
-
-![An example of a snapshot failure in Xcode.](.github/snapshot-test.png)
-
-## Stability
-
-This library should be considered alpha, and not stable. Breaking changes will happen often.
-
-## Installation
-
-### Swift Package Manager
-
-```swift
-import PackageDescription
-
-let package = Package(
-  dependencies: [
-    .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", .branch("master")),
-  ]
-)
-```
-
-### Cocoapods
-
-```ruby
-target 'Tests' do
-  pod 'SnapshotTesting', :git => 'https://github.com/pointfreeco/swift-snapshot-testing.git'
-end
-```
 
 ## Usage
 
