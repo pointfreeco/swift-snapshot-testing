@@ -10,7 +10,7 @@ Delightful Swift snapshot testing.
 
 ## Usage
 
-Once the library [is installed](#installation), _no additional configuration is required_. You can import the `SnapshotTesting` module and call the `assertSnapshot` function.
+Once [installed](#installation), _no additional configuration is required_. You can import the `SnapshotTesting` module and call the `assertSnapshot` function.
 
 ``` swift
 import SnapshotTesting
