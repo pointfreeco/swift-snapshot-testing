@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = "SnapshotTesting"
-  s.version = "0.1.0"
+  s.version = "1.0"
   s.summary = "Tests that save and assert against reference data"
 
   s.description = <<-DESC
@@ -21,7 +21,7 @@ Pod::Spec.new do |s|
 
   s.source = {
     :git => "https://github.com/pointfreeco/swift-snapshot-testing.git",
-    :tag => "0.1.0"
+    :tag => "1.0"
   }
 
   s.swift_version = "4.2"
