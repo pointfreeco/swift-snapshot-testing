@@ -92,9 +92,7 @@ public func verifySnapshot<A, B>(
       }
 
       let testName = sanitizePathComponent(testName)
-      let snapshotFileUrl = snapshotDirectoryUrl
-        .appendingPathComponent("\(testName).\(identifier)")
-        .appendingPathExtension(snapshotting.pathExtension ?? "")
+      let snapshotFileUrl = snapshotUrl(directoryUrl: snapshotDirectoryUrl, testName: testName, identifier: identifier, pathExtension: snapshotting.pathExtension)
       let fileManager = FileManager.default
       try fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
 
@@ -123,11 +121,25 @@ public func verifySnapshot<A, B>(
         return "Recorded snapshot: …\n\n\"\(snapshotFileUrl.path)\""
       }
 
-      let data = try Data(contentsOf: snapshotFileUrl)
-      let reference = snapshotting.diffing.fromData(data)
+      var allVariantsToTest = [snapshotFileUrl]
+      for c in "abcdefghijklmnopqrstuvwxyz" {
+        let url = snapshotUrl(directoryUrl: snapshotDirectoryUrl, testName: testName, identifier: identifier, pathExtension: snapshotting.pathExtension, variant: String(c))
+        if fileManager.fileExists(atPath: url.path) {
+          allVariantsToTest.append(url)
+        } else {
+          break
+        }
+      }
 
-      guard let (failure, attachments) = snapshotting.diffing.diff(reference, diffable) else {
-        return nil
+      var (failure, attachments): (String, [Attachment]) = ("", [])
+      for variantUrl in allVariantsToTest {
+        let data = try Data(contentsOf: variantUrl)
+        let reference = snapshotting.diffing.fromData(data)
+
+        guard let (f, a) = snapshotting.diffing.diff(reference, diffable) else {
+          return nil
+        }
+        (failure, attachments) = (f, a)
       }
 
       let artifactsUrl = URL(
@@ -169,4 +181,11 @@ func sanitizePathComponent(_ string: String) -> String {
   return string
     .replacingOccurrences(of: "\\W+", with: "-", options: .regularExpression)
     .replacingOccurrences(of: "^-|-$", with: "", options: .regularExpression)
+}
+
+func snapshotUrl(directoryUrl: URL, testName: String, identifier: String, pathExtension: String? = nil, variant: String? = nil) -> URL {
+  let variantExtension = variant.flatMap { ".\($0)" } ?? ""
+  return directoryUrl
+    .appendingPathComponent("\(testName).\(identifier)\(variantExtension)")
+    .appendingPathExtension(pathExtension ?? "")
 }
