@@ -1,6 +1,6 @@
 # Defining Custom Snapshot Strategies
 
-While SnapshotTesting comes with [a wide variety of snapshot strategies](Available-Snapshot-Strategies.md), it can also be extended with custom, user-defined strategies using the [`Snapshotting`](#snapshotting-value-format-) and [`Diffing`](#diffing-value-) types.
+While SnapshotTesting comes with [a wide variety of snapshot strategies](Available-Snapshot-Strategies.md), it can also be extended with custom, user-defined strategies using the [`Snapshotting`](#snapshottingvalue-format) and [`Diffing`](#diffingvalue) types.
 
 ## `Snapshotting<Value, Format>`
 
@@ -29,7 +29,7 @@ Pullback takes a transform function from the new strategy's value to the existin
 
 ### Creating Brand New Strategies
 
-Most strategies can be built from existing ones, but if you've defined your own [`Diffing`](#diffing-value-) strategy, you may need to create a base `Snapshotting` value alongside it.
+Most strategies can be built from existing ones, but if you've defined your own [`Diffing`](#diffingvalue) strategy, you may need to create a base `Snapshotting` value alongside it.
 
 ### Asynchronous Strategies
 
