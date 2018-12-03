@@ -69,6 +69,12 @@ extension AnySnapshotStringConvertible {
   }
 }
 
+extension Character: AnySnapshotStringConvertible {
+  public var snapshotDescription: String {
+    return self.debugDescription
+  }
+}
+
 extension Data: AnySnapshotStringConvertible {
   public var snapshotDescription: String {
     return self.debugDescription
@@ -94,6 +100,12 @@ extension NSObject: AnySnapshotStringConvertible {
 }
 
 extension String: AnySnapshotStringConvertible {
+  public var snapshotDescription: String {
+    return self.debugDescription
+  }
+}
+
+extension Substring: AnySnapshotStringConvertible {
   public var snapshotDescription: String {
     return self.debugDescription
   }

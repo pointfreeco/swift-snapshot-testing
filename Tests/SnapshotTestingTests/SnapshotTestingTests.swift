@@ -26,12 +26,16 @@ class SnapshotTestingTests: TestCase {
     struct User { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
     assertSnapshot(matching: user, as: .dump)
-    assertSnapshot(matching: Data("Hello, world!".utf8), as: .dump)
-    assertSnapshot(matching: URL(string: "https://www.pointfree.co")!, as: .dump)
   }
 
-  func testDate() {
-    assertSnapshot(matching: Date(timeIntervalSinceReferenceDate: 0), as: .dump)
+  func testAnySnapshotStringConvertible() {
+    assertSnapshot(matching: "a" as Character, as: .dump, named: "character")
+    assertSnapshot(matching: Data("Hello, world!".utf8), as: .dump, named: "data")
+    assertSnapshot(matching: Date(timeIntervalSinceReferenceDate: 0), as: .dump, named: "date")
+    assertSnapshot(matching: NSObject(), as: .dump, named: "nsobject")
+    assertSnapshot(matching: "Hello, world!", as: .dump, named: "string")
+    assertSnapshot(matching: "Hello, world!".dropLast(8), as: .dump, named: "substring")
+    assertSnapshot(matching: URL(string: "https://www.pointfree.co")!, as: .dump, named: "url")
   }
 
   func testDeterministicDictionaryAndSetSnapshots() {
@@ -87,10 +91,6 @@ class SnapshotTestingTests: TestCase {
     struct User { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
     assertSnapshot(matching: user, as: .dump, named: "named")
-  }
-
-  func testNSObject() {
-    assertSnapshot(matching: NSObject(), as: .dump)
   }
 
   func testNSView() {
@@ -472,13 +472,12 @@ extension SnapshotTestingTests {
   static var allTests : [(String, (SnapshotTestingTests) -> () throws -> Void)] {
     return [
       ("testAny", testAny),
-      ("testDate", testDate),
+      ("testAnySnapshotStringConvertible", testAnySnapshotStringConvertible),
       ("testDeterministicDictionaryAndSetSnapshots", testDeterministicDictionaryAndSetSnapshots),
       ("testEncodable", testEncodable),
       ("testMixedViews", testMixedViews),
       ("testMultipleSnapshots", testMultipleSnapshots),
       ("testNamedAssertion", testNamedAssertion),
-      ("testNSObject", testNSObject),
       ("testPrecision", testPrecision),
       ("testSCNView", testSCNView),
       ("testSKView", testSKView),
