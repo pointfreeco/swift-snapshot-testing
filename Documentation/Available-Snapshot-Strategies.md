@@ -1,8 +1,6 @@
 # Available Snapshot Strategies
 
-SnapshotTesting comes with a wide variety of snapshot strategies and can be extended by [defining custom snapshot strategies](Defining-Custom-Snapshot-Strategies.md).
-
-## Table of Contents
+SnapshotTesting comes with a wide variety of snapshot strategies for a varienty of platforms. To extend these strategies or define your own, see "[Defining Custom Snapshot Strategies](Defining-Custom-Snapshot-Strategies.md)".
 
   - [`Any`](#any)
       - [`.dump`](#dump)
