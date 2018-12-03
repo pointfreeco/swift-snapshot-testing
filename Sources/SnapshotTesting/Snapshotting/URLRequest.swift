@@ -1,6 +1,7 @@
 import Foundation
 
 extension Snapshotting where Value == URLRequest, Format == String {
+  /// A snapshot strategy for comparing requests based on raw equality.
   public static let raw = SimplySnapshotting.lines.pullback { (request: URLRequest) in
 
     let method = "\(request.httpMethod ?? "GET") \(request.url?.absoluteString ?? "(null)")"
