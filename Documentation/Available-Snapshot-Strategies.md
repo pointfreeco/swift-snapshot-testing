@@ -57,6 +57,8 @@ A snapshot strategy for comparing layers based on pixel equality.
 
   - `precision: Float = 1`
 
+    The percentage of pixels that must match.
+
 #### Example:
 
 ``` swift
@@ -79,7 +81,7 @@ A snapshot strategy for comparing encodable structures based on their JSON repre
 
 #### Parameters:
 
-  - `encoder: JSONEncoder`, optional.
+  - `encoder: JSONEncoder` (optional)
 
 #### Example:
 
@@ -105,7 +107,7 @@ A snapshot strategy for comparing encodable structures based on their property l
 
 #### Parameters:
 
-  - `encoder: PropertyListEncoder`, optional.
+  - `encoder: PropertyListEncoder` (optional)
 
 #### Example:
 
