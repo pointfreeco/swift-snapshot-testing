@@ -25,7 +25,7 @@ class MyViewControllerTests: XCTestCase {
 }
 ```
 
-When the test first runs, a snapshot is automatically recorded to disk and the test will fail, printing out the file path of the reference.
+When the test first runs, a snapshot is automatically recorded to disk and the test will fail, printing out the file path of the newly-recorded reference.
 
 > 🛑 failed - Recorded: …
 >
