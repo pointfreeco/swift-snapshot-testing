@@ -22,11 +22,11 @@ public struct Snapshotting<Value, Format> {
   public init(
     pathExtension: String?,
     diffing: Diffing<Format>,
-    snapshot: @escaping (_ value: Value) -> Async<Format>
+    asyncSnapshot: @escaping (_ value: Value) -> Async<Format>
     ) {
     self.pathExtension = pathExtension
     self.diffing = diffing
-    self.snapshot = snapshot
+    self.snapshot = asyncSnapshot
   }
 
   /// Creates a snapshot strategy.
