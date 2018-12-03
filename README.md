@@ -48,14 +48,14 @@ assertSnapshot(matching: vc, as: .image)
 
 While most snapshot testing libraries in the Swift community are limited to `UIView`s and `UIImage`s, SnapshotTesting can work with _any_ value and _any_ format on _any_ Swift platform!
 
-The `assertSnapshot` function accepts a value and any snapshot strategy that value supports. This means that a [view](Documentation/Available-Snapshot-Strategies.md#uiview) or [view controller](Documentation/Available-Snapshot-Strategies.md#uiviewcontroller) can be tested against an image representation _and_ against a textual representation of its properties and hierarchy.
+The `assertSnapshot` function accepts a value and any snapshot strategy that value supports. This means that a [view](Documentation/Available-Snapshot-Strategies.md#uiview) or [view controller](Documentation/Available-Snapshot-Strategies.md#uiviewcontroller) can be tested against an image representation _and_ against a textual representation of its properties and subview hierarchy.
 
 ``` swift
 assertSnapshot(matching: vc, as: .image)
 assertSnapshot(matching: vc, as: .recursiveDescription)
 ```
 
-View testing is highly configurable. You can generate device-agnostic snapshots from a single simulator.
+View testing is [highly configurable](Documentation/Available-Snapshot-Strategies.md#uiviewcontroller). You can override trait collections (for specific size classes and content size categories) and generate device-agnostic snapshots, all from a single simulator.
 
 ``` swift
 assertSnapshot(matching: vc, as: .image(on: .iPhoneSe))
@@ -64,7 +64,7 @@ assertSnapshot(matching: vc, as: .image(on: .iPhoneX))
 assertSnapshot(matching: vc, as: .image(on: .iPadMini(.portrait))
 ```
 
-Better yet, SnapshotTesting isn't limited to views and view controllers! There are [a number of available snapshot strategies](Documentation/Available-Snapshot-Strategies.md).
+Better yet, SnapshotTesting isn't limited to views and view controllers! There are [a number of available snapshot strategies](Documentation/Available-Snapshot-Strategies.md) to choose from.
 
 For example, you can snapshot test URL requests (_e.g._, those that your API client prepares).
 
@@ -111,7 +111,7 @@ assertSnapshot(matching: user, as: .dump)
 //   - name: "Blobby"
 ```
 
-If your data can be represented as an image, text, or data, you can write a snapshot test for it! Check out [all of the snapshot strategies](Documentation/Available-Snapshot-Strategies.md) that ship with SnapshotTesting and [learn how to define custom strategies](Documentation/Defining-Custom-Snapshot-Strategies.md).
+If your data can be represented as an image, text, or data, you can write a snapshot test for it! Check out [all of the snapshot strategies](Documentation/Available-Snapshot-Strategies.md) that ship with SnapshotTesting and [learn how to define your own custom strategies](Documentation/Defining-Custom-Snapshot-Strategies.md).
 
 ## Installation
 
