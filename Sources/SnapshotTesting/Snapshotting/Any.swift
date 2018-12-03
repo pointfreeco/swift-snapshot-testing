@@ -58,8 +58,14 @@ private func sort(_ children: Mirror.Children) -> Mirror.Children {
   return .init(children.sorted { snap($0) < snap($1) })
 }
 
+/// A type with a customized snapshot dump representation.
+///
+/// Types that conform to the `AnySnapshotStringConvertible` protocol can provide their own representation to be used when converting an instance to a `dump`-based snapshot.
 public protocol AnySnapshotStringConvertible {
+  /// Whether or not to dump child nodes (defaults to `false`).
   static var renderChildren: Bool { get }
+
+  /// A textual snapshot dump representation of this instance.
   var snapshotDescription: String { get }
 }
 
