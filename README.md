@@ -78,7 +78,7 @@ assertSnapshot(matching: urlRequest, as: .raw)
 
 And you can snapshot test `Encodable` values against their JSON _and_ property list representations.
 
-```
+``` swift
 assertSnapshot(matching: user, as: .json)
 // {
 //   "bio" : "Blobbed around the world.",
