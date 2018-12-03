@@ -24,7 +24,11 @@ SnapshotTesting comes with a wide variety of snapshot strategies and can be exte
 
 ### `.dump`
 
-A snapshot strategy for comparing any structure based on a sanitized text dump.
+A snapshot strategy for comparing _any_ structure based on a sanitized text dump.
+
+The reference format looks a lot like the output of Swift's built-in [`dump`](https://developer.apple.com/documentation/swift/1539127-dump) function, though it does its best to make output deterministic by stripping out pointer memory addresses and sorting non-deterministic data, like dictionaries and sets.
+
+You can hook into how an instance of a type is rendered in this strategy by conforming to the `AnySnapshotStringConvertible` protocol and defining the `snapshotDescription` property.
 
 **Format:** `String`
 
