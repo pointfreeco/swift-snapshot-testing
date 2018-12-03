@@ -153,8 +153,8 @@ dependencies: [
   - **Device-agnostic snapshots.** Render views and view controllers for specific devices and trait collections from a single simulator.
   - **First-class Xcode support.** Image differences are captured as XCTest attachments. Text differences are rendered inline in error messages.
   - **Supports any platform that supports Swift.** Write snapshot tests for iOS, Linux, macOS, and tvOS.
-  - **SceneKit, SpriteKit, and WebKit support.** Most snapshot testing libraries don't support these special view subclasses.
-  - **`Codable` support**. Snapshot encodable data structures into their JSON and property list representations.
+  - **SceneKit, SpriteKit, and WebKit support.** Most snapshot testing libraries don't support these view subclasses.
+  - **`Codable` support**. Snapshot encodable data structures into their [JSON](Documentation/Available-Snapshot-Strategies.md#json) and [property list](Documentation/Available-Snapshot-Strategies.md#plist) representations.
 
 ## Learn More
 
