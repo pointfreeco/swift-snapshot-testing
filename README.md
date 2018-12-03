@@ -149,7 +149,7 @@ dependencies: [
 - [**Write your own snapshot strategies**](Documentation/Defining-Custom-Snapshot-Strategies.md). If you can convert it to an image, string, data, or your own diffable format, you can snapshot test it!
 - **No configuration required.** Don’t fuss with scheme settings and environment variables. Snapshots are automatically saved alongside your tests.
 - **More hands-off.** New snapshots are automatically recorded.
-- **Subclass-free.** Assert from any XCTest test case or Quick spec.
+- **Subclass-free.** Assert from any XCTest case or Quick spec.
 - **Device-agnostic snapshots.** Render views and view controllers for specific devices and trait collections from a single simulator.
 - **First-class Xcode support.** Image differences are captured as XCTest attachments. Text differences are rendered in inline error messages.
 - **iOS, macOS, and tvOS support.**
