@@ -16,6 +16,7 @@ SnapshotTesting comes with a wide variety of snapshot strategies and can be exte
 - [`UIImage`](#uiimage)
 - [`UIView`](#uiview)
 - [`UIViewController`](#uiviewcontroller)
+- [`URLRequest`](#urlrequest)
 
 ## `Any`
 
