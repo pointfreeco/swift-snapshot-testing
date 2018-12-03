@@ -145,7 +145,8 @@ dependencies: [
 
 ## Features
 
-- **Snapshot test _anything_.** Snapshot testing isn’t just for UI. Write snapshots against _any_ format.
+- [**Dozens of snapshot strategies**](Documentation/Available-Snapshot-Strategies.md). Snapshot testing isn’t just for UI. Write snapshots against a number of types.
+- [**Write your own snapshot strategies**](Documentation/Defining-Custom-Snapshot-Strategies.md). If you can convert it to an image, string, data, or your own diffable format, you can snapshot test it!
 - **No configuration required.** Don’t fuss with scheme settings and environment variables. Snapshots are automatically saved alongside your tests.
 - **More hands-off.** New snapshots are automatically recorded.
 - **Subclass-free.** Assert from any XCTest test case or Quick spec.
