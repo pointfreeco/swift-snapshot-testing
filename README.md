@@ -155,6 +155,7 @@ dependencies: [
   - **Supports any platform that supports Swift.** Write snapshot tests for iOS, Linux, macOS, and tvOS.
   - **SceneKit, SpriteKit, and WebKit support.** Most snapshot testing libraries don't support these view subclasses.
   - **`Codable` support**. Snapshot encodable data structures into their [JSON](Documentation/Available-Snapshot-Strategies.md#json) and [property list](Documentation/Available-Snapshot-Strategies.md#plist) representations.
+  - **Custom diff tool inregration**.
 
 ## Learn More
 
