@@ -38,7 +38,7 @@ If you'd like to submit your own custom strategy, see [Contributing](../CONTRIBU
   - [`URLRequest`](#urlrequest)
       - [`.raw`](#raw)
 
-## `Any`
+## Any
 
 **Platforms:** All
 
@@ -67,7 +67,7 @@ Records:
   - name: "Blobby"
 ```
 
-## `CALayer`
+## CALayer
 
 **Platforms:** iOS, macOS, tvOS
 
