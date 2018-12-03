@@ -55,4 +55,28 @@ extension Snapshotting where Value == WKWebView, Format == UIImage {
 }
 ```
 
+#### Async Initializer
+
+`Snapshotting` defines an alternate initializer to describe snapshotting values in an asynchronous fashion.
+
+For example, were we to define a strategy for `WKWebView` _without_ [`asyncPullback`](#asyncpullback):
+
+``` swift
+extension Snapshotting where Value == WKWebView, Format == UIImage {
+  public static let image = Snapshotting(
+    pathExtension: "png",
+    diffing: .image,
+    asyncSnapshot: { webView in
+      Async { callback in
+        webView.takeSnapshot(with: nil) { image, error in
+          callback(image!)
+        }
+      }
+    }
+  )
+}
+```
+
 ## `Diffing<Value>`
+
+The [`Diffing`](../Sources/SnapshotTesting/Diffing.swift) type represents the ability to compare `Value`s and convert them to and from `Data`.
