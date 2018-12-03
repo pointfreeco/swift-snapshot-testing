@@ -10,7 +10,7 @@ Delightful Swift snapshot testing.
 
 ## Usage
 
-Once the library [is installed](#installation), _no additional configuration is required_. You can import the `SnapshotTesting` module into a test and pass a value to the `assertSnapshot` function.
+Once the library [is installed](#installation), _no additional configuration is required_. You can import the `SnapshotTesting` module and call the `assertSnapshot` function.
 
 ``` swift
 import SnapshotTesting
@@ -25,15 +25,15 @@ class MyViewControllerTests: XCTestCase {
 }
 ```
 
-When the test first runs, a snapshot is recorded automatically to disk and the test will fail and print out the file path of the reference.
+When the test first runs, a snapshot is automatically recorded to disk and the test will fail, printing out the file path of the reference.
 
 > 🛑 failed - Recorded: …
 >
 > "…/MyAppTests/\_\_Snapshots\_\_/MyViewControllerTests/testMyViewController.png"
 
-Repeat test runs will load this reference for comparison. If the images don't match, the test will fail and print out the file path of each image for further inspection.
+Repeat test runs will load this reference for comparison. If the values don't match, the test will fail and describe the difference.
 
-You can record a new reference by setting `record` mode to `true` on the assertion or globally.
+You can record a new reference by setting the `record` mode to `true` on the assertion or globally.
 
 ``` swift
 assertSnapshot(matching: vc, as: .image, record: true)
@@ -44,11 +44,74 @@ record = true
 assertSnapshot(matching: vc, as: .image)
 ```
 
-## Snapshot Strategies
+## Snapshot Anything
 
+While most snapshot testing libraries in the Swift community are limited to `UIView`s and `UIImage`s, SnapshotTesting can work with _any_ value and _any_ format on _any_ Swift platform!
 
+The `assertSnapshot` function accepts a value and any snapshot strategy that value supports. This means that a [view](Documentation/Available-Snapshot-Strategies.md#uiview) or [view controller](Documentation/Available-Snapshot-Strategies.md#uiviewcontroller) can be tested against an image representation _and_ against a textual representation of its properties and hierarchy.
 
-## Defining Your Own Strategies
+``` swift
+assertSnapshot(matching: vc, as: .image)
+assertSnapshot(matching: vc, as: .recursiveDescription)
+```
+
+View testing is highly configurable. You can generate device-agnostic snapshots from a single simulator.
+
+``` swift
+assertSnapshot(matching: vc, as: .image(on: .iPhoneSe))
+assertSnapshot(matching: vc, as: .image(on: .iPhoneSe(.landscape)))
+assertSnapshot(matching: vc, as: .image(on: .iPhoneX))
+assertSnapshot(matching: vc, as: .image(on: .iPadMini(.portrait))
+```
+
+Better yet, SnapshotTesting isn't limited to views and view controllers! There are [a number of available snapshot strategies](Documentation/Available-Snapshot-Strategies.md).
+
+For example, you can snapshot test URL requests (_e.g._, those that your API client prepares).
+
+``` swift
+assertSnapshot(matching: urlRequest, as: .raw)
+// POST http://localhost:8080/account
+// Cookie: pf_session={"userId":"1"}
+//
+// email=blob%40pointfree.co&name=Blob
+```
+
+And you can snapshot test `Encodable` values against their JSON _and_ property list representations.
+
+```
+assertSnapshot(matching: user, as: .json)
+// {
+//   "bio" : "Blobbed around the world.",
+//   "id" : 1,
+//   "name" : "Blobby"
+// }
+
+assertSnapshot(matching: user, as: .plist)
+// <?xml version="1.0" encoding="UTF-8"?>
+// <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+// <plist version="1.0">
+// <dict>
+//   <key>bio</key>
+//   <string>Blobbed around the world.</string>
+//   <key>id</key>
+//   <integer>1</integer>
+//   <key>name</key>
+//   <string>Blobby</string>
+// </dict>
+// </plist>
+```
+
+In fact, _[any](Documentation/Available-Snapshot-Strategies.md#any)_ value can be snapshot-tested by default using its [mirror](https://developer.apple.com/documentation/swift/mirror)!
+
+``` swift
+assertSnapshot(matching: user, as: .dump)
+// ▿ User
+//   - bio: "Blobbed around the world."
+//   - id: 1
+//   - name: "Blobby"
+```
+
+If your data can be represented as an image, text, or data, you can write a snapshot test for it! Check out [all of the snapshot strategies](Documentation/Available-Snapshot-Strategies.md) that ship with SnapshotTesting and [learn how to define custom strategies](Documentation/Defining-Custom-Snapshot-Strategies.md).
 
 ## Installation
 
@@ -79,23 +142,6 @@ dependencies: [
   .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", .branch("master")),
 ]
 ```
-# Contents
-
-* [Features](#features)
-* [Usage](#usage)
-  * [Basics](#basics)
-  * Custom snapshot strategies
-  * [Advanced](#advanced)
-* [Installation](#installation)
-  * Swift Package Manager
-  * [Cocoapods](#cocoapods)
-  * [Carthage](#carthage)
-  * Git Submodule
-* Related Tools
-* Learn More
-* [License](#license)
-
----
 
 ## Features
 
@@ -111,267 +157,25 @@ dependencies: [
 - **Codable support**. Snapshot your data structures into JSON and property lists.
 - **Extensible and transformable.** Build your own snapshot strategies from scratch or build from existing ones.
 
-## Usage
-
-Snapshot Testing provides an `assertSnapshot` function for asserting that the reference data on disk matches the current snapshot of your data. The reference data can be plain text, an image, or any other data format you may be interested in.
-
-### Basics
-
-Suppose you had an `ApiService` that creates properly formatted URL requests to your web API. It might be responsible for attaching authorization to the query params, setting some custom request headers, and more. You can write an assertion against the `URLRequest` that is constructed from your service to give broad test coverage across all the properties of the value:
-
-```swift
-import SnapshotTesting
-import XCTest
-
-class ApiServiceTests: XCTestCase {
-  func testUrlRequestPreparation() {
-    let service = ApiService()
-    let request = service
-      .prepare(endpoint: .createArticle("Hello, world!"))
-
-    assertSnapshot(matching: request, as: .raw)
-  }
-}
-```
-
-The first time this is run, a file will be written to `__Snapshots__/ApiServiceTests/testUrlRequestPreparation.0.txt`:
-
-```txt
-POST https://api.site.com/articles?oauth_token=deadbeef
-User-Agent: iOS/BlobApp 1.0
-X-App-Version: 42
-
-title=Hello%20World
-```
-
-Subsequent test runs will generate a new snapshot and assert it against the contents of this file on disk. If there are any differences, the test will fail and present a nicely formatted diff. For example, suppose that during a refactor we accidentally broke the logic that sets the HTTP method of the request. This would easily be caught in our snapshot:
-
-```diff
--POST https://api.site.com/articles?oauth_token=deadbeef
-+GET https://api.site.com/articles?oauth_token=deadbeef
- User-Agent: iOS/BlobApp 1.0
- X-App-Version: 42
- 
- title=Hello%20World
-```
-
-### Snapshot strategies
-
-The `assertSnapshot` helper allows you to customize how you want to snapshot your values by providing a `Strategy`. It is a concrete datatype that describes preicsely how to snapshot a value, including how to serialize/deserialize to/from disk, and how to display a human friendly description of a diff. Snapshot Testing comes with many strategies for snapshotting a wide assortment of Foundation, UIKit and Cocoa types in both text and image formats.
-
-For example, a `UIView` could be snapshot as an image:
-
-```swift
-let myView = ...
-assertSnapshot(myView, as: .image)
-```
-
-But it could also be snapshot as a textual description of the view tree hierarchy:
-
-```swift
-let myView = ...
-assertSnapshot(myView, as: .recursiveDescription)
-```
-
-Note that we can use the abbreviated `.image` and `.recursiveDescription` syntax because `image` is a static property on `Strategy`.
-
-
-
-### Custom snapshot strategies
-
-Although the library comes with [many](link) snapshot strategies for various types in Foundation, UIKit and Cocoa, there are still going to be times you want to customize a snapshot's output. For those times, you want to create a custom `Strategy` value that can be passed to the `assertSnapshot` helper.
-
-todo: pullback
-
-### Advanced
-
-Some types need additional set up time in order to be snapshot. For example, `WKWebView` needs to wait for a delegate callback that says the view is finished loading before it can be snapshot. For this reason, `Strategy` does not use a function of the form `(Snapshottable) -> Format` to snapshot types, but rather a function `(Snapshottable) -> Async<Format>`, where `Async` is a wrapper around a callback. This allows you to take as much time as you need to perform the snapshot.
-
-For example, to snapshot a `WKWebView` you must wait until the delegate calls `webView(_:didFinish:)`. This can handily be done using `Async`:
-
-```swift
-private final class NavigationDelegate: NSObject, WKNavigationDelegate {
-  var didFinish: () -> Void = { }
-
-  func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-    self.didFinish()
-  }
-}
-
-let webViewImage = Strategy<WKWebView, UIImage>(
-  pathExtension: "png",
-  diffable: .image,
-  snapshotToDiffable: { webView in
-    Async<UIImage> { callback in 
-      let delegate = NavigationDelegate()
-      delegate.didFinish = {
-        webView.takeSnapshot(with: nil) { image, _ in 
-          callback(image!)
-        }
-      }
-      webView.navigationDelegate = delegate
-    }
-  }
-)
-```
-
-## Installation
-
-### Swift Package Manager
-
-```swift
-import PackageDescription
-
-let package = Package(
-  dependencies: [
-    .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", .branch("master")),
-  ]
-)
-```
-
-### Cocoapods
-
-```ruby
-target 'Tests' do
-  pod 'SnapshotTesting', :git => 'https://github.com/pointfreeco/swift-snapshot-testing.git'
-end
-```
-
-## Related Tools
-
-- [`FBSnapshotTestCase`](https://github.com/facebook/ios-snapshot-test-case) helped introduce screen shot testing to a broad audience in the iOS community. Experience with it inspired the creation of this library.
-
-- [`Jest`](http://facebook.github.io/jest/) brought generalized snapshot testing to the front-end with a polished user experience. Several features of this library (diffing, tracking outdated snapshots) were directly influenced.
-
 ## Learn More
 
-## License
-
-This library is released under the MIT license. See [LICENSE](LICENSE) for details.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## Usage
-
-Snapshot Testing provides an `assertSnapshot` function, which records data structures as text or images accordingly.
-
-Here's how you might test a URL request you've prepared for your app's API client:
-
-```swift
-import SnapshotTesting
-import XCTest
-
-class ApiServiceTests: XCTestCase {
-  func testUrlRequestPreparation() {
-    let service = ApiService()
-    let request = service
-      .prepare(endpoint: .createArticle("Hello, world!"))
-
-    assertSnapshot(matching: request)
-  }
-}
-```
-
-The above will render as the following text to `__Snapshots__/ApiServiceTests/testUrlRequestPreparation.0.txt`:
-
-```
-▿ https://api.site.com/articles?oauth_token=deadbeef
-  ▿ url: Optional(https://api.site.com/articles?oauth_token=deadbeef)
-    ▿ some: https://api.site.com/articles?oauth_token=deadbeef
-      - _url: https://api.site.com/articles?oauth_token=deadbeef #0
-        - super: NSObject
-  - cachePolicy: 0
-  - timeoutInterval: 60.0
-  - mainDocumentURL: nil
-  - networkServiceType: __ObjC.NSURLRequest.NetworkServiceType
-  - allowsCellularAccess: true
-  ▿ httpMethod: Optional("POST")
-    - some: "POST"
-  ▿ allHTTPHeaderFields: Optional(["App-Version": "42"])
-    ▿ some: 1 key/value pairs
-      ▿ (2 elements)
-        - key: "App-Version"
-        - value: "42"
-  ▿ httpBody: Optional(19 bytes)
-    ▿ some: "body=Hello%20world!"
-  - httpBodyStream: nil
-  - httpShouldHandleCookies: true
-  - httpShouldUsePipelining: false
-```
-
-Renderable data will write as an image. This includes `UIImage`s and `NSImage`s, but also data that is typically viewed visually, like `UIView`s and `NSView`s.
-
-Given a view:
-
-``` swift
-import SnapshotTesting
-import XCTest
-
-class HomepageTests: XCTestCase {
-  func testRender() {
-    let size = CGSize(width: 800, height: 600)
-    let webView = UIWebView(frame: .init(origin: .zero, size: size))
-    webView.loadHTMLString(renderHomepage())
-
-    assertSnapshot(matching: webView)
-  }
-}
-```
-
-The above will write to an image on disk. If that image ever renders differently in the future, the assertion will fail and produce a diff for inspection.
-
-![A screen shot failure.](.github/kaleidoscope-diff.png)
-
-
-## Related Tools
-
-  - [`FBSnapshotTestCase`](https://github.com/facebook/ios-snapshot-test-case) helped introduce screen shot testing to a broad audience in the iOS community. Experience with it inspired the creation of this library.
-
-  - [`Jest`](http://facebook.github.io/jest/) brought generalized snapshot testing to the front-end with a polished user experience. Several features of this library (diffing, tracking outdated snapshots) were directly influenced.
+SnapshotTesting was written using [witness-oriented programming](https://www.pointfree.co/episodes/ep39-witness-oriented-library-design).
+
+These concepts (and more) are explored thoroughly in a series of episodes on [Point-Free](https://www.pointfree.co), a video series exploring functional programming and Swift hosted by [Brandon Williams](https://github.com/mbrandonw) and [Stephen Celis](https://github.com/stephencelis).
+
+The ideas for this library were explored in the following episodes:
+
+- [Episode 33](https://www.pointfree.co/episodes/ep33-protocol-witnesses-part-1): Protocol Witnesses: Part 1
+- [Episode 34](https://www.pointfree.co/episodes/ep34-protocol-witnesses-part-1): Protocol Witnesses: Part 2
+- [Episode 35](https://www.pointfree.co/episodes/ep35-advanced-protocol-witnesses-part-1): Protocol Witnesses: Part 1
+- [Episode 36](https://www.pointfree.co/episodes/ep36-advanced-protocol-witnesses-part-2): Protocol Witnesses: Part 2
+- [Episode 37](https://www.pointfree.co/episodes/ep37-protocol-oriented-library-design-part-1): Protocol-Oriented Library Design: Part 1
+- [Episode 38](https://www.pointfree.co/episodes/ep38-protocol-oriented-library-design-part-2): Protocol-Oriented Library Design: Part 2
+- [Episode 39](https://www.pointfree.co/episodes/ep39-witness-oriented-library-design): Witness-Oriented Library Design
+
+<a href="https://www.pointfree.co/episodes/ep26-domain-specific-languages-part-1">
+  <img alt="video poster image" src="https://d1hf1soyumxcgv.cloudfront.net/0039-witness-oriented-library-design/poster.jpg" width="480">
+</a>
 
 
 ## License
