@@ -607,16 +607,27 @@ private final class ScaledWindow: NSWindow {
 extension Array {
   func sequence<A>() -> Async<[A]> where Element == Async<A> {
     guard !self.isEmpty else { return Async(value: []) }
+    guard self.count > 1 else { return self.first!.map { [$0] } }
+
     return Async<[A]> { callback in
       var result = [A?](repeating: nil, count: self.count)
       result.reserveCapacity(self.count)
       var count = 0
       zip(self.indices, self).forEach { idx, async in
-        async.run {
-          result[idx] = $0
+        switch async {
+        case let .pure(value):
+          result[idx] = value
           count += 1
           if count == self.count {
             callback(result as! [A])
+          }
+        case let .delayed(runner):
+          runner {
+            result[idx] = $0
+            count += 1
+            if count == self.count {
+              callback(result as! [A])
+            }
           }
         }
       }

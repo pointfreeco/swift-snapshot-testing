@@ -98,20 +98,27 @@ public func verifySnapshot<Value, Format>(
       let fileManager = FileManager.default
       try fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
 
-      let tookSnapshot = XCTestExpectation(description: "Took snapshot")
       var optionalDiffable: Format?
-      snapshotting.snapshot(try value()).run { b in
-        optionalDiffable = b
-        tookSnapshot.fulfill()
-      }
-      let result = XCTWaiter.wait(for: [tookSnapshot], timeout: timeout)
-      switch result {
-      case .completed:
-        break
-      case .timedOut:
-        return "Exceeded timeout of \(timeout) seconds waiting for snapshot"
-      case .incorrectOrder, .invertedFulfillment, .interrupted:
-        return "Couldn't snapshot value"
+
+      switch snapshotting.snapshot(try value()) {
+      case let .pure(snapshot):
+        optionalDiffable = snapshot
+
+      case let .delayed(snapshotRunner):
+        let tookSnapshot = XCTestExpectation(description: "Took snapshot")
+        snapshotRunner { snapshot in
+          optionalDiffable = snapshot
+          tookSnapshot.fulfill()
+        }
+        let result = XCTWaiter.wait(for: [tookSnapshot], timeout: timeout)
+        switch result {
+        case .completed:
+          break
+        case .timedOut:
+          return "Exceeded timeout of \(timeout) seconds waiting for snapshot"
+        case .incorrectOrder, .invertedFulfillment, .interrupted:
+          return "Couldn't snapshot value"
+        }
       }
 
       guard let diffable = optionalDiffable else {

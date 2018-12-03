@@ -1,4 +1,4 @@
-#if os(Linux)
+//#if os(Linux)
 import XCTest
 
 /// An XCTest subclass that provides snaphot testing helpers.
@@ -58,9 +58,13 @@ open class SnapshotTestCase: XCTestCase {
       let fileManager = FileManager.default
       try fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
 
-      let tookSnapshot = self.expectation(description: "Took snapshot")
       var optionalDiffable: Format?
-      snapshotting.snapshot(value).run { b in
+      switch snapshotting.snapshot(value) {
+      case let .pure(snapshot):
+        optionalDiffable = snapshot
+      case let .delayed(snapshotRunner):
+      let tookSnapshot = self.expectation(description: "Took snapshot")
+        snapshotRunner { b in
         optionalDiffable = b
         tookSnapshot.fulfill()
       }
@@ -69,6 +73,7 @@ open class SnapshotTestCase: XCTestCase {
       #else
       self.wait(for: [tookSnapshot], timeout: timeout)
       #endif
+      }
 
       guard let diffing = optionalDiffable else {
         XCTFail("Couldn't snapshot value", file: file, line: line)
@@ -129,4 +134,4 @@ open class SnapshotTestCase: XCTestCase {
 
   private var counter = 1
 }
-#endif
+//#endif

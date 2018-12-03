@@ -41,9 +41,10 @@ public struct Snapshotting<Value, Format> {
     diffing: Diffing<Format>,
     snapshot: @escaping (_ value: Value) -> Format
     ) {
-    self.init(pathExtension: pathExtension, diffing: diffing) {
-      Async(value: snapshot($0))
-    }
+
+    self.pathExtension = pathExtension
+    self.diffing = diffing
+    self.snapshot = { Async(value: snapshot($0)) }
   }
 
   /// Transforms a strategy on `Value`s into a strategy on `A`s through a function `(A) -> Async<Value>`.
