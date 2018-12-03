@@ -31,7 +31,7 @@ When the test first runs, a snapshot is automatically recorded to disk and the t
 >
 > "…/MyAppTests/\_\_Snapshots\_\_/MyViewControllerTests/testMyViewController.png"
 
-Repeat test runs will load this reference for comparison. If the values don't match, the test will fail and describe the difference.
+Repeat test runs will load this reference and compare it with the runtime value. If they don't match, the test will fail and describe the difference.
 
 You can record a new reference by setting the `record` mode to `true` on the assertion or globally.
 
