@@ -2,6 +2,10 @@
 
 SnapshotTesting comes with a wide variety of snapshot strategies for a varienty of platforms. To extend these strategies or define your own, see "[Defining Custom Snapshot Strategies](Defining-Custom-Snapshot-Strategies.md)".
 
+If you'd like to submit your own custom strategy, see "[Contributing](../CONTRIBUTING.md)".
+
+## List of Available Snapshot Strategies
+
   - [`Any`](#any)
       - [`.dump`](#dump)
   - [`CALayer`](#calayer)
