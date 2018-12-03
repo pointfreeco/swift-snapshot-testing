@@ -178,7 +178,6 @@ Witness-oriented programming was explored in the following episodes:
   <img alt="video poster image" src="https://d1hf1soyumxcgv.cloudfront.net/0039-witness-oriented-library-design/poster.jpg" width="480">
 </a>
 
-
 ## License
 
 This library is released under the MIT license. See [LICENSE](LICENSE) for details.
