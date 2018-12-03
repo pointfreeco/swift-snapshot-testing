@@ -61,7 +61,7 @@ View testing is [highly configurable](Documentation/Available-Snapshot-Strategie
 assertSnapshot(matching: vc, as: .image(on: .iPhoneSe))
 assertSnapshot(matching: vc, as: .image(on: .iPhoneSe(.landscape)))
 assertSnapshot(matching: vc, as: .image(on: .iPhoneX))
-assertSnapshot(matching: vc, as: .image(on: .iPadMini(.portrait))
+assertSnapshot(matching: vc, as: .image(on: .iPadMini(.portrait)))
 ```
 
 Better yet, SnapshotTesting isn't limited to views and view controllers! There are [a number of available snapshot strategies](Documentation/Available-Snapshot-Strategies.md) to choose from.
