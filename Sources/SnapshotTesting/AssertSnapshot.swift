@@ -20,9 +20,9 @@ public var record = false
 ///   - file: The file in which failure occurred. Defaults to the file name of the test case in which this function was called.
 ///   - testName: The name of the test in which failure occurred. Defaults to the function name of the test case in which this function was called.
 ///   - line: The line number on which failure occurred. Defaults to the line number on which this function was called.
-public func assertSnapshot<A, B>(
-  matching value: @autoclosure () throws -> A,
-  as snapshotting: Snapshotting<A, B>,
+public func assertSnapshot<Value, Format>(
+  matching value: @autoclosure () throws -> Value,
+  as snapshotting: Snapshotting<Value, Format>,
   named name: String? = nil,
   record recording: Bool = false,
   timeout: TimeInterval = 5,
@@ -57,9 +57,9 @@ public func assertSnapshot<A, B>(
 ///   - testName: The name of the test in which failure occurred. Defaults to the function name of the test case in which this function was called.
 ///   - line: The line number on which failure occurred. Defaults to the line number on which this function was called.
 /// - Returns: A failure message or, if the value matches, nil.
-public func verifySnapshot<A, B>(
-  matching value: @autoclosure () throws -> A,
-  as snapshotting: Snapshotting<A, B>,
+public func verifySnapshot<Value, Format>(
+  matching value: @autoclosure () throws -> Value,
+  as snapshotting: Snapshotting<Value, Format>,
   named name: String? = nil,
   record recording: Bool = false,
   timeout: TimeInterval = 5,
@@ -99,7 +99,7 @@ public func verifySnapshot<A, B>(
       try fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
 
       let tookSnapshot = XCTestExpectation(description: "Took snapshot")
-      var optionalDiffable: B?
+      var optionalDiffable: Format?
       snapshotting.snapshot(try value()).run { b in
         optionalDiffable = b
         tookSnapshot.fulfill()
