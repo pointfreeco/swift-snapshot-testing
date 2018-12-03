@@ -33,7 +33,7 @@ Most strategies can be built from existing ones, but if you've defined your own 
 
 ### Asynchronous Strategies
 
-Some types need to be snapshot in an asynchronous fashion. `Snapshotting` offers two APIs for building asynchronous strategies by utilizing a built-in `Async` type.
+Some types need to be snapshot in an asynchronous fashion. `Snapshotting` offers two APIs for building asynchronous strategies by utilizing a built-in [`Async`](../Sources/SnapshotTesting/Async.swift) type.
 
 #### `asyncPullback`
 
