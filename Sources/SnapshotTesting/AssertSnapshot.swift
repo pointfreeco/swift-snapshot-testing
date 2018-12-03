@@ -175,17 +175,18 @@ public func verifySnapshot<A, B>(
 
 private let counterQueue = DispatchQueue(label: "co.pointfree.SnapshotTesting.counter")
 private var counterMap: [URL: Int] = [:]
-#endif
-
-func sanitizePathComponent(_ string: String) -> String {
-  return string
-    .replacingOccurrences(of: "\\W+", with: "-", options: .regularExpression)
-    .replacingOccurrences(of: "^-|-$", with: "", options: .regularExpression)
-}
 
 func snapshotUrl(directoryUrl: URL, testName: String, identifier: String, pathExtension: String? = nil, variant: String? = nil) -> URL {
   let variantExtension = variant.flatMap { ".\($0)" } ?? ""
   return directoryUrl
     .appendingPathComponent("\(testName).\(identifier)\(variantExtension)")
     .appendingPathExtension(pathExtension ?? "")
+}
+
+#endif
+
+func sanitizePathComponent(_ string: String) -> String {
+  return string
+    .replacingOccurrences(of: "\\W+", with: "-", options: .regularExpression)
+    .replacingOccurrences(of: "^-|-$", with: "", options: .regularExpression)
 }
