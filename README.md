@@ -145,18 +145,16 @@ dependencies: [
 
 ## Features
 
-- [**Dozens of snapshot strategies**](Documentation/Available-Snapshot-Strategies.md). Snapshot testing isn’t just for UI. Write snapshots against a number of types.
-- [**Write your own snapshot strategies**](Documentation/Defining-Custom-Snapshot-Strategies.md). If you can convert it to an image, string, data, or your own diffable format, you can snapshot test it!
-- **No configuration required.** Don’t fuss with scheme settings and environment variables. Snapshots are automatically saved alongside your tests.
-- **More hands-off.** New snapshots are automatically recorded.
-- **Subclass-free.** Assert from any XCTest case or Quick spec.
-- **Device-agnostic snapshots.** Render views and view controllers for specific devices and trait collections from a single simulator.
-- **First-class Xcode support.** Image differences are captured as XCTest attachments. Text differences are rendered in inline error messages.
-- **iOS, macOS, and tvOS support.**
-- **SceneKit, SpriteKit, and WebKit support.**
-- **Test _any_ data structure.** Snap complex app state in a dependable way.
-- **Codable support**. Snapshot your data structures into JSON and property lists.
-- **Extensible and transformable.** Build your own snapshot strategies from scratch or build from existing ones.
+  - [**Dozens of snapshot strategies**](Documentation/Available-Snapshot-Strategies.md). Snapshot testing isn't just for `UIView`s and `CALayer`s. Write snapshots against _any_ value, including…
+  - [**Write your own snapshot strategies**](Documentation/Defining-Custom-Snapshot-Strategies.md). If you can convert it to an image, string, data, or your own diffable format, you can snapshot test it! Build your own snapshot strategies from scratch or transform existing ones.
+  - **No configuration required.** Don't fuss with scheme settings and environment variables. Snapshots are automatically saved alongside your tests.
+  - **More hands-off.** New snapshots are recorded whether `record` mode is `true` or not.
+  - **Subclass-free.** Assert from any XCTest case or Quick spec.
+  - **Device-agnostic snapshots.** Render views and view controllers for specific devices and trait collections from a single simulator.
+  - **First-class Xcode support.** Image differences are captured as XCTest attachments. Text differences are rendered inline in error messages.
+  - **Supports any platform that supports Swift.** Write snapshot tests for iOS, Linux, macOS, and tvOS.
+  - **SceneKit, SpriteKit, and WebKit support.** Most snapshot testing libraries don't support these special view subclasses.
+  - **`Codable` support**. Snapshot encodable data structures into their JSON and property list representations.
 
 ## Learn More
 
