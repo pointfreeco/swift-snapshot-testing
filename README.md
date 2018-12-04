@@ -120,7 +120,7 @@ If your data can be represented as an image, text, or data, you can write a snap
 If you use [Carthage](https://github.com/Carthage/Carthage), you can add the following dependency to your `Cartfile`:
 
 ``` ruby
-github "pointfreeco/swift-snapshot-testing" <~ 1.0
+github "pointfreeco/swift-snapshot-testing" ~> 1.0
 ```
 
 ### CocoaPods
@@ -129,7 +129,7 @@ If your project uses [CocoaPods](https://cocoapods.org), add the pod to any appl
 
 ```ruby
 target 'MyAppTests' do
-  pod 'SnapshotTesting', '<~ 1.0'
+  pod 'SnapshotTesting', '~> 1.0'
 end
 ```
 
