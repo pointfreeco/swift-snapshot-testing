@@ -161,7 +161,7 @@ dependencies: [
 
   - [`iOSSnapshotTestCase`](https://github.com/uber/ios-snapshot-test-case/) helped introduce screen shot testing to a broad audience in the iOS community. Experience with it inspired the creation of this library.
 
-  - [Jest](https://jestjs.io) brought generalized snapshot testing to the front-end with a polished user experience. Several features of this library (diffing, automatically capturing new snapshots) were directly influenced.
+  - [Jest](https://jestjs.io) brought generalized snapshot testing to the JavaScript community with a polished user experience. Several features of this library (diffing, automatically capturing new snapshots) were directly influenced.
 
 ## Learn More
 
