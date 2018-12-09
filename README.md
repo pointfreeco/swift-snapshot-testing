@@ -159,9 +159,9 @@ dependencies: [
   
 ## Related Tools
 
-  - [`FBSnapshotTestCase`](https://github.com/facebook/ios-snapshot-test-case) helped introduce screen shot testing to a broad audience in the iOS community. Experience with it inspired the creation of this library.
+  - [`iOSSnapshotTestCase`](https://github.com/uber/ios-snapshot-test-case/) helped introduce screen shot testing to a broad audience in the iOS community. Experience with it inspired the creation of this library.
 
-  - [`Jest`](http://facebook.github.io/jest/) brought generalized snapshot testing to the front-end with a polished user experience. Several features of this library (diffing, tracking outdated snapshots) were directly influenced.
+  - [Jest](https://jestjs.io) brought generalized snapshot testing to the front-end with a polished user experience. Several features of this library (diffing, automatically capturing new snapshots) were directly influenced.
 
 ## Learn More
 
