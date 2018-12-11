@@ -195,10 +195,16 @@ public func assertAllSnapshotsChecked(for testClass: XCTestCase.Type, file: Stat
 
   let fileManager = FileManager.default
   do {
-    let expected = try fileManager.contentsOfDirectory(
-        at: snapshotDirectoryUrl, includingPropertiesForKeys: [], options: .skipsHiddenFiles)
-    let diff = expected.filter { !checked[snapshotDirectoryUrl, default: []].contains($0) }
-    XCTAssertEqual(diff, [], "Not all files were checked", file: file, line: line)
+    let expected = try fileManager.contentsOfDirectory(at: snapshotDirectoryUrl, 
+                                                       includingPropertiesForKeys: [], 
+                                                       options: .skipsHiddenFiles)
+    let diff: String = expected
+                         .filter { !checked[snapshotDirectoryUrl, default: []].contains($0) }
+                         .map { $0.absoluteString }
+                         .joined(separator: "\n")
+    if !diff.isEmpty {
+      XCTFail("These files were not checked:\n\(diff)", file: file, line: line)
+    }
   } catch {
     XCTFail(error.localizedDescription, file: file, line: line)
   }
@@ -216,10 +222,10 @@ private func numberOfTestMethods(_ testClass: XCTestCase.Type) -> Int? {
     return nil
   }
   let count: Int = (0..<Int(methodCount))
-    .reduce(0, { result, i in
-        let selName = sel_getName(method_getName(methodList[i]))
-        let methodName = String(cString: selName, encoding: .utf8)!
-        return result + (methodName.hasPrefix("test") ? 1 : 0)
+    .reduce(0, { result, index in
+      let selName = sel_getName(method_getName(methodList[index]))
+      let methodName = String(cString: selName, encoding: .utf8)!
+      return result + (methodName.hasPrefix("test") ? 1 : 0)
     })
   return count
 }
