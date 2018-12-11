@@ -163,6 +163,10 @@ public func verifySnapshot<Value, Format>(
     }
 }
 
+private let counterQueue = DispatchQueue(label: "co.pointfree.SnapshotTesting.counter")
+private var counterMap: [URL: Int] = [:]
+
+#if !os(tvOS)
 
 /// Asserts that all snapshots were checked for a test case
 ///   (call it from the test case's tearDown method)
@@ -195,8 +199,8 @@ public func assertAllSnapshotsChecked(for testClass: XCTestCase.Type, file: Stat
 
   let fileManager = FileManager.default
   do {
-    let expected = try fileManager.contentsOfDirectory(at: snapshotDirectoryUrl, 
-                                                       includingPropertiesForKeys: [], 
+    let expected = try fileManager.contentsOfDirectory(at: snapshotDirectoryUrl,
+                                                       includingPropertiesForKeys: [],
                                                        options: .skipsHiddenFiles)
     let diff: String = expected
                          .filter { !checked[snapshotDirectoryUrl, default: []].contains($0) }
@@ -209,9 +213,6 @@ public func assertAllSnapshotsChecked(for testClass: XCTestCase.Type, file: Stat
     XCTFail(error.localizedDescription, file: file, line: line)
   }
 }
-
-private let counterQueue = DispatchQueue(label: "co.pointfree.SnapshotTesting.counter")
-private var counterMap: [URL: Int] = [:]
 
 private var checked: [URL: [URL]] = [:]
 private var checkedCounter: [URL: Int] = [:]
@@ -230,7 +231,8 @@ private func numberOfTestMethods(_ testClass: XCTestCase.Type) -> Int? {
   return count
 }
 
-#endif
+#endif // tvOS
+#endif // Linux
 
 func sanitizePathComponent(_ string: String) -> String {
   return string
