@@ -163,11 +163,6 @@ public func verifySnapshot<Value, Format>(
     }
 }
 
-private let counterQueue = DispatchQueue(label: "co.pointfree.SnapshotTesting.counter")
-private var counterMap: [URL: Int] = [:]
-
-#if !os(tvOS)
-
 /// Asserts that all snapshots were checked for a test case
 ///   (call it from the test case's tearDown method)
 ///
@@ -214,9 +209,6 @@ public func assertAllSnapshotsChecked(for testClass: XCTestCase.Type, file: Stat
   }
 }
 
-private var checked: [URL: [URL]] = [:]
-private var checkedCounter: [URL: Int] = [:]
-
 private func numberOfTestMethods(_ testClass: XCTestCase.Type) -> Int? {
   var methodCount: UInt32 = 0
   guard let methodList = class_copyMethodList(testClass, &methodCount) else {
@@ -231,7 +223,12 @@ private func numberOfTestMethods(_ testClass: XCTestCase.Type) -> Int? {
   return count
 }
 
-#endif // tvOS
+private let counterQueue = DispatchQueue(label: "co.pointfree.SnapshotTesting.counter")
+private var counterMap: [URL: Int] = [:]
+
+private var checkedCounter: [URL: Int] = [:]
+private var checked: [URL: [URL]] = [:]
+
 #endif // Linux
 
 func sanitizePathComponent(_ string: String) -> String {
