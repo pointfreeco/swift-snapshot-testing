@@ -77,7 +77,12 @@ open class SnapshotTestCase: XCTestCase {
 
       guard !recording, fileManager.fileExists(atPath: snapshotFileUrl.path) else {
         try snapshotting.diffing.toData(diffing).write(to: snapshotFileUrl)
-        XCTFail("Recorded snapshot: …\n\n\"\(snapshotFileUrl.path)\"", file: file, line: line)
+        let message = """
+        An existing reference was not found on disk. Automatically recorded snapshot: …
+
+        "\(snapshotFileUrl.path)"
+        """
+        XCTFail(message, file: file, line: line)
         return
       }
 
