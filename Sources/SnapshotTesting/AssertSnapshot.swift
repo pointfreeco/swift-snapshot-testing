@@ -124,6 +124,8 @@ public func verifySnapshot<Value, Format>(
         An existing reference was not found on disk. Automatically recorded snapshot: …
 
         "\(snapshotFileUrl.path)"
+        
+        Re-run "\(testName)" to test against the newly-recorded snapshot.
         """
       }
 
