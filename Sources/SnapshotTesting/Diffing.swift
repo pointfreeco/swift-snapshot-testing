@@ -14,9 +14,9 @@ public struct Diffing<Value> {
   /// Creates a new `Diffing` on `Value`.
   ///
   /// - Parameters:
-  ///   - to: A function used to convert a value _to_ data.
+  ///   - toData: A function used to convert a value _to_ data.
   ///   - value: A value to convert into data.
-  ///   - fro: A function used to produce a value _from_ data.
+  ///   - fromData: A function used to produce a value _from_ data.
   ///   - data: Data to convert into a value.
   ///   - diff: A function used to compare two values. If the values do not match, returns a failure message and artifacts describing the failure.
   ///   - lhs: A value to compare.
