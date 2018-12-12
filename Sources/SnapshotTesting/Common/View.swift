@@ -370,8 +370,8 @@ func addImagesForRenderedViews(_ view: View) -> [Async<View>] {
   return view.snapshot
     .map { async in
       [
-        Async { callback in
-          async.run { image in
+//        Async { callback in
+          async.map { image in
             let imageView = ImageView()
             imageView.image = image
             imageView.frame = view.frame
@@ -380,9 +380,10 @@ func addImagesForRenderedViews(_ view: View) -> [Async<View>] {
             #elseif os(iOS) || os(tvOS)
             view.superview?.insertSubview(imageView, aboveSubview: view)
             #endif
-            callback(imageView)
+            return imageView
+//            callback(imageView)
           }
-        }
+//        }
       ]
     }
     ?? view.subviews.flatMap(addImagesForRenderedViews)
