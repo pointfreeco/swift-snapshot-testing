@@ -123,6 +123,12 @@ If you use [Carthage](https://github.com/Carthage/Carthage), you can add the fol
 github "pointfreeco/swift-snapshot-testing" ~> 1.0
 ```
 
+> ⚠️ Warning: Carthage instructs you to drag frameworks into your Xcode project. Xcode may automatically attempt to link these frameworks to your app target. `SnapshotTesting.framework` is only compatible with test targets. Upon initial installation:
+>
+>  1. Remove `SnapshotTesting.framework` from any non-test target.
+>  2. Add `SnapshotTesting.framework` to any applicable test targets.
+>  3. Add a **New Copy Build Phase** to any applicable test targets with **Destination** set to "Frameworks", and add `SnapshotTesting.framework` as an item to this phase.
+
 ### CocoaPods
 
 If your project uses [CocoaPods](https://cocoapods.org), add the pod to any applicable test targets in your `Podfile`:
