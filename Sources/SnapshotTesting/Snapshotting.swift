@@ -56,11 +56,17 @@ public struct Snapshotting<Value, Format> {
     return Snapshotting<A, Format>(
       pathExtension: self.pathExtension,
       diffing: self.diffing
-    ) { a0 in
-      return .init { callback in
-        transform(a0).run { a in
-          self.snapshot(a).run { b in
-            callback(b)
+    ) { a0 -> Async<Format> in
+
+      switch transform(a0) {
+      case let .pure(a):
+        return self.snapshot(a)
+      case let .delayed(run):
+        return .init { callback in
+          run { a in
+            self.snapshot(a).run { b
+              in callback(b)
+            }
           }
         }
       }

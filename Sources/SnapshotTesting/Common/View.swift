@@ -508,19 +508,17 @@ func snapshotView(
       )
     }
     add(traits: traits, viewController: viewController, to: window)
-    return view.snapshot ?? Async { callback in
-      addImagesForRenderedViews(view).sequence().run { views in
-        callback(
-          renderer(bounds: view.bounds, for: traits).image { ctx in
-            if drawHierarchyInKeyWindow {
-              view.drawHierarchy(in: view.bounds, afterScreenUpdates: true)
-            } else {
-              view.layer.render(in: ctx.cgContext)
-            }
-          }
-        )
+    return view.snapshot ?? addImagesForRenderedViews(view).sequence().map { views in
+      defer {
         views.forEach { $0.removeFromSuperview() }
         view.frame = initialFrame
+      }
+      return renderer(bounds: view.bounds, for: traits).image { ctx in
+        if drawHierarchyInKeyWindow {
+          view.drawHierarchy(in: view.bounds, afterScreenUpdates: true)
+        } else {
+          view.layer.render(in: ctx.cgContext)
+        }
       }
     }
 }
@@ -607,27 +605,15 @@ private final class ScaledWindow: NSWindow {
 
 extension Array {
   func sequence<A>() -> Async<[A]> where Element == Async<A> {
-    guard !self.isEmpty else { return Async(value: []) }
-    guard self.count > 1 else { return self.first!.map { [$0] } }
-
-    return Async<[A]> { callback in
-      var result = [A?](repeating: nil, count: self.count)
-      result.reserveCapacity(self.count)
-      var count = 0
-      zip(self.indices, self).forEach { idx, async in
-        switch async {
-        case let .pure(value):
-          result[idx] = value
-          count += 1
-          if count == self.count {
-            callback(result as! [A])
-          }
-        case let .delayed(runner):
-          runner {
-            result[idx] = $0
-            count += 1
-            if count == self.count {
-              callback(result as! [A])
+    return self.reduce(Async(value: [])) { axs, ax in
+      switch (axs, ax) {
+      case let (.pure(xs), .pure(x)):
+        return .init(value: xs + [x])
+      default:
+        return .init { callback in
+          axs.run { xs in
+            ax.run { x in
+              callback(xs + [x])
             }
           }
         }

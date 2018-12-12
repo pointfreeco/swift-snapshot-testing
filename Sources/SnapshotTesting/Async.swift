@@ -40,11 +40,12 @@ public enum Async<Value> {
     self = .pure(value)
   }
 
-  public func map<NewValue>(_ f: @escaping (Value) -> NewValue) -> Async<NewValue> {
-    return Async<NewValue> { callback in
-      self.run { a in
-        callback(f(a))
-      }
+  public func map<NewValue>(_ transform: @escaping (Value) -> NewValue) -> Async<NewValue> {
+    switch self {
+    case let .pure(value):
+      return .init(value: transform(value))
+    case let .delayed(run):
+      return .init { callback in run { value in callback(transform(value)) } }
     }
   }
 }
