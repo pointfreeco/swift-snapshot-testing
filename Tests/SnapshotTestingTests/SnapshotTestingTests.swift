@@ -434,6 +434,20 @@ class SnapshotTestingTests: TestCase {
     #endif
   }
 
+  func testViewControllerHierarchy() {
+    let page = UIPageViewController.init(transitionStyle: .scroll, navigationOrientation: .horizontal)
+    page.setViewControllers([UIViewController()], direction: .forward, animated: false)
+    let tab = UITabBarController()
+    tab.viewControllers = [
+      UINavigationController(rootViewController: page),
+      UINavigationController(rootViewController: UIViewController()),
+      UINavigationController(rootViewController: UIViewController()),
+      UINavigationController(rootViewController: UIViewController()),
+      UINavigationController(rootViewController: UIViewController())
+    ]
+    assertSnapshot(matching: tab, as: .hierarchy)
+  }
+
   func testURLRequest() {
     var get = URLRequest(url: URL(string: "https://www.pointfree.co/")!)
     get.addValue("pf_session={}", forHTTPHeaderField: "Cookie")

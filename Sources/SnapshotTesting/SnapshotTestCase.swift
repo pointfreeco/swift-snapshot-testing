@@ -80,7 +80,7 @@ open class SnapshotTestCase: XCTestCase {
         let message = """
         An existing reference was not found on disk. Automatically recorded snapshot: …
 
-        "\(snapshotFileUrl.path)"
+        open "\(snapshotFileUrl.path)"
 
         Re-run "\(testName)" to test against the newly-recorded snapshot.
         """

@@ -123,7 +123,7 @@ public func verifySnapshot<Value, Format>(
         return """
         An existing reference was not found on disk. Automatically recorded snapshot: …
 
-        "\(snapshotFileUrl.path)"
+        open "\(snapshotFileUrl.path)"
 
         Re-run "\(testName)" to test against the newly-recorded snapshot.
         """
