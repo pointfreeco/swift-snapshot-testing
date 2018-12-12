@@ -27,9 +27,11 @@ class MyViewControllerTests: XCTestCase {
 
 When an assertion first runs, a snapshot is automatically recorded to disk and the test will fail, printing out the file path of any newly-recorded reference.
 
-> 🛑 failed - Recorded: …
+> 🛑 failed - An existing reference was not found on disk. Automatically recorded snapshot: …
 >
 > "…/MyAppTests/\_\_Snapshots\_\_/MyViewControllerTests/testMyViewController.png"
+>
+> Re-run "testMyViewController" to test against the newly-recorded snapshot.
 
 Repeat test runs will load this reference and compare it with the runtime value. If they don't match, the test will fail and describe the difference.
 
