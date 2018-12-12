@@ -435,6 +435,7 @@ class SnapshotTestingTests: TestCase {
   }
 
   func testViewControllerHierarchy() {
+    #if os(iOS)
     let page = UIPageViewController.init(transitionStyle: .scroll, navigationOrientation: .horizontal)
     page.setViewControllers([UIViewController()], direction: .forward, animated: false)
     let tab = UITabBarController()
@@ -446,6 +447,7 @@ class SnapshotTestingTests: TestCase {
       UINavigationController(rootViewController: UIViewController())
     ]
     assertSnapshot(matching: tab, as: .hierarchy)
+    #endif
   }
 
   func testURLRequest() {
