@@ -1,4 +1,5 @@
 import Foundation
+import XCTest
 
 extension Snapshotting where Value == String, Format == String {
   /// A snapshot strategy for comparing strings based on equality.
@@ -19,6 +20,7 @@ extension Diffing where Value == String {
     let failure = hunks
       .flatMap { [$0.patchMark] + $0.lines }
       .joined(separator: "\n")
-    return ("Diff: …\n\n\(failure)", [.init(string: failure, uniformTypeIdentifier: "public.patch-file")])
+    let attachment = XCTAttachment(data: Data(failure.utf8), uniformTypeIdentifier: "public.patch-file")
+    return ("Diff: …\n\n\(failure)", [attachment])
   }
 }
