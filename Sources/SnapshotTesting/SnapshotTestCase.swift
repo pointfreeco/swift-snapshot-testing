@@ -107,7 +107,7 @@ open class SnapshotTestCase: XCTestCase {
         #if !os(Linux)
         XCTContext.runActivity(named: "Attached Failure Diff") { activity in
           attachments.forEach {
-            activity.add($0.rawValue)
+            activity.add($0)
           }
         }
         #endif
