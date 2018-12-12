@@ -602,23 +602,4 @@ private final class ScaledWindow: NSWindow {
   }
 }
 #endif
-
-extension Array {
-  func sequence<A>() -> Async<[A]> where Element == Async<A> {
-    return self.reduce(Async(value: [])) { axs, ax in
-      switch (axs, ax) {
-      case let (.pure(xs), .pure(x)):
-        return .init(value: xs + [x])
-      default:
-        return .init { callback in
-          axs.run { xs in
-            ax.run { x in
-              callback(xs + [x])
-            }
-          }
-        }
-      }
-    }
-  }
-}
 #endif

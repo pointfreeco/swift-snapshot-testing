@@ -13,17 +13,6 @@ public enum Async<Value> {
   case pure(Value)
   case delayed((@escaping (Value) -> Void) -> Void)
 
-  public var run: (@escaping (Value) -> Void) -> Void {
-    return { callback in
-      switch self {
-      case let .pure(value):
-        callback(value)
-      case let .delayed(runner):
-        runner(callback)
-      }
-    }
-  }
-
   /// Creates an asynchronous operation.
   ///
   /// - Parameters:
@@ -40,12 +29,40 @@ public enum Async<Value> {
     self = .pure(value)
   }
 
+  public func run(callback: @escaping (Value) -> Void) {
+    switch self {
+    case let .pure(value):
+      callback(value)
+    case let .delayed(runner):
+      runner(callback)
+    }
+  }
+
   public func map<NewValue>(_ transform: @escaping (Value) -> NewValue) -> Async<NewValue> {
     switch self {
     case let .pure(value):
-      return .init(value: transform(value))
+      return Async<NewValue>(value: transform(value))
     case let .delayed(run):
-      return .init { callback in run { value in callback(transform(value)) } }
+      return Async<NewValue> { callback in run { value in callback(transform(value)) } }
+    }
+  }
+}
+
+extension Array {
+  public func sequence<A>() -> Async<[A]> where Element == Async<A> {
+    return self.reduce(Async(value: [])) { axs, ax in
+      switch (axs, ax) {
+      case let (.pure(xs), .pure(x)):
+        return Async(value: xs + [x])
+      default:
+        return Async { callback in
+          axs.run { xs in
+            ax.run { x in
+              callback(xs + [x])
+            }
+          }
+        }
+      }
     }
   }
 }

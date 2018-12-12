@@ -41,10 +41,9 @@ public struct Snapshotting<Value, Format> {
     diffing: Diffing<Format>,
     snapshot: @escaping (_ value: Value) -> Format
     ) {
-
-    self.pathExtension = pathExtension
-    self.diffing = diffing
-    self.snapshot = { Async(value: snapshot($0)) }
+    self.init(pathExtension: pathExtension, diffing: diffing) {
+      Async(value: snapshot($0))
+    }
   }
 
   /// Transforms a strategy on `Value`s into a strategy on `A`s through a function `(A) -> Async<Value>`.
@@ -56,16 +55,16 @@ public struct Snapshotting<Value, Format> {
     return Snapshotting<A, Format>(
       pathExtension: self.pathExtension,
       diffing: self.diffing
-    ) { a0 -> Async<Format> in
+    ) { a -> Async<Format> in
 
-      switch transform(a0) {
-      case let .pure(a):
-        return self.snapshot(a)
+      switch transform(a) {
+      case let .pure(value):
+        return self.snapshot(value)
       case let .delayed(run):
-        return .init { callback in
-          run { a in
-            self.snapshot(a).run { b
-              in callback(b)
+        return Async { callback in
+          run { value in
+            self.snapshot(value).run { format in
+              callback(format)
             }
           }
         }
@@ -79,11 +78,7 @@ public struct Snapshotting<Value, Format> {
   ///   - transform: A transform function from `A` into `Value`.
   ///   - otherValue: A value to be transformed.
   public func pullback<A>(_ transform: @escaping (_ otherValue: A) -> Value) -> Snapshotting<A, Format> {
-    return Snapshotting<A, Format>(
-      pathExtension: self.pathExtension,
-      diffing: self.diffing,
-      asyncSnapshot: { a in self.snapshot(transform(a)) }
-    )
+    return self.asyncPullback { Async(value: transform($0)) }
   }
 }
 
