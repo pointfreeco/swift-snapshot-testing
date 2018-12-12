@@ -128,7 +128,7 @@ github "pointfreeco/swift-snapshot-testing" ~> 1.0
 >  1. Remove `SnapshotTesting.framework` from any non-test target it may have been added to.
 >  2. Add `SnapshotTesting.framework` to any applicable test targets.
 >  3. Add a **New Copy Build Phase** to any applicable test targets with **Destination** set to "Frameworks", and add `SnapshotTesting.framework` as an item to this phase.
->  4. Do _not_ add `SnapshotTesting.framework` to the "Input Files" or "Output Files" of Carthage's `copy-frameworks` **Run Script Phase** alongside other app target frameworks.
+>  4. Do _not_ add `SnapshotTesting.framework` to the "Input Files" or "Output Files" of your app target's Carthage `copy-frameworks` **Run Script Phase**.
 >
 > See Carthage's [Adding frameworks to unit tests or a framework](https://github.com/Carthage/Carthage#adding-frameworks-to-unit-tests-or-a-framework) documentation for more.
 
