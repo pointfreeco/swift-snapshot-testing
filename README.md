@@ -29,7 +29,7 @@ When an assertion first runs, a snapshot is automatically recorded to disk and t
 
 > 🛑 failed - An existing reference was not found on disk. Automatically recorded snapshot: …
 >
-> "…/MyAppTests/\_\_Snapshots\_\_/MyViewControllerTests/testMyViewController.png"
+> open "…/MyAppTests/\_\_Snapshots\_\_/MyViewControllerTests/testMyViewController.png"
 >
 > Re-run "testMyViewController" to test against the newly-recorded snapshot.
 
