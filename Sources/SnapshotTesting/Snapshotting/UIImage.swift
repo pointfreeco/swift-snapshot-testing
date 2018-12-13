@@ -2,13 +2,6 @@
 import UIKit
 import XCTest
 
-extension Attachment {
-  public init(image: UIImage, name: String? = nil) {
-    self.rawValue = XCTAttachment(image: image)
-    self.rawValue.name = name
-  }
-}
-
 extension Snapshotting where Value == UIImage, Format == UIImage {
   /// A snapshot strategy for comparing images based on pixel equality.
   public static var image: Snapshotting {
@@ -30,13 +23,15 @@ extension Snapshotting where Value == UIImage, Format == UIImage {
         let message = new.size == old.size
           ? "Expected snapshot to match reference"
           : "Expected snapshot@\(new.size) to match reference@\(old.size)"
+        let oldAttachment = XCTAttachment(image: old)
+        oldAttachment.name = "reference"
+        let newAttachment = XCTAttachment(image: new)
+        newAttachment.name = "failure"
+        let differenceAttachment = XCTAttachment(image: difference)
+        differenceAttachment.name = "difference"
         return (
           message,
-          [
-            .init(image: old, name: "reference"),
-            .init(image: new, name: "failure"),
-            .init(image: difference, name: "difference")
-          ]
+          [oldAttachment, newAttachment, differenceAttachment]
         )
       }
     )
