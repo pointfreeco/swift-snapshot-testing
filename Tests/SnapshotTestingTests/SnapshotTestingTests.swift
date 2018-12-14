@@ -211,7 +211,6 @@ class SnapshotTestingTests: TestCase {
     }
     let tableViewController = TableViewController()
     assertSnapshot(matching: tableViewController, as: .image(on: .iPhoneSe))
-    assertSnapshot(matching: tableViewController, as: .recursiveDescription(on: .iPhoneSe))
     #endif
   }
 
@@ -284,6 +283,16 @@ class SnapshotTestingTests: TestCase {
       assertSnapshot(matching: viewController, as: .image(on: .iPadMini), named: "ipad-mini")
       assertSnapshot(matching: viewController, as: .image(on: .iPadPro10_5), named: "ipad-pro-10-5")
       assertSnapshot(matching: viewController, as: .image(on: .iPadPro12_9), named: "ipad-pro-12-9")
+
+      assertSnapshot(matching: viewController, as: .recursiveDescription(on: .iPhoneSe), named: "iphone-se")
+      assertSnapshot(matching: viewController, as: .recursiveDescription(on: .iPhone8), named: "iphone-8")
+      assertSnapshot(matching: viewController, as: .recursiveDescription(on: .iPhone8Plus), named: "iphone-8-plus")
+      assertSnapshot(matching: viewController, as: .recursiveDescription(on: .iPhoneX), named: "iphone-x")
+      assertSnapshot(matching: viewController, as: .recursiveDescription(on: .iPhoneXr), named: "iphone-xr")
+      assertSnapshot(matching: viewController, as: .recursiveDescription(on: .iPhoneXsMax), named: "iphone-xs-max")
+      assertSnapshot(matching: viewController, as: .recursiveDescription(on: .iPadMini), named: "ipad-mini")
+      assertSnapshot(matching: viewController, as: .recursiveDescription(on: .iPadPro10_5), named: "ipad-pro-10-5")
+      assertSnapshot(matching: viewController, as: .recursiveDescription(on: .iPadPro12_9), named: "ipad-pro-12-9")
 
       assertSnapshot(matching: viewController, as: .image(on: .iPhoneSe(.portrait)), named: "iphone-se")
       assertSnapshot(matching: viewController, as: .image(on: .iPhone8(.portrait)), named: "iphone-8")
