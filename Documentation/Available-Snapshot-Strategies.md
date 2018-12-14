@@ -484,16 +484,10 @@ A snapshot strategy for comparing views based on a recursive description of thei
 assertSnapshot(matching: view, as: .recursiveDescription)
 
 // Layout with a certain size.
-assertSnapshot(matching: view, as: .recursiveDescription(size: .init(width: 44, height: 44))
+assertSnapshot(matching: view, as: .recursiveDescription(size: .init(width: 22, height: 22))
 
 // Layout with a certain trait collection.
 assertSnapshot(matching: view, as: .recursiveDescription(traits: .init(horizontalSizeClass: .regular))
-```
-
-#### Example
-
-``` swift
-assertSnapshot(matching: view, as: .recursiveDescription)
 ```
 
 Records:
