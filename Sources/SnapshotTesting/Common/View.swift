@@ -483,7 +483,6 @@ func prepareView(
   guard size.width > 0, size.height > 0 else {
     fatalError("View not renderable to image at size \(size)")
   }
-  // NB: Avoid safe area influence.
   view.frame.size = size
   if view != viewController.view {
     viewController.view.bounds = view.bounds
@@ -522,6 +521,7 @@ func snapshotView(
       view: view,
       viewController: viewController
     )
+    // NB: Avoid safe area influence.
     if config.safeArea == .zero { view.frame.origin = .init(x: offscreen, y: offscreen) }
     return view.snapshot ?? Async { callback in
       addImagesForRenderedViews(view).sequence().run { views in
