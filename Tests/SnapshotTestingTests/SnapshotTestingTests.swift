@@ -22,6 +22,11 @@ class SnapshotTestingTests: TestCase {
 //    record = true
   }
 
+  override func tearDown() {
+    record = false
+    super.tearDown()
+  }
+
   func testAny() {
     struct User { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
@@ -190,8 +195,23 @@ class SnapshotTestingTests: TestCase {
 
   func testTableViewController() {
     #if os(iOS)
-    let tableViewController = UITableViewController()
+    class TableViewController: UITableViewController {
+      override func viewDidLoad() {
+        super.viewDidLoad()
+        self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
+      }
+      override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 10
+      }
+      override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+        cell.textLabel?.text = "\(indexPath.row)"
+        return cell
+      }
+    }
+    let tableViewController = TableViewController()
     assertSnapshot(matching: tableViewController, as: .image(on: .iPhoneSe))
+    assertSnapshot(matching: tableViewController, as: .recursiveDescription(on: .iPhoneSe))
     #endif
   }
 
@@ -436,7 +456,7 @@ class SnapshotTestingTests: TestCase {
 
   func testViewControllerHierarchy() {
     #if os(iOS)
-    let page = UIPageViewController.init(transitionStyle: .scroll, navigationOrientation: .horizontal)
+    let page = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal)
     page.setViewControllers([UIViewController()], direction: .forward, animated: false)
     let tab = UITabBarController()
     tab.viewControllers = [
