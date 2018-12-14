@@ -552,7 +552,7 @@ func renderer(bounds: CGRect, for traits: UITraitCollection) -> UIGraphicsImageR
   return renderer
 }
 
-func add(traits: UITraitCollection, viewController: UIViewController, to window: UIWindow) {
+private func add(traits: UITraitCollection, viewController: UIViewController, to window: UIWindow) {
   let rootViewController = UIViewController()
   rootViewController.view.backgroundColor = .clear
   rootViewController.view.frame = window.frame
@@ -570,7 +570,7 @@ func add(traits: UITraitCollection, viewController: UIViewController, to window:
   rootViewController.view.layoutIfNeeded()
 }
 
-final class Window: UIWindow {
+private final class Window: UIWindow {
   var config: ViewImageConfig
 
   init(config: ViewImageConfig, viewController: UIViewController) {
