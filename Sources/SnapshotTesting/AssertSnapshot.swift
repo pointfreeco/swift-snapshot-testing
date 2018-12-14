@@ -120,13 +120,21 @@ public func verifySnapshot<Value, Format>(
 
       guard !recording, fileManager.fileExists(atPath: snapshotFileUrl.path) else {
         try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)
-        return """
-        An existing reference was not found on disk. Automatically recorded snapshot: …
+        return recording
+          ? """
+            Record mode is on. Recorded snapshot: …
 
-        open "\(snapshotFileUrl.path)"
+            open "\(snapshotFileUrl.path)"
 
-        Re-run "\(testName)" to test against the newly-recorded snapshot.
-        """
+            Turn record mode off and re-run "\(testName)" to test against the newly-recorded snapshot.
+            """
+          : """
+            No reference was found on disk. Automatically recorded snapshot: …
+
+            open "\(snapshotFileUrl.path)"
+
+            Re-run "\(testName)" to test against the newly-recorded snapshot.
+            """
       }
 
       let data = try Data(contentsOf: snapshotFileUrl)
