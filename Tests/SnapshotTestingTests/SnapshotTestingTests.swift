@@ -39,6 +39,7 @@ class SnapshotTestingTests: TestCase {
   }
 
   func testAutolayout() {
+    #if os(iOS)
     let vc = UIViewController()
     vc.view.translatesAutoresizingMaskIntoConstraints = false
     let subview = UIView()
@@ -51,6 +52,7 @@ class SnapshotTestingTests: TestCase {
       subview.rightAnchor.constraint(equalTo: vc.view.rightAnchor),
       ])
     assertSnapshot(matching: vc, as: .image)
+    #endif
   }
 
   func testDeterministicDictionaryAndSetSnapshots() {
@@ -504,6 +506,7 @@ extension SnapshotTestingTests {
     return [
       ("testAny", testAny),
       ("testAnySnapshotStringConvertible", testAnySnapshotStringConvertible),
+      ("testAutolayout", testAutolayout),
       ("testDeterministicDictionaryAndSetSnapshots", testDeterministicDictionaryAndSetSnapshots),
       ("testEncodable", testEncodable),
       ("testMixedViews", testMixedViews),
