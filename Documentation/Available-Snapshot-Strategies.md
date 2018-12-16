@@ -33,6 +33,7 @@ If you'd like to submit your own custom strategy, see [Contributing](../CONTRIBU
       - [`.image`](#image-7)
       - [`.recursiveDescription`](#recursivedescription-2)
   - [`UIViewController`](#uiviewcontroller)
+      - [`.hierarchy`](#hierarchy)
       - [`.image`](#image-8)
       - [`.recursiveDescription`](#recursivedescription-3)
   - [`URLRequest`](#urlrequest)
@@ -466,10 +467,27 @@ A snapshot strategy for comparing views based on a recursive description of thei
 
 **Format:** `String`
 
+#### Parameters:
+
+  - `size: CGSize = nil`
+
+    A view size override.
+
+  - `traits: UITraitCollection = .init()`
+
+    A trait collection override.
+
 #### Example
 
 ``` swift
+// Layout on the current device.
 assertSnapshot(matching: view, as: .recursiveDescription)
+
+// Layout with a certain size.
+assertSnapshot(matching: view, as: .recursiveDescription(size: .init(width: 22, height: 22))
+
+// Layout with a certain trait collection.
+assertSnapshot(matching: view, as: .recursiveDescription(traits: .init(horizontalSizeClass: .regular))
 ```
 
 Records:
@@ -482,6 +500,35 @@ Records:
 ## UIViewController
 
 **Platforms:** iOS, tvOS
+
+### `.hierarchy`
+
+A snapshot strategy for comparing view controllers based on their embedded controller hierarchy.
+
+**Format:** `String`
+
+#### Example
+
+``` swift
+assertSnapshot(matching: vc, as: .hierarchy)
+```
+
+Records:
+
+```
+<UITabBarController>, state: appeared, view: <UILayoutContainerView>
+   | <UINavigationController>, state: appeared, view: <UILayoutContainerView>
+   |    | <UIPageViewController>, state: appeared, view: <_UIPageViewControllerContentView>
+   |    |    | <UIViewController>, state: appeared, view: <UIView>
+   | <UINavigationController>, state: disappeared, view: <UILayoutContainerView> not in the window
+   |    | <UIViewController>, state: disappeared, view: (view not loaded)
+   | <UINavigationController>, state: disappeared, view: <UILayoutContainerView> not in the window
+   |    | <UIViewController>, state: disappeared, view: (view not loaded)
+   | <UINavigationController>, state: disappeared, view: <UILayoutContainerView> not in the window
+   |    | <UIViewController>, state: disappeared, view: (view not loaded)
+   | <UINavigationController>, state: disappeared, view: <UILayoutContainerView> not in the window
+   |    | <UIViewController>, state: disappeared, view: (view not loaded)
+```
 
 ### `.image`
 
@@ -551,10 +598,28 @@ A snapshot strategy for comparing view controller views based on a recursive des
 
 **Format:** `String`
 
+#### Parameters:
+    
+  - `on: ViewImageConfig`
+
+    A set of device configuration settings.
+
+  - `size: CGSize = nil`
+
+    A view size override.
+    
+  - `traits: UITraitCollection = .init()`
+
+    A trait collection override.
+
 #### Example
 
 ``` swift
+// Layout on the current device.
 assertSnapshot(matching: vc, as: .recursiveDescription)
+
+// Layout as if on a certain device.
+assertSnapshot(matching: vc, as: .recursiveDescription(on: .iPhoneSe(.portrait))
 ```
 
 Records:

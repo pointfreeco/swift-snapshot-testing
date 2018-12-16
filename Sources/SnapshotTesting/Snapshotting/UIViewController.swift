@@ -61,18 +61,50 @@ extension Snapshotting where Value == UIViewController, Format == UIImage {
 }
 
 extension Snapshotting where Value == UIViewController, Format == String {
-  /// A snapshot strategy for comparing view controller views based on a recursive description of their properties and hierarchies.
-  public static var recursiveDescription: Snapshotting {
-    return Snapshotting<UIView, String>.recursiveDescription.pullback { $0.view }
-  }
-
   /// A snapshot strategy for comparing view controllers based on their embedded controller hierarchy.
   public static var hierarchy: Snapshotting {
-    return Snapshotting<String, String>.lines.pullback { vc in
-      purgePointers(
-        vc.perform(Selector(("_printHierarchy"))).retain().takeUnretainedValue() as! String
+    return Snapshotting<String, String>.lines.pullback { viewController in
+      prepareView(
+        config: .init(),
+        drawHierarchyInKeyWindow: false,
+        traits: .init(),
+        view: viewController.view,
+        viewController: viewController
+      )
+      return purgePointers(
+        viewController.perform(Selector(("_printHierarchy"))).retain().takeUnretainedValue() as! String
       )
     }
+  }
+
+  /// A snapshot strategy for comparing view controller views based on a recursive description of their properties and hierarchies.
+  public static let recursiveDescription = Snapshotting.recursiveDescription()
+
+  /// A snapshot strategy for comparing view controller views based on a recursive description of their properties and hierarchies.
+  ///
+  /// - Parameters:
+  ///   - config: A set of device configuration settings.
+  ///   - size: A view size override.
+  ///   - traits: A trait collection override.
+  public static func recursiveDescription(
+    on config: ViewImageConfig = .init(),
+    size: CGSize? = nil,
+    traits: UITraitCollection = .init()
+    )
+    -> Snapshotting<UIViewController, String> {
+      return SimplySnapshotting.lines.pullback { viewController in
+        prepareView(
+          config: .init(safeArea: config.safeArea, size: size ?? config.size, traits: config.traits),
+          drawHierarchyInKeyWindow: false,
+          traits: .init(),
+          view: viewController.view,
+          viewController: viewController
+        )
+        return purgePointers(
+          viewController.view.perform(Selector(("recursiveDescription"))).retain().takeUnretainedValue()
+            as! String
+        )
+      }
   }
 }
 #endif
