@@ -36,15 +36,27 @@ extension Snapshotting where Value == UIView, Format == UIImage {
 
 extension Snapshotting where Value == UIView, Format == String {
   /// A snapshot strategy for comparing views based on a recursive description of their properties and hierarchies.
-  public static var recursiveDescription: Snapshotting<UIView, String> {
-    return SimplySnapshotting.lines.pullback { view in
-      view.setNeedsLayout()
-      view.layoutIfNeeded()
-      return purgePointers(
-        view.perform(Selector(("recursiveDescription"))).retain().takeUnretainedValue()
-          as! String
-      )
-    }
+  public static let recursiveDescription = Snapshotting<UIView, String>.recursiveDescription()
+
+  /// A snapshot strategy for comparing views based on a recursive description of their properties and hierarchies.
+  public static func recursiveDescription(
+    size: CGSize? = nil,
+    traits: UITraitCollection = .init()
+    )
+    -> Snapshotting<UIView, String> {
+      return SimplySnapshotting.lines.pullback { view in
+        prepareView(
+          config: .init(safeArea: .zero, size: size ?? view.frame.size, traits: traits),
+          drawHierarchyInKeyWindow: false,
+          traits: .init(),
+          view: view,
+          viewController: .init()
+        )
+        return purgePointers(
+          view.perform(Selector(("recursiveDescription"))).retain().takeUnretainedValue()
+            as! String
+        )
+      }
   }
 }
 #endif
