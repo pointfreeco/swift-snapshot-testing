@@ -1,7 +1,7 @@
-   + <UITabBarController>, state: disappeared, view: <UILayoutContainerView> not in the window, presented with: (null)
-   | <UINavigationController>, state: disappeared, view: <UILayoutContainerView> not in the window
-   |    | <UIPageViewController>, state: disappeared, view: (view not loaded)
-   |    |    | <UIViewController>, state: disappeared, view: <UIView> not in the window
+<UITabBarController>, state: appeared, view: <UILayoutContainerView>
+   | <UINavigationController>, state: appeared, view: <UILayoutContainerView>
+   |    | <UIPageViewController>, state: appeared, view: <_UIPageViewControllerContentView>
+   |    |    | <UIViewController>, state: appeared, view: <UIView>
    | <UINavigationController>, state: disappeared, view: <UILayoutContainerView> not in the window
    |    | <UIViewController>, state: disappeared, view: (view not loaded)
    | <UINavigationController>, state: disappeared, view: <UILayoutContainerView> not in the window
