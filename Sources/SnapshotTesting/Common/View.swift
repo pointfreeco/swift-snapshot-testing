@@ -556,10 +556,21 @@ private func add(traits: UITraitCollection, viewController: UIViewController, to
   let rootViewController = UIViewController()
   rootViewController.view.backgroundColor = .clear
   rootViewController.view.frame = window.frame
+  rootViewController.view.translatesAutoresizingMaskIntoConstraints =
+    viewController.view.translatesAutoresizingMaskIntoConstraints
   rootViewController.preferredContentSize = rootViewController.view.frame.size
-  viewController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
   viewController.view.frame = rootViewController.view.frame
   rootViewController.view.addSubview(viewController.view)
+  if viewController.view.translatesAutoresizingMaskIntoConstraints {
+    viewController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+  } else {
+    NSLayoutConstraint.activate([
+      viewController.view.topAnchor.constraint(equalTo: rootViewController.view.topAnchor),
+      viewController.view.bottomAnchor.constraint(equalTo: rootViewController.view.bottomAnchor),
+      viewController.view.leadingAnchor.constraint(equalTo: rootViewController.view.leadingAnchor),
+      viewController.view.trailingAnchor.constraint(equalTo: rootViewController.view.trailingAnchor),
+      ])
+  }
   rootViewController.addChild(viewController)
   rootViewController.setOverrideTraitCollection(traits, forChild: viewController)
   viewController.didMove(toParent: rootViewController)
