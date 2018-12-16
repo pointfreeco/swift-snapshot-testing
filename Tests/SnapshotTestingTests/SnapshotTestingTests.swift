@@ -43,6 +43,23 @@ class SnapshotTestingTests: TestCase {
     assertSnapshot(matching: URL(string: "https://www.pointfree.co")!, as: .dump, named: "url")
   }
 
+  func testAutolayout() {
+    #if os(iOS)
+    let vc = UIViewController()
+    vc.view.translatesAutoresizingMaskIntoConstraints = false
+    let subview = UIView()
+    subview.translatesAutoresizingMaskIntoConstraints = false
+    vc.view.addSubview(subview)
+    NSLayoutConstraint.activate([
+      subview.topAnchor.constraint(equalTo: vc.view.topAnchor),
+      subview.bottomAnchor.constraint(equalTo: vc.view.bottomAnchor),
+      subview.leftAnchor.constraint(equalTo: vc.view.leftAnchor),
+      subview.rightAnchor.constraint(equalTo: vc.view.rightAnchor),
+      ])
+    assertSnapshot(matching: vc, as: .image)
+    #endif
+  }
+
   func testDeterministicDictionaryAndSetSnapshots() {
     struct Person: Hashable { let name: String }
     struct DictionarySetContainer { let dict: [String: Int], set: Set<Person> }
@@ -518,6 +535,7 @@ extension SnapshotTestingTests {
     return [
       ("testAny", testAny),
       ("testAnySnapshotStringConvertible", testAnySnapshotStringConvertible),
+      ("testAutolayout", testAutolayout),
       ("testDeterministicDictionaryAndSetSnapshots", testDeterministicDictionaryAndSetSnapshots),
       ("testEncodable", testEncodable),
       ("testMixedViews", testMixedViews),
