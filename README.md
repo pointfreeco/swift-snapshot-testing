@@ -48,7 +48,7 @@ assertSnapshot(matching: vc, as: .image)
 
 ## Snapshot Anything
 
-While most snapshot testing libraries in the Swift community are limited to `UIView`s and `UIImage`s, SnapshotTesting can work with _any_ value and _any_ format on _any_ Swift platform!
+While most snapshot testing libraries in the Swift community are limited to `UIImage`s of `UIView`s, SnapshotTesting can work with _any_ format of _any_ value on _any_ Swift platform!
 
 The `assertSnapshot` function accepts a value and any snapshot strategy that value supports. This means that a [view](Documentation/Available-Snapshot-Strategies.md#uiview) or [view controller](Documentation/Available-Snapshot-Strategies.md#uiviewcontroller) can be tested against an image representation _and_ against a textual representation of its properties and subview hierarchy.
 
