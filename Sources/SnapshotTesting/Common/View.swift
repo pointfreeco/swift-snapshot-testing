@@ -630,6 +630,7 @@ private final class ScaledWindow: NSWindow {
   }
 }
 #endif
+#endif
 
 extension Array {
   func sequence<A>() -> Async<[A]> where Element == Async<A> {
@@ -650,4 +651,3 @@ extension Array {
     }
   }
 }
-#endif

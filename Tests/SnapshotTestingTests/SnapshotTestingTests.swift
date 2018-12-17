@@ -70,6 +70,25 @@ class SnapshotTestingTests: TestCase {
     assertSnapshot(matching: set, as: .dump)
   }
 
+  func testCaseIterable() {
+    enum Direction: String, CaseIterable {
+      case up, down, left, right
+      var rotatedLeft: Direction {
+        switch self {
+        case .up:    return .left
+        case .down:  return .right
+        case .left:  return .down
+        case .right: return .up
+        }
+      }
+    }
+
+    assertSnapshot(
+      matching: { $0.rotatedLeft },
+      as: Snapshotting<Direction, String>.func(into: .description)
+    )
+  }
+
   func testEncodable() {
     struct User: Encodable { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")

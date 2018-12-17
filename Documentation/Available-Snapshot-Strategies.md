@@ -10,6 +10,7 @@ If you'd like to submit your own custom strategy, see [Contributing](../CONTRIBU
       - [`.dump`](#dump)
   - [`CALayer`](#calayer)
       - [`.image`](#image)
+  - [`CaseIterable`](#caseiterable)
   - [`Encodable`](#encodable)
       - [`.json`](#json)
       - [`.plist`](#plist)
@@ -92,6 +93,50 @@ assertSnapshot(matching: layer, as: .image)
 
 // Allow for a 1% pixel difference.
 assertSnapshot(matching: layer, as: .image(precision: 0.99)
+```
+
+## CaseIterable
+
+**Platforms:** All
+
+### `.func(into:)`
+
+A snapshot strategy for functions on `CaseIterable` types. It feeds every possible input into the function and puts the inputs and outputs into a CSV table.
+
+**Format**: Comma-separated values (CSV)
+
+#### Parameters:
+
+A snapshotting strategy on the output of the function you are snapshotting.
+
+#### Example:
+
+```swift
+enum Direction: String, CaseIterable {
+  case up, down, left, right
+  var rotatedLeft: Direction {
+    switch self {
+    case .up:    return .left
+    case .down:  return .right
+    case .left:  return .down
+    case .right: return .up
+    }
+  }
+}
+
+assertSnapshot(
+  matching: { $0.rotatedLeft },
+  as: Snapshotting<Direction, String>.func(into: .description)
+)
+```
+
+Records:
+
+```csv
+"up","left"
+"down","right"
+"left","down"
+"right","up" 
 ```
 
 ## Encodable
