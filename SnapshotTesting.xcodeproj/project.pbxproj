@@ -14,6 +14,7 @@
 		BF_1092D6738E4E10DA749423711942C04C /* Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_8EB55DE46F77C40F38DC441C396C2AA2 /* Async.swift */; };
 		BF_126B68C59C12F7E7D78393BF1E0341B7 /* SnapshotTesting.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FR_55C12DE66D3E4C2C5F02C60546270EBB /* SnapshotTesting.framework */; };
 		BF_13ABDFCF104CFDC9B6D7EB1D51154CBB /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_5FB34DB4E0B5FE49F13CC42C44133736 /* Data.swift */; };
+		BF_1B273CA859788C23D383FB93A26EE1E7 /* NSAttributedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_4432276E4A122677D3E5D234AAD6E593 /* NSAttributedString.swift */; };
 		BF_1B6045ADCE87DEF3D4001A8799A9B5D2 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_7BB70E2CD7F54FE131DF32A77CB1F21A /* String.swift */; };
 		BF_1BF868397B24F68E388CCD9DF81E6765 /* SnapshotTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_C8995DA5A1D0CF67499F936B6684ABA6 /* SnapshotTestCase.swift */; };
 		BF_263252156D9427A414995A105CA3D1A5 /* SpriteKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_63AC337D2235727921E421B9C056817A /* SpriteKit.swift */; };
@@ -49,6 +50,7 @@
 		BF_7AC8E48EFC29E295E5E724369539B30C /* Diffing.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_AADA18683509076485FAB9034E4D0796 /* Diffing.swift */; };
 		BF_7B976D4ACA01B1DBE01C45E1B579D948 /* SpriteKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_63AC337D2235727921E421B9C056817A /* SpriteKit.swift */; };
 		BF_7CDD84EF48592B6EAC71FC742DF61616 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_5FB34DB4E0B5FE49F13CC42C44133736 /* Data.swift */; };
+		BF_7D2941580E2F79E410EABFC8CD5BD136 /* NSAttributedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_4432276E4A122677D3E5D234AAD6E593 /* NSAttributedString.swift */; };
 		BF_7F07D382F9EF72AA58FF59AFF775ECC3 /* NSViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_D16875899FD4B9C3954B3FD07C383CAE /* NSViewController.swift */; };
 		BF_7F8FCEA9AA6339EA3ED1A994CE05F0F9 /* Snapshotting.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_4B671595EC397E2142ED555D6EA3B5C5 /* Snapshotting.swift */; };
 		BF_803219DA32D805A2734E66442011B2B3 /* Any.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_61CC375A290FFCFD5537E3FC50C195C4 /* Any.swift */; };
@@ -66,6 +68,7 @@
 		BF_A0C4D5953F26C13D113B550DBE99C8D2 /* Diffing.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_AADA18683509076485FAB9034E4D0796 /* Diffing.swift */; };
 		BF_A9C5B5783E101E35CF7D52DEE6EABE2A /* SnapshotTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_C8995DA5A1D0CF67499F936B6684ABA6 /* SnapshotTestCase.swift */; };
 		BF_A9D28DCE49BFF316C266857758916AF2 /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_9FB445A07DD2AEA8730CB0DE72C8C326 /* View.swift */; };
+		BF_AB199637DE47D7C7B7A12ECCBA2A7C35 /* NSAttributedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_4432276E4A122677D3E5D234AAD6E593 /* NSAttributedString.swift */; };
 		BF_AC8F7FF472727045C5F60D12EBD1113A /* NSImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_005396B25C1F9DA46556618A49C9C47B /* NSImage.swift */; };
 		BF_ACD752E9B5D43698661C2566F6E1A967 /* Diff.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_FE1535B3F5372A6ADD6A0D18184766D4 /* Diff.swift */; };
 		BF_AF25210575C9C2FDDB9589CC5E610042 /* URLRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_74CCF22394671D5DFBA0B8557B453EBF /* URLRequest.swift */; };
@@ -169,6 +172,7 @@
 		FR_3F509EEC1F54697A6B09689D5A77039A /* Internal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Internal.swift; sourceTree = "<group>"; };
 		FR_3F75F013FD55B116C9AECB84C5DA414D /* SnapshotTestingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SnapshotTestingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FR_3FE46CE4B7BAED1BC44269D2778F0F6F /* SceneKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneKit.swift; sourceTree = "<group>"; };
+		FR_4432276E4A122677D3E5D234AAD6E593 /* NSAttributedString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSAttributedString.swift; sourceTree = "<group>"; };
 		FR_4B671595EC397E2142ED555D6EA3B5C5 /* Snapshotting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Snapshotting.swift; sourceTree = "<group>"; };
 		FR_55C12DE66D3E4C2C5F02C60546270EBB /* SnapshotTesting.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SnapshotTesting.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FR_57BBB31DA8305F9680053B72B569D190 /* UIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIView.swift; sourceTree = "<group>"; };
@@ -313,6 +317,7 @@
 				FR_E49F728124ECC51B87A0E3D3B4A1690C /* Codable.swift */,
 				FR_5FB34DB4E0B5FE49F13CC42C44133736 /* Data.swift */,
 				FR_5ABFA0C568E5F812C96A9872ED576BDA /* Description.swift */,
+				FR_4432276E4A122677D3E5D234AAD6E593 /* NSAttributedString.swift */,
 				FR_005396B25C1F9DA46556618A49C9C47B /* NSImage.swift */,
 				FR_979E0633037F6D9DA50CFA64C45A7A39 /* NSView.swift */,
 				FR_D16875899FD4B9C3954B3FD07C383CAE /* NSViewController.swift */,
@@ -474,6 +479,7 @@
 				BF_ACD752E9B5D43698661C2566F6E1A967 /* Diff.swift in Sources */,
 				BF_A0C4D5953F26C13D113B550DBE99C8D2 /* Diffing.swift in Sources */,
 				BF_CF306FE37026CA4A6FCD27C04615D14C /* Internal.swift in Sources */,
+				BF_AB199637DE47D7C7B7A12ECCBA2A7C35 /* NSAttributedString.swift in Sources */,
 				BF_AC8F7FF472727045C5F60D12EBD1113A /* NSImage.swift in Sources */,
 				BF_52A1694C77D89DF1C1DE1A47BCC8E4C1 /* NSView.swift in Sources */,
 				BF_7F07D382F9EF72AA58FF59AFF775ECC3 /* NSViewController.swift in Sources */,
@@ -507,6 +513,7 @@
 				BF_9A01810940759397231DF86801A1FC13 /* Diff.swift in Sources */,
 				BF_7AC8E48EFC29E295E5E724369539B30C /* Diffing.swift in Sources */,
 				BF_B01317AFFBE71ED77072466503481AE8 /* Internal.swift in Sources */,
+				BF_7D2941580E2F79E410EABFC8CD5BD136 /* NSAttributedString.swift in Sources */,
 				BF_EC957B17A8CABDD606D94AF6C1445DEB /* NSImage.swift in Sources */,
 				BF_4672E2C11AB91CA51E3BE7133E6DD19B /* NSView.swift in Sources */,
 				BF_31066DF0CDCF6D506B168D41FFC3E5AE /* NSViewController.swift in Sources */,
@@ -540,6 +547,7 @@
 				BF_2A6009E29732718FAE9B1F03806A09AB /* Diff.swift in Sources */,
 				BF_84FA52AF52EBE0F3EB846D561476573A /* Diffing.swift in Sources */,
 				BF_B2BCF9D3B47FD08FB7AEAEE77EC6AE2E /* Internal.swift in Sources */,
+				BF_1B273CA859788C23D383FB93A26EE1E7 /* NSAttributedString.swift in Sources */,
 				BF_956C2D642E82ADA320F7B7B0534D1401 /* NSImage.swift in Sources */,
 				BF_4259E9DD026D13D82770DFCE8ECA35FA /* NSView.swift in Sources */,
 				BF_6A6F48AE6A2F90DB452DF1C05F9D203D /* NSViewController.swift in Sources */,

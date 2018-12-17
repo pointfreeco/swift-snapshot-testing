@@ -4,9 +4,7 @@ import XCTest
 
 extension Snapshotting where Value == UIImage, Format == UIImage {
   /// A snapshot strategy for comparing images based on pixel equality.
-  public static var image: Snapshotting {
-    return .image(precision: 1)
-  }
+  public static let image = Snapshotting.image(precision: 1)
 
   /// A snapshot strategy for comparing images based on pixel equality.
   ///

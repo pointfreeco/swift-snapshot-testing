@@ -84,8 +84,8 @@ class SnapshotTestingTests: TestCase {
     }
 
     assertSnapshot(
-      matching: { $0.rotatedLeft },
-      as: Snapshotting<Direction, String>.func(into: .description)
+      matching: { $0.rotatedLeft } as (Direction) -> Direction,
+      as: Snapshotting.func(into: .description)
     )
   }
 
@@ -132,6 +132,24 @@ class SnapshotTestingTests: TestCase {
     struct User { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
     assertSnapshot(matching: user, as: .dump, named: "named")
+  }
+
+  func testNSAttributedString() {
+    #if canImport(Cocoa) || canImport(UIKit)
+    let html = Data("""
+Hello, <strong style="color: red">Point-Free</strong>! Goodbye,
+<em style="color: blue">traditional testing</em>!
+""".utf8)
+    #if canImport(Cocoa)
+    let attributedString = NSAttributedString(html: html, options: [:], documentAttributes: nil)!
+    #elseif canImport(UIKit)
+    let attributedString = try! NSAttributedString(
+      data: html, options: [.documentType: NSAttributedString.DocumentType.html], documentAttributes: nil
+    )
+    #endif
+
+    assertSnapshot(matching: attributedString, as: .image(maxWidth: 100), named: platform)
+    #endif  
   }
 
   func testNSView() {
@@ -560,6 +578,7 @@ extension SnapshotTestingTests {
       ("testMixedViews", testMixedViews),
       ("testMultipleSnapshots", testMultipleSnapshots),
       ("testNamedAssertion", testNamedAssertion),
+      ("testNSAttributedString", testNSAttributedString),
       ("testPrecision", testPrecision),
       ("testSCNView", testSCNView),
       ("testSKView", testSKView),

@@ -3,9 +3,7 @@ import UIKit
 
 extension Snapshotting where Value == UIView, Format == UIImage {
   /// A snapshot strategy for comparing views based on pixel equality.
-  public static var image: Snapshotting {
-    return .image()
-  }
+  public static let image = Snapshotting.image()
 
   /// A snapshot strategy for comparing views based on pixel equality.
   ///
@@ -36,7 +34,7 @@ extension Snapshotting where Value == UIView, Format == UIImage {
 
 extension Snapshotting where Value == UIView, Format == String {
   /// A snapshot strategy for comparing views based on a recursive description of their properties and hierarchies.
-  public static let recursiveDescription = Snapshotting<UIView, String>.recursiveDescription()
+  public static let recursiveDescription = Snapshotting.recursiveDescription()
 
   /// A snapshot strategy for comparing views based on a recursive description of their properties and hierarchies.
   public static func recursiveDescription(
