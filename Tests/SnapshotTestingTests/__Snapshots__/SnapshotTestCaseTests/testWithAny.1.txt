@@ -1,4 +1,0 @@
-▿ User
-  - id: 1
-  - name: "Blobby"
-  - bio: "Blobbed around the world."

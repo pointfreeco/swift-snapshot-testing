@@ -1,4 +1,4 @@
-FROM norionomura/swift:421
+FROM swift:4.2
 
 WORKDIR /package
 
