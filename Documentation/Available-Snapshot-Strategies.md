@@ -9,7 +9,7 @@ If you'd like to submit your own custom strategy, see [Contributing](../CONTRIBU
   - [`Any`](#any)
       - [`.dump`](#dump)
   - [`CALayer`](#calayer)
-     - [`.image`](#image)
+      - [`.image`](#image)
   - [`CaseIterable`](#caseiterable)
   - [`Encodable`](#encodable)
       - [`.json`](#json)
