@@ -23,8 +23,8 @@ extension Snapshotting where Value == NSAttributedString, Format == UIImage {
     return Snapshotting<UIView, UIImage>.image(precision: precision).pullback { attributedString in
       let label = UILabel()
       label.attributedText = attributedString
-      label.numberOfLines = 0
       label.backgroundColor = .white
+      label.numberOfLines = 0
       label.frame.size = label.systemLayoutSizeFitting(
         CGSize(width: maxWidth, height: 0),
         withHorizontalFittingPriority: .defaultHigh,
