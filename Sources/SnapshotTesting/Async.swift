@@ -28,8 +28,11 @@ public struct Async<Value> {
     self.init { callback in callback(value) }
   }
 
-  public func map<B>(_ f: @escaping (A) -> B) -> Async<B> {
-    return Async<B> { callback in
+  /// Transforms an Async<Value> into an Async<NewValue> with a function `(Value) -> NewValue`.
+  ///
+  /// - Parameter f: A transformation to apply to the value wrapped by the async value.
+  public func map<NewValue>(_ f: @escaping (Value) -> NewValue) -> Async<NewValue> {
+    return .init { callback in
       self.run { a in callback(f(a)) }
     }
   }
