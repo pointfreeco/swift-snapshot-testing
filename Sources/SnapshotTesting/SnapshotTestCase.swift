@@ -76,10 +76,15 @@ open class SnapshotTestCase: XCTestCase {
       }
 
       guard !recording, fileManager.fileExists(atPath: snapshotFileUrl.path) else {
-        try snapshotting.diffing.toData(diffing).write(to: snapshotFileUrl)
+        let diffMessage = (try? Data(contentsOf: snapshotFileUrl))
+          .flatMap { data in snapshotting.diffing.diff(snapshotting.diffing.fromData(data), diffable) }
+          .map { diff, _ in diff.trimmingCharacters(in: .whitespacesAndNewlines) }
+          ?? "Recorded snapshot: …"
+
+        try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)
         let message = recording
           ? """
-            Record mode is on. Recorded snapshot: …
+            Record mode is on. \(diffMessage)
 
             open "\(snapshotFileUrl.path)"
 
