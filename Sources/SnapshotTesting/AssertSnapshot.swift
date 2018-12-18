@@ -122,7 +122,7 @@ public func verifySnapshot<Value, Format>(
         let diffMessage = (try? Data(contentsOf: snapshotFileUrl))
           .flatMap { data in snapshotting.diffing.diff(snapshotting.diffing.fromData(data), diffable) }
           .map { diff, _ in diff.trimmingCharacters(in: .whitespacesAndNewlines) }
-          ?? "Recorded: …"
+          ?? "Recorded snapshot: …"
 
         try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)
         return recording
