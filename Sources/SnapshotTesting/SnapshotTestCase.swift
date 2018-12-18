@@ -70,16 +70,21 @@ open class SnapshotTestCase: XCTestCase {
       self.wait(for: [tookSnapshot], timeout: timeout)
       #endif
 
-      guard let diffing = optionalDiffable else {
+      guard let diffable = optionalDiffable else {
         XCTFail("Couldn't snapshot value", file: file, line: line)
         return
       }
 
       guard !recording, fileManager.fileExists(atPath: snapshotFileUrl.path) else {
-        try snapshotting.diffing.toData(diffing).write(to: snapshotFileUrl)
+        let diffMessage = (try? Data(contentsOf: snapshotFileUrl))
+          .flatMap { data in snapshotting.diffing.diff(snapshotting.diffing.fromData(data), diffable) }
+          .map { diff, _ in diff.trimmingCharacters(in: .whitespacesAndNewlines) }
+          ?? "Recorded snapshot: …"
+
+        try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)
         let message = recording
           ? """
-            Record mode is on. Recorded snapshot: …
+            Record mode is on. \(diffMessage)
 
             open "\(snapshotFileUrl.path)"
 
@@ -100,7 +105,7 @@ open class SnapshotTestCase: XCTestCase {
       let data = try Data(contentsOf: snapshotFileUrl)
       let reference = snapshotting.diffing.fromData(data)
 
-      guard let (failure, attachments) = snapshotting.diffing.diff(reference, diffing) else {
+      guard let (failure, attachments) = snapshotting.diffing.diff(reference, diffable) else {
         return
       }
 
@@ -110,7 +115,7 @@ open class SnapshotTestCase: XCTestCase {
       let artifactsSubUrl = artifactsUrl.appendingPathComponent(fileName)
       try fileManager.createDirectory(at: artifactsSubUrl, withIntermediateDirectories: true)
       let failedSnapshotFileUrl = artifactsSubUrl.appendingPathComponent(snapshotFileUrl.lastPathComponent)
-      try snapshotting.diffing.toData(diffing).write(to: failedSnapshotFileUrl)
+      try snapshotting.diffing.toData(diffable).write(to: failedSnapshotFileUrl)
 
       if !attachments.isEmpty {
         #if !os(Linux)
