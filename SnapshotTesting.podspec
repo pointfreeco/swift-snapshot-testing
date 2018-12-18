@@ -21,7 +21,7 @@ Pod::Spec.new do |s|
 
   s.source = {
     :git => "https://github.com/pointfreeco/swift-snapshot-testing.git",
-    :tag => "1.0.0"
+    :tag => s.version
   }
 
   s.swift_version = "4.2"
