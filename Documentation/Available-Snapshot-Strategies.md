@@ -7,6 +7,7 @@ If you'd like to submit your own custom strategy, see [Contributing](../CONTRIBU
 ## List of Available Snapshot Strategies
 
   - [`Any`](#any)
+      - [`.description`](#description)
       - [`.dump`](#dump)
   - [`CALayer`](#calayer)
       - [`.image`](#image)
@@ -44,6 +45,26 @@ If you'd like to submit your own custom strategy, see [Contributing](../CONTRIBU
 
 **Platforms:** All
 
+### `.description`
+
+A snapshot strategy that captures a value's textual description from `String`'s `init(description:)` initializer.
+
+**Format:** `String`
+
+#### Example:
+
+``` swift
+assertSnapshot(matching: user, as: .description)
+```
+
+Records:
+
+```
+User(bio: "Blobbed around the world.", id: 1, name: "Blobby")
+```
+
+**See also**: [`.dump`](#dump).
+
 ### `.dump`
 
 A snapshot strategy for comparing _any_ structure based on a sanitized text dump.
@@ -68,6 +89,8 @@ Records:
   - id: 1
   - name: "Blobby"
 ```
+
+**See also**: [`.description`](#description).
 
 ## CALayer
 
