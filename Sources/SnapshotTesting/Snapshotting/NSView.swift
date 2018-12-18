@@ -32,7 +32,11 @@ extension Snapshotting where Value == NSView, Format == NSImage {
       return view.snapshot ?? Async { callback in
         addImagesForRenderedViews(window.contentView!).sequence().run { views in
           let image = NSImage(data: window.contentView!.dataWithPDF(inside: window.contentView!.bounds))!
-          image.size = .init(width: image.size.width, height: image.size.height)
+          NSScreen.main?.backingScaleFactor
+          image.size = .init(
+            width: (image.size.width * 2) / (NSScreen.main?.backingScaleFactor ?? 1),
+            height: (image.size.height * 2) / (NSScreen.main?.backingScaleFactor ?? 1)
+          )
           callback(image)
           views.forEach { $0.removeFromSuperview() }
           view.frame.size = initialSize
