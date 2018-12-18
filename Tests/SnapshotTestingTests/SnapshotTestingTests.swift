@@ -159,11 +159,27 @@ Hello, <strong style="color: red">Point-Free</strong>! Goodbye,
     button.title = "Push Me"
     button.sizeToFit()
     if #available(macOS 10.14, *) {
+//      record = true
+      assertSnapshot(matching: button, as: .recursiveDescription, named: "abc")
       assertSnapshot(matching: button, as: .image)
-      assertSnapshot(matching: button, as: .recursiveDescription)
+      assertSnapshot(matching: button, as: .recursiveDescription, named: "abc")
     }
     #endif
   }
+//
+//  func testNSView_OppositeOrder() {
+//    #if os(macOS)
+//    let button = NSButton()
+//    button.bezelStyle = .rounded
+//    button.title = "Push Me"
+//    button.sizeToFit()
+//    if #available(macOS 10.14, *) {
+//      record = true
+//      assertSnapshot(matching: button, as: .image)
+//      assertSnapshot(matching: button, as: .recursiveDescription)
+//    }
+//    #endif
+//  }
 
   func testPrecision() {
     #if os(iOS) || os(macOS) || os(tvOS)

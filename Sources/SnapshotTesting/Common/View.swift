@@ -390,27 +390,27 @@ func addImagesForRenderedViews(_ view: View) -> [Async<View>] {
 
 extension View {
   var snapshot: Async<Image>? {
-    func inWindow<T>(_ perform: () -> T) -> T {
-      #if os(macOS)
-      let superview = self.superview
-      defer { superview?.addSubview(self) }
-      let window = ScaledWindow()
-      window.contentView = NSView()
-      window.contentView?.addSubview(self)
-      window.makeKey()
-      #endif
-      return perform()
-    }
+//    func inWindow<T>(_ perform: () -> T) -> T {
+//      #if os(macOS)
+//      let superview = self.superview
+//      defer { superview?.addSubview(self) }
+//      let window = ScaledWindow()
+//      window.contentView = NSView()
+//      window.contentView?.addSubview(self)
+//      window.makeKey()
+//      #endif
+//      return perform()
+//    }
     #if os(iOS) || os(tvOS)
     if let glkView = self as? GLKView {
-      return Async(value: inWindow { glkView.snapshot })
+      return Async(value: glkView.snapshot)
     }
     #endif
     if let scnView = self as? SCNView {
-      return Async(value: inWindow { scnView.snapshot() })
+      return Async(value: scnView.snapshot())
     } else if let skView = self as? SKView {
       if #available(macOS 10.11, *) {
-        let cgImage = inWindow { skView.texture(from: skView.scene!)!.cgImage() }
+        let cgImage = skView.texture(from: skView.scene!)!.cgImage()
         #if os(macOS)
         let image = Image(cgImage: cgImage, size: skView.bounds.size)
         #elseif os(iOS) || os(tvOS)
@@ -427,11 +427,9 @@ extension View {
         let delegate = NavigationDelegate()
         let work = {
           if #available(iOS 11.0, macOS 10.13, *) {
-            inWindow {
-              wkWebView.takeSnapshot(with: nil) { image, _ in
-                _ = delegate
-                callback(image!)
-              }
+            wkWebView.takeSnapshot(with: nil) { image, _ in
+              _ = delegate
+              callback(image!)
             }
           } else {
             #if os(iOS)
@@ -624,7 +622,7 @@ private final class Window: UIWindow {
 #if os(macOS)
 import Cocoa
 
-private final class ScaledWindow: NSWindow {
+final class ScaledWindow: NSWindow {
   override var backingScaleFactor: CGFloat {
     return 2
   }
