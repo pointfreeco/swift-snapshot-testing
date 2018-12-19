@@ -45,6 +45,45 @@ public func assertSnapshot<Value, Format>(
   XCTFail(message, file: file, line: line)
 }
 
+/// Asserts that a given value matches a reference on disk.
+///
+/// - Parameters:
+///   - value: A value to compare against a reference.
+///   - snapshotting: A strategy for serializing, deserializing, and comparing values.
+///   - bundle: Bundle containing the resource.
+///   - name: An optional description of the snapshot.
+///   - recording: Whether or not to record a new reference.
+///   - timeout: The amount of time a snapshot must be generated in.
+///   - file: The file in which failure occurred. Defaults to the file name of the test case in which this function was called.
+///   - testName: The name of the test in which failure occurred. Defaults to the function name of the test case in which this function was called.
+///   - line: The line number on which failure occurred. Defaults to the line number on which this function was called.
+public func assertSnapshotFromResources<Value, Format>(
+  matching value: @autoclosure () throws -> Value,
+  as snapshotting: Snapshotting<Value, Format>,
+  bundle: Bundle,
+  named name: String? = nil,
+  record: Bool = false,
+  timeout: TimeInterval = 5,
+  file: StaticString = #file,
+  testName: String = #function,
+  line: UInt = #line
+  ) {
+  
+  let failure = verifySnapshotFromResources(
+    matching: value,
+    as: snapshotting,
+    bundle: bundle,
+    named: name,
+    record: record,
+    timeout: timeout,
+    file: file,
+    testName: testName,
+    line: line
+  )
+  guard let message = failure else { return }
+  XCTFail(message, file: file, line: line)
+}
+
 /// Verifies that a given value matches a reference on disk.
 ///
 /// - Parameters:
@@ -84,7 +123,7 @@ public func verifySnapshot<Value, Format>(
         identifier = sanitizePathComponent(name)
       } else {
         let counter = counterQueue.sync { () -> Int in
-          let key = snapshotDirectoryUrl.appendingPathComponent(testName)
+          let key = snapshotDirectoryUrl.appendingPathComponent(testName).absoluteString
           counterMap[key, default: 0] += 1
           return counterMap[key]!
         }
@@ -182,8 +221,136 @@ public func verifySnapshot<Value, Format>(
     }
 }
 
+/// Verifies that a given value matches a reference on disk.
+///
+/// - Parameters:
+///   - value: A value to compare against a reference.
+///   - snapshotting: A strategy for serializing, deserializing, and comparing values.
+///   - bundle: Bundle containing the resource
+///   - name: An optional description of the snapshot.
+///   - recording: Whether or not to record a new reference.
+///   - timeout: The amount of time a snapshot must be generated in.
+///   - file: The file in which failure occurred. Defaults to the file name of the test case in which this function was called.
+///   - testName: The name of the test in which failure occurred. Defaults to the function name of the test case in which this function was called.
+///   - line: The line number on which failure occurred. Defaults to the line number on which this function was called.
+/// - Returns: A failure message or, if the value matches, nil.
+public func verifySnapshotFromResources<Value, Format>(
+  matching value: @autoclosure () throws -> Value,
+  as snapshotting: Snapshotting<Value, Format>,
+  bundle: Bundle,
+  named name: String? = nil,
+  record recording: Bool,
+  timeout: TimeInterval = 5,
+  file: StaticString = #file,
+  testName: String = #function,
+  line: UInt = #line
+  )
+  -> String? {
+
+    do {
+      let fileUrl = URL(fileURLWithPath: "\(file)")
+      let fileName = fileUrl.deletingPathExtension().lastPathComponent
+
+      let identifier: String
+      if let name = name {
+        identifier = sanitizePathComponent(name)
+      } else {
+        let counter = counterQueue.sync { () -> Int in
+          let key = "\(fileName)/\(testName)"
+          counterMap[key, default: 0] += 1
+          return counterMap[key]!
+        }
+        identifier = String(counter)
+      }
+
+      let testName = sanitizePathComponent(testName)
+
+      let tookSnapshot = XCTestExpectation(description: "Took snapshot")
+      var optionalDiffable: Format?
+      snapshotting.snapshot(try value()).run { b in
+        optionalDiffable = b
+        tookSnapshot.fulfill()
+      }
+      let result = XCTWaiter.wait(for: [tookSnapshot], timeout: timeout)
+      switch result {
+      case .completed:
+        break
+      case .timedOut:
+        return "Exceeded timeout of \(timeout) seconds waiting for snapshot"
+      case .incorrectOrder, .invertedFulfillment, .interrupted:
+        return "Couldn't snapshot value"
+      }
+
+      guard let diffable = optionalDiffable else {
+        return "Couldn't snapshot value"
+      }
+
+      let resourceName = "\(fileName).\(testName).\(identifier)"
+      let directoryUrl = fileUrl.deletingLastPathComponent()
+      let writableSnapshotDirectoryUrl: URL = directoryUrl
+        .appendingPathComponent("__Snapshots__")
+
+      let writableSnapshotFileUrl = writableSnapshotDirectoryUrl
+        .appendingPathComponent(resourceName)
+        .appendingPathExtension(snapshotting.pathExtension ?? "")
+
+      let fileManager = FileManager.default
+
+      guard !recording else {
+        let snapshotFileDidExist = fileManager.fileExists(atPath: writableSnapshotFileUrl.path)
+
+        try fileManager.createDirectory(at: writableSnapshotDirectoryUrl, withIntermediateDirectories: true)
+        try snapshotting.diffing.toData(diffable).write(to: writableSnapshotFileUrl)
+
+        return snapshotFileDidExist
+          ? "Updated resource \(resourceName).\(snapshotting.pathExtension ?? "")"
+          : "New resource created \(resourceName).\(snapshotting.pathExtension ?? "")"
+      }
+
+      guard let resourcePathUrl = bundle.url(forResource: resourceName, withExtension: snapshotting.pathExtension) else {
+        return "Could not find resource \(resourceName).\(snapshotting.pathExtension ?? "")"
+      }
+
+      let data = try Data(contentsOf: resourcePathUrl)
+      let reference = snapshotting.diffing.fromData(data)
+
+      guard let (failure, attachments) = snapshotting.diffing.diff(reference, diffable) else {
+        return nil
+      }
+
+      let artifactsUrl = URL(
+        fileURLWithPath: ProcessInfo.processInfo.environment["SNAPSHOT_ARTIFACTS"] ?? NSTemporaryDirectory()
+      )
+      let artifactsSubUrl = artifactsUrl.appendingPathComponent(fileName)
+      try fileManager.createDirectory(at: artifactsSubUrl, withIntermediateDirectories: true)
+      let failedSnapshotFileUrl = artifactsSubUrl.appendingPathComponent(resourcePathUrl.lastPathComponent)
+      try snapshotting.diffing.toData(diffable).write(to: failedSnapshotFileUrl)
+
+      if !attachments.isEmpty {
+        #if !os(Linux)
+        XCTContext.runActivity(named: "Attached Failure Diff") { activity in
+          attachments.forEach {
+            activity.add($0.rawValue)
+          }
+        }
+        #endif
+      }
+
+      let diffMessage = diffTool
+        .map { "\($0) \"\(failedSnapshotFileUrl.path)\"" }
+        ?? "@\(minus)\n\(writableSnapshotFileUrl.path)\n@\(plus)\n\"\(failedSnapshotFileUrl.path)\""
+      return """
+      \(failure.trimmingCharacters(in: .whitespacesAndNewlines))
+      
+      \(diffMessage)
+      """
+    } catch {
+      return error.localizedDescription
+    }
+}
+
 private let counterQueue = DispatchQueue(label: "co.pointfree.SnapshotTesting.counter")
-private var counterMap: [URL: Int] = [:]
+private var counterMap: [String: Int] = [:]
 #endif
 
 func sanitizePathComponent(_ string: String) -> String {
