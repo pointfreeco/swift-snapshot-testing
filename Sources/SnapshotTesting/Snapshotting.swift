@@ -46,20 +46,20 @@ public struct Snapshotting<Value, Format> {
     }
   }
 
-  /// Transforms a strategy on `Value`s into a strategy on `A`s through a function `(A) -> Async<Value>`.
+  /// Transforms a strategy on `Value`s into a strategy on `Root`s through a function `(Root) -> Async<Value>`.
   ///
   /// - Parameters:
-  ///   - transform: A transform function from `A` into `Async<Value>`.
+  ///   - transform: A transform function from `Root` into `Async<Value>`.
   ///   - otherValue: A value to be transformed.
-  public func asyncPullback<A>(_ transform: @escaping (_ otherValue: A) -> Async<Value>) -> Snapshotting<A, Format> {
-    return Snapshotting<A, Format>(
+  public func asyncPullback<Root>(_ transform: @escaping (_ otherValue: Root) -> Async<Value>) -> Snapshotting<Root, Format> {
+    return Snapshotting<Root, Format>(
       pathExtension: self.pathExtension,
       diffing: self.diffing
-    ) { a0 in
+    ) { root in
       return .init { callback in
-        transform(a0).run { a in
-          self.snapshot(a).run { b in
-            callback(b)
+        transform(root).run { value in
+          self.snapshot(value).run { snapshot in
+            callback(snapshot)
           }
         }
       }
@@ -71,13 +71,13 @@ public struct Snapshotting<Value, Format> {
   /// - Parameters:
   ///   - transform: A transform function from `A` into `Value`.
   ///   - otherValue: A value to be transformed.
-  public func pullback<A>(_ transform: @escaping (_ otherValue: A) -> Value) -> Snapshotting<A, Format> {
-    return self.asyncPullback { Async(value: transform($0)) }
+  public func pullback<Root>(_ transform: @escaping (_ otherValue: Root) -> Value) -> Snapshotting<Root, Format> {
+    return self.asyncPullback { root in Async(value: transform(root)) }
   }
 }
 
 /// A snapshot strategy where the type being snapshot is also a diffable type.
-public typealias SimplySnapshotting<A> = Snapshotting<A, A>
+public typealias SimplySnapshotting<Format> = Snapshotting<Format, Format>
 
 extension Snapshotting where Value == Format {
   public init(pathExtension: String?, diffing: Diffing<Format>) {
