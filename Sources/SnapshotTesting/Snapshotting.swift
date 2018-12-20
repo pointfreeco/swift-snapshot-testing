@@ -74,7 +74,7 @@ public struct Snapshotting<Value, Format> {
   ///   - transform: A transform function from `NewValue` into `Value`.
   ///   - otherValue: A value to be transformed.
   public func pullback<NewValue>(_ transform: @escaping (_ otherValue: NewValue) -> Value) -> Snapshotting<NewValue, Format> {
-    return self.asyncPullback { root in Async(value: transform(root)) }
+    return self.asyncPullback { newValue in Async(value: transform(newValue)) }
   }
 }
 
