@@ -127,11 +127,11 @@ public func verifySnapshot<Value, Format>(
         try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)
         return recording
           ? """
-            Record mode is on. \(diffMessage)
+            Record mode is on. Turn record mode off and re-run "\(testName)" to test against the newly-recorded snapshot.
 
             open "\(snapshotFileUrl.path)"
 
-            Turn record mode off and re-run "\(testName)" to test against the newly-recorded snapshot.
+            \(diffMessage)
             """
           : """
             No reference was found on disk. Automatically recorded snapshot: …
@@ -173,9 +173,11 @@ public func verifySnapshot<Value, Format>(
         .map { "\($0) \"\(snapshotFileUrl.path)\" \"\(failedSnapshotFileUrl.path)\"" }
         ?? "@\(minus)\n\"\(snapshotFileUrl.path)\"\n@\(plus)\n\"\(failedSnapshotFileUrl.path)\""
       return """
-      \(failure.trimmingCharacters(in: .whitespacesAndNewlines))
+      Snapshot does not match reference.
 
       \(diffMessage)
+
+      \(failure.trimmingCharacters(in: .whitespacesAndNewlines))
       """
     } catch {
       return error.localizedDescription
