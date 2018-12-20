@@ -46,38 +46,40 @@ public struct Snapshotting<Value, Format> {
     }
   }
 
-  /// Transforms a strategy on `Value`s into a strategy on `A`s through a function `(A) -> Async<Value>`.
+  /// Transforms a strategy on `Value`s into a strategy on `NewValue`s through a function `(NewValue) -> Async<Value>`.
   ///
   /// - Parameters:
-  ///   - transform: A transform function from `A` into `Async<Value>`.
+  ///   - transform: A transform function from `NewValue` into `Async<Value>`.
   ///   - otherValue: A value to be transformed.
-  public func asyncPullback<A>(_ transform: @escaping (_ otherValue: A) -> Async<Value>) -> Snapshotting<A, Format> {
-    return Snapshotting<A, Format>(
-      pathExtension: self.pathExtension,
-      diffing: self.diffing
-    ) { a0 in
-      return .init { callback in
-        transform(a0).run { a in
-          self.snapshot(a).run { b in
-            callback(b)
+  public func asyncPullback<NewValue>(_ transform: @escaping (_ otherValue: NewValue) -> Async<Value>)
+    -> Snapshotting<NewValue, Format> {
+
+      return Snapshotting<NewValue, Format>(
+        pathExtension: self.pathExtension,
+        diffing: self.diffing
+      ) { newValue in
+        return .init { callback in
+          transform(newValue).run { value in
+            self.snapshot(value).run { snapshot in
+              callback(snapshot)
+            }
           }
         }
       }
-    }
   }
 
-  /// Transforms a strategy on `Value`s into a strategy on `A`s through a function `(A) -> Value`.
+  /// Transforms a strategy on `Value`s into a strategy on `NewValue`s through a function `(NewValue) -> Value`.
   ///
   /// - Parameters:
-  ///   - transform: A transform function from `A` into `Value`.
+  ///   - transform: A transform function from `NewValue` into `Value`.
   ///   - otherValue: A value to be transformed.
-  public func pullback<A>(_ transform: @escaping (_ otherValue: A) -> Value) -> Snapshotting<A, Format> {
-    return self.asyncPullback { Async(value: transform($0)) }
+  public func pullback<NewValue>(_ transform: @escaping (_ otherValue: NewValue) -> Value) -> Snapshotting<NewValue, Format> {
+    return self.asyncPullback { newValue in Async(value: transform(newValue)) }
   }
 }
 
 /// A snapshot strategy where the type being snapshot is also a diffable type.
-public typealias SimplySnapshotting<A> = Snapshotting<A, A>
+public typealias SimplySnapshotting<Format> = Snapshotting<Format, Format>
 
 extension Snapshotting where Value == Format {
   public init(pathExtension: String?, diffing: Diffing<Format>) {
