@@ -132,7 +132,7 @@ open class SnapshotTestCase: XCTestCase {
         ?? "@\(minus)\n\"\(snapshotFileUrl.path)\"\n@\(plus)\n\"\(failedSnapshotFileUrl.path)\""
       let message = """
       Snapshot does not match reference.
-      
+
       \(diffMessage)
 
       \(failure.trimmingCharacters(in: .whitespacesAndNewlines))
