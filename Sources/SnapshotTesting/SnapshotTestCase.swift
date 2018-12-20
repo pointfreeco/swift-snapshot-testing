@@ -84,11 +84,11 @@ open class SnapshotTestCase: XCTestCase {
         try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)
         let message = recording
           ? """
-            Record mode is on. \(diffMessage)
+            Record mode is on. Turn record mode off and re-run "\(testName)" to test against the newly-recorded snapshot.
 
             open "\(snapshotFileUrl.path)"
 
-            Turn record mode off and re-run "\(testName)" to test against the newly-recorded snapshot.
+            \(diffMessage)
             """
           : """
             No reference was found on disk. Automatically recorded snapshot: …
@@ -131,9 +131,11 @@ open class SnapshotTestCase: XCTestCase {
         .map { "\($0) \"\(snapshotFileUrl.path)\" \"\(failedSnapshotFileUrl.path)\"" }
         ?? "@\(minus)\n\"\(snapshotFileUrl.path)\"\n@\(plus)\n\"\(failedSnapshotFileUrl.path)\""
       let message = """
-      \(failure.trimmingCharacters(in: .whitespacesAndNewlines))
+      Snapshot does not match reference.
 
       \(diffMessage)
+
+      \(failure.trimmingCharacters(in: .whitespacesAndNewlines))
       """
       XCTFail(message, file: file, line: line)
     } catch {
