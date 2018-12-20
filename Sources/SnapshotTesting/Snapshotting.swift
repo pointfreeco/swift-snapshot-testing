@@ -46,32 +46,34 @@ public struct Snapshotting<Value, Format> {
     }
   }
 
-  /// Transforms a strategy on `Value`s into a strategy on `Root`s through a function `(Root) -> Async<Value>`.
+  /// Transforms a strategy on `Value`s into a strategy on `NewValue`s through a function `(NewValue) -> Async<Value>`.
   ///
   /// - Parameters:
-  ///   - transform: A transform function from `Root` into `Async<Value>`.
+  ///   - transform: A transform function from `NewValue` into `Async<Value>`.
   ///   - otherValue: A value to be transformed.
-  public func asyncPullback<Root>(_ transform: @escaping (_ otherValue: Root) -> Async<Value>) -> Snapshotting<Root, Format> {
-    return Snapshotting<Root, Format>(
-      pathExtension: self.pathExtension,
-      diffing: self.diffing
-    ) { root in
-      return .init { callback in
-        transform(root).run { value in
-          self.snapshot(value).run { snapshot in
-            callback(snapshot)
+  public func asyncPullback<NewValue>(_ transform: @escaping (_ otherValue: NewValue) -> Async<Value>)
+    -> Snapshotting<NewValue, Format> {
+
+      return Snapshotting<NewValue, Format>(
+        pathExtension: self.pathExtension,
+        diffing: self.diffing
+      ) { newValue in
+        return .init { callback in
+          transform(newValue).run { value in
+            self.snapshot(value).run { snapshot in
+              callback(snapshot)
+            }
           }
         }
       }
-    }
   }
 
-  /// Transforms a strategy on `Value`s into a strategy on `A`s through a function `(A) -> Value`.
+  /// Transforms a strategy on `Value`s into a strategy on `NewValue`s through a function `(NewValue) -> Value`.
   ///
   /// - Parameters:
-  ///   - transform: A transform function from `A` into `Value`.
+  ///   - transform: A transform function from `NewValue` into `Value`.
   ///   - otherValue: A value to be transformed.
-  public func pullback<Root>(_ transform: @escaping (_ otherValue: Root) -> Value) -> Snapshotting<Root, Format> {
+  public func pullback<NewValue>(_ transform: @escaping (_ otherValue: NewValue) -> Value) -> Snapshotting<NewValue, Format> {
     return self.asyncPullback { root in Async(value: transform(root)) }
   }
 }
