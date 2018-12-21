@@ -45,7 +45,7 @@ public func assertSnapshot<Value, Format>(
   XCTFail(message, file: file, line: line)
 }
 
-/// Asserts that a given value matches a reference on disk.
+/// Asserts that a given value matches references on disk.
 ///
 /// - Parameters:
 ///   - value: A value to compare against a reference.
@@ -79,7 +79,7 @@ public func assertSnapshots<Value, Format>(
   }
 }
 
-/// Asserts that a given value matches a reference on disk.
+/// Asserts that a given value matches references on disk.
 ///
 /// - Parameters:
 ///   - value: A value to compare against a reference.
