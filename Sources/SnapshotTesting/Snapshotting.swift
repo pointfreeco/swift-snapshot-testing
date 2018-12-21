@@ -68,6 +68,9 @@ public struct Snapshotting<Value, Format> {
   /// `UIViewController`'s by using the function `(UIViewController) -> UIView` that simply plucks the
   /// view out of the controller.
   ///
+  /// Nearly every snapshot strategy provided in this library is a `pullback` of some base strategy, which
+  /// shows just how important this operation is.
+  ///
   /// - Parameters:
   ///   - transform: A transform function from `NewValue` into `Value`.
   ///   - otherValue: A value to be transformed.
