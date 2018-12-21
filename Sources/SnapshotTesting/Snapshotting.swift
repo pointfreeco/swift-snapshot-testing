@@ -64,7 +64,7 @@ public struct Snapshotting<Value, Format> {
   /// }
   /// ```
   ///
-  /// Here we took the strategy that snapshots `UIView`'s as `UIImage`'s and pulled it back to work on
+  /// Here we took the strategy that snapshots `UIView`s as `UIImage`s and pulled it back to work on
   /// `UIViewController`'s by using the function `(UIViewController) -> UIView` that simply plucks the
   /// view out of the controller.
   ///
