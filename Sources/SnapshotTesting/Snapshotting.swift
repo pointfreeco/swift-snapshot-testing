@@ -55,7 +55,7 @@ public struct Snapshotting<Value, Format> {
   /// in the direction `(NewValue) -> Value` even though we are transforming in the other direction
   /// `(Snapshotting<Value, Format>) -> Snapshotting<NewValue, Format>`.
   ///
-  /// A simple example of this is to `pullback` the snapshot strategy on `UIView`'s to work on
+  /// A simple example of this is to `pullback` the snapshot strategy on `UIView`s to work on
   /// `UIViewController`'s:
   ///
   /// ```
