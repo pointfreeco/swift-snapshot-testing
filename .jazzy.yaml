@@ -1,0 +1,32 @@
+author: Point-Free
+author_url: https://www.pointfree.co
+module: SnapshotTesting
+theme: fullwidth
+documentation: Docs/**/*.md
+abstract: Docs/**/*.md
+output: Docs/output
+custom_categories:
+- name: Documentation
+  children: 
+    - About SnapshotTesting
+    - Why SnapshotTesting
+    - Getting Started
+    - Installation
+- name: Snapshot Strategies
+  children:
+  - Any 
+  - CALayer
+  - CaseIterable
+  - Codable
+  - Data
+  - Description
+  - NSImage
+  - NSView
+  - NSViewController
+  - SceneKit
+  - SpriteKit
+  - String 
+  - UIImage 
+  - UIView
+  - UIViewController
+  - URLRequest

@@ -12,3 +12,7 @@
 xcuserdata
 *.xccheckout
 *.xcscmblueprint
+
+Docs/tmp
+Docs/output
+build
