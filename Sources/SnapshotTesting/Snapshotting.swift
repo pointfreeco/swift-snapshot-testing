@@ -56,7 +56,7 @@ public struct Snapshotting<Value, Format> {
   /// `(Snapshotting<Value, Format>) -> Snapshotting<NewValue, Format>`.
   ///
   /// A simple example of this is to `pullback` the snapshot strategy on `UIView`s to work on
-  /// `UIViewController`'s:
+  /// `UIViewController`s:
   ///
   /// ```
   /// let strategy = Snapshotting<UIView, UIImage>.image.pullback { (vc: UIViewController) in
