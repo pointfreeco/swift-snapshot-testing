@@ -18,7 +18,7 @@ extension Snapshotting where Value == URLRequest, Format == String {
         .map { ["\n\(String(decoding: $0, as: UTF8.self))"] }
         ?? []
       } else {
-        throw NSError.init(domain: "", code: 1, userInfo: nil)
+        throw NSError.init(domain: "co.pointfree.Never", code: 1, userInfo: nil)
       }
     }
     catch {
