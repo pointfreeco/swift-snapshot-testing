@@ -10,9 +10,23 @@ extension Snapshotting where Value == URLRequest, Format == String {
       .map { key, value in "\(key): \(value)" }
       .sorted()
 
-    let body = request.httpBody
-      .map { ["\n\(String(decoding: $0, as: UTF8.self))"] }
-      ?? []
+    let body: [String]
+    do {
+      if #available(iOS 11.0, *) {
+      body = try request.httpBody
+        .map { try JSONSerialization.jsonObject(with: $0, options: []) }
+        .map { try JSONSerialization.data(withJSONObject: $0, options: [.prettyPrinted, .sortedKeys]) }
+        .map { ["\n\(String(decoding: $0, as: UTF8.self))"] }
+        ?? []
+      } else {
+        throw NSError.init(domain: "", code: 1, userInfo: nil)
+      }
+    }
+    catch {
+      body = request.httpBody
+        .map { ["\n\(String(decoding: $0, as: UTF8.self))"] }
+        ?? []
+    }
 
     return ([method] + headers + body).joined(separator: "\n")
   }
