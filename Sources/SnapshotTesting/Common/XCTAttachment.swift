@@ -2,7 +2,7 @@
 import Foundation
 
 public struct XCTAttachment {
-  init(data: Data) {}
-  init(data: Data, uniformTypeIdentifier: String) {}
+  public init(data: Data) {}
+  public init(data: Data, uniformTypeIdentifier: String) {}
 }
 #endif
