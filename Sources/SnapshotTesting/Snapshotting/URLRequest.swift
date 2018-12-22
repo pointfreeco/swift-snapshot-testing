@@ -11,7 +11,7 @@ extension Snapshotting where Value == URLRequest, Format == String {
 
     let body: [String]
     do {
-      if #available(iOS 11.0, macOS 10.3, tvOS 11.0, *) {
+      if #available(iOS 11.0, macOS 10.13, tvOS 11.0, *) {
       body = try request.httpBody
         .map { try JSONSerialization.jsonObject(with: $0, options: []) }
         .map { try JSONSerialization.data(withJSONObject: $0, options: [.prettyPrinted, .sortedKeys]) }
