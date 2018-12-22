@@ -143,11 +143,13 @@ github "pointfreeco/swift-snapshot-testing" ~> 1.1
 
 ### CocoaPods
 
-If your project uses [CocoaPods](https://cocoapods.org), add the pod to any applicable test targets in your `Podfile`:
+If your project uses [CocoaPods](https://cocoapods.org), add the pod to applicable _test_ targets in your `Podfile`:
 
 ```ruby
-target 'MyAppTests' do
-  pod 'SnapshotTesting', '~> 1.1'
+target 'MyApp' do
+  target 'MyAppTests' do
+    pod 'SnapshotTesting', '~> 1.1'
+  end
 end
 ```
 
