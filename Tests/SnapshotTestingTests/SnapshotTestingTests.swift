@@ -553,7 +553,7 @@ class SnapshotTestingTests: TestCase {
     post = URLRequest(url: URL(string: "https://www.pointfree.co/subscribe")!)
     post.httpMethod = "POST"
     post.addValue("pf_session={\"user_id\":\"0\"}", forHTTPHeaderField: "Cookie")
-    post.addValue("text/json", forHTTPHeaderField: "Accept")
+    post.addValue("application/json", forHTTPHeaderField: "Accept")
     post.httpBody = Data("""
                          {"pricing": {"lane": "individual","billing": "monthly"}}
                          """.utf8)
