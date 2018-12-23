@@ -30,14 +30,16 @@ Pod::Spec.new do |s|
   s.osx.deployment_target = "10.10"
   s.tvos.deployment_target = "10.0"
 
-  s.weak_framework = "XCTest"
+  s.framework = "XCTest"
 
   s.source_files = "Sources", "Sources/**/*.swift"
 
   s.pod_target_xcconfig = {
     'ENABLE_BITCODE' => 'NO',
+  }
+
+  s.user_target_xcconfig = {
     'FRAMEWORK_SEARCH_PATHS' =>
       '$(inherited) "$(PLATFORM_DIR)/Developer/Library/Frameworks"',
-    'OTHER_LDFLAGS' => '$(inherited) -weak-lswiftXCTest'
   }
 end
