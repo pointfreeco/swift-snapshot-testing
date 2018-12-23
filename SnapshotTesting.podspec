@@ -35,11 +35,9 @@ Pod::Spec.new do |s|
   s.source_files = "Sources", "Sources/**/*.swift"
 
   s.pod_target_xcconfig = {
-    'APPLICATION_EXTENSION_API_ONLY' => 'YES',
     'ENABLE_BITCODE' => 'NO',
     'FRAMEWORK_SEARCH_PATHS' =>
       '$(inherited) "$(PLATFORM_DIR)/Developer/Library/Frameworks"',
-    'OTHER_LDFLAGS' =>
-      '$(inherited) -weak-lswiftXCTest -Xlinker -no_application_extension'
+    'OTHER_LDFLAGS' => '$(inherited) -weak-lswiftXCTest'
   }
 end
