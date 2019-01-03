@@ -259,6 +259,8 @@ assertSnapshot(matching: image, as: .image(precision: 0.99)
 
 A snapshot strategy for comparing layers based on pixel equality.
 
+> Note: Snapshots must be compared on the same OS as the device that originally took the reference to avoid discrepancies between images.
+
 **Format:** `NSImage`
 
 **Note:** Includes `SCNView`, `SKView`, `WKWebView`.
@@ -321,6 +323,8 @@ A=autoresizesSubviews, C=canDrawConcurrently, D=needsDisplay, F=flipped, G=gstat
 ```
 
 ## NSViewController
+
+> Note: Snapshots must be compared on the same OS as the device that originally took the reference to avoid discrepancies between images.
 
 ### `.image`
 
@@ -485,6 +489,8 @@ assertSnapshot(matching: image, as: .image(precision: 0.99)
 
 A snapshot strategy for comparing layers based on pixel equality.
 
+> Note: Snapshots must be compared using a simulator with the same OS, device gamut, and scale as the simulator that originally took the reference to avoid discrepancies between images.
+
 **Format:** `UIImage`
 
 **Note:** Includes `SCNView`, `SKView`, `WKWebView`.
@@ -601,6 +607,8 @@ Records:
 ### `.image`
 
 A snapshot strategy for comparing layers based on pixel equality.
+
+> Note: Snapshots must be compared using a simulator with the same OS, device gamut, and scale as the simulator that originally took the reference to avoid discrepancies between images.
 
 **Format:** `UIImage`
 
