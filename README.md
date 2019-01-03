@@ -73,6 +73,8 @@ assertSnapshot(matching: vc, as: .image(on: .iPadMini(.portrait)))
 assertSnapshot(matching: vc, as: .recursiveDescription(on: .iPadMini(.portrait)))
 ```
 
+> Note: Device-agnostic snapshots must still be compared with a same simulator that has the same device gamut, scale, and OS to avoid discrepancies.
+
 Better yet, SnapshotTesting isn't limited to views and view controllers! There are [a number of available snapshot strategies](Documentation/Available-Snapshot-Strategies.md) to choose from.
 
 For example, you can snapshot test URL requests (_e.g._, those that your API client prepares).
