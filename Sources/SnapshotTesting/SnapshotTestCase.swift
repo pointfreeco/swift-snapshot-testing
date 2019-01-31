@@ -143,8 +143,10 @@ open class SnapshotTestCase: XCTestCase {
       do {
         let fileUrl = URL(fileURLWithPath: "\(file)")
         let fileName = fileUrl.deletingPathExtension().lastPathComponent
-        let directoryUrl = fileUrl.deletingLastPathComponent()
-        let snapshotDirectoryUrl: URL = directoryUrl
+        let userDefinedDirectory = ProcessInfo.processInfo.environment["SNAPSHOT_REFERENCE_DIR"]
+        let fallbackDirectoryUrl = fileUrl.deletingLastPathComponent()
+        let snapshotDirectoryBaseUrl = userDefinedDirectory.flatMap(URL.init(fileURLWithPath:)) ?? fallbackDirectoryUrl
+        let snapshotDirectoryUrl: URL = snapshotDirectoryBaseUrl
           .appendingPathComponent("__Snapshots__")
           .appendingPathComponent(fileName)
 
