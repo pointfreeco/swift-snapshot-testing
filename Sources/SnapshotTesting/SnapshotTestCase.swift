@@ -1,5 +1,8 @@
-#if os(Linux)
 import XCTest
+
+#if !os(Linux)
+public typealias SnapshotTestCase = XCTestCase
+#else
 
 /// An XCTest subclass that provides snaphot testing helpers.
 open class SnapshotTestCase: XCTestCase {
