@@ -1,7 +1,7 @@
 import XCTest
 
 #if !os(Linux)
-@available(swift, obsoleted: 5.0, message: "Please use XCTestCase instead")
+@available(swift, obsoleted: 5.0, renamed: "XCTestCase", message: "Please use XCTestCase instead")
 public typealias SnapshotTestCase = XCTestCase
 #else
 
