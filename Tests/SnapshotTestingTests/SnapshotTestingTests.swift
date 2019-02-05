@@ -9,13 +9,7 @@ import SpriteKit
 import WebKit
 #endif
 
-#if os(Linux)
-typealias TestCase = SnapshotTestCase
-#else
-typealias TestCase = XCTestCase
-#endif
-
-class SnapshotTestingTests: TestCase {
+final class SnapshotTestingTests: SnapshotTestCase {
   override func setUp() {
     super.setUp()
     diffTool = "ksdiff"
