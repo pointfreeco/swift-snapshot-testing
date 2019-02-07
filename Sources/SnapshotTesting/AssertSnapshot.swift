@@ -164,6 +164,8 @@ public func verifySnapshot<Value, Format>(
         .appendingPathExtension(snapshotting.pathExtension ?? "")
       let fileManager = FileManager.default
       try fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
+      checked[snapshotDirectoryUrl, default: []].append(snapshotFileUrl)
+
 
       let tookSnapshot = XCTestExpectation(description: "Took snapshot")
       var optionalDiffable: Format?
@@ -251,9 +253,73 @@ public func verifySnapshot<Value, Format>(
     }
 }
 
+/// Asserts that all snapshots were checked for a test case
+///   (call it from the test case's tearDown method)
+///
+/// - Parameters:
+///   - for: The test case's class
+///   - file: The file in which failure occurred. Defaults to the file name of the test case in which this function was called.
+///   - line: The line number on which failure occurred. Defaults to the line number on which this function was called.
+public func assertAllSnapshotsChecked(for testClass: XCTestCase.Type, file: StaticString = #file, line: UInt = #line) {
+
+  guard let testCount = numberOfTestMethods(testClass) else {
+    XCTFail("Couldn't find methodList for \(testClass)", file: file, line: line)
+    return
+  }
+
+  let fileUrl = URL(fileURLWithPath: "\(file)")
+  let fileName = fileUrl.deletingPathExtension().lastPathComponent
+  let directoryUrl = fileUrl.deletingLastPathComponent()
+  let snapshotDirectoryUrl: URL = directoryUrl
+    .appendingPathComponent("__Snapshots__")
+    .appendingPathComponent(fileName)
+
+  let counter = counterQueue.sync { () -> Int in
+    checkedCounter[snapshotDirectoryUrl, default: 0] += 1
+    return checkedCounter[snapshotDirectoryUrl]!
+  }
+
+  // only assert if all test were run
+  guard testCount == counter else { return }
+
+  let fileManager = FileManager.default
+  do {
+    let expected = try fileManager.contentsOfDirectory(at: snapshotDirectoryUrl,
+                                                       includingPropertiesForKeys: [],
+                                                       options: .skipsHiddenFiles)
+    let diff: String = expected
+                         .filter { !checked[snapshotDirectoryUrl, default: []].contains($0) }
+                         .map { $0.absoluteString }
+                         .joined(separator: "\n")
+    if !diff.isEmpty {
+      XCTFail("These files were not checked:\n\(diff)", file: file, line: line)
+    }
+  } catch {
+    XCTFail(error.localizedDescription, file: file, line: line)
+  }
+}
+
+private func numberOfTestMethods(_ testClass: XCTestCase.Type) -> Int? {
+  var methodCount: UInt32 = 0
+  guard let methodList = class_copyMethodList(testClass, &methodCount) else {
+    return nil
+  }
+  let count: Int = (0..<Int(methodCount))
+    .reduce(0, { result, index in
+      let selName = sel_getName(method_getName(methodList[index]))
+      let methodName = String(cString: selName, encoding: .utf8)!
+      return result + (methodName.hasPrefix("test") ? 1 : 0)
+    })
+  return count
+}
+
 private let counterQueue = DispatchQueue(label: "co.pointfree.SnapshotTesting.counter")
 private var counterMap: [URL: Int] = [:]
-#endif
+
+private var checkedCounter: [URL: Int] = [:]
+private var checked: [URL: [URL]] = [:]
+
+#endif // Linux
 
 func sanitizePathComponent(_ string: String) -> String {
   return string
