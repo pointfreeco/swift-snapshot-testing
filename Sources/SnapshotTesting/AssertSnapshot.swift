@@ -130,6 +130,7 @@ public func verifySnapshot<Value, Format>(
   named name: String? = nil,
   record recording: Bool = false,
   timeout: TimeInterval = 5,
+  snapshotDirectory: String? = nil,
   file: StaticString = #file,
   testName: String = #function,
   line: UInt = #line
@@ -141,10 +142,12 @@ public func verifySnapshot<Value, Format>(
     do {
       let fileUrl = URL(fileURLWithPath: "\(file)")
       let fileName = fileUrl.deletingPathExtension().lastPathComponent
-      let directoryUrl = fileUrl.deletingLastPathComponent()
-      let snapshotDirectoryUrl: URL = directoryUrl
-        .appendingPathComponent("__Snapshots__")
-        .appendingPathComponent(fileName)
+
+      let snapshotDirectoryUrl = snapshotDirectory.map(URL.init(fileURLWithPath:))
+        ?? fileUrl
+          .deletingLastPathComponent()
+          .appendingPathComponent("__Snapshots__")
+          .appendingPathComponent(fileName)
 
       let identifier: String
       if let name = name {
