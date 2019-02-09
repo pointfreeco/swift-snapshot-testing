@@ -135,6 +135,7 @@ open class SnapshotTestCase: XCTestCase {
     as snapshotting: Snapshotting<Value, Format>,
     named name: String? = nil,
     record recording: Bool = false,
+    snapshotDirectory: String? = nil,
     timeout: TimeInterval = 5,
     file: StaticString = #file,
     testName: String = #function,
@@ -147,10 +148,12 @@ open class SnapshotTestCase: XCTestCase {
       do {
         let fileUrl = URL(fileURLWithPath: "\(file)")
         let fileName = fileUrl.deletingPathExtension().lastPathComponent
-        let directoryUrl = fileUrl.deletingLastPathComponent()
-        let snapshotDirectoryUrl: URL = directoryUrl
-          .appendingPathComponent("__Snapshots__")
-          .appendingPathComponent(fileName)
+
+        let snapshotDirectoryUrl = snapshotDirectory.map(URL.init(fileURLWithPath:))
+          ?? fileUrl
+            .deletingLastPathComponent()
+            .appendingPathComponent("__Snapshots__")
+            .appendingPathComponent(fileName)
 
         let identifier: String
         if let name = name {
