@@ -38,7 +38,8 @@ public func assertSnapshot<Value, Format>(
     record: recording,
     timeout: timeout,
     file: file,
-    testName: testName
+    testName: testName,
+    line: line
   )
   guard let message = failure else { return }
   XCTFail(message, file: file, line: line)
@@ -160,7 +161,8 @@ public func verifySnapshot<Value, Format>(
   snapshotDirectory: String? = nil,
   timeout: TimeInterval = 5,
   file: StaticString = #file,
-  testName: String = #function
+  testName: String = #function,
+  line: UInt = #line
   )
   -> String? {
 
