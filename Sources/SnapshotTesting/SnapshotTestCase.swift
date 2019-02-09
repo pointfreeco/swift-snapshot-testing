@@ -44,8 +44,7 @@ open class SnapshotTestCase: XCTestCase {
       record: recording,
       timeout: timeout,
       file: file,
-      testName: testName,
-      line: line
+      testName: testName
     )
     guard let message = failure else { return }
     XCTFail(message, file: file, line: line)
@@ -138,8 +137,7 @@ open class SnapshotTestCase: XCTestCase {
     snapshotDirectory: String? = nil,
     timeout: TimeInterval = 5,
     file: StaticString = #file,
-    testName: String = #function,
-    line: UInt = #line
+    testName: String = #function
     )
     -> String? {
 
