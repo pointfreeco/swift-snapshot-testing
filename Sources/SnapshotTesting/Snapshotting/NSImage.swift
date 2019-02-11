@@ -2,6 +2,32 @@
 import Cocoa
 import XCTest
 
+extension Diffing where Value == NSImage {
+  /// A pixel-diffing strategy for NSImage's which requires a 100% match.
+  public static let image = Diffing.image(precision: 1)
+
+  /// A pixel-diffing strategy for NSImage that allows customizing how precise the matching must be.
+  ///
+  /// - Parameter precision: A value between 0 and 1, where 1 means the images must match 100% of their pixels.
+  /// - Returns: A new diffing strategy.
+  public static func image(precision: Float) -> Diffing {
+    return .init(
+      toData: { NSImagePNGRepresentation($0)! },
+      fromData: { NSImage(data: $0)! }
+    ) { old, new in
+      guard !compare(old, new, precision: precision) else { return nil }
+      let difference = SnapshotTesting.diff(old, new)
+      let message = new.size == old.size
+        ? "Expected snapshot to match reference"
+        : "Expected snapshot@\(new.size) to match reference@\(old.size)"
+      return (
+        message,
+        [XCTAttachment(image: old), XCTAttachment(image: new), XCTAttachment(image: difference)]
+      )
+    }
+  }
+}
+
 extension Snapshotting where Value == NSImage, Format == NSImage {
   /// A snapshot strategy for comparing images based on pixel equality.
   public static var image: Snapshotting {
@@ -14,20 +40,7 @@ extension Snapshotting where Value == NSImage, Format == NSImage {
   public static func image(precision: Float) -> Snapshotting {
     return .init(
       pathExtension: "png",
-      diffing: .init(
-        toData: { NSImagePNGRepresentation($0)! },
-        fromData: { NSImage(data: $0)! }
-      ) { old, new in
-        guard !compare(old, new, precision: precision) else { return nil }
-        let difference = diff(old, new)
-        let message = new.size == old.size
-          ? "Expected snapshot to match reference"
-          : "Expected snapshot@\(new.size) to match reference@\(old.size)"
-        return (
-          message,
-          [XCTAttachment(image: old), XCTAttachment(image: new), XCTAttachment(image: difference)]
-        )
-      }
+      diffing: .image(precision: precision)
     )
   }
 }
