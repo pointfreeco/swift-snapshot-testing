@@ -189,9 +189,24 @@ public func verifySnapshot<Value, Format>(
         identifier = String(counter)
       }
 
+      let platformString: String = {
+        let iOSVersion = "iOS \(UIDevice.current.systemVersion)"
+        let traits = UIScreen.main.traitCollection
+        let gamut: String
+        switch traits.displayGamut {
+        case .unspecified:
+          gamut = "unspecified"
+        case .SRGB:
+          gamut = "srgb"
+        case .P3:
+          gamut = "p3"
+        }
+        let scale = Int(traits.displayScale)
+        return "\(iOSVersion)-\(gamut)@\(scale)x"
+      }()
       let testName = sanitizePathComponent(testName)
       let snapshotFileUrl = snapshotDirectoryUrl
-        .appendingPathComponent("\(testName).\(identifier)")
+        .appendingPathComponent("\(testName)-\(identifier)-\(platformString)")
         .appendingPathExtension(snapshotting.pathExtension ?? "")
       let fileManager = FileManager.default
       try fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
@@ -225,7 +240,7 @@ public func verifySnapshot<Value, Format>(
           ?? "Recorded snapshot: …"
 
         try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)
-        return recording
+        return recording // FIXME: third case, this simulator doesn't have a snapshot but another does; maybe *4th* case checking pre-2.0 filename as well
           ? """
             Record mode is on. Turn record mode off and re-run "\(testName)" to test against the newly-recorded snapshot.
 
