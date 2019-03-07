@@ -707,7 +707,7 @@ final class SnapshotTestingTests: XCTestCase {
     XCTAssert(!fileExists(for: iPhoneXR, snapshot: 1))
 
     // do autorecord (despite the same-name other-simulator snapshot) if this simulator is *explicitly* requested
-    // TODO: verify this behaviour with PointFree: should we also demand record=true here?
+    // FIXME: verify this behaviour with PointFree: should we also demand record=true here?
     supportedPlatforms = [iPhoneXR]
     let failureBecauseAutorecording = verifySnapshot(matching: view, as: .image)
     XCTAssert(failureBecauseAutorecording != nil) // FIXME: more specific please
