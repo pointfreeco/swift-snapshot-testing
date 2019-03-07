@@ -680,9 +680,45 @@ final class SnapshotTestingTests: XCTestCase {
     let snapshotURL = URL(fileURLWithPath: String(#file))
       .deletingLastPathComponent()
       .appendingPathComponent("__Snapshots__/SnapshotTestingTests/testSimulatorBasedFilenames-1-\(iPhoneXR).png")
-    var isDirectory: ObjCBool = false
-    XCTAssert(FileManager.default.fileExists(atPath: snapshotURL.path, isDirectory: &isDirectory))
-    XCTAssert(!isDirectory.boolValue)
+    XCTAssert(FileManager.default.fileExists(atPath: snapshotURL.path))
+  }
+  
+  func testSimulatorBasedFilenamesBlockAutorecord() {
+    let iPhone5S = "iOS-12.1-srgb@2x"
+    let iPhoneXR = "iOS-12.1-p3@2x"
+    let view = UIView(frame: .init(origin: .zero, size: .init(width: 10, height: 10)))
+
+    func fileExists(for simulator: String, snapshot number: UInt) -> Bool {
+      let snapshotURL = URL(fileURLWithPath: String(#file))
+        .deletingLastPathComponent()
+        .appendingPathComponent("__Snapshots__/SnapshotTestingTests/testSimulatorBasedFilenamesBlockAutorecord-\(number)-\(simulator).png")
+      return FileManager.default.fileExists(atPath: snapshotURL.path)
+    }
+    // confirm test setup
+    XCTAssert(fileExists(for: iPhone5S, snapshot: 1))
+    XCTAssert(!fileExists(for: iPhoneXR, snapshot: 1))
+    XCTAssert(fileExists(for: iPhone5S, snapshot: 2))
+    XCTAssert(!fileExists(for: iPhoneXR, snapshot: 2))
+
+    // do not autorecord if a same-name snapshot from other simulator exists
+    supportedPlatforms = []
+    let failureBecauseOtherExists = verifySnapshot(matching: view, as: .image)
+    XCTAssert(failureBecauseOtherExists != nil) // FIXME: more specific please
+    XCTAssert(!fileExists(for: iPhoneXR, snapshot: 1))
+
+    // do autorecord (despite the same-name other-simulator snapshot) if this simulator is *explicitly* requested
+    // TODO: verify this behaviour with PointFree: should we also demand record=true here?
+    supportedPlatforms = [iPhoneXR]
+    let failureBecauseAutorecording = verifySnapshot(matching: view, as: .image)
+    XCTAssert(failureBecauseAutorecording != nil) // FIXME: more specific please
+    XCTAssert(fileExists(for: iPhoneXR, snapshot: 2))
+
+    // Clean up and check cleanup succeeded
+    try? FileManager.default.removeItem(at:
+      URL(fileURLWithPath: String(#file))
+        .deletingLastPathComponent()
+        .appendingPathComponent("__Snapshots__/SnapshotTestingTests/testSimulatorBasedFilenamesBlockAutorecord-2-\(iPhoneXR).png"))
+    XCTAssert(!fileExists(for: iPhoneXR, snapshot: 2))
   }
 }
 
@@ -708,6 +744,7 @@ extension SnapshotTestingTests {
       ("testURLRequest", testURLRequest),
       ("testWebView", testWebView),
       ("testSimulatorBasedFilenames", testSimulatorBasedFilenames),
+      ("testSimulatorBasedFilenamesBlockAutorecord", testSimulatorBasedFilenamesBlockAutorecord)
     ]
   }
 }
