@@ -9,6 +9,9 @@ public var diffTool: String? = nil
 /// Whether or not to record all new references.
 public var record = false
 
+/// Simulators and devices to record snapshots for, or nil for pre-2.0 compatibility
+public var supportedPlatforms: [String]? = nil
+
 /// Asserts that a given value matches a reference on disk.
 ///
 /// - Parameters:
@@ -206,8 +209,11 @@ public func verifySnapshot<Value, Format>(
         return "\(iOSVersion)-\(gamut)@\(scale)x"
       }()
       let testName = sanitizePathComponent(testName)
+      let preV2Basename = "\(testName).\(identifier)"
+      let postV2Basename = "\(testName)-\(identifier)-\(platformString)"
+      let fileBasename: String = supportedPlatforms == nil ? preV2Basename : postV2Basename
       let snapshotFileUrl = snapshotDirectoryUrl
-        .appendingPathComponent("\(testName)-\(identifier)-\(platformString)")
+        .appendingPathComponent(fileBasename)
         .appendingPathExtension(snapshotting.pathExtension ?? "")
       let fileManager = FileManager.default
       try fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
