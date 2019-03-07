@@ -18,6 +18,7 @@ final class SnapshotTestingTests: SnapshotTestCase {
 
   override func tearDown() {
     record = false
+    supportedPlatforms = nil
     super.tearDown()
   }
 
@@ -562,6 +563,19 @@ final class SnapshotTestingTests: SnapshotTestCase {
     }
     #endif
   }
+  
+  func testSimulatorBasedFilenames() {
+    let iPhoneXR = "iOS-12.1-p3@2x"
+    supportedPlatforms = [iPhoneXR]
+    let view = UIView(frame: .init(origin: .zero, size: .init(width: 10, height: 10)))
+    assertSnapshot(matching: view, as: .image)
+    let snapshotURL = URL(fileURLWithPath: String(#file))
+      .deletingLastPathComponent()
+      .appendingPathComponent("__Snapshots__/SnapshotTestingTests/testSimulatorBasedFilenames-1-\(iPhoneXR).png")
+    var isDirectory: ObjCBool = false
+    XCTAssert(FileManager.default.fileExists(atPath: snapshotURL.path, isDirectory: &isDirectory))
+    XCTAssert(!isDirectory.boolValue)
+  }
 }
 
 #if os(Linux)
@@ -585,6 +599,7 @@ extension SnapshotTestingTests {
       ("testUIView", testUIView),
       ("testURLRequest", testURLRequest),
       ("testWebView", testWebView),
+      ("testSimulatorBasedFilenames", testSimulatorBasedFilenames),
     ]
   }
 }
