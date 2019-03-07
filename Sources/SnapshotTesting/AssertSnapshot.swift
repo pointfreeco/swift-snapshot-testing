@@ -245,8 +245,26 @@ public func verifySnapshot<Value, Format>(
           .map { diff, _ in diff.trimmingCharacters(in: .whitespacesAndNewlines) }
           ?? "Recorded snapshot: …"
 
+        // FIXME: check for pre-v2 filename format which will no longer match
+        
+        if let supportedPlatforms = supportedPlatforms,
+          !supportedPlatforms.contains(platformString),
+          let otherSnapshots = Optional.some(try fileManager.contentsOfDirectory(
+            atPath: snapshotFileUrl.deletingLastPathComponent().path)),
+          // FIXME: duplicated string-construction
+          let snapshotFromOtherSimulator = otherSnapshots
+            .first(where: { $0.starts(with: "\(testName)-\(identifier)-") }) {
+          // Do *not* autorecord a screenshot, regardless of recording=true
+          // FIXME: this reports only the filename, not full path, of the other snapshot
+          return """
+          A screenshot already exists from an incompatible simulator. To record from this simulator add "\(platformString)" to SnapshotTesting.supportedPlatforms.
+          
+          see "\(snapshotFromOtherSimulator)"
+          """
+        }
+          
         try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)
-        return recording // FIXME: third case, this simulator doesn't have a snapshot but another does; maybe *4th* case checking pre-2.0 filename as well
+        return recording
           ? """
             Record mode is on. Turn record mode off and re-run "\(testName)" to test against the newly-recorded snapshot.
 
