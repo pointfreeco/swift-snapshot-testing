@@ -194,7 +194,7 @@ public func verifySnapshot<Value, Format>(
       }
 
       let platformString: String = {
-        let iOSVersion = "iOS \(UIDevice.current.systemVersion)"
+        let iOSVersion = "iOS-\(UIDevice.current.systemVersion)"
         let traits = UIScreen.main.traitCollection
         let gamut: String
         switch traits.displayGamut {
