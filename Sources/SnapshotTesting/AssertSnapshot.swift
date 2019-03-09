@@ -1,11 +1,6 @@
 #if !os(Linux)
 import XCTest
 
-/// Enhances failure messages with a command line diff tool expression that can be copied and pasted into a terminal.
-///
-///     diffTool = "ksdiff"
-public var diffTool: String? = nil
-
 /// Whether or not to record all new references.
 public var record = false
 
@@ -23,6 +18,7 @@ public var record = false
 public func assertSnapshot<Value, Format>(
   matching value: @autoclosure () throws -> Value,
   as snapshotting: Snapshotting<Value, Format>,
+  informing: Informing<Format> = .basic,
   named name: String? = nil,
   record recording: Bool = false,
   timeout: TimeInterval = 5,
@@ -34,6 +30,7 @@ public func assertSnapshot<Value, Format>(
   let failure = verifySnapshot(
     matching: value,
     as: snapshotting,
+    informing: informing,
     named: name,
     record: recording,
     timeout: timeout,
@@ -58,6 +55,7 @@ public func assertSnapshot<Value, Format>(
 public func assertSnapshots<Value, Format>(
   matching value: @autoclosure () throws -> Value,
   as strategies: [String: Snapshotting<Value, Format>],
+  informing: Informing<Format> = .basic,
   record recording: Bool = false,
   timeout: TimeInterval = 5,
   file: StaticString = #file,
@@ -69,6 +67,7 @@ public func assertSnapshots<Value, Format>(
     assertSnapshot(
       matching: value,
       as: strategy,
+      informing: informing,
       named: name,
       record: recording,
       timeout: timeout,
@@ -92,6 +91,7 @@ public func assertSnapshots<Value, Format>(
 public func assertSnapshots<Value, Format>(
   matching value: @autoclosure () throws -> Value,
   as strategies: [Snapshotting<Value, Format>],
+  informing: Informing<Format> = .basic,
   record recording: Bool = false,
   timeout: TimeInterval = 5,
   file: StaticString = #file,
@@ -103,6 +103,7 @@ public func assertSnapshots<Value, Format>(
     assertSnapshot(
       matching: value,
       as: strategy,
+      informing: informing,
       record: recording,
       timeout: timeout,
       file: file,
@@ -156,6 +157,7 @@ public func assertSnapshots<Value, Format>(
 public func verifySnapshot<Value, Format>(
   matching value: @autoclosure () throws -> Value,
   as snapshotting: Snapshotting<Value, Format>,
+  informing: Informing<Format> = .basic,
   named name: String? = nil,
   record recording: Bool = false,
   snapshotDirectory: String? = nil,
@@ -228,14 +230,14 @@ public func verifySnapshot<Value, Format>(
           ? """
             Record mode is on. Turn record mode off and re-run "\(testName)" to test against the newly-recorded snapshot.
 
-            open "\(snapshotFileUrl.path)"
+            \(informing.snapshotRecorded(testName, snapshotFileUrl))
 
             \(diffMessage)
             """
           : """
             No reference was found on disk. Automatically recorded snapshot: …
 
-            open "\(snapshotFileUrl.path)"
+            \(informing.snapshotRecorded(testName, snapshotFileUrl))
 
             Re-run "\(testName)" to test against the newly-recorded snapshot.
             """
@@ -268,13 +270,11 @@ public func verifySnapshot<Value, Format>(
         #endif
       }
 
-      let diffMessage = diffTool
-        .map { "\($0) \"\(snapshotFileUrl.path)\" \"\(failedSnapshotFileUrl.path)\"" }
-        ?? "@\(minus)\n\"\(snapshotFileUrl.path)\"\n@\(plus)\n\"\(failedSnapshotFileUrl.path)\""
+      
       return """
       Snapshot does not match reference.
 
-      \(diffMessage)
+      \(informing.testFailed(testName, snapshotFileUrl, failedSnapshotFileUrl))
 
       \(failure.trimmingCharacters(in: .whitespacesAndNewlines))
       """
