@@ -334,6 +334,7 @@ final class SnapshotTestingTests: SnapshotTestCase {
       assertSnapshot(matching: viewController, as: .image(on: .iPhoneXsMax), named: "iphone-xs-max")
       assertSnapshot(matching: viewController, as: .image(on: .iPadMini), named: "ipad-mini")
       assertSnapshot(matching: viewController, as: .image(on: .iPadPro10_5), named: "ipad-pro-10-5")
+      assertSnapshot(matching: viewController, as: .image(on: .iPadPro11), named: "ipad-pro-11")
       assertSnapshot(matching: viewController, as: .image(on: .iPadPro12_9), named: "ipad-pro-12-9")
 
       assertSnapshot(matching: viewController, as: .recursiveDescription(on: .iPhoneSe), named: "iphone-se")
@@ -344,6 +345,7 @@ final class SnapshotTestingTests: SnapshotTestCase {
       assertSnapshot(matching: viewController, as: .recursiveDescription(on: .iPhoneXsMax), named: "iphone-xs-max")
       assertSnapshot(matching: viewController, as: .recursiveDescription(on: .iPadMini), named: "ipad-mini")
       assertSnapshot(matching: viewController, as: .recursiveDescription(on: .iPadPro10_5), named: "ipad-pro-10-5")
+      assertSnapshot(matching: viewController, as: .recursiveDescription(on: .iPadPro11), named: "ipad-pro-11")
       assertSnapshot(matching: viewController, as: .recursiveDescription(on: .iPadPro12_9), named: "ipad-pro-12-9")
 
       assertSnapshot(matching: viewController, as: .image(on: .iPhoneSe(.portrait)), named: "iphone-se")
@@ -354,6 +356,7 @@ final class SnapshotTestingTests: SnapshotTestCase {
       assertSnapshot(matching: viewController, as: .image(on: .iPhoneXsMax(.portrait)), named: "iphone-xs-max")
       assertSnapshot(matching: viewController, as: .image(on: .iPadMini(.landscape)), named: "ipad-mini")
       assertSnapshot(matching: viewController, as: .image(on: .iPadPro10_5(.landscape)), named: "ipad-pro-10-5")
+      assertSnapshot(matching: viewController, as: .image(on: .iPadPro11(.landscape)), named: "ipad-pro-11")
       assertSnapshot(matching: viewController, as: .image(on: .iPadPro12_9(.landscape)), named: "ipad-pro-12-9")
 
       assertSnapshot(
@@ -372,6 +375,8 @@ final class SnapshotTestingTests: SnapshotTestCase {
         matching: viewController, as: .image(on: .iPadMini(.portrait)), named: "ipad-mini-alternative")
       assertSnapshot(
         matching: viewController, as: .image(on: .iPadPro10_5(.portrait)), named: "ipad-pro-10-5-alternative")
+      assertSnapshot(
+        matching: viewController, as: .image(on: .iPadPro11(.portrait)), named: "ipad-pro-11-alternative")
       assertSnapshot(
         matching: viewController, as: .image(on: .iPadPro12_9(.portrait)), named: "ipad-pro-12-9-alternative")
 
@@ -473,6 +478,7 @@ final class SnapshotTestingTests: SnapshotTestCase {
       assertSnapshot(matching: viewController, as: .image(on: .iPhoneXsMax), named: "iphone-xs-max")
       assertSnapshot(matching: viewController, as: .image(on: .iPadMini), named: "ipad-mini")
       assertSnapshot(matching: viewController, as: .image(on: .iPadPro10_5), named: "ipad-pro-10-5")
+      assertSnapshot(matching: viewController, as: .image(on: .iPadPro11), named: "ipad-pro-11")
       assertSnapshot(matching: viewController, as: .image(on: .iPadPro12_9), named: "ipad-pro-12-9")
 
       assertSnapshot(matching: viewController, as: .image(on: .iPhoneSe(.portrait)), named: "iphone-se")
@@ -483,6 +489,7 @@ final class SnapshotTestingTests: SnapshotTestCase {
       assertSnapshot(matching: viewController, as: .image(on: .iPhoneXsMax(.portrait)), named: "iphone-xs-max")
       assertSnapshot(matching: viewController, as: .image(on: .iPadMini(.landscape)), named: "ipad-mini")
       assertSnapshot(matching: viewController, as: .image(on: .iPadPro10_5(.landscape)), named: "ipad-pro-10-5")
+      assertSnapshot(matching: viewController, as: .image(on: .iPadPro11(.landscape)), named: "ipad-pro-11")
       assertSnapshot(matching: viewController, as: .image(on: .iPadPro12_9(.landscape)), named: "ipad-pro-12-9")
 
       assertSnapshot(
@@ -501,6 +508,8 @@ final class SnapshotTestingTests: SnapshotTestCase {
         matching: viewController, as: .image(on: .iPadMini(.portrait)), named: "ipad-mini-alternative")
       assertSnapshot(
         matching: viewController, as: .image(on: .iPadPro10_5(.portrait)), named: "ipad-pro-10-5-alternative")
+      assertSnapshot(
+        matching: viewController, as: .image(on: .iPadPro11(.portrait)), named: "ipad-pro-11-alternative")
       assertSnapshot(
         matching: viewController, as: .image(on: .iPadPro12_9(.portrait)), named: "ipad-pro-12-9-alternative")
     }
