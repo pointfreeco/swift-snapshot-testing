@@ -12,7 +12,6 @@ import WebKit
 final class SnapshotTestingTests: SnapshotTestCase {
   override func setUp() {
     super.setUp()
-    diffTool = "ksdiff"
 //    record = true
   }
 
@@ -24,7 +23,7 @@ final class SnapshotTestingTests: SnapshotTestCase {
   func testAny() {
     struct User { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
-    assertSnapshot(matching: user, as: .dump)
+    assertSnapshot(matching: user, as: .dump, informing: .ksdiff)
   }
 
   func testAnySnapshotStringConvertible() {

@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		33470EBE2233E99F002EC0A2 /* Informing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33470EBD2233E99F002EC0A2 /* Informing.swift */; };
+		33470EBF2233E99F002EC0A2 /* Informing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33470EBD2233E99F002EC0A2 /* Informing.swift */; };
+		33470EC02233E99F002EC0A2 /* Informing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33470EBD2233E99F002EC0A2 /* Informing.swift */; };
 		BF_04E4225C7AC81D2E93C9A210AD1C768C /* Description.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_5ABFA0C568E5F812C96A9872ED576BDA /* Description.swift */; };
 		BF_056DF95B208610B26A04CB328545B236 /* CALayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_750D6728D7492B7DD301DAED19ABD98F /* CALayer.swift */; };
 		BF_05C3161CF564303E9D4AC30321A44C35 /* UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_DA4183393C1DF1FE2E01DCB0D845772C /* UIImage.swift */; };
@@ -160,6 +163,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		33470EBD2233E99F002EC0A2 /* Informing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Informing.swift; sourceTree = "<group>"; };
 		FR_005396B25C1F9DA46556618A49C9C47B /* NSImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSImage.swift; sourceTree = "<group>"; };
 		FR_1C0F0F9D1E3946C22AB189D75CBFA00A /* SnapshotTesting.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SnapshotTesting.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FR_249284F48787C8FEC6C4C3B317A68737 /* SnapshotTestingTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SnapshotTestingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -258,6 +262,7 @@
 				FR_4B671595EC397E2142ED555D6EA3B5C5 /* Snapshotting.swift */,
 				G_BA5C1E83965C514CC7D95706C68E181E /* Common */,
 				G_F0974E282B3FC447C9E6CC190D1AC2CE /* Snapshotting */,
+				33470EBD2233E99F002EC0A2 /* Informing.swift */,
 			);
 			path = SnapshotTesting;
 			sourceTree = "<group>";
@@ -464,6 +469,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BF_62AD99C1B3A8484024522ACBB7508934 /* Any.swift in Sources */,
+				33470EBE2233E99F002EC0A2 /* Informing.swift in Sources */,
 				BF_60E780A5566C14D1B9C49FE1213C005F /* AssertSnapshot.swift in Sources */,
 				BF_1092D6738E4E10DA749423711942C04C /* Async.swift in Sources */,
 				BF_B3BE9EA2F5E7F5B4AC137BB9BD46F6BF /* CALayer.swift in Sources */,
@@ -497,6 +503,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BF_C3DA65F8B72D393D5E907074465BDFD1 /* Any.swift in Sources */,
+				33470EBF2233E99F002EC0A2 /* Informing.swift in Sources */,
 				BF_CEA78BD0477B1745D042FAE6049A5B73 /* AssertSnapshot.swift in Sources */,
 				BF_97AA84D478C020B4F7906D46DA4D0C15 /* Async.swift in Sources */,
 				BF_056DF95B208610B26A04CB328545B236 /* CALayer.swift in Sources */,
@@ -530,6 +537,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BF_803219DA32D805A2734E66442011B2B3 /* Any.swift in Sources */,
+				33470EC02233E99F002EC0A2 /* Informing.swift in Sources */,
 				BF_F896D52B8FF76B9328361A8857B4BF87 /* AssertSnapshot.swift in Sources */,
 				BF_51479BC7C87FC0B4B8FBFD68EEBD3726 /* Async.swift in Sources */,
 				BF_5BB83217C775F89CF3FDE1B31B347BE6 /* CALayer.swift in Sources */,
@@ -678,7 +686,10 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
 				INFOPLIST_FILE = Sources/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
@@ -701,7 +712,10 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
 				INFOPLIST_FILE = Sources/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
@@ -723,7 +737,10 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
 				INFOPLIST_FILE = Sources/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -838,7 +855,10 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
 				INFOPLIST_FILE = Sources/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -861,7 +881,10 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
 				INFOPLIST_FILE = Sources/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -910,7 +933,10 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
 				INFOPLIST_FILE = Sources/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
