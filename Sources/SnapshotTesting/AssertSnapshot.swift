@@ -10,7 +10,7 @@ public var diffTool: String? = nil
 public var record = false
 
 /// Simulators and devices to record snapshots for, or nil for pre-2.0 compatibility
-public var supportedPlatforms: [String]? = nil
+public var supportedPlatforms: [Platform]? = nil
 
 /// Asserts that a given value matches a reference on disk.
 ///
@@ -193,24 +193,10 @@ public func verifySnapshot<Value, Format>(
         identifier = String(counter)
       }
 
-      let platformString: String = {
-        let iOSVersion = "iOS-\(UIDevice.current.systemVersion)"
-        let traits = UIScreen.main.traitCollection
-        let gamut: String
-        switch traits.displayGamut {
-        case .unspecified:
-          gamut = "unspecified"
-        case .SRGB:
-          gamut = "srgb"
-        case .P3:
-          gamut = "p3"
-        }
-        let scale = Int(traits.displayScale)
-        return "\(iOSVersion)-\(gamut)@\(scale)x"
-      }()
+      let platform = Platform()
       let testName = sanitizePathComponent(testName)
       let preV2Basename = "\(testName).\(identifier)"
-      let postV2Basename = "\(testName)-\(identifier)-\(platformString)"
+      let postV2Basename = "\(testName)-\(identifier)-\(platform.rawValue)"
       let fileBasename: String = supportedPlatforms == nil ? preV2Basename : postV2Basename
       let snapshotFileUrl = snapshotDirectoryUrl
         .appendingPathComponent(fileBasename)
@@ -247,7 +233,7 @@ public func verifySnapshot<Value, Format>(
         // FIXME: check for pre-v2 filename format which will no longer match
         
         if let supportedPlatforms = supportedPlatforms,
-          !supportedPlatforms.contains(platformString),
+          !supportedPlatforms.contains(platform),
           let otherSnapshots = Optional.some(try fileManager.contentsOfDirectory(
             atPath: snapshotFileUrl.deletingLastPathComponent().path)),
           // FIXME: duplicated string-construction
@@ -256,7 +242,7 @@ public func verifySnapshot<Value, Format>(
           // Do *not* autorecord a screenshot, regardless of recording=true
           // FIXME: this reports only the filename, not full path, of the other snapshot
           return """
-          A screenshot already exists from an incompatible simulator. To record from this simulator add "\(platformString)" to SnapshotTesting.supportedPlatforms.
+          A screenshot already exists from an incompatible simulator. To record from this simulator add "\(platform.rawValue)" to SnapshotTesting.supportedPlatforms.
           
           see "\(snapshotFromOtherSimulator)"
           """
@@ -330,4 +316,56 @@ func sanitizePathComponent(_ string: String) -> String {
   return string
     .replacingOccurrences(of: "\\W+", with: "-", options: .regularExpression)
     .replacingOccurrences(of: "^-|-$", with: "", options: .regularExpression)
+}
+
+public struct Platform: RawRepresentable, Equatable {
+  let os: OS
+  let version: String
+  let gamut: Gamut
+  let scale: Int
+  
+  public init?(rawValue: String) {
+    let components = rawValue.split(separator: "-")
+    guard components.count == 3 else { return nil }
+    guard let os = OS(rawValue: String(components[0])) else { return nil }
+    guard components[2].last == "x" else { return nil } // FIXME: oh come on this is ridiculous
+    let imageStuff = components[2].dropLast().split(separator: "@")
+    guard imageStuff.count == 2 else { return nil }
+    guard let gamut = Gamut(rawValue: String(imageStuff[0])) else { return nil }
+    guard let scale = Int(imageStuff[1]) else { return nil }
+    self.os = os
+    self.gamut = gamut
+    self.version = String(components[1]) // FIXME: validate it's a version-string?
+    self.scale = scale
+  }
+  
+  public var rawValue: String {
+    return "\(os)-\(version)-\(gamut.rawValue)@\(scale)x"
+  }
+  
+  init() {
+    os = .iOS // FIXME: x-platform
+    version = UIDevice.current.systemVersion // FIXME: x-platform
+    let traits = UIScreen.main.traitCollection // FIXME: x-platform
+    gamut = Gamut(from: traits.displayGamut)
+    scale = Int(traits.displayScale)
+  }
+  
+  enum Gamut: String {
+    case unspecified
+    case SRGB = "srgb"
+    case P3 = "p3"
+    
+    init(from gamut: UIDisplayGamut) {
+      switch gamut {
+      case .unspecified: self = .unspecified
+      case .SRGB: self = .SRGB
+      case .P3: self = .P3
+      }
+    }
+  }
+  
+  enum OS: String {
+    case iOS, macOS, tvOS
+  }
 }

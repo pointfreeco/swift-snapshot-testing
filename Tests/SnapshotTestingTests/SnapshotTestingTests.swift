@@ -565,25 +565,25 @@ final class SnapshotTestingTests: SnapshotTestCase {
   }
   
   func testSimulatorBasedFilenames() {
-    let iPhoneXR = "iOS-12.1-p3@2x"
+    let iPhoneXR = Platform(rawValue: "iOS-12.1-p3@2x")!
     supportedPlatforms = [iPhoneXR]
     let view = UIView(frame: .init(origin: .zero, size: .init(width: 10, height: 10)))
     assertSnapshot(matching: view, as: .image)
     let snapshotURL = URL(fileURLWithPath: String(#file))
       .deletingLastPathComponent()
-      .appendingPathComponent("__Snapshots__/SnapshotTestingTests/testSimulatorBasedFilenames-1-\(iPhoneXR).png")
+      .appendingPathComponent("__Snapshots__/SnapshotTestingTests/testSimulatorBasedFilenames-1-\(iPhoneXR.rawValue).png")
     XCTAssert(FileManager.default.fileExists(atPath: snapshotURL.path))
   }
   
   func testSimulatorBasedFilenamesBlockAutorecord() {
-    let iPhone5S = "iOS-12.1-srgb@2x"
-    let iPhoneXR = "iOS-12.1-p3@2x"
+    let iPhone5S = Platform(rawValue: "iOS-12.1-srgb@2x")!
+    let iPhoneXR = Platform(rawValue: "iOS-12.1-p3@2x")!
     let view = UIView(frame: .init(origin: .zero, size: .init(width: 10, height: 10)))
 
-    func fileExists(for simulator: String, snapshot number: UInt) -> Bool {
+    func fileExists(for simulator: Platform, snapshot number: UInt) -> Bool {
       let snapshotURL = URL(fileURLWithPath: String(#file))
         .deletingLastPathComponent()
-        .appendingPathComponent("__Snapshots__/SnapshotTestingTests/testSimulatorBasedFilenamesBlockAutorecord-\(number)-\(simulator).png")
+        .appendingPathComponent("__Snapshots__/SnapshotTestingTests/testSimulatorBasedFilenamesBlockAutorecord-\(number)-\(simulator.rawValue).png")
       return FileManager.default.fileExists(atPath: snapshotURL.path)
     }
     // confirm test setup
@@ -609,7 +609,7 @@ final class SnapshotTestingTests: SnapshotTestCase {
     try? FileManager.default.removeItem(at:
       URL(fileURLWithPath: String(#file))
         .deletingLastPathComponent()
-        .appendingPathComponent("__Snapshots__/SnapshotTestingTests/testSimulatorBasedFilenamesBlockAutorecord-2-\(iPhoneXR).png"))
+        .appendingPathComponent("__Snapshots__/SnapshotTestingTests/testSimulatorBasedFilenamesBlockAutorecord-2-\(iPhoneXR.rawValue).png"))
     XCTAssert(!fileExists(for: iPhoneXR, snapshot: 2))
   }
 }
