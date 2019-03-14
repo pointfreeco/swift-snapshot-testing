@@ -1,5 +1,5 @@
 xcodeproj:
-	xcodegen && xed .
+	swift run xcodegen
 
 test-linux:
 	docker build --tag snapshot-testing . \
