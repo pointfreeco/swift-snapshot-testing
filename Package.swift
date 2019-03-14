@@ -10,6 +10,7 @@ let package = Package(
       targets: ["SnapshotTesting"]),
   ],
   dependencies: [
+    .package(url: "https://github.com/yonaskolb/XcodeGen.git", from: "2.2.0"),
   ],
   targets: [
     .target(
