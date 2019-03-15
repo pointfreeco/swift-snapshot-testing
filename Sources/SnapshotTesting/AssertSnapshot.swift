@@ -339,13 +339,28 @@ public struct Platform: Equatable {
   }
   
   enum OS: String {
-    case iOS, macOS, tvOS
+    case iOS, macOS, tvOS, linux
+    
+    init() {
+      #if os(iOS)
+      self = .iOS
+      #endif
+      #if os(macOS)
+      self = .macOS
+      #endif
+      #if os(tvOS)
+      self = .tvOS
+      #endif
+      #if os(Linux)
+      self = .linux
+      #endif
+    }
   }
 }
 
 extension Platform {
   internal init() {
-    os = .iOS // FIXME: x-platform
+    os = OS()
     version = UIDevice.current.systemVersion // FIXME: x-platform
     let traits = UIScreen.main.traitCollection // FIXME: x-platform
     gamut = Gamut(from: traits.displayGamut)
