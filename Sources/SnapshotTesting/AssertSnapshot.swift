@@ -362,9 +362,18 @@ extension Platform {
   internal init() {
     os = OS()
     version = ProcessInfo().operatingSystemVersion.pretty
-    let traits = UIScreen.main.traitCollection // FIXME: x-platform
+    #if os(Linux)
+    gamut = .unspecified
+    scale = 0 // "unspecified" in UITraitCollection.displayScale
+    #endif
+    #if os(iOS) || os(tvOS)
+    let traits = UIScreen.main.traitCollection
     gamut = Gamut(from: traits.displayGamut)
     scale = Int(traits.displayScale)
+    #endif
+    #if os(macOS)
+    // TODO (no trait collection, gamut especially seems to have to read API?)
+    #endif
   }
 }
 
