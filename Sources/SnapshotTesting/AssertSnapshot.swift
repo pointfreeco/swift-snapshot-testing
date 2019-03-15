@@ -361,10 +361,16 @@ public struct Platform: Equatable {
 extension Platform {
   internal init() {
     os = OS()
-    version = UIDevice.current.systemVersion // FIXME: x-platform
+    version = ProcessInfo().operatingSystemVersion.pretty
     let traits = UIScreen.main.traitCollection // FIXME: x-platform
     gamut = Gamut(from: traits.displayGamut)
     scale = Int(traits.displayScale)
+  }
+}
+
+extension OperatingSystemVersion {
+  fileprivate var pretty: String {
+    return patchVersion == 0 ? "\(majorVersion).\(minorVersion)" : "\(majorVersion).\(minorVersion).\(patchVersion)"
   }
 }
 
