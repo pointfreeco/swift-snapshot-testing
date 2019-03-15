@@ -320,39 +320,12 @@ func sanitizePathComponent(_ string: String) -> String {
     .replacingOccurrences(of: "^-|-$", with: "", options: .regularExpression)
 }
 
-public struct Platform: RawRepresentable, Equatable {
+public struct Platform: Equatable {
   let os: OS
   let version: String
   let gamut: Gamut
   let scale: Int
-  
-  public init?(rawValue: String) {
-    let components = rawValue.split(separator: "-")
-    guard components.count == 3 else { return nil }
-    guard let os = OS(rawValue: String(components[0])) else { return nil }
-    guard components[2].last == "x" else { return nil } // FIXME: oh come on this is ridiculous
-    let imageStuff = components[2].dropLast().split(separator: "@")
-    guard imageStuff.count == 2 else { return nil }
-    guard let gamut = Gamut(rawValue: String(imageStuff[0])) else { return nil }
-    guard let scale = Int(imageStuff[1]) else { return nil }
-    self.os = os
-    self.gamut = gamut
-    self.version = String(components[1]) // FIXME: validate it's a version-string?
-    self.scale = scale
-  }
-  
-  public var rawValue: String {
-    return "\(os)-\(version)-\(gamut.rawValue)@\(scale)x"
-  }
-  
-  init() {
-    os = .iOS // FIXME: x-platform
-    version = UIDevice.current.systemVersion // FIXME: x-platform
-    let traits = UIScreen.main.traitCollection // FIXME: x-platform
-    gamut = Gamut(from: traits.displayGamut)
-    scale = Int(traits.displayScale)
-  }
-  
+
   enum Gamut: String {
     case unspecified
     case SRGB = "srgb"
@@ -370,4 +343,40 @@ public struct Platform: RawRepresentable, Equatable {
   enum OS: String {
     case iOS, macOS, tvOS
   }
+}
+
+extension Platform {
+  internal init() {
+    os = .iOS // FIXME: x-platform
+    version = UIDevice.current.systemVersion // FIXME: x-platform
+    let traits = UIScreen.main.traitCollection // FIXME: x-platform
+    gamut = Gamut(from: traits.displayGamut)
+    scale = Int(traits.displayScale)
+  }
+}
+
+extension Platform: RawRepresentable {
+  public var rawValue: String {
+    return "\(os)-\(version)-\(gamut.rawValue)@\(scale)x"
+  }
+  
+  public init?(rawValue: String) {
+    let components = rawValue.split(separator: "-")
+    guard components.count == 3 else { return nil }
+    guard let os = OS(rawValue: String(components[0])) else { return nil }
+    guard components[2].last == "x" else { return nil } // FIXME: oh come on this is ridiculous
+    let imageStuff = components[2].dropLast().split(separator: "@")
+    guard imageStuff.count == 2 else { return nil }
+    guard let gamut = Gamut(rawValue: String(imageStuff[0])) else { return nil }
+    guard let scale = Int(imageStuff[1]) else { return nil }
+    self.os = os
+    self.gamut = gamut
+    self.version = String(components[1]) // FIXME: validate it's a version-string?
+    self.scale = scale
+  }
+}
+
+extension Platform {
+  public static let iPhone5sSimulator_12_1 = Platform(os: .iOS, version: "12.1", gamut: .SRGB, scale: 2)
+  public static let iPhoneXrSimulator_12_1 = Platform(os: .iOS, version: "12.1", gamut: .P3, scale: 2)
 }
