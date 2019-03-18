@@ -18,6 +18,7 @@ final class SnapshotTestingTests: SnapshotTestCase {
 
   override func tearDown() {
     record = false
+    supportedPlatforms = nil
     super.tearDown()
   }
 
@@ -571,6 +572,51 @@ final class SnapshotTestingTests: SnapshotTestCase {
     }
     #endif
   }
+  
+  func testSimulatorBasedFilenames() {
+    supportedPlatforms = [.iPhoneXrSimulator_12_1]
+    let view = UIView(frame: .init(origin: .zero, size: .init(width: 10, height: 10)))
+    assertSnapshot(matching: view, as: .image)
+    let snapshotURL = URL(fileURLWithPath: String(#file))
+      .deletingLastPathComponent()
+      .appendingPathComponent("__Snapshots__/SnapshotTestingTests/testSimulatorBasedFilenames-1-\(Platform.iPhoneXrSimulator_12_1.rawValue).png")
+    XCTAssert(FileManager.default.fileExists(atPath: snapshotURL.path))
+  }
+  
+  func testSimulatorBasedFilenamesBlockAutorecord() {
+    let view = UIView(frame: .init(origin: .zero, size: .init(width: 10, height: 10)))
+
+    func fileExists(for simulator: Platform, snapshot number: UInt) -> Bool {
+      let snapshotURL = URL(fileURLWithPath: String(#file))
+        .deletingLastPathComponent()
+        .appendingPathComponent("__Snapshots__/SnapshotTestingTests/testSimulatorBasedFilenamesBlockAutorecord-\(number)-\(simulator.rawValue).png")
+      return FileManager.default.fileExists(atPath: snapshotURL.path)
+    }
+    // confirm test setup
+    XCTAssert(fileExists(for: .iPhone5sSimulator_12_1, snapshot: 1))
+    XCTAssert(!fileExists(for: .iPhoneXrSimulator_12_1, snapshot: 1))
+    XCTAssert(fileExists(for: .iPhone5sSimulator_12_1, snapshot: 2))
+    XCTAssert(!fileExists(for: .iPhoneXrSimulator_12_1, snapshot: 2))
+
+    // do not autorecord if a same-name snapshot from other simulator exists
+    supportedPlatforms = []
+    let failureBecauseOtherExists = verifySnapshot(matching: view, as: .image)
+    XCTAssert(failureBecauseOtherExists != nil) // FIXME: more specific please
+    XCTAssert(!fileExists(for: .iPhoneXrSimulator_12_1, snapshot: 1))
+
+    // do autorecord (despite the same-name other-simulator snapshot) if this simulator is *explicitly* requested
+    supportedPlatforms = [.iPhoneXrSimulator_12_1]
+    let failureBecauseAutorecording = verifySnapshot(matching: view, as: .image)
+    XCTAssert(failureBecauseAutorecording != nil) // FIXME: more specific please
+    XCTAssert(fileExists(for: .iPhoneXrSimulator_12_1, snapshot: 2))
+
+    // Clean up and check cleanup succeeded
+    try? FileManager.default.removeItem(at:
+      URL(fileURLWithPath: String(#file))
+        .deletingLastPathComponent()
+        .appendingPathComponent("__Snapshots__/SnapshotTestingTests/testSimulatorBasedFilenamesBlockAutorecord-2-\(Platform.iPhoneXrSimulator_12_1.rawValue).png"))
+    XCTAssert(!fileExists(for: .iPhoneXrSimulator_12_1, snapshot: 2))
+  }
 }
 
 #if os(Linux)
@@ -594,6 +640,8 @@ extension SnapshotTestingTests {
       ("testUIView", testUIView),
       ("testURLRequest", testURLRequest),
       ("testWebView", testWebView),
+      ("testSimulatorBasedFilenames", testSimulatorBasedFilenames),
+      ("testSimulatorBasedFilenamesBlockAutorecord", testSimulatorBasedFilenamesBlockAutorecord)
     ]
   }
 }

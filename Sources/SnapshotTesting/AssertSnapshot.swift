@@ -9,6 +9,9 @@ public var diffTool: String? = nil
 /// Whether or not to record all new references.
 public var record = false
 
+/// Simulators and devices to record snapshots for, or nil for pre-2.0 compatibility
+public var supportedPlatforms: [Platform]? = nil
+
 /// Asserts that a given value matches a reference on disk.
 ///
 /// - Parameters:
@@ -190,9 +193,13 @@ public func verifySnapshot<Value, Format>(
         identifier = String(counter)
       }
 
+      let platform = Platform()
       let testName = sanitizePathComponent(testName)
+      let preV2Basename = "\(testName).\(identifier)"
+      let postV2Basename = "\(testName)-\(identifier)-\(platform.rawValue)"
+      let fileBasename: String = supportedPlatforms == nil ? preV2Basename : postV2Basename
       let snapshotFileUrl = snapshotDirectoryUrl
-        .appendingPathComponent("\(testName).\(identifier)")
+        .appendingPathComponent(fileBasename)
         .appendingPathExtension(snapshotting.pathExtension ?? "")
       let fileManager = FileManager.default
       try fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
@@ -223,6 +230,24 @@ public func verifySnapshot<Value, Format>(
           .map { diff, _ in diff.trimmingCharacters(in: .whitespacesAndNewlines) }
           ?? "Recorded snapshot: …"
 
+        // FIXME: check for pre-v2 filename format which will no longer match
+        
+        if let supportedPlatforms = supportedPlatforms,
+          !supportedPlatforms.contains(platform),
+          let otherSnapshots = Optional.some(try fileManager.contentsOfDirectory(
+            atPath: snapshotFileUrl.deletingLastPathComponent().path)),
+          // FIXME: duplicated string-construction
+          let snapshotFromOtherSimulator = otherSnapshots
+            .first(where: { $0.starts(with: "\(testName)-\(identifier)-") }) {
+          // Do *not* autorecord a screenshot, regardless of recording=true
+          // FIXME: this reports only the filename, not full path, of the other snapshot
+          return """
+          A screenshot already exists from an incompatible simulator. To record from this simulator add "\(platform.rawValue)" to SnapshotTesting.supportedPlatforms.
+          
+          see "\(snapshotFromOtherSimulator)"
+          """
+        }
+          
         try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)
         return recording
           ? """
@@ -291,4 +316,95 @@ func sanitizePathComponent(_ string: String) -> String {
   return string
     .replacingOccurrences(of: "\\W+", with: "-", options: .regularExpression)
     .replacingOccurrences(of: "^-|-$", with: "", options: .regularExpression)
+}
+
+public struct Platform: Equatable {
+  let os: OS
+  let version: String
+  let gamut: Gamut
+  let scale: Int
+
+  enum Gamut: String {
+    case unspecified
+    case SRGB = "srgb"
+    case P3 = "p3"
+    
+    init(from gamut: UIDisplayGamut) {
+      switch gamut {
+      case .unspecified: self = .unspecified
+      case .SRGB: self = .SRGB
+      case .P3: self = .P3
+      }
+    }
+  }
+  
+  enum OS: String {
+    case iOS, macOS, tvOS, linux
+    
+    init() {
+      #if os(iOS)
+      self = .iOS
+      #endif
+      #if os(macOS)
+      self = .macOS
+      #endif
+      #if os(tvOS)
+      self = .tvOS
+      #endif
+      #if os(Linux)
+      self = .linux
+      #endif
+    }
+  }
+}
+
+extension Platform {
+  internal init() {
+    os = OS()
+    version = ProcessInfo().operatingSystemVersion.pretty
+    #if os(Linux)
+    gamut = .unspecified
+    scale = 0 // "unspecified" in UITraitCollection.displayScale
+    #endif
+    #if os(iOS) || os(tvOS)
+    let traits = UIScreen.main.traitCollection
+    gamut = Gamut(from: traits.displayGamut)
+    scale = Int(traits.displayScale)
+    #endif
+    #if os(macOS)
+    // TODO (no trait collection, gamut especially seems to have to read API?)
+    #endif
+  }
+}
+
+extension OperatingSystemVersion {
+  fileprivate var pretty: String {
+    return patchVersion == 0 ? "\(majorVersion).\(minorVersion)" : "\(majorVersion).\(minorVersion).\(patchVersion)"
+  }
+}
+
+extension Platform: RawRepresentable {
+  public var rawValue: String {
+    return "\(os)-\(version)-\(gamut.rawValue)@\(scale)x"
+  }
+  
+  public init?(rawValue: String) {
+    let components = rawValue.split(separator: "-")
+    guard components.count == 3 else { return nil }
+    guard let os = OS(rawValue: String(components[0])) else { return nil }
+    guard components[2].last == "x" else { return nil } // FIXME: oh come on this is ridiculous
+    let imageStuff = components[2].dropLast().split(separator: "@")
+    guard imageStuff.count == 2 else { return nil }
+    guard let gamut = Gamut(rawValue: String(imageStuff[0])) else { return nil }
+    guard let scale = Int(imageStuff[1]) else { return nil }
+    self.os = os
+    self.gamut = gamut
+    self.version = String(components[1]) // FIXME: validate it's a version-string?
+    self.scale = scale
+  }
+}
+
+extension Platform {
+  public static let iPhone5sSimulator_12_1 = Platform(os: .iOS, version: "12.1", gamut: .SRGB, scale: 2)
+  public static let iPhoneXrSimulator_12_1 = Platform(os: .iOS, version: "12.1", gamut: .P3, scale: 2)
 }
