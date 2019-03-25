@@ -25,6 +25,12 @@ final class SnapshotTestingTests: SnapshotTestCase {
     struct User { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
     assertSnapshot(matching: user, as: .dump)
+    assertInlineSnapshot(of: user, as: .dump, toMatch: """
+    ▿ User
+      - bio: "Blobbed around the world."
+      - id: 1
+      - name: "Blobby"
+    """)
   }
 
   func testAnySnapshotStringConvertible() {
@@ -35,6 +41,28 @@ final class SnapshotTestingTests: SnapshotTestCase {
     assertSnapshot(matching: "Hello, world!", as: .dump, named: "string")
     assertSnapshot(matching: "Hello, world!".dropLast(8), as: .dump, named: "substring")
     assertSnapshot(matching: URL(string: "https://www.pointfree.co")!, as: .dump, named: "url")
+    // Inline
+    assertInlineSnapshot(of: "a" as Character, as: .dump, toMatch: """
+    - "a"
+    """)
+    assertInlineSnapshot(of: Data("Hello, world!".utf8), as: .dump, toMatch: """
+    - 13 bytes
+    """)
+    assertInlineSnapshot(of: Date(timeIntervalSinceReferenceDate: 0), as: .dump, toMatch: """
+    - 2001-01-01T00:00:00Z
+    """)
+    assertInlineSnapshot(of: NSObject(), as: .dump, toMatch: """
+    - <NSObject>
+    """)
+    assertInlineSnapshot(of: "Hello, world!", as: .dump, toMatch: """
+    - "Hello, world!"
+    """)
+    assertInlineSnapshot(of: "Hello, world!".dropLast(8), as: .dump, toMatch: """
+    - "Hello"
+    """)
+    assertInlineSnapshot(of: URL(string: "https://www.pointfree.co")!, as: .dump, toMatch: """
+    - https://www.pointfree.co
+    """)
   }
 
   func testAutolayout() {
@@ -62,6 +90,24 @@ final class SnapshotTestingTests: SnapshotTestCase {
       set: [.init(name: "Brandon"), .init(name: "Stephen")]
     )
     assertSnapshot(matching: set, as: .dump)
+    assertInlineSnapshot(of: set, as: .dump, toMatch: """
+    ▿ DictionarySetContainer
+      ▿ dict: 3 key/value pairs
+        ▿ (2 elements)
+          - key: "a"
+          - value: 1
+        ▿ (2 elements)
+          - key: "b"
+          - value: 2
+        ▿ (2 elements)
+          - key: "c"
+          - value: 3
+      ▿ set: 2 members
+        ▿ Person
+          - name: "Brandon"
+        ▿ Person
+          - name: "Stephen"
+    """)
   }
 
   func testCaseIterable() {
