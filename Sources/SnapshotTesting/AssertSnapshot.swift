@@ -1,4 +1,3 @@
-#if !os(Linux)
 import XCTest
 
 /// Enhances failure messages with a command line diff tool expression that can be copied and pasted into a terminal.
@@ -32,7 +31,7 @@ public func assertSnapshot<Value, Format>(
   ) {
 
   let failure = verifySnapshot(
-    matching: value,
+    matching: try value(),
     as: snapshotting,
     named: name,
     record: recording,
@@ -65,9 +64,9 @@ public func assertSnapshots<Value, Format>(
   line: UInt = #line
   ) {
 
-  strategies.forEach { name, strategy in
+  try? strategies.forEach { name, strategy in
     assertSnapshot(
-      matching: value,
+      matching: try value(),
       as: strategy,
       named: name,
       record: recording,
@@ -99,9 +98,9 @@ public func assertSnapshots<Value, Format>(
   line: UInt = #line
   ) {
 
-  strategies.forEach { strategy in
+  try? strategies.forEach { strategy in
     assertSnapshot(
-      matching: value,
+      matching: try value(),
       as: strategy,
       record: recording,
       timeout: timeout,
@@ -248,6 +247,8 @@ public func verifySnapshot<Value, Format>(
       case .timedOut:
         return "Exceeded timeout of \(timeout) seconds waiting for snapshot"
       case .incorrectOrder, .invertedFulfillment, .interrupted:
+        return "Couldn't snapshot value"
+      @unknown default:
         return "Couldn't snapshot value"
       }
 
@@ -473,6 +474,7 @@ private var counterMap: [URL: Int] = [:]
 private var recordings: [String: [FileRecording]] = [:]
 private let emptyStringLiteralWithCloseBrace = "\"\")"
 private let multiLineStringLiteralTerminator = "\"\"\""
+
 private func indentation<S: StringProtocol>(of str: S) -> String {
   var count = 0
   for char in str {
@@ -481,9 +483,8 @@ private func indentation<S: StringProtocol>(of str: S) -> String {
   }
   return String(repeating: " ", count: count)
 }
-#endif
 
-func sanitizePathComponent(_ string: String) -> String {
+private func sanitizePathComponent(_ string: String) -> String {
   return string
     .replacingOccurrences(of: "\\W+", with: "-", options: .regularExpression)
     .replacingOccurrences(of: "^-|-$", with: "", options: .regularExpression)

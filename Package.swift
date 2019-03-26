@@ -1,5 +1,5 @@
-// swift-tools-version:4.2
-
+// swift-tools-version:5.0
+import Foundation
 import PackageDescription
 
 let package = Package(
@@ -8,9 +8,6 @@ let package = Package(
     .library(
       name: "SnapshotTesting",
       targets: ["SnapshotTesting"]),
-  ],
-  dependencies: [
-    .package(url: "https://github.com/yonaskolb/XcodeGen.git", from: "2.2.0"),
   ],
   targets: [
     .target(
@@ -21,3 +18,11 @@ let package = Package(
       dependencies: ["SnapshotTesting"]),
   ]
 )
+
+if ProcessInfo.processInfo.environment.keys.contains("PF_DEVELOP") {
+  package.dependencies.append(
+    contentsOf: [
+      .package(url: "https://github.com/yonaskolb/XcodeGen.git", from: "2.3.0"),
+    ]
+  )
+}
