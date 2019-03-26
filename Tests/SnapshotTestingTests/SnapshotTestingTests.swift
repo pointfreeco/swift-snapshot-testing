@@ -9,7 +9,7 @@ import SpriteKit
 import WebKit
 #endif
 
-final class SnapshotTestingTests: SnapshotTestCase {
+final class SnapshotTestingTests: XCTestCase {
   override func setUp() {
     super.setUp()
     diffTool = "ksdiff"
@@ -96,7 +96,7 @@ final class SnapshotTestingTests: SnapshotTestCase {
   func testMixedViews() {
     #if os(iOS) || os(macOS)
     // NB: CircleCI crashes while trying to instantiate SKView.
-    if #available(macOS 10.14, *) {
+    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
       let webView = WKWebView(frame: .init(x: 0, y: 0, width: 50, height: 50))
       webView.loadHTMLString("🌎", baseURL: nil)
 
@@ -134,7 +134,7 @@ final class SnapshotTestingTests: SnapshotTestCase {
     button.bezelStyle = .rounded
     button.title = "Push Me"
     button.sizeToFit()
-    if #available(macOS 10.14, *) {
+    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
       assertSnapshot(matching: button, as: .image)
       assertSnapshot(matching: button, as: .recursiveDescription)
     }
@@ -158,7 +158,7 @@ final class SnapshotTestingTests: SnapshotTestCase {
     label.isBezeled = false
     label.isEditable = false
     #endif
-    if #available(macOS 10.14, *) {
+    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
       label.text = "Hello."
       assertSnapshot(matching: label, as: .image(precision: 0.9), named: platform)
       label.text = "Hello"
@@ -170,7 +170,7 @@ final class SnapshotTestingTests: SnapshotTestCase {
   func testSCNView() {
     #if os(iOS) || os(macOS) || os(tvOS)
     // NB: CircleCI crashes while trying to instantiate SCNView.
-    if #available(macOS 10.14, *) {
+    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
       let scene = SCNScene()
 
       let sphereGeometry = SCNSphere(radius: 3)
@@ -207,7 +207,7 @@ final class SnapshotTestingTests: SnapshotTestCase {
   func testSKView() {
     #if os(iOS) || os(macOS) || os(tvOS)
     // NB: CircleCI crashes while trying to instantiate SKView.
-    if #available(macOS 10.14, *) {
+    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
       let scene = SKScene(size: .init(width: 50, height: 50))
       let node = SKShapeNode(circleOfRadius: 15)
       node.fillColor = .red
@@ -562,7 +562,7 @@ final class SnapshotTestingTests: SnapshotTestCase {
     let html = try String(contentsOf: fixtureUrl)
     let webView = WKWebView()
     webView.loadHTMLString(html, baseURL: nil)
-    if #available(macOS 10.14, *) {
+    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
       assertSnapshot(
         matching: webView,
         as: .image(size: .init(width: 800, height: 600)),
