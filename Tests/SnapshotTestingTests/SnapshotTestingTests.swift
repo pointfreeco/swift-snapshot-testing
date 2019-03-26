@@ -170,7 +170,7 @@ final class SnapshotTestingTests: XCTestCase {
   func testSCNView() {
     #if os(iOS) || os(macOS) || os(tvOS)
     // NB: CircleCI crashes while trying to instantiate SCNView.
-    if #available(macOS 10.14, *) {
+    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
       let scene = SCNScene()
 
       let sphereGeometry = SCNSphere(radius: 3)
@@ -207,7 +207,7 @@ final class SnapshotTestingTests: XCTestCase {
   func testSKView() {
     #if os(iOS) || os(macOS) || os(tvOS)
     // NB: CircleCI crashes while trying to instantiate SKView.
-    if #available(macOS 10.14, *) {
+    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
       let scene = SKScene(size: .init(width: 50, height: 50))
       let node = SKShapeNode(circleOfRadius: 15)
       node.fillColor = .red
