@@ -233,7 +233,7 @@ Records:
 
 A snapshot strategy for comparing images based on pixel equality.
 
-**Format:** `UIImage`
+**Format:** `NSImage`
 
 #### Parameters:
 
@@ -275,10 +275,6 @@ A snapshot strategy for comparing layers based on pixel equality.
 
     A view size override.
     
-  - `traits: UITraitCollection = .init()`
-
-    A trait collection override.
-
 #### Example:
 
 ``` swift
@@ -292,12 +288,6 @@ assertSnapshot(matching: view, as: .image(precision: 0.99))
 assertSnapshot(
   matching: view,
   as: .image(size: .init(width: 44, height: 44))
-)
-
-// Render with a horizontally-compact size class.
-assertSnapshot(
-  matching: view,
-  as: .image(traits: .init(horizontalSizeClass: .regular))
 )
 ```
 
