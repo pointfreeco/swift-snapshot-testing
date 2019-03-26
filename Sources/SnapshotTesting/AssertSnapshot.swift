@@ -138,7 +138,7 @@ public func assertInlineSnapshot<Value>(
   ) {
 
   let failure = verifyInlineSnapshot(
-    of: value,
+    of: try value(),
     as: snapshotting,
     timeout: timeout,
     toMatch: expectedValue,
