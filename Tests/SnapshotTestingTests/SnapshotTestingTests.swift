@@ -96,7 +96,7 @@ final class SnapshotTestingTests: XCTestCase {
   func testMixedViews() {
     #if os(iOS) || os(macOS)
     // NB: CircleCI crashes while trying to instantiate SKView.
-    if #available(macOS 10.14, *) {
+    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
       let webView = WKWebView(frame: .init(x: 0, y: 0, width: 50, height: 50))
       webView.loadHTMLString("🌎", baseURL: nil)
 
@@ -562,7 +562,7 @@ final class SnapshotTestingTests: XCTestCase {
     let html = try String(contentsOf: fixtureUrl)
     let webView = WKWebView()
     webView.loadHTMLString(html, baseURL: nil)
-    if #available(macOS 10.14, *) {
+    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
       assertSnapshot(
         matching: webView,
         as: .image(size: .init(width: 800, height: 600)),
