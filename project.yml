@@ -14,15 +14,18 @@ targets:
     settings:
       ENABLE_BITCODE: false
       FRAMEWORK_SEARCH_PATHS: $(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks
+      SWIFT_VERSION: 5.0
     scheme:
       environmentVariables:
         SNAPSHOT_ARTIFACTS: /tmp/__SnapshotArtifacts__
-      testTargets: [SnapshotTestingTests_$platform]
+      testTargets: ['SnapshotTestingTests_${platform}']
     sources: [Sources]
     type: framework
   SnapshotTestingTests:
-    dependencies: [{target: SnapshotTesting_$platform}]
+    dependencies: [{target: 'SnapshotTesting_${platform}'}]
     platform: [macOS, iOS, tvOS]
+    settings:
+      SWIFT_VERSION: 5.0
     sources:
       - path: Tests
         excludes:

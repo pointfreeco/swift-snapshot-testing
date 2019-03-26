@@ -15,7 +15,7 @@ test-ios:
 	set -o pipefail && \
 	xcodebuild test \
 		-scheme SnapshotTesting_iOS \
-		-destination platform="iOS Simulator,name=iPhone XR,OS=12.1" \
+		-destination platform="iOS Simulator,name=iPhone Xʀ,OS=12.2" \
 
 test-swift:
 	swift test

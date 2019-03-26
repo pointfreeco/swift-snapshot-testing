@@ -9,7 +9,7 @@ import SpriteKit
 import WebKit
 #endif
 
-final class SnapshotTestingTests: SnapshotTestCase {
+final class SnapshotTestingTests: XCTestCase {
   override func setUp() {
     super.setUp()
     diffTool = "ksdiff"

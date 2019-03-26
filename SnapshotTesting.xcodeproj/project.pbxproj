@@ -68,17 +68,14 @@
 		99848560C9BED9C8F028AE6A1F0E2411 /* Diffing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 619A277E9C7B85515EC88C8467B506DA /* Diffing.swift */; };
 		9BCC2F0960B073BFF9FB428745D11B8D /* URLRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA7A398EA6B559423293315830B841FD /* URLRequest.swift */; };
 		9D50BC78E1CD381CC14D8F127445B27A /* CALayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96E01FF29B2959DE5FD093FB07C9ADAB /* CALayer.swift */; };
-		A0E37550A28F360B822B5119473001CC /* SnapshotTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CD2F74288CF52A13C9BB497FD0CD954 /* SnapshotTestCase.swift */; };
 		A30DF11CD95406EC7D9095CAE0FB4A8C /* XCTAttachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE8DE5E8A102E1012CD0C95EC731CF2 /* XCTAttachment.swift */; };
 		A54C692C27C0F7E2EBE0FBE6B5188E0E /* SnapshotTestingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA789F513A8B1E8EF5BF81E23C94CD06 /* SnapshotTestingTests.swift */; };
 		A85FB3B58B2863355416F3F6B103410C /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F429C62A87AC95E13E2D78F7359E51 /* String.swift */; };
 		AA986DA1DFF9C5105364DBFF9B32FB59 /* CALayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96E01FF29B2959DE5FD093FB07C9ADAB /* CALayer.swift */; };
 		B56666955EAADBD0C907A8D0317644DB /* SnapshotTesting.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3BBC3220F45BA5E71F819602DA1999CE /* SnapshotTesting.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		B6E51633E0298368BDDF109693D9BAB4 /* UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810407271A6CB90161DCE6A0A36AC81D /* UIImage.swift */; };
-		BB78E219B5424852F381101CDC02BA4D /* SnapshotTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CD2F74288CF52A13C9BB497FD0CD954 /* SnapshotTestCase.swift */; };
 		BE3A4EFEFA6C4654CB4B2DCD1A6D5B27 /* SpriteKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4055310797F1D4813ABD035936F5DE73 /* SpriteKit.swift */; };
 		C4CD3E6D700486FF032EAFEED020ACA4 /* UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D04C79E5D44F1874BBACB114F57EEA2 /* UIView.swift */; };
-		CCEF731FDEAC0A57E73A4A3FB88BCF98 /* SnapshotTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CD2F74288CF52A13C9BB497FD0CD954 /* SnapshotTestCase.swift */; };
 		CE9D13123AC9A9432457D626AEFF901C /* SnapshotTesting.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8F9883B60A8B403A39BCF888507E9BB5 /* SnapshotTesting.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CF644E54D9FA062E6F15132324941790 /* NSView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D57E3B929139A0C14AEBA771BE0BDB /* NSView.swift */; };
 		CFCC1F1FC09C71E7A4174EAB34BC0963 /* Snapshotting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D7D5B93AE097C0B92B78931A6CF4051 /* Snapshotting.swift */; };
@@ -174,7 +171,6 @@
 		5580E7AC2CEBEA656780C7A91CD9CBAC /* SceneKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneKit.swift; sourceTree = "<group>"; };
 		58583084B2E2BC023E981D2B0F74C2A5 /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
 		5AAFA3BB389939B18F4D71876456FD66 /* UIViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewController.swift; sourceTree = "<group>"; };
-		5CD2F74288CF52A13C9BB497FD0CD954 /* SnapshotTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotTestCase.swift; sourceTree = "<group>"; };
 		619A277E9C7B85515EC88C8467B506DA /* Diffing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diffing.swift; sourceTree = "<group>"; };
 		6244D0EADF210BE6E3CE2EE767C37ED1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		646ABA578B433C2F4DD4A086AD993126 /* Async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Async.swift; sourceTree = "<group>"; };
@@ -246,7 +242,6 @@
 				646ABA578B433C2F4DD4A086AD993126 /* Async.swift */,
 				8EEE36D7D9E53E70DABA3996A0CBB95F /* Diff.swift */,
 				619A277E9C7B85515EC88C8467B506DA /* Diffing.swift */,
-				5CD2F74288CF52A13C9BB497FD0CD954 /* SnapshotTestCase.swift */,
 				9D7D5B93AE097C0B92B78931A6CF4051 /* Snapshotting.swift */,
 				D37322FEADE9539AF927F08CE34CEAC7 /* Common */,
 				F9BB85DCB605867FAE2159445EC3BA7B /* Snapshotting */,
@@ -479,7 +474,6 @@
 				22F4AA4D5EACCC850B8E168EE6D4EADC /* NSViewController.swift in Sources */,
 				785EA7D584B3B2931C79B74D77A26D65 /* PlistEncoder.swift in Sources */,
 				5D6691BB5397A9F6D26365398AA1D2CB /* SceneKit.swift in Sources */,
-				A0E37550A28F360B822B5119473001CC /* SnapshotTestCase.swift in Sources */,
 				89D5FBBC4C20A7AACCA4889ED4C81457 /* Snapshotting.swift in Sources */,
 				E1B0DCA81846C554FD2635A784E8729A /* SpriteKit.swift in Sources */,
 				367ECD2CC593DDD9754164899ED3F5D1 /* String.swift in Sources */,
@@ -512,7 +506,6 @@
 				530139DE598DCF3E48E86E934D100049 /* NSViewController.swift in Sources */,
 				614215917A308BD31299E17E19E237B3 /* PlistEncoder.swift in Sources */,
 				550935276751FB2E116934D141BC50B8 /* SceneKit.swift in Sources */,
-				CCEF731FDEAC0A57E73A4A3FB88BCF98 /* SnapshotTestCase.swift in Sources */,
 				CFCC1F1FC09C71E7A4174EAB34BC0963 /* Snapshotting.swift in Sources */,
 				BE3A4EFEFA6C4654CB4B2DCD1A6D5B27 /* SpriteKit.swift in Sources */,
 				A85FB3B58B2863355416F3F6B103410C /* String.swift in Sources */,
@@ -563,7 +556,6 @@
 				0CCB2E9CC806441D8F6B3F669180E387 /* NSViewController.swift in Sources */,
 				990C475228C9D9EA025C0C6D38614A95 /* PlistEncoder.swift in Sources */,
 				ED0F07BDB79D93B6EB1B5D7BDC5F9EA5 /* SceneKit.swift in Sources */,
-				BB78E219B5424852F381101CDC02BA4D /* SnapshotTestCase.swift in Sources */,
 				9041BB8A16C019899875AA6E77A8C376 /* Snapshotting.swift in Sources */,
 				0C8484D309F0D80152E1D7F898B377A8 /* SpriteKit.swift in Sources */,
 				DFA64386ABEA74F4294E22264171CCAA /* String.swift in Sources */,
@@ -611,10 +603,15 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				INFOPLIST_FILE = Tests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "co.pointfree.SnapshotTestingTests-iOS";
 				PRODUCT_NAME = SnapshotTestingTests;
 				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -624,10 +621,15 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				INFOPLIST_FILE = Tests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "co.pointfree.SnapshotTestingTests-tvOS";
 				PRODUCT_NAME = SnapshotTestingTests;
 				SDKROOT = appletvos;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 3;
 			};
 			name = Debug;
@@ -637,10 +639,15 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				INFOPLIST_FILE = Tests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "co.pointfree.SnapshotTestingTests-iOS";
 				PRODUCT_NAME = SnapshotTestingTests;
 				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -656,14 +663,21 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
 				INFOPLIST_FILE = Sources/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "co.pointfree.SnapshotTesting-macOS";
 				PRODUCT_NAME = SnapshotTesting;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -674,10 +688,15 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = Tests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "co.pointfree.SnapshotTestingTests-macOS";
 				PRODUCT_NAME = SnapshotTestingTests;
 				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -692,14 +711,21 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
 				INFOPLIST_FILE = Sources/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "co.pointfree.SnapshotTesting-macOS";
 				PRODUCT_NAME = SnapshotTesting;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
@@ -767,14 +793,21 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
 				INFOPLIST_FILE = Sources/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "co.pointfree.SnapshotTesting-iOS";
 				PRODUCT_NAME = SnapshotTesting;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -790,14 +823,21 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
 				INFOPLIST_FILE = Sources/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "co.pointfree.SnapshotTesting-iOS";
 				PRODUCT_NAME = SnapshotTesting;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -813,14 +853,21 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
 				INFOPLIST_FILE = Sources/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "co.pointfree.SnapshotTesting-tvOS";
 				PRODUCT_NAME = SnapshotTesting;
 				SDKROOT = appletvos;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 3;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -892,10 +939,15 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				INFOPLIST_FILE = Tests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "co.pointfree.SnapshotTestingTests-tvOS";
 				PRODUCT_NAME = SnapshotTestingTests;
 				SDKROOT = appletvos;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 3;
 			};
 			name = Release;
@@ -910,14 +962,21 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
 				INFOPLIST_FILE = Sources/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "co.pointfree.SnapshotTesting-tvOS";
 				PRODUCT_NAME = SnapshotTesting;
 				SDKROOT = appletvos;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 3;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -929,10 +988,15 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = Tests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "co.pointfree.SnapshotTestingTests-macOS";
 				PRODUCT_NAME = SnapshotTestingTests;
 				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
