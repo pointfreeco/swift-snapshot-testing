@@ -40,6 +40,7 @@ If you'd like to submit your own custom strategy, see [Contributing](../CONTRIBU
       - [`.recursiveDescription`](#recursivedescription-3)
   - [`URLRequest`](#urlrequest)
       - [`.raw`](#raw)
+      - [`.curlRepresentation`](#curlRepresentation)
 
 ## Any
 
@@ -719,3 +720,26 @@ Cookie: pf_session={"userId":"1"}
 
 email=blob%40pointfree.co&name=Blob
 ```
+
+### `.curlRepresentation`
+
+A snapshot strategy for comparing requests based on a cURL representation.
+
+**Format:** `String`
+
+#### Example:
+
+``` swift
+assertSnapshot(matching: request, as: .curlRepresentation)
+```
+
+Records:
+
+```
+curl \
+	-X POST \
+	-H "Accept: text/html" \
+	-d 'pricing[billing]=monthly&pricing[lane]=individual' \
+	"https://www.pointfree.co/subscribe"
+```
+

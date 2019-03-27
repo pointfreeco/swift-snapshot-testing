@@ -1,0 +1,3 @@
+curl \
+	--head \
+	"https://www.pointfree.co/"

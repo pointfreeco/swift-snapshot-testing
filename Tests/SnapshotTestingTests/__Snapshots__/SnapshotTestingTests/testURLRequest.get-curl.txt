@@ -1,0 +1,3 @@
+curl \
+	-H "Accept: text/html" \
+	"https://www.pointfree.co/"
