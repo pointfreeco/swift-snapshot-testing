@@ -18,7 +18,7 @@ extension Snapshotting where Value == URLRequest, Format == String {
   }
   
   /// A snapshot strategy for comparing requests based on a cURL representation.
-  public static let curlRepresentation = SimplySnapshotting.lines.pullback { (request: URLRequest) in
+  public static let curl = SimplySnapshotting.lines.pullback { (request: URLRequest) in
 
     var components = ["curl"]
 
