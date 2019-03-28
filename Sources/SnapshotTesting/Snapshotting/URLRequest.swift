@@ -27,14 +27,14 @@ extension Snapshotting where Value == URLRequest, Format == String {
     switch httpMethod {
     case "GET": break
     case "HEAD": components.append("--head")
-    default: components.append("-X \(httpMethod)")
+    default: components.append("--request \(httpMethod)")
     }
 
     // Headers
     if let headers = request.allHTTPHeaderFields {
       for (field, value) in headers where field != "Cookie" {
         let escapedValue = value.replacingOccurrences(of: "\"", with: "\\\"")
-        components.append("-H \"\(field): \(escapedValue)\"")
+        components.append("--header \"\(field): \(escapedValue)\"")
       }
     }
 
@@ -43,7 +43,13 @@ extension Snapshotting where Value == URLRequest, Format == String {
       var escapedBody = httpBody.replacingOccurrences(of: "\\\"", with: "\\\\\"")
       escapedBody = escapedBody.replacingOccurrences(of: "\"", with: "\\\"")
       
-      components.append("-d '\(escapedBody)'")
+      components.append("--data '\(escapedBody)'")
+    }
+    
+    // Cookies
+    if let cookie = request.allHTTPHeaderFields?["Cookie"] {
+      let escapedValue = cookie.replacingOccurrences(of: "\"", with: "\\\"")
+      components.append("--cookie \"\(escapedValue)\"")
     }
 
     // URL

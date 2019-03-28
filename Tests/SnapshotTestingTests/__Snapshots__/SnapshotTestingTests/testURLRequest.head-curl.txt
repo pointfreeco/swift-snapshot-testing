@@ -1,3 +1,4 @@
 curl \
 	--head \
+	--cookie "pf_session={}" \
 	"https://www.pointfree.co/"
