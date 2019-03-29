@@ -1,4 +1,4 @@
-FROM swift:4.2
+FROM norionomura/swift:swift-5.0-branch
 
 WORKDIR /package
 

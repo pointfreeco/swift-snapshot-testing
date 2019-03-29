@@ -7,10 +7,10 @@ public struct Snapshotting<Value, Format> {
   public var pathExtension: String?
 
   /// How the snapshot format is diffed and converted to and from data.
-  public let diffing: Diffing<Format>
+  public var diffing: Diffing<Format>
 
   /// How a value is transformed into a diffable snapshot format.
-  public let snapshot: (Value) -> Async<Format>
+  public var snapshot: (Value) -> Async<Format>
 
   /// Creates a snapshot strategy.
   ///

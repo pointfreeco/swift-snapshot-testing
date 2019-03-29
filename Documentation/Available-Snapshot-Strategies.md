@@ -39,6 +39,7 @@ If you'd like to submit your own custom strategy, see [Contributing](../CONTRIBU
       - [`.image`](#image-8)
       - [`.recursiveDescription`](#recursivedescription-3)
   - [`URLRequest`](#urlrequest)
+      - [`.curl`](#curl)
       - [`.raw`](#raw)
 
 ## Any
@@ -115,7 +116,7 @@ A snapshot strategy for comparing layers based on pixel equality.
 assertSnapshot(matching: layer, as: .image)
 
 // Allow for a 1% pixel difference.
-assertSnapshot(matching: layer, as: .image(precision: 0.99)
+assertSnapshot(matching: layer, as: .image(precision: 0.99))
 ```
 
 ## CaseIterable
@@ -233,7 +234,7 @@ Records:
 
 A snapshot strategy for comparing images based on pixel equality.
 
-**Format:** `UIImage`
+**Format:** `NSImage`
 
 #### Parameters:
 
@@ -248,7 +249,7 @@ A snapshot strategy for comparing images based on pixel equality.
 assertSnapshot(matching: image, as: .image)
 
 // Allow for a 1% pixel difference.
-assertSnapshot(matching: image, as: .image(precision: 0.99)
+assertSnapshot(matching: image, as: .image(precision: 0.99))
 ```
 
 ## NSView
@@ -258,6 +259,8 @@ assertSnapshot(matching: image, as: .image(precision: 0.99)
 ### `.image`
 
 A snapshot strategy for comparing layers based on pixel equality.
+
+> Note: Snapshots must be compared on the same OS as the device that originally took the reference to avoid discrepancies between images.
 
 **Format:** `NSImage`
 
@@ -273,10 +276,6 @@ A snapshot strategy for comparing layers based on pixel equality.
 
     A view size override.
     
-  - `traits: UITraitCollection = .init()`
-
-    A trait collection override.
-
 #### Example:
 
 ``` swift
@@ -284,18 +283,12 @@ A snapshot strategy for comparing layers based on pixel equality.
 assertSnapshot(matching: view, as: .image)
 
 // Allow for a 1% pixel difference.
-assertSnapshot(matching: view, as: .image(precision: 0.99)
+assertSnapshot(matching: view, as: .image(precision: 0.99))
 
 // Render at a certain size.
 assertSnapshot(
   matching: view,
-  as: .image(size: .init(width: 44, height: 44)
-)
-
-// Render with a horizontally-compact size class.
-assertSnapshot(
-  matching: view,
-  as: .image(traits: .init(horizontalSizeClass: .regular))
+  as: .image(size: .init(width: 44, height: 44))
 )
 ```
 
@@ -322,6 +315,8 @@ A=autoresizesSubviews, C=canDrawConcurrently, D=needsDisplay, F=flipped, G=gstat
 
 ## NSViewController
 
+> Note: Snapshots must be compared on the same OS as the device that originally took the reference to avoid discrepancies between images.
+
 ### `.image`
 
 A snapshot strategy for comparing layers based on pixel equality.
@@ -345,12 +340,12 @@ A snapshot strategy for comparing layers based on pixel equality.
 assertSnapshot(matching: vc, as: .image)
 
 // Allow for a 1% pixel difference.
-assertSnapshot(matching: vc, as: .image(precision: 0.99)
+assertSnapshot(matching: vc, as: .image(precision: 0.99))
 
 // Render at a certain size.
 assertSnapshot(
   matching: vc,
-  as: .image(size: .init(width: 640, height: 480)
+  as: .image(size: .init(width: 640, height: 480))
 )
 ```
 
@@ -474,7 +469,7 @@ A snapshot strategy for comparing images based on pixel equality.
 assertSnapshot(matching: image, as: .image)
 
 // Allow for a 1% pixel difference.
-assertSnapshot(matching: image, as: .image(precision: 0.99)
+assertSnapshot(matching: image, as: .image(precision: 0.99))
 ```
 
 ## UIView
@@ -484,6 +479,8 @@ assertSnapshot(matching: image, as: .image(precision: 0.99)
 ### `.image`
 
 A snapshot strategy for comparing layers based on pixel equality.
+
+> Note: Snapshots must be compared using a simulator with the same OS, device gamut, and scale as the simulator that originally took the reference to avoid discrepancies between images.
 
 **Format:** `UIImage`
 
@@ -514,12 +511,12 @@ A snapshot strategy for comparing layers based on pixel equality.
 assertSnapshot(matching: view, as: .image)
 
 // Allow for a 1% pixel difference.
-assertSnapshot(matching: view, as: .image(precision: 0.99)
+assertSnapshot(matching: view, as: .image(precision: 0.99))
 
 // Render at a certain size.
 assertSnapshot(
   matching: view,
-  as: .image(size: .init(width: 44, height: 44)
+  as: .image(size: .init(width: 44, height: 44))
 )
 
 // Render with a horizontally-compact size class.
@@ -552,10 +549,10 @@ A snapshot strategy for comparing views based on a recursive description of thei
 assertSnapshot(matching: view, as: .recursiveDescription)
 
 // Layout with a certain size.
-assertSnapshot(matching: view, as: .recursiveDescription(size: .init(width: 22, height: 22))
+assertSnapshot(matching: view, as: .recursiveDescription(size: .init(width: 22, height: 22)))
 
 // Layout with a certain trait collection.
-assertSnapshot(matching: view, as: .recursiveDescription(traits: .init(horizontalSizeClass: .regular))
+assertSnapshot(matching: view, as: .recursiveDescription(traits: .init(horizontalSizeClass: .regular)))
 ```
 
 Records:
@@ -602,6 +599,8 @@ Records:
 
 A snapshot strategy for comparing layers based on pixel equality.
 
+> Note: Snapshots must be compared using a simulator with the same OS, device gamut, and scale as the simulator that originally took the reference to avoid discrepancies between images.
+
 **Format:** `UIImage`
 
 #### Parameters:
@@ -637,7 +636,7 @@ A snapshot strategy for comparing layers based on pixel equality.
 assertSnapshot(matching: vc, as: .image)
 
 // Allow for a 1% pixel difference.
-assertSnapshot(matching: vc, as: .image(precision: 0.99)
+assertSnapshot(matching: vc, as: .image(precision: 0.99))
 
 // Render as if on a certain device.
 assertSnapshot(matching: vc, on: .iPhoneX(.portrait))
@@ -645,7 +644,7 @@ assertSnapshot(matching: vc, on: .iPhoneX(.portrait))
 // Render at a certain size.
 assertSnapshot(
   matching: vc,
-  as: .image(size: .init(width: 375, height: 667)
+  as: .image(size: .init(width: 375, height: 667))
 )
 
 // Render with a horizontally-compact size class.
@@ -687,7 +686,7 @@ A snapshot strategy for comparing view controller views based on a recursive des
 assertSnapshot(matching: vc, as: .recursiveDescription)
 
 // Layout as if on a certain device.
-assertSnapshot(matching: vc, as: .recursiveDescription(on: .iPhoneSe(.portrait))
+assertSnapshot(matching: vc, as: .recursiveDescription(on: .iPhoneSe(.portrait)))
 ```
 
 Records:
@@ -700,6 +699,28 @@ Records:
 ## URLRequest
 
 **Platforms:** All
+
+### `.curl`
+
+A snapshot strategy for comparing requests based on a cURL representation.
+
+**Format:** `String`
+
+#### Example:
+
+``` swift
+assertSnapshot(matching: request, as: .curl)
+```
+
+Records:
+
+```
+curl \
+	--request POST \
+	--header "Accept: text/html" \
+	--data 'pricing[billing]=monthly&pricing[lane]=individual' \
+	"https://www.pointfree.co/subscribe"
+```
 
 ### `.raw`
 
