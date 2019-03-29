@@ -284,6 +284,8 @@ public func verifySnapshot<Value, Format>(
     }
 }
 
+// MARK: - Private
+
 private let counterQueue = DispatchQueue(label: "co.pointfree.SnapshotTesting.counter")
 private var counterMap: [URL: Int] = [:]
 
