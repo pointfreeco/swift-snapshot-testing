@@ -39,6 +39,7 @@ If you'd like to submit your own custom strategy, see [Contributing](../CONTRIBU
       - [`.image`](#image-8)
       - [`.recursiveDescription`](#recursivedescription-3)
   - [`URLRequest`](#urlrequest)
+      - [`.curl`](#curl)
       - [`.raw`](#raw)
 
 ## Any
@@ -698,6 +699,28 @@ Records:
 ## URLRequest
 
 **Platforms:** All
+
+### `.curl`
+
+A snapshot strategy for comparing requests based on a cURL representation.
+
+**Format:** `String`
+
+#### Example:
+
+``` swift
+assertSnapshot(matching: request, as: .curl)
+```
+
+Records:
+
+```
+curl \
+	--request POST \
+	--header "Accept: text/html" \
+	--data 'pricing[billing]=monthly&pricing[lane]=individual' \
+	"https://www.pointfree.co/subscribe"
+```
 
 ### `.raw`
 

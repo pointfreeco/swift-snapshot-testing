@@ -1,0 +1,4 @@
+curl \
+	--header "Accept: text/html" \
+	--cookie "pf_session={}" \
+	"https://www.pointfree.co/"
