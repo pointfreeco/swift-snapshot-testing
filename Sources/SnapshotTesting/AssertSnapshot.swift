@@ -113,11 +113,11 @@ public func assertSnapshots<Value, Format>(
 
 /// Asserts that a given value matches a string literal.
 ///
-/// Note: Empty `expectedValue` will be replaced automatically with generated output.
+/// Note: Empty `reference` will be replaced automatically with generated output.
 ///
 /// Usage:
 /// ```
-/// assertInlineSnapshot(of: value, as: .dump, toMatch: """
+/// _assertInlineSnapshot(matching: value, as: .dump, with: """
 /// """)
 /// ```
 ///
@@ -125,24 +125,26 @@ public func assertSnapshots<Value, Format>(
 ///   - value: A value to compare against a reference.
 ///   - snapshotting: A strategy for serializing, deserializing, and comparing values.
 ///   - timeout: The amount of time a snapshot must be generated in.
-///   - expectedValue: The expected output of snapshotting.
+///   - reference: The expected output of snapshotting.
 ///   - file: The file in which failure occurred. Defaults to the file name of the test case in which this function was called.
 ///   - line: The line number on which failure occurred. Defaults to the line number on which this function was called.
-public func assertInlineSnapshot<Value>(
-  of value: @autoclosure () throws -> Value,
+public func _assertInlineSnapshot<Value>(
+  matching value: @autoclosure () throws -> Value,
   as snapshotting: Snapshotting<Value, String>,
   timeout: TimeInterval = 5,
-  toMatch expectedValue: String,
+  with reference: String,
   file: StaticString = #file,
+  testName: String = #function,
   line: UInt = #line
   ) {
 
-  let failure = verifyInlineSnapshot(
-    of: try value(),
+  let failure = _verifyInlineSnapshot(
+    matching: try value(),
     as: snapshotting,
     timeout: timeout,
-    toMatch: expectedValue,
+    with: reference,
     file: file,
+    testName: testName,
     line: line
   )
   guard let message = failure else { return }
@@ -330,17 +332,18 @@ public func verifySnapshot<Value, Format>(
 ///   - value: A value to compare against a reference.
 ///   - snapshotting: A strategy for serializing, deserializing, and comparing values.
 ///   - timeout: The amount of time a snapshot must be generated in.
-///   - expectedValue: The expected output of snapshotting.
+///   - reference: The expected output of snapshotting.
 ///   - file: The file in which failure occurred. Defaults to the file name of the test case in which this function was called.
 ///   - testName: The name of the test in which failure occurred. Defaults to the function name of the test case in which this function was called.
 ///   - line: The line number on which failure occurred. Defaults to the line number on which this function was called.
 /// - Returns: A failure message or, if the value matches, nil.
-public func verifyInlineSnapshot<Value>(
-  of value: @autoclosure () throws -> Value,
+public func _verifyInlineSnapshot<Value>(
+  matching value: @autoclosure () throws -> Value,
   as snapshotting: Snapshotting<Value, String>,
   timeout: TimeInterval = 5,
-  toMatch expectedValue: String,
+  with reference: String,
   file: StaticString = #file,
+  testName: String = #function,
   line: UInt = #line
   )
   -> String? {
@@ -360,6 +363,8 @@ public func verifyInlineSnapshot<Value>(
         return "Exceeded timeout of \(timeout) seconds waiting for snapshot"
       case .incorrectOrder, .invertedFulfillment, .interrupted:
         return "Couldn't snapshot value"
+      @unknown default:
+        return "Couldn't snapshot value"
       }
 
       let trimmingChars = CharacterSet.whitespacesAndNewlines.union(CharacterSet(charactersIn: "\u{FEFF}"))
@@ -367,7 +372,7 @@ public func verifyInlineSnapshot<Value>(
         return "Couldn't snapshot value"
       }
 
-      let trimmedReference = expectedValue.trimmingCharacters(in: .whitespacesAndNewlines)
+      let trimmedReference = reference.trimmingCharacters(in: .whitespacesAndNewlines)
 
       /// Always perform diff, and return early on success!
       guard let (failure, attachments) = snapshotting.diffing.diff(trimmedReference, diffable) else {
@@ -392,9 +397,9 @@ public func verifyInlineSnapshot<Value>(
         if sourceCodeLines[functionLineIndex].hasSuffix(emptyStringLiteralWithCloseBrace) {
           /// eg.
           /// Converting:
-          ///    assertInlineSnapshot(of: value, as: .dump, toMatch: "")
+          ///    _assertInlineSnapshot(matching: value, as: .dump, with: "")
           /// to:
-          ///    assertInlineSnapshot(of: value, as: .dump, toMatch: """
+          ///    _assertInlineSnapshot(matching: value, as: .dump, with: """
           ///    """)
           var functionCallLine = sourceCodeLines.remove(at: functionLineIndex)
           functionCallLine.removeLast(emptyStringLiteralWithCloseBrace.count)
@@ -408,7 +413,7 @@ public func verifyInlineSnapshot<Value>(
 
         /// If they haven't got a multi-line literal by now, then just fail.
         guard sourceCodeLines[functionLineIndex].hasSuffix(multiLineStringLiteralTerminator) else {
-          return "Please convert to a multi-line literal."
+          return "To use inline snapshots, please convert `with` argument to a multi-line literal."
         }
 
         /// Find the end of multi-line literal and replace contents with recording.
@@ -433,7 +438,11 @@ public func verifyInlineSnapshot<Value>(
 
           if otherRecordings.isEmpty {
             /// If no other recording has been made, then fail!
-            return "🆕 Test updated! Please re-run test."
+            return """
+            No reference was found inline. Automatically recorded snapshot.
+
+            Re-run "\(sanitizePathComponent(testName))" to test against the newly-recorded snapshot.
+            """
           } else {
             /// There is already an failure in this file,
             /// and we don't want to write to the wrong place.
