@@ -614,7 +614,18 @@ final class SnapshotTestingTests: XCTestCase {
     post.httpBody = Data("""
                          {"pricing": {"lane": "individual","billing": "monthly"}}
                          """.utf8)
-    assertSnapshot(matching: post, as: .raw, named: "post-json")
+    _assertInlineSnapshot(matching: post, as: .raw(pretty: true), with: """
+    POST https://www.pointfree.co/subscribe
+    Accept: application/json
+    Cookie: pf_session={"user_id":"0"}
+    
+    {
+      "pricing" : {
+        "billing" : "monthly",
+        "lane" : "individual"
+      }
+    }
+    """)
   }
 
   func testWebView() throws {
