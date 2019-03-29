@@ -716,9 +716,9 @@ Records:
 
 ```
 curl \
-	-X POST \
-	-H "Accept: text/html" \
-	-d 'pricing[billing]=monthly&pricing[lane]=individual' \
+	--request POST \
+	--header "Accept: text/html" \
+	--data 'pricing[billing]=monthly&pricing[lane]=individual' \
 	"https://www.pointfree.co/subscribe"
 ```
 
