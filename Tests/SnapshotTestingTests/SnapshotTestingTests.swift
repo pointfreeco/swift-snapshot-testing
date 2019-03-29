@@ -9,13 +9,7 @@ import SpriteKit
 import WebKit
 #endif
 
-#if os(Linux)
-typealias TestCase = SnapshotTestCase
-#else
-typealias TestCase = XCTestCase
-#endif
-
-class SnapshotTestingTests: TestCase {
+final class SnapshotTestingTests: XCTestCase {
   override func setUp() {
     super.setUp()
     diffTool = "ksdiff"
@@ -31,6 +25,12 @@ class SnapshotTestingTests: TestCase {
     struct User { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
     assertSnapshot(matching: user, as: .dump)
+    _assertInlineSnapshot(matching: user, as: .dump, with: """
+    ▿ User
+      - bio: "Blobbed around the world."
+      - id: 1
+      - name: "Blobby"
+    """)
   }
 
   func testAnySnapshotStringConvertible() {
@@ -41,6 +41,28 @@ class SnapshotTestingTests: TestCase {
     assertSnapshot(matching: "Hello, world!", as: .dump, named: "string")
     assertSnapshot(matching: "Hello, world!".dropLast(8), as: .dump, named: "substring")
     assertSnapshot(matching: URL(string: "https://www.pointfree.co")!, as: .dump, named: "url")
+    // Inline
+    _assertInlineSnapshot(matching: "a" as Character, as: .dump, with: """
+    - "a"
+    """)
+    _assertInlineSnapshot(matching: Data("Hello, world!".utf8), as: .dump, with: """
+    - 13 bytes
+    """)
+    _assertInlineSnapshot(matching: Date(timeIntervalSinceReferenceDate: 0), as: .dump, with: """
+    - 2001-01-01T00:00:00Z
+    """)
+    _assertInlineSnapshot(matching: NSObject(), as: .dump, with: """
+    - <NSObject>
+    """)
+    _assertInlineSnapshot(matching: "Hello, world!", as: .dump, with: """
+    - "Hello, world!"
+    """)
+    _assertInlineSnapshot(matching: "Hello, world!".dropLast(8), as: .dump, with: """
+    - "Hello"
+    """)
+    _assertInlineSnapshot(matching: URL(string: "https://www.pointfree.co")!, as: .dump, with: """
+    - https://www.pointfree.co
+    """)
   }
 
   func testAutolayout() {
@@ -68,6 +90,24 @@ class SnapshotTestingTests: TestCase {
       set: [.init(name: "Brandon"), .init(name: "Stephen")]
     )
     assertSnapshot(matching: set, as: .dump)
+    _assertInlineSnapshot(matching: set, as: .dump, with: """
+    ▿ DictionarySetContainer
+      ▿ dict: 3 key/value pairs
+        ▿ (2 elements)
+          - key: "a"
+          - value: 1
+        ▿ (2 elements)
+          - key: "b"
+          - value: 2
+        ▿ (2 elements)
+          - key: "c"
+          - value: 3
+      ▿ set: 2 members
+        ▿ Person
+          - name: "Brandon"
+        ▿ Person
+          - name: "Stephen"
+    """)
   }
 
   func testCaseIterable() {
@@ -102,7 +142,7 @@ class SnapshotTestingTests: TestCase {
   func testMixedViews() {
     #if os(iOS) || os(macOS)
     // NB: CircleCI crashes while trying to instantiate SKView.
-    if #available(macOS 10.14, *) {
+    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
       let webView = WKWebView(frame: .init(x: 0, y: 0, width: 50, height: 50))
       webView.loadHTMLString("🌎", baseURL: nil)
 
@@ -140,7 +180,7 @@ class SnapshotTestingTests: TestCase {
     button.bezelStyle = .rounded
     button.title = "Push Me"
     button.sizeToFit()
-    if #available(macOS 10.14, *) {
+    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
       assertSnapshot(matching: button, as: .image)
       assertSnapshot(matching: button, as: .recursiveDescription)
     }
@@ -164,7 +204,7 @@ class SnapshotTestingTests: TestCase {
     label.isBezeled = false
     label.isEditable = false
     #endif
-    if #available(macOS 10.14, *) {
+    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
       label.text = "Hello."
       assertSnapshot(matching: label, as: .image(precision: 0.9), named: platform)
       label.text = "Hello"
@@ -176,7 +216,7 @@ class SnapshotTestingTests: TestCase {
   func testSCNView() {
     #if os(iOS) || os(macOS) || os(tvOS)
     // NB: CircleCI crashes while trying to instantiate SCNView.
-    if #available(macOS 10.14, *) {
+    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
       let scene = SCNScene()
 
       let sphereGeometry = SCNSphere(radius: 3)
@@ -213,7 +253,7 @@ class SnapshotTestingTests: TestCase {
   func testSKView() {
     #if os(iOS) || os(macOS) || os(tvOS)
     // NB: CircleCI crashes while trying to instantiate SKView.
-    if #available(macOS 10.14, *) {
+    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
       let scene = SKScene(size: .init(width: 50, height: 50))
       let node = SKShapeNode(circleOfRadius: 15)
       node.fillColor = .red
@@ -340,6 +380,7 @@ class SnapshotTestingTests: TestCase {
       assertSnapshot(matching: viewController, as: .image(on: .iPhoneXsMax), named: "iphone-xs-max")
       assertSnapshot(matching: viewController, as: .image(on: .iPadMini), named: "ipad-mini")
       assertSnapshot(matching: viewController, as: .image(on: .iPadPro10_5), named: "ipad-pro-10-5")
+      assertSnapshot(matching: viewController, as: .image(on: .iPadPro11), named: "ipad-pro-11")
       assertSnapshot(matching: viewController, as: .image(on: .iPadPro12_9), named: "ipad-pro-12-9")
 
       assertSnapshot(matching: viewController, as: .recursiveDescription(on: .iPhoneSe), named: "iphone-se")
@@ -350,6 +391,7 @@ class SnapshotTestingTests: TestCase {
       assertSnapshot(matching: viewController, as: .recursiveDescription(on: .iPhoneXsMax), named: "iphone-xs-max")
       assertSnapshot(matching: viewController, as: .recursiveDescription(on: .iPadMini), named: "ipad-mini")
       assertSnapshot(matching: viewController, as: .recursiveDescription(on: .iPadPro10_5), named: "ipad-pro-10-5")
+      assertSnapshot(matching: viewController, as: .recursiveDescription(on: .iPadPro11), named: "ipad-pro-11")
       assertSnapshot(matching: viewController, as: .recursiveDescription(on: .iPadPro12_9), named: "ipad-pro-12-9")
 
       assertSnapshot(matching: viewController, as: .image(on: .iPhoneSe(.portrait)), named: "iphone-se")
@@ -360,6 +402,7 @@ class SnapshotTestingTests: TestCase {
       assertSnapshot(matching: viewController, as: .image(on: .iPhoneXsMax(.portrait)), named: "iphone-xs-max")
       assertSnapshot(matching: viewController, as: .image(on: .iPadMini(.landscape)), named: "ipad-mini")
       assertSnapshot(matching: viewController, as: .image(on: .iPadPro10_5(.landscape)), named: "ipad-pro-10-5")
+      assertSnapshot(matching: viewController, as: .image(on: .iPadPro11(.landscape)), named: "ipad-pro-11")
       assertSnapshot(matching: viewController, as: .image(on: .iPadPro12_9(.landscape)), named: "ipad-pro-12-9")
 
       assertSnapshot(
@@ -378,6 +421,8 @@ class SnapshotTestingTests: TestCase {
         matching: viewController, as: .image(on: .iPadMini(.portrait)), named: "ipad-mini-alternative")
       assertSnapshot(
         matching: viewController, as: .image(on: .iPadPro10_5(.portrait)), named: "ipad-pro-10-5-alternative")
+      assertSnapshot(
+        matching: viewController, as: .image(on: .iPadPro11(.portrait)), named: "ipad-pro-11-alternative")
       assertSnapshot(
         matching: viewController, as: .image(on: .iPadPro12_9(.portrait)), named: "ipad-pro-12-9-alternative")
 
@@ -479,6 +524,7 @@ class SnapshotTestingTests: TestCase {
       assertSnapshot(matching: viewController, as: .image(on: .iPhoneXsMax), named: "iphone-xs-max")
       assertSnapshot(matching: viewController, as: .image(on: .iPadMini), named: "ipad-mini")
       assertSnapshot(matching: viewController, as: .image(on: .iPadPro10_5), named: "ipad-pro-10-5")
+      assertSnapshot(matching: viewController, as: .image(on: .iPadPro11), named: "ipad-pro-11")
       assertSnapshot(matching: viewController, as: .image(on: .iPadPro12_9), named: "ipad-pro-12-9")
 
       assertSnapshot(matching: viewController, as: .image(on: .iPhoneSe(.portrait)), named: "iphone-se")
@@ -489,6 +535,7 @@ class SnapshotTestingTests: TestCase {
       assertSnapshot(matching: viewController, as: .image(on: .iPhoneXsMax(.portrait)), named: "iphone-xs-max")
       assertSnapshot(matching: viewController, as: .image(on: .iPadMini(.landscape)), named: "ipad-mini")
       assertSnapshot(matching: viewController, as: .image(on: .iPadPro10_5(.landscape)), named: "ipad-pro-10-5")
+      assertSnapshot(matching: viewController, as: .image(on: .iPadPro11(.landscape)), named: "ipad-pro-11")
       assertSnapshot(matching: viewController, as: .image(on: .iPadPro12_9(.landscape)), named: "ipad-pro-12-9")
 
       assertSnapshot(
@@ -507,6 +554,8 @@ class SnapshotTestingTests: TestCase {
         matching: viewController, as: .image(on: .iPadMini(.portrait)), named: "ipad-mini-alternative")
       assertSnapshot(
         matching: viewController, as: .image(on: .iPadPro10_5(.portrait)), named: "ipad-pro-10-5-alternative")
+      assertSnapshot(
+        matching: viewController, as: .image(on: .iPadPro11(.portrait)), named: "ipad-pro-11-alternative")
       assertSnapshot(
         matching: viewController, as: .image(on: .iPadPro12_9(.portrait)), named: "ipad-pro-12-9-alternative")
     }
@@ -568,7 +617,7 @@ class SnapshotTestingTests: TestCase {
     let html = try String(contentsOf: fixtureUrl)
     let webView = WKWebView()
     webView.loadHTMLString(html, baseURL: nil)
-    if #available(macOS 10.14, *) {
+    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
       assertSnapshot(
         matching: webView,
         as: .image(size: .init(width: 800, height: 600)),

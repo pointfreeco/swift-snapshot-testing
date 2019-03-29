@@ -156,6 +156,19 @@ public struct ViewImageConfig {
     }
     return .init(safeArea: .init(top: 20, left: 0, bottom: 0, right: 0), size: size, traits: .iPadPro10_5)
   }
+  
+  public static let iPadPro11 = ViewImageConfig.iPadPro11(.landscape)
+  
+  public static func iPadPro11(_ orientation: Orientation) -> ViewImageConfig {
+    let size: CGSize
+    switch orientation {
+    case .landscape:
+      size = .init(width: 1194, height: 834)
+    case .portrait:
+      size = .init(width: 834, height: 1194)
+    }
+    return .init(safeArea: .init(top: 24, left: 0, bottom: 20, right: 0), size: size, traits: .iPadPro11)
+  }
 
   public static let iPadPro12_9 = ViewImageConfig.iPadPro12_9(.landscape)
 
@@ -350,6 +363,7 @@ extension UITraitCollection {
 
   public static let iPadMini = iPad
   public static let iPadPro10_5 = iPad
+  public static let iPadPro11 = iPad
   public static let iPadPro12_9 = iPad
 
   private static let iPad = UITraitCollection(

@@ -55,7 +55,12 @@ private func snap<T>(_ value: T, name: String? = nil, indent: Int = 0) -> String
 }
 
 private func sort(_ children: Mirror.Children) -> Mirror.Children {
-  return .init(children.sorted { snap($0) < snap($1) })
+  return .init(
+    children
+      .map({ (child: $0, snap: snap($0)) })
+      .sorted(by: { $0.snap < $1.snap })
+      .map({ $0.child })
+  )
 }
 
 /// A type with a customized snapshot dump representation.
