@@ -32,6 +32,7 @@ public func _assertInlineSnapshot<Value>(
   let failure = _verifyInlineSnapshot(
     matching: try value(),
     as: snapshotting,
+    record: recording,
     timeout: timeout,
     with: reference,
     file: file,
