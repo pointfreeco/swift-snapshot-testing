@@ -21,6 +21,7 @@ extension Diffing where Value == String {
       .flatMap { [$0.patchMark] + $0.lines }
       .joined(separator: "\n")
     let attachment = XCTAttachment(data: Data(failure.utf8), uniformTypeIdentifier: "public.patch-file")
+    attachment.lifetime = .keepAlways
     return (failure, [attachment])
   }
 }

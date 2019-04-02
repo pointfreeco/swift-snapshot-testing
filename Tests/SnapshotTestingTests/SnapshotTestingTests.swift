@@ -571,6 +571,17 @@ final class SnapshotTestingTests: SnapshotTestCase {
     }
     #endif
   }
+  
+  func testAttachmentUserInfo() {
+    #if os(iOS) || os(macOS)
+    let result = verifySnapshot(matching: UUID().uuidString, as: .dump, userInfo: [
+      "stringKey": "value",
+      "numberKey": 1
+    ])
+    
+    XCTAssertNotNil(result)
+    #endif
+  }
 }
 
 #if os(Linux)

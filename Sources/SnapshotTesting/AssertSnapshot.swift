@@ -149,6 +149,7 @@ public func assertSnapshots<Value, Format>(
 ///   - recording: Whether or not to record a new reference.
 ///   - snapshotDirectory: Optional directory to save snapshots. By default snapshots will be saved in a directory with the same name as the test file, and that directory will sit inside a directory `__Snapshots__` that sits next to your test file.
 ///   - timeout: The amount of time a snapshot must be generated in.
+///   - attachmentUserInfo: A dictionary of information which is added to failure attachments.
 ///   - file: The file in which failure occurred. Defaults to the file name of the test case in which this function was called.
 ///   - testName: The name of the test in which failure occurred. Defaults to the function name of the test case in which this function was called.
 ///   - line: The line number on which failure occurred. Defaults to the line number on which this function was called.
@@ -160,6 +161,7 @@ public func verifySnapshot<Value, Format>(
   record recording: Bool = false,
   snapshotDirectory: String? = nil,
   timeout: TimeInterval = 5,
+  attachmentUserInfo: [AnyHashable: Any]? = nil,
   file: StaticString = #file,
   testName: String = #function,
   line: UInt = #line
@@ -260,8 +262,17 @@ public func verifySnapshot<Value, Format>(
         #if !os(Linux)
         if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
           XCTContext.runActivity(named: "Attached Failure Diff") { activity in
-            attachments.forEach {
-              activity.add($0)
+            attachments.forEach { attachment in
+              if let userInfo = attachmentUserInfo {
+                if attachment.userInfo == nil {
+                  attachment.userInfo = [:]
+                }
+                userInfo.forEach { key, value in
+                  attachment.userInfo?[key] = value
+                }
+              }
+              
+              activity.add(attachment)
             }
           }
         }
