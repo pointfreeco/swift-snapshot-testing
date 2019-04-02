@@ -574,7 +574,7 @@ final class SnapshotTestingTests: SnapshotTestCase {
   
   func testAttachmentUserInfo() {
     #if os(iOS) || os(macOS)
-    let result = verifySnapshot(matching: UUID().uuidString, as: .dump, userInfo: [
+    let result = verifySnapshot(matching: UUID().uuidString, as: .dump, attachmentUserInfo: [
       "stringKey": "value",
       "numberKey": 1
     ])
