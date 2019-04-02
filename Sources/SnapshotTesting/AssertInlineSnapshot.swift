@@ -13,6 +13,7 @@ import XCTest
 /// - Parameters:
 ///   - value: A value to compare against a reference.
 ///   - snapshotting: A strategy for serializing, deserializing, and comparing values.
+///   - recording: Whether or not to record a new reference.
 ///   - timeout: The amount of time a snapshot must be generated in.
 ///   - reference: The expected output of snapshotting.
 ///   - file: The file in which failure occurred. Defaults to the file name of the test case in which this function was called.
@@ -20,6 +21,7 @@ import XCTest
 public func _assertInlineSnapshot<Value>(
   matching value: @autoclosure () throws -> Value,
   as snapshotting: Snapshotting<Value, String>,
+  record recording: Bool = false,
   timeout: TimeInterval = 5,
   with reference: String,
   file: StaticString = #file,
@@ -30,6 +32,7 @@ public func _assertInlineSnapshot<Value>(
   let failure = _verifyInlineSnapshot(
     matching: try value(),
     as: snapshotting,
+    record: recording,
     timeout: timeout,
     with: reference,
     file: file,
@@ -47,6 +50,7 @@ public func _assertInlineSnapshot<Value>(
 /// - Parameters:
 ///   - value: A value to compare against a reference.
 ///   - snapshotting: A strategy for serializing, deserializing, and comparing values.
+///   - recording: Whether or not to record a new reference.
 ///   - timeout: The amount of time a snapshot must be generated in.
 ///   - reference: The expected output of snapshotting.
 ///   - file: The file in which failure occurred. Defaults to the file name of the test case in which this function was called.
@@ -56,6 +60,7 @@ public func _assertInlineSnapshot<Value>(
 public func _verifyInlineSnapshot<Value>(
   matching value: @autoclosure () throws -> Value,
   as snapshotting: Snapshotting<Value, String>,
+  record recording: Bool = false,
   timeout: TimeInterval = 5,
   with reference: String,
   file: StaticString = #file,
@@ -63,6 +68,8 @@ public func _verifyInlineSnapshot<Value>(
   line: UInt = #line
   )
   -> String? {
+
+    let recording = recording || record
 
     do {
       let tookSnapshot = XCTestExpectation(description: "Took snapshot")
@@ -90,14 +97,13 @@ public func _verifyInlineSnapshot<Value>(
 
       let trimmedReference = reference.trimmingCharacters(in: .whitespacesAndNewlines)
 
-      /// Always perform diff, and return early on success!
+      // Always perform diff, and return early on success!
       guard let (failure, attachments) = snapshotting.diffing.diff(trimmedReference, diffable) else {
         return nil
       }
 
-      /// If that diff failed, we either record or fail.
-
-      if record || trimmedReference.isEmpty {
+      // If that diff failed, we either record or fail.
+      if recording || trimmedReference.isEmpty {
         let fileName = "\(file)"
         let sourceCodeFilePath = URL(fileURLWithPath: fileName)
         var sourceCodeLines = try String(contentsOf: sourceCodeFilePath).split(separator: "\n", omittingEmptySubsequences: false)
@@ -109,14 +115,13 @@ public func _verifyInlineSnapshot<Value>(
         let functionLineIndex = offsetStartIndex - 1
         var lineCountDifference = 0
 
-        /// Convert `""` to multi-line literal
+        // Convert `""` to multi-line literal
         if sourceCodeLines[functionLineIndex].hasSuffix(emptyStringLiteralWithCloseBrace) {
-          /// eg.
-          /// Converting:
-          ///    _assertInlineSnapshot(matching: value, as: .dump, with: "")
-          /// to:
-          ///    _assertInlineSnapshot(matching: value, as: .dump, with: """
-          ///    """)
+          // Convert:
+          //    _assertInlineSnapshot(matching: value, as: .dump, with: "")
+          // to:
+          //    _assertInlineSnapshot(matching: value, as: .dump, with: """
+          //    """)
           var functionCallLine = sourceCodeLines.remove(at: functionLineIndex)
           functionCallLine.removeLast(emptyStringLiteralWithCloseBrace.count)
           let indentText = indentation(of: functionCallLine)
@@ -129,7 +134,9 @@ public func _verifyInlineSnapshot<Value>(
 
         /// If they haven't got a multi-line literal by now, then just fail.
         guard sourceCodeLines[functionLineIndex].hasSuffix(multiLineStringLiteralTerminator) else {
-          return "To use inline snapshots, please convert `with` argument to a multi-line literal."
+          return """
+          To use inline snapshots, please convert the "with" argument to a multi-line literal.
+          """
         }
 
         /// Find the end of multi-line literal and replace contents with recording.
@@ -145,7 +152,7 @@ public func _verifyInlineSnapshot<Value>(
           recordings[fileName, default: []].append(fileRecording)
 
           /// Insert the lines
-          sourceCodeLines.replaceSubrange(offsetStartIndex ..< multiLineLiteralEndIndex, with: newDiffableLines)
+          sourceCodeLines.replaceSubrange(offsetStartIndex..<multiLineLiteralEndIndex, with: newDiffableLines)
 
           try sourceCodeLines
             .joined(separator: "\n")
@@ -206,5 +213,5 @@ private func indentation<S: StringProtocol>(of str: S) -> String {
 }
 
 private let emptyStringLiteralWithCloseBrace = "\"\")"
-private var recordings: [String: [FileRecording]] = [:]
 private let multiLineStringLiteralTerminator = "\"\"\""
+private var recordings: [String: [FileRecording]] = [:]
