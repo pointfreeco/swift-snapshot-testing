@@ -17,6 +17,21 @@ public struct ViewImageConfig {
     case landscape
     case portrait
   }
+  public enum TabletOrientation {
+    public enum PortraitSplits {
+      case oneThird
+      case twoThirds
+      case full
+    }
+    public enum LandscapeSplits {
+      case oneThird
+      case oneHalf
+      case twoThirds
+      case full
+    }
+    case landscape(splitView: LandscapeSplits)
+    case portrait(splitView: PortraitSplits)
+  }
 
   public var safeArea: UIEdgeInsets
   public var size: CGSize?
@@ -134,53 +149,187 @@ public struct ViewImageConfig {
   public static let iPadMini = ViewImageConfig.iPadMini(.landscape)
 
   public static func iPadMini(_ orientation: Orientation) -> ViewImageConfig {
-    let size: CGSize
     switch orientation {
     case .landscape:
-      size = .init(width: 1024, height: 768)
+      return ViewImageConfig.iPadMini(.landscape(splitView: .full))
     case .portrait:
-      size = .init(width: 768, height: 1024)
+      return ViewImageConfig.iPadMini(.portrait(splitView: .full))
     }
-    return .init(safeArea: .init(top: 20, left: 0, bottom: 0, right: 0), size: size, traits: .iPadMini)
+  }
+  
+  public static func iPadMini(_ orientation: TabletOrientation) -> ViewImageConfig {
+    let size: CGSize
+    let traits: UITraitCollection
+    switch orientation {
+    case .landscape(let splitView):
+      switch splitView {
+      case .oneThird:
+        size = .init(width: 320, height: 768)
+        traits = .iPadMini_Compact_SplitView
+      case .oneHalf:
+        size = .init(width: 507, height: 768)
+        traits = .iPadMini_Compact_SplitView
+      case .twoThirds:
+        size = .init(width: 694, height: 768)
+        traits = .iPadMini
+      case .full:
+        size = .init(width: 1024, height: 768)
+        traits = .iPadMini
+      }
+    case .portrait(let splitView):
+      switch splitView {
+      case .oneThird:
+        size = .init(width: 320, height: 1024)
+        traits = .iPadMini_Compact_SplitView
+      case .twoThirds:
+        size = .init(width: 438, height: 1024)
+        traits = .iPadMini_Compact_SplitView
+      case .full:
+        size = .init(width: 768, height: 1024)
+        traits = .iPadMini
+      }
+    }
+    return .init(safeArea: .init(top: 20, left: 0, bottom: 0, right: 0), size: size, traits: traits)
   }
 
   public static let iPadPro10_5 = ViewImageConfig.iPadPro10_5(.landscape)
 
   public static func iPadPro10_5(_ orientation: Orientation) -> ViewImageConfig {
-    let size: CGSize
     switch orientation {
     case .landscape:
-      size = .init(width: 1112, height: 834)
+      return ViewImageConfig.iPadPro10_5(.landscape(splitView: .full))
     case .portrait:
-      size = .init(width: 834, height: 1112)
+      return ViewImageConfig.iPadPro10_5(.portrait(splitView: .full))
     }
-    return .init(safeArea: .init(top: 20, left: 0, bottom: 0, right: 0), size: size, traits: .iPadPro10_5)
+  }
+  
+  public static func iPadPro10_5(_ orientation: TabletOrientation) -> ViewImageConfig {
+    let size: CGSize
+    let traits: UITraitCollection
+    switch orientation {
+    case .landscape(let splitView):
+      switch splitView {
+      case .oneThird:
+        size = .init(width: 320, height: 834)
+        traits = .iPadPro10_5_Compact_SplitView
+      case .oneHalf:
+        size = .init(width: 551, height: 834)
+        traits = .iPadPro10_5_Compact_SplitView
+      case .twoThirds:
+        size = .init(width: 782, height: 834)
+        traits = .iPadPro10_5
+      case .full:
+        size = .init(width: 1112, height: 834)
+        traits = .iPadPro10_5
+      }
+    case .portrait(let splitView):
+      switch splitView {
+      case .oneThird:
+        size = .init(width: 320, height: 1112)
+        traits = .iPadPro10_5_Compact_SplitView
+      case .twoThirds:
+        size = .init(width: 504, height: 1112)
+        traits = .iPadPro10_5_Compact_SplitView
+      case .full:
+        size = .init(width: 834, height: 1112)
+        traits = .iPadPro10_5
+      }
+    }
+    return .init(safeArea: .init(top: 20, left: 0, bottom: 0, right: 0), size: size, traits: traits)
   }
   
   public static let iPadPro11 = ViewImageConfig.iPadPro11(.landscape)
   
   public static func iPadPro11(_ orientation: Orientation) -> ViewImageConfig {
-    let size: CGSize
     switch orientation {
     case .landscape:
-      size = .init(width: 1194, height: 834)
+      return ViewImageConfig.iPadPro11(.landscape(splitView: .full))
     case .portrait:
-      size = .init(width: 834, height: 1194)
+      return ViewImageConfig.iPadPro11(.portrait(splitView: .full))
     }
-    return .init(safeArea: .init(top: 24, left: 0, bottom: 20, right: 0), size: size, traits: .iPadPro11)
+  }
+  
+  public static func iPadPro11(_ orientation: TabletOrientation) -> ViewImageConfig {
+    let size: CGSize
+    let traits: UITraitCollection
+    switch orientation {
+    case .landscape(let splitView):
+      switch splitView {
+      case .oneThird:
+        size = .init(width: 375, height: 834)
+        traits = .iPadPro11_Compact_SplitView
+      case .oneHalf:
+        size = .init(width: 592, height: 834)
+        traits = .iPadPro11_Compact_SplitView
+      case .twoThirds:
+        size = .init(width: 809, height: 834)
+        traits = .iPadPro11
+      case .full:
+        size = .init(width: 1194, height: 834)
+        traits = .iPadPro11
+      }
+    case .portrait(let splitView):
+      switch splitView {
+      case .oneThird:
+        size = .init(width: 320, height: 1194)
+        traits = .iPadPro11_Compact_SplitView
+      case .twoThirds:
+        size = .init(width: 504, height: 1194)
+        traits = .iPadPro11_Compact_SplitView
+      case .full:
+        size = .init(width: 834, height: 1194)
+        traits = .iPadPro11
+      }
+    }
+    return .init(safeArea: .init(top: 24, left: 0, bottom: 20, right: 0), size: size, traits: traits)
   }
 
   public static let iPadPro12_9 = ViewImageConfig.iPadPro12_9(.landscape)
 
   public static func iPadPro12_9(_ orientation: Orientation) -> ViewImageConfig {
-    let size: CGSize
     switch orientation {
     case .landscape:
-      size = .init(width: 1366, height: 1024)
+      return ViewImageConfig.iPadPro12_9(.landscape(splitView: .full))
     case .portrait:
-      size = .init(width: 1024, height: 1366)
+      return ViewImageConfig.iPadPro12_9(.portrait(splitView: .full))
     }
-    return .init(safeArea: .init(top: 20, left: 0, bottom: 0, right: 0), size: size, traits: .iPadPro12_9)
+  }
+  
+  public static func iPadPro12_9(_ orientation: TabletOrientation) -> ViewImageConfig {
+    let size: CGSize
+    let traits: UITraitCollection
+    switch orientation {
+    case .landscape(let splitView):
+      switch splitView {
+      case .oneThird:
+        size = .init(width: 375, height: 1024)
+        traits = .iPadPro12_9_Compact_SplitView
+      case .oneHalf:
+        size = .init(width: 678, height: 1024)
+        traits = .iPadPro12_9
+      case .twoThirds:
+        size = .init(width: 981, height: 1024)
+        traits = .iPadPro12_9
+      case .full:
+        size = .init(width: 1366, height: 1024)
+        traits = .iPadPro12_9
+      }
+      
+    case .portrait(let splitView):
+      switch splitView {
+      case .oneThird:
+        size = .init(width: 375, height: 1366)
+        traits = .iPadPro12_9_Compact_SplitView
+      case .twoThirds:
+        size = .init(width: 639, height: 1366)
+        traits = .iPadPro12_9_Compact_SplitView
+      case .full:
+        size = .init(width: 1024, height: 1366)
+        traits = .iPadPro12_9
+      }
+      
+    }
+    return .init(safeArea: .init(top: 20, left: 0, bottom: 0, right: 0), size: size, traits: traits)
   }
   #elseif os(tvOS)
   public static let tv = ViewImageConfig(
@@ -362,14 +511,26 @@ extension UITraitCollection {
   }
 
   public static let iPadMini = iPad
+  public static let iPadMini_Compact_SplitView = iPadCompactSplitView
   public static let iPadPro10_5 = iPad
+  public static let iPadPro10_5_Compact_SplitView = iPadCompactSplitView
   public static let iPadPro11 = iPad
+  public static let iPadPro11_Compact_SplitView = iPadCompactSplitView
   public static let iPadPro12_9 = iPad
+  public static let iPadPro12_9_Compact_SplitView = iPadCompactSplitView
 
   private static let iPad = UITraitCollection(
     traitsFrom: [
 //      .init(displayScale: 2),
       .init(horizontalSizeClass: .regular),
+      .init(verticalSizeClass: .regular),
+      .init(userInterfaceIdiom: .pad)
+    ]
+  )
+  
+  private static let iPadCompactSplitView = UITraitCollection(
+    traitsFrom: [
+      .init(horizontalSizeClass: .compact),
       .init(verticalSizeClass: .regular),
       .init(userInterfaceIdiom: .pad)
     ]

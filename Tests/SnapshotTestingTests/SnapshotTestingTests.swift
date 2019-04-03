@@ -405,6 +405,30 @@ final class SnapshotTestingTests: XCTestCase {
       assertSnapshot(matching: viewController, as: .image(on: .iPadPro11(.landscape)), named: "ipad-pro-11")
       assertSnapshot(matching: viewController, as: .image(on: .iPadPro12_9(.landscape)), named: "ipad-pro-12-9")
 
+      assertSnapshot(matching: viewController, as: .image(on: .iPadMini(.landscape(splitView: .oneThird))), named: "ipad-mini-33-split-landscape")
+      assertSnapshot(matching: viewController, as: .image(on: .iPadMini(.landscape(splitView: .oneHalf))), named: "ipad-mini-50-split-landscape")
+      assertSnapshot(matching: viewController, as: .image(on: .iPadMini(.landscape(splitView: .twoThirds))), named: "ipad-mini-66-split-landscape")
+      assertSnapshot(matching: viewController, as: .image(on: .iPadMini(.portrait(splitView: .oneThird))), named: "ipad-mini-33-split-portrait")
+      assertSnapshot(matching: viewController, as: .image(on: .iPadMini(.portrait(splitView: .twoThirds))), named: "ipad-mini-66-split-portrait")
+      
+      assertSnapshot(matching: viewController, as: .image(on: .iPadPro10_5(.landscape(splitView: .oneThird))), named: "ipad-pro-10inch-33-split-landscape")
+      assertSnapshot(matching: viewController, as: .image(on: .iPadPro10_5(.landscape(splitView: .oneHalf))), named: "ipad-pro-10inch-50-split-landscape")
+      assertSnapshot(matching: viewController, as: .image(on: .iPadPro10_5(.landscape(splitView: .twoThirds))), named: "ipad-pro-10inch-66-split-landscape")
+      assertSnapshot(matching: viewController, as: .image(on: .iPadPro10_5(.portrait(splitView: .oneThird))), named: "ipad-pro-10inch-33-split-portrait")
+      assertSnapshot(matching: viewController, as: .image(on: .iPadPro10_5(.portrait(splitView: .twoThirds))), named: "ipad-pro-10inch-66-split-portrait")
+      
+      assertSnapshot(matching: viewController, as: .image(on: .iPadPro11(.landscape(splitView: .oneThird))), named: "ipad-pro-11inch-33-split-landscape")
+      assertSnapshot(matching: viewController, as: .image(on: .iPadPro11(.landscape(splitView: .oneHalf))), named: "ipad-pro-11inch-50-split-landscape")
+      assertSnapshot(matching: viewController, as: .image(on: .iPadPro11(.landscape(splitView: .twoThirds))), named: "ipad-pro-11inch-66-split-landscape")
+      assertSnapshot(matching: viewController, as: .image(on: .iPadPro11(.portrait(splitView: .oneThird))), named: "ipad-pro-11inch-33-split-portrait")
+      assertSnapshot(matching: viewController, as: .image(on: .iPadPro11(.portrait(splitView: .twoThirds))), named: "ipad-pro-11inch-66-split-portrait")
+      
+      assertSnapshot(matching: viewController, as: .image(on: .iPadPro12_9(.landscape(splitView: .oneThird))), named: "ipad-pro-12inch-33-split-landscape")
+      assertSnapshot(matching: viewController, as: .image(on: .iPadPro12_9(.landscape(splitView: .oneHalf))), named: "ipad-pro-12inch-50-split-landscape")
+      assertSnapshot(matching: viewController, as: .image(on: .iPadPro12_9(.landscape(splitView: .twoThirds))), named: "ipad-pro-12inch-66-split-landscape")
+      assertSnapshot(matching: viewController, as: .image(on: .iPadPro12_9(.portrait(splitView: .oneThird))), named: "ipad-pro-12inch-33-split-portrait")
+      assertSnapshot(matching: viewController, as: .image(on: .iPadPro12_9(.portrait(splitView: .twoThirds))), named: "ipad-pro-12inch-66-split-portrait")
+      
       assertSnapshot(
         matching: viewController, as: .image(on: .iPhoneSe(.landscape)), named: "iphone-se-alternative")
       assertSnapshot(
