@@ -9,7 +9,7 @@ import SpriteKit
 import WebKit
 #endif
 
-final class SnapshotTestingTests: SnapshotTestCase {
+final class SnapshotTestingTests: XCTestCase {
   override func setUp() {
     super.setUp()
     diffTool = "ksdiff"
@@ -25,6 +25,12 @@ final class SnapshotTestingTests: SnapshotTestCase {
     struct User { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
     assertSnapshot(matching: user, as: .dump)
+    _assertInlineSnapshot(matching: user, as: .dump, with: """
+    ▿ User
+      - bio: "Blobbed around the world."
+      - id: 1
+      - name: "Blobby"
+    """)
   }
 
   func testAnySnapshotStringConvertible() {
@@ -35,6 +41,28 @@ final class SnapshotTestingTests: SnapshotTestCase {
     assertSnapshot(matching: "Hello, world!", as: .dump, named: "string")
     assertSnapshot(matching: "Hello, world!".dropLast(8), as: .dump, named: "substring")
     assertSnapshot(matching: URL(string: "https://www.pointfree.co")!, as: .dump, named: "url")
+    // Inline
+    _assertInlineSnapshot(matching: "a" as Character, as: .dump, with: """
+    - "a"
+    """)
+    _assertInlineSnapshot(matching: Data("Hello, world!".utf8), as: .dump, with: """
+    - 13 bytes
+    """)
+    _assertInlineSnapshot(matching: Date(timeIntervalSinceReferenceDate: 0), as: .dump, with: """
+    - 2001-01-01T00:00:00Z
+    """)
+    _assertInlineSnapshot(matching: NSObject(), as: .dump, with: """
+    - <NSObject>
+    """)
+    _assertInlineSnapshot(matching: "Hello, world!", as: .dump, with: """
+    - "Hello, world!"
+    """)
+    _assertInlineSnapshot(matching: "Hello, world!".dropLast(8), as: .dump, with: """
+    - "Hello"
+    """)
+    _assertInlineSnapshot(matching: URL(string: "https://www.pointfree.co")!, as: .dump, with: """
+    - https://www.pointfree.co
+    """)
   }
 
   func testAutolayout() {
@@ -62,6 +90,24 @@ final class SnapshotTestingTests: SnapshotTestCase {
       set: [.init(name: "Brandon"), .init(name: "Stephen")]
     )
     assertSnapshot(matching: set, as: .dump)
+    _assertInlineSnapshot(matching: set, as: .dump, with: """
+    ▿ DictionarySetContainer
+      ▿ dict: 3 key/value pairs
+        ▿ (2 elements)
+          - key: "a"
+          - value: 1
+        ▿ (2 elements)
+          - key: "b"
+          - value: 2
+        ▿ (2 elements)
+          - key: "c"
+          - value: 3
+      ▿ set: 2 members
+        ▿ Person
+          - name: "Brandon"
+        ▿ Person
+          - name: "Stephen"
+    """)
   }
 
   func testCaseIterable() {
@@ -96,7 +142,7 @@ final class SnapshotTestingTests: SnapshotTestCase {
   func testMixedViews() {
     #if os(iOS) || os(macOS)
     // NB: CircleCI crashes while trying to instantiate SKView.
-    if #available(macOS 10.14, *) {
+    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
       let webView = WKWebView(frame: .init(x: 0, y: 0, width: 50, height: 50))
       webView.loadHTMLString("🌎", baseURL: nil)
 
@@ -134,7 +180,7 @@ final class SnapshotTestingTests: SnapshotTestCase {
     button.bezelStyle = .rounded
     button.title = "Push Me"
     button.sizeToFit()
-    if #available(macOS 10.14, *) {
+    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
       assertSnapshot(matching: button, as: .image)
       assertSnapshot(matching: button, as: .recursiveDescription)
     }
@@ -158,7 +204,7 @@ final class SnapshotTestingTests: SnapshotTestCase {
     label.isBezeled = false
     label.isEditable = false
     #endif
-    if #available(macOS 10.14, *) {
+    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
       label.text = "Hello."
       assertSnapshot(matching: label, as: .image(precision: 0.9), named: platform)
       label.text = "Hello"
@@ -170,7 +216,7 @@ final class SnapshotTestingTests: SnapshotTestCase {
   func testSCNView() {
     #if os(iOS) || os(macOS) || os(tvOS)
     // NB: CircleCI crashes while trying to instantiate SCNView.
-    if #available(macOS 10.14, *) {
+    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
       let scene = SCNScene()
 
       let sphereGeometry = SCNSphere(radius: 3)
@@ -207,7 +253,7 @@ final class SnapshotTestingTests: SnapshotTestCase {
   func testSKView() {
     #if os(iOS) || os(macOS) || os(tvOS)
     // NB: CircleCI crashes while trying to instantiate SKView.
-    if #available(macOS 10.14, *) {
+    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
       let scene = SKScene(size: .init(width: 50, height: 50))
       let node = SKShapeNode(circleOfRadius: 15)
       node.fillColor = .red
@@ -569,6 +615,7 @@ final class SnapshotTestingTests: SnapshotTestCase {
     get.addValue("pf_session={}", forHTTPHeaderField: "Cookie")
     get.addValue("text/html", forHTTPHeaderField: "Accept")
     assertSnapshot(matching: get, as: .raw, named: "get")
+    assertSnapshot(matching: get, as: .curl, named: "get-curl")
 
     var post = URLRequest(url: URL(string: "https://www.pointfree.co/subscribe")!)
     post.httpMethod = "POST"
@@ -576,6 +623,33 @@ final class SnapshotTestingTests: SnapshotTestCase {
     post.addValue("text/html", forHTTPHeaderField: "Accept")
     post.httpBody = Data("pricing[billing]=monthly&pricing[lane]=individual".utf8)
     assertSnapshot(matching: post, as: .raw, named: "post")
+    assertSnapshot(matching: post, as: .curl, named: "post-curl")
+
+    var head = URLRequest(url: URL(string: "https://www.pointfree.co/")!)
+    head.httpMethod = "HEAD"
+    head.addValue("pf_session={}", forHTTPHeaderField: "Cookie")
+    assertSnapshot(matching: head, as: .raw, named: "head")
+    assertSnapshot(matching: head, as: .curl, named: "head-curl")
+
+    post = URLRequest(url: URL(string: "https://www.pointfree.co/subscribe")!)
+    post.httpMethod = "POST"
+    post.addValue("pf_session={\"user_id\":\"0\"}", forHTTPHeaderField: "Cookie")
+    post.addValue("application/json", forHTTPHeaderField: "Accept")
+    post.httpBody = Data("""
+                         {"pricing": {"lane": "individual","billing": "monthly"}}
+                         """.utf8)
+    _assertInlineSnapshot(matching: post, as: .raw(pretty: true), with: """
+    POST https://www.pointfree.co/subscribe
+    Accept: application/json
+    Cookie: pf_session={"user_id":"0"}
+    
+    {
+      "pricing" : {
+        "billing" : "monthly",
+        "lane" : "individual"
+      }
+    }
+    """)
   }
 
   func testWebView() throws {
@@ -586,7 +660,7 @@ final class SnapshotTestingTests: SnapshotTestCase {
     let html = try String(contentsOf: fixtureUrl)
     let webView = WKWebView()
     webView.loadHTMLString(html, baseURL: nil)
-    if #available(macOS 10.14, *) {
+    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
       assertSnapshot(
         matching: webView,
         as: .image(size: .init(width: 800, height: 600)),

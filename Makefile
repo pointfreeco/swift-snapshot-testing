@@ -1,5 +1,5 @@
 xcodeproj:
-	swift run xcodegen
+	PF_DEVELOP=1 swift run xcodegen
 
 test-linux:
 	docker build --tag snapshot-testing . \
@@ -15,7 +15,7 @@ test-ios:
 	set -o pipefail && \
 	xcodebuild test \
 		-scheme SnapshotTesting_iOS \
-		-destination platform="iOS Simulator,name=iPhone XR,OS=12.1" \
+		-destination platform="iOS Simulator,name=iPhone Xʀ,OS=12.2" \
 
 test-swift:
 	swift test
@@ -24,6 +24,6 @@ test-tvos:
 	set -o pipefail && \
 	xcodebuild test \
 		-scheme SnapshotTesting_tvOS \
-		-destination platform="tvOS Simulator,name=Apple TV 4K,OS=12.1" \
+		-destination platform="tvOS Simulator,name=Apple TV 4K,OS=12.2" \
 
 test-all: test-linux test-macos test-ios
