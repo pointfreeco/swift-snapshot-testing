@@ -614,6 +614,7 @@ final class SnapshotTestingTests: XCTestCase {
     var get = URLRequest(url: URL(string: "https://www.pointfree.co/")!)
     get.addValue("pf_session={}", forHTTPHeaderField: "Cookie")
     get.addValue("text/html", forHTTPHeaderField: "Accept")
+    get.addValue("application/json", forHTTPHeaderField: "Content-Type")
     assertSnapshot(matching: get, as: .raw, named: "get")
     assertSnapshot(matching: get, as: .curl, named: "get-curl")
 
