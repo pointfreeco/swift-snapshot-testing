@@ -52,8 +52,8 @@ extension Snapshotting where Value == URLRequest, Format == String {
 
     // Headers
     if let headers = request.allHTTPHeaderFields {
-      for (field, value) in headers where field != "Cookie" {
-        let escapedValue = value.replacingOccurrences(of: "\"", with: "\\\"")
+      for field in headers.keys.sorted() where field != "Cookie" {
+        let escapedValue = headers[field]!.replacingOccurrences(of: "\"", with: "\\\"")
         components.append("--header \"\(field): \(escapedValue)\"")
       }
     }
