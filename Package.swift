@@ -4,6 +4,11 @@ import PackageDescription
 
 let package = Package(
   name: "SnapshotTesting",
+  platforms: [
+    .iOS(.v10),
+    .macOS(.v10_10),
+    .tvOS(.v10)
+  ],
   products: [
     .library(
       name: "SnapshotTesting",
