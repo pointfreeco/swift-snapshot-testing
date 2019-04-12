@@ -655,9 +655,6 @@ func prepareView(
   viewController: UIViewController
   ) {
   let size = config.size ?? viewController.view.frame.size
-  guard size.width > 0, size.height > 0 else {
-    fatalError("View not renderable to image at size \(size)")
-  }
   view.frame.size = size
   if view != viewController.view {
     viewController.view.bounds = view.bounds
@@ -678,6 +675,17 @@ func prepareView(
     )
   }
   add(traits: traits, viewController: viewController, to: window)
+
+  if size.width == 0 || size.height == 0 {
+    // Try to call sizeToFit() if the view still has invalid size
+    view.sizeToFit()
+    view.setNeedsLayout()
+    view.layoutIfNeeded()
+  }
+
+  guard view.frame.size.width > 0, view.frame.size.height > 0 else {
+    fatalError("View not renderable to image at size \(size)")
+  }
 }
 
 func snapshotView(
