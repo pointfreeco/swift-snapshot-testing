@@ -639,7 +639,7 @@ assertSnapshot(matching: vc, as: .image)
 assertSnapshot(matching: vc, as: .image(precision: 0.99))
 
 // Render as if on a certain device.
-assertSnapshot(matching: vc, on: .iPhoneX(.portrait))
+assertSnapshot(matching: vc, as: .image(on: .iPhoneX(.portrait)))
 
 // Render at a certain size.
 assertSnapshot(
@@ -650,7 +650,7 @@ assertSnapshot(
 // Render with a horizontally-compact size class.
 assertSnapshot(
   matching: vc,
-  as: .image(traits: .init(horizontalSizeClass: .regular))
+  as: .image(traits: .init(horizontalSizeClass: .compact))
 )
 
 // Match reference as-is.
