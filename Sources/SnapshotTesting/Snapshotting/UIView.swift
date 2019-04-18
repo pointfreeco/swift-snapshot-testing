@@ -60,3 +60,22 @@ extension Snapshotting where Value == UIView, Format == String {
   }
 }
 #endif
+
+extension Snapshotting where Value == UIView, Format == Data {
+
+  /// A snapshot strategy to compare UIView UIImage pixels data, based on `image` `UIView` snapshotting strategy
+  public static var pixel: Snapshotting {
+    return SimplySnapshotting
+      .data
+      .pullback { $0.pngData() ?? Data() }
+      .asyncPullback { Snapshotting<UIView, UIImage>.image.snapshot($0) }
+  }
+}
+
+extension Snapshotting where Value == UIView, Format == Int {
+
+  /// A snapshot strategy to compare UIView UIImage pixels data hashes, based on `pixel` `UIView`  and `hash` `Hashable` snapshotting strategies
+  public static var pixelsHash: Snapshotting {
+    return Snapshotting<UIView, Data>.hash(from: .pixel)
+  }
+}

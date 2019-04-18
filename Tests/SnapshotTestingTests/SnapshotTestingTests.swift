@@ -621,6 +621,18 @@ final class SnapshotTestingTests: XCTestCase {
     let view = UIButton(type: .contactAdd)
     assertSnapshot(matching: view, as: .image)
     assertSnapshot(matching: view, as: .recursiveDescription)
+    assertSnapshot(matching: view, as: .pixel)
+    assertSnapshot(matching: view, as: .pixelsHash)
+
+    // Comparing UIView straight hashes is not relevent as UIView hash does not only depends on its pixels
+    // This is the same for UIImage
+    // Thoses assertions should fail
+//    let view = UIButton(type: .contactAdd)
+//    assertSnapshot(matching: view, as: .hash)
+//    assertSnapshot(
+//      matching: view,
+//      as: Snapshotting<UIView, UIImage>.hash(from: .image)
+//    )
     #endif
   }
 
