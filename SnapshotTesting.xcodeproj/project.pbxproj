@@ -61,6 +61,9 @@
 		879FE1DD22662F920028B84E /* Int.swift in Sources */ = {isa = PBXBuildFile; fileRef = 879FE1DB22662F8A0028B84E /* Int.swift */; };
 		879FE1DE22662F920028B84E /* Int.swift in Sources */ = {isa = PBXBuildFile; fileRef = 879FE1DB22662F8A0028B84E /* Int.swift */; };
 		879FE1DF22662F930028B84E /* Int.swift in Sources */ = {isa = PBXBuildFile; fileRef = 879FE1DB22662F8A0028B84E /* Int.swift */; };
+		87B1DE5E2268BB9600E6DE1C /* Hashable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87B1DE5C2268BB3000E6DE1C /* Hashable.swift */; };
+		87B1DE5F2268BB9700E6DE1C /* Hashable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87B1DE5C2268BB3000E6DE1C /* Hashable.swift */; };
+		87B1DE602268BB9700E6DE1C /* Hashable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87B1DE5C2268BB3000E6DE1C /* Hashable.swift */; };
 		89C7F09355ECFF4C8D9BDDDE1ECE8501 /* TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C676C30FCAE10DB1773832024B59EA /* TestHelpers.swift */; };
 		89D5FBBC4C20A7AACCA4889ED4C81457 /* Snapshotting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D7D5B93AE097C0B92B78931A6CF4051 /* Snapshotting.swift */; };
 		8D6CE128BCC2F391F543026459725279 /* CaseIterable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B843712AB555B46BA6E4EC2ACDF4DFB2 /* CaseIterable.swift */; };
@@ -188,6 +191,7 @@
 		8563DC0D660D87E1CDE5D6968D82E7B3 /* SnapshotTestingTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SnapshotTestingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		86367454DF23E14D681FDE272D9269C7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		879FE1DB22662F8A0028B84E /* Int.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Int.swift; sourceTree = "<group>"; };
+		87B1DE5C2268BB3000E6DE1C /* Hashable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hashable.swift; sourceTree = "<group>"; };
 		8EEE36D7D9E53E70DABA3996A0CBB95F /* Diff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diff.swift; sourceTree = "<group>"; };
 		8F9883B60A8B403A39BCF888507E9BB5 /* SnapshotTesting.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SnapshotTesting.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		96E01FF29B2959DE5FD093FB07C9ADAB /* CALayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CALayer.swift; sourceTree = "<group>"; };
@@ -323,6 +327,7 @@
 				58583084B2E2BC023E981D2B0F74C2A5 /* Data.swift */,
 				A76261A778A1B8C06EB7E1B495C4F404 /* Description.swift */,
 				879FE1DB22662F8A0028B84E /* Int.swift */,
+				87B1DE5C2268BB3000E6DE1C /* Hashable.swift */,
 				48914A258708D7AC11DC12EF09CD32F6 /* NSImage.swift */,
 				E9D57E3B929139A0C14AEBA771BE0BDB /* NSView.swift */,
 				CB124D18325606D35B7027A66C68816D /* NSViewController.swift */,
@@ -497,6 +502,7 @@
 				367ECD2CC593DDD9754164899ED3F5D1 /* String.swift in Sources */,
 				2C592B61EA07325B5CF7EA676B69A6B4 /* UIImage.swift in Sources */,
 				542FF741734688E01E94ED90D06FBEBC /* UIView.swift in Sources */,
+				87B1DE5F2268BB9700E6DE1C /* Hashable.swift in Sources */,
 				DC03D15DA299DAB54605459C1AF69DD1 /* UIViewController.swift in Sources */,
 				D536DBE498B7F0F239B335AC9A47EA01 /* URLRequest.swift in Sources */,
 				80DA5E8270E78072D2DD01EAB46E01AF /* View.swift in Sources */,
@@ -532,6 +538,7 @@
 				A85FB3B58B2863355416F3F6B103410C /* String.swift in Sources */,
 				E49619FA3E9F8730784C6601EAD4F5D1 /* UIImage.swift in Sources */,
 				43977ED12EE730182E9449FB46C4A48B /* UIView.swift in Sources */,
+				87B1DE5E2268BB9600E6DE1C /* Hashable.swift in Sources */,
 				48564BF3D5817E9AD58CBD49983C9B25 /* UIViewController.swift in Sources */,
 				9BCC2F0960B073BFF9FB428745D11B8D /* URLRequest.swift in Sources */,
 				8470217FD9064F50405C30FB5B3FF0F4 /* View.swift in Sources */,
@@ -585,6 +592,7 @@
 				DFA64386ABEA74F4294E22264171CCAA /* String.swift in Sources */,
 				B6E51633E0298368BDDF109693D9BAB4 /* UIImage.swift in Sources */,
 				C4CD3E6D700486FF032EAFEED020ACA4 /* UIView.swift in Sources */,
+				87B1DE602268BB9700E6DE1C /* Hashable.swift in Sources */,
 				9416EB67797333CF46CF4864BAF47C00 /* UIViewController.swift in Sources */,
 				3138413A4893DD296CC29B5CC230CC1C /* URLRequest.swift in Sources */,
 				0FEB4DBE9A3CCB5B7A09EB1C6BCE3E37 /* View.swift in Sources */,

@@ -26,6 +26,25 @@ final class SnapshotTestingTests: XCTestCase {
     assertSnapshot(matching: int, as: .int)
   }
 
+  func testHashable() {
+    struct User: Hashable { let id: Int, name: String, bio: String }
+    let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
+    let hashValue = user.hashValue
+    assertSnapshot(matching: hashValue, as: .int)
+    assertSnapshot(matching: user, as: SimplySnapshotting.hash)
+
+    struct UnhashableUser { let id: Int, name: String, bio: String }
+    let unashableUser = UnhashableUser(id: 1, name: "Blobby", bio: "Blobbed around the world.")
+    assertSnapshot(
+      matching: unashableUser,
+      as: Snapshotting<UnhashableUser, String>.hash(from: { $0.name })
+    )
+    assertSnapshot(
+      matching: unashableUser,
+      as: Snapshotting<UnhashableUser, String>.hash(from: { Async(value: $0.name) })
+    )
+  }
+
   func testAny() {
     struct User { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
