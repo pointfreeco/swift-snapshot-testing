@@ -21,6 +21,11 @@ final class SnapshotTestingTests: XCTestCase {
     super.tearDown()
   }
 
+  func testInt() {
+    let int: Int = 1234
+    assertSnapshot(matching: int, as: .int)
+  }
+
   func testAny() {
     struct User { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")

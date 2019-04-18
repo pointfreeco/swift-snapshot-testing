@@ -58,6 +58,9 @@
 		80DA5E8270E78072D2DD01EAB46E01AF /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F6B5B3AB021FA3CD751973309F966A6 /* View.swift */; };
 		8470217FD9064F50405C30FB5B3FF0F4 /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F6B5B3AB021FA3CD751973309F966A6 /* View.swift */; };
 		859C0625D07E19979C6BC4AA6ACD422E /* Internal.swift in Sources */ = {isa = PBXBuildFile; fileRef = F479E2BD835B9641B85EB51E990659C5 /* Internal.swift */; };
+		879FE1DD22662F920028B84E /* Int.swift in Sources */ = {isa = PBXBuildFile; fileRef = 879FE1DB22662F8A0028B84E /* Int.swift */; };
+		879FE1DE22662F920028B84E /* Int.swift in Sources */ = {isa = PBXBuildFile; fileRef = 879FE1DB22662F8A0028B84E /* Int.swift */; };
+		879FE1DF22662F930028B84E /* Int.swift in Sources */ = {isa = PBXBuildFile; fileRef = 879FE1DB22662F8A0028B84E /* Int.swift */; };
 		89C7F09355ECFF4C8D9BDDDE1ECE8501 /* TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C676C30FCAE10DB1773832024B59EA /* TestHelpers.swift */; };
 		89D5FBBC4C20A7AACCA4889ED4C81457 /* Snapshotting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D7D5B93AE097C0B92B78931A6CF4051 /* Snapshotting.swift */; };
 		8D6CE128BCC2F391F543026459725279 /* CaseIterable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B843712AB555B46BA6E4EC2ACDF4DFB2 /* CaseIterable.swift */; };
@@ -184,6 +187,7 @@
 		810407271A6CB90161DCE6A0A36AC81D /* UIImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImage.swift; sourceTree = "<group>"; };
 		8563DC0D660D87E1CDE5D6968D82E7B3 /* SnapshotTestingTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SnapshotTestingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		86367454DF23E14D681FDE272D9269C7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		879FE1DB22662F8A0028B84E /* Int.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Int.swift; sourceTree = "<group>"; };
 		8EEE36D7D9E53E70DABA3996A0CBB95F /* Diff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diff.swift; sourceTree = "<group>"; };
 		8F9883B60A8B403A39BCF888507E9BB5 /* SnapshotTesting.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SnapshotTesting.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		96E01FF29B2959DE5FD093FB07C9ADAB /* CALayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CALayer.swift; sourceTree = "<group>"; };
@@ -318,6 +322,7 @@
 				34D7CFCA42A4D2168436F6C1DE61C35A /* Codable.swift */,
 				58583084B2E2BC023E981D2B0F74C2A5 /* Data.swift */,
 				A76261A778A1B8C06EB7E1B495C4F404 /* Description.swift */,
+				879FE1DB22662F8A0028B84E /* Int.swift */,
 				48914A258708D7AC11DC12EF09CD32F6 /* NSImage.swift */,
 				E9D57E3B929139A0C14AEBA771BE0BDB /* NSView.swift */,
 				CB124D18325606D35B7027A66C68816D /* NSViewController.swift */,
@@ -471,6 +476,7 @@
 				F46F9548180861C618A18E7E4CD79E57 /* Any.swift in Sources */,
 				D8985C933B6425665F356652BF9FDA63 /* AssertInlineSnapshot.swift in Sources */,
 				7D70893188EC1DBD212EDAF095057360 /* AssertSnapshot.swift in Sources */,
+				879FE1DE22662F920028B84E /* Int.swift in Sources */,
 				7AA09977FE827241C82FDEB2BBD7A7C1 /* Async.swift in Sources */,
 				2A9554E007DD3CA39E4BA0EEFF11A689 /* CALayer.swift in Sources */,
 				27893B953501E9EC4283A3593072E8F8 /* CaseIterable.swift in Sources */,
@@ -505,6 +511,7 @@
 				728759C61A562F8384C65B92623ED54E /* Any.swift in Sources */,
 				ABC63FF213625CBC413EDDD081E301F5 /* AssertInlineSnapshot.swift in Sources */,
 				409C1FA9093B622D46B1EA9DF3CEFDF2 /* AssertSnapshot.swift in Sources */,
+				879FE1DD22662F920028B84E /* Int.swift in Sources */,
 				5B626E053F2BDEF61823E970D8306DFF /* Async.swift in Sources */,
 				AA986DA1DFF9C5105364DBFF9B32FB59 /* CALayer.swift in Sources */,
 				8D6CE128BCC2F391F543026459725279 /* CaseIterable.swift in Sources */,
@@ -557,6 +564,7 @@
 				EBAAEFBC5AE04EC3344F24F238DE8F60 /* Any.swift in Sources */,
 				DDB513F122190E36D0CA9E6B7634F6E7 /* AssertInlineSnapshot.swift in Sources */,
 				29890397150C81C5C44646DA46781719 /* AssertSnapshot.swift in Sources */,
+				879FE1DF22662F930028B84E /* Int.swift in Sources */,
 				13616B1C36228F9B06007AF3F9EE2C2F /* Async.swift in Sources */,
 				9D50BC78E1CD381CC14D8F127445B27A /* CALayer.swift in Sources */,
 				0AC11BB902884E53C89720DA9473D80C /* CaseIterable.swift in Sources */,
