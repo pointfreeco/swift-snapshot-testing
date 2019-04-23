@@ -14,7 +14,7 @@ extension Diffing where Value == Int {
     fromData: { $0.intValue }
   ) { old, new in
     guard old != new else { return nil }
-    let failure = "\(old) - \(new)"
+    let failure = "\(old) - \(new)\(deterministicHashingWarning())"
     let attachment = XCTAttachment(
       data: Data(failure.utf8),
       uniformTypeIdentifier: "public.patch-file"
@@ -41,4 +41,12 @@ private extension Int {
       count: MemoryLayout.size(ofValue: value)
     )
   }
+}
+
+private func deterministicHashingWarning() -> String {
+  let deterministicHashingValue = ProcessInfo.processInfo.environment["SWIFT_DETERMINISTIC_HASHING"]
+  let deterministicHashingActivated = deterministicHashingValue == "1"
+  return deterministicHashingActivated
+    ? ""
+    : " When snapshotting and testing hashes, SWIFT_DETERMINISTIC_HASHING should be activated, as hash values are not consistent across executions"
 }
