@@ -41,6 +41,8 @@ If you'd like to submit your own custom strategy, see [Contributing](../CONTRIBU
   - [`URLRequest`](#urlrequest)
       - [`.curl`](#curl)
       - [`.raw`](#raw)
+  - [`XCUIElement`](#xcuielement)
+      - [`.recursivedescription`](#recursivedescription-4)
 
 ## Any
 
@@ -742,3 +744,36 @@ Cookie: pf_session={"userId":"1"}
 
 email=blob%40pointfree.co&name=Blob
 ```
+
+## XCUIElement
+
+**Platforms:** iOS
+
+### `.recursivedescription`
+
+A snapshot strategy comparing view uitesting screen elements based on a recursive description of their properties and hierarchies.
+
+**Format:** `String`
+
+#### Example:
+
+``` swift
+app = XCUIApplication()
+app.launch()
+let element = app.otherElements["testView1"]
+    
+assertSnapshot(matching: element, as: .recursiveDescription)
+```
+
+Records:
+
+```
+Other, {{0.0, 20.0}, {320.0, 548.0}}, identifier: 'testView1'
+ Other, {{10.0, 30.0}, {300.0, 528.0}}, identifier: 'testView2'
+  Other, {{20.0, 40.0}, {280.0, 508.0}}, identifier: 'testView3'
+   Other, {{30.0, 50.0}, {260.0, 488.0}}, identifier: 'testView4'
+    Other, {{40.0, 60.0}, {240.0, 468.0}}, identifier: 'testView5'
+     StaticText, {{139.0, 222.5}, {42.0, 20.5}}, identifier: 'testLabel', label: 'testLabel'
+     Button, {{137.0, 279.0}, {46.0, 30.0}}, identifier: 'testButton', label: 'testButton'
+```
+
