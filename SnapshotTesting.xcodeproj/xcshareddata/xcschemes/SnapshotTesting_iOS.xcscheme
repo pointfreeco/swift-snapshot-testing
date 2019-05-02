@@ -38,6 +38,16 @@
                ReferencedContainer = "container:SnapshotTesting.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "B171080D227AFDDE00229C53"
+               BuildableName = "SnapshotTestingTests_UI.xctest"
+               BlueprintName = "SnapshotTestingTests_UI"
+               ReferencedContainer = "container:SnapshotTesting.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
@@ -48,12 +58,20 @@
             ReferencedContainer = "container:SnapshotTesting.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
-      <CommandLineArguments>
-      </CommandLineArguments>
       <EnvironmentVariables>
          <EnvironmentVariable
             key = "SNAPSHOT_ARTIFACTS"
             value = "/tmp/__SnapshotArtifacts__"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "TEST_TARGET_NAME"
+            value = "TestApp"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "USES_XCTRUNNER"
+            value = "YES"
             isEnabled = "YES">
          </EnvironmentVariable>
       </EnvironmentVariables>
@@ -79,8 +97,6 @@
             ReferencedContainer = "container:SnapshotTesting.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
-      <CommandLineArguments>
-      </CommandLineArguments>
       <EnvironmentVariables>
          <EnvironmentVariable
             key = "SNAPSHOT_ARTIFACTS"
@@ -107,8 +123,6 @@
             ReferencedContainer = "container:SnapshotTesting.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
-      <CommandLineArguments>
-      </CommandLineArguments>
       <EnvironmentVariables>
          <EnvironmentVariable
             key = "SNAPSHOT_ARTIFACTS"

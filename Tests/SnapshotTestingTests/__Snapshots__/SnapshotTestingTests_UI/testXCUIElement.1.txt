@@ -1,0 +1,7 @@
+Other, {{0.0, 20.0}, {320.0, 548.0}}, identifier: 'testView1'
+ Other, {{10.0, 30.0}, {300.0, 528.0}}, identifier: 'testView2'
+  Other, {{20.0, 40.0}, {280.0, 508.0}}, identifier: 'testView3'
+   Other, {{30.0, 50.0}, {260.0, 488.0}}, identifier: 'testView4'
+    Other, {{40.0, 60.0}, {240.0, 468.0}}, identifier: 'testView5'
+     StaticText, {{139.0, 222.5}, {42.0, 20.5}}, identifier: 'testLabel', label: 'testLabel'
+     Button, {{137.0, 279.0}, {46.0, 30.0}}, identifier: 'testButton', label: 'testButton'
