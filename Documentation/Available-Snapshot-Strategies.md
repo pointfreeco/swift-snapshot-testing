@@ -747,7 +747,7 @@ email=blob%40pointfree.co&name=Blob
 
 ## XCUIElement
 
-**Platforms:** All
+**Platforms:** iOS
 
 ### `.recursivedescription`
 
