@@ -14,7 +14,7 @@ extension Snapshotting where Value: Encodable, Format == String {
   /// - Parameter encoder: A JSON encoder.
   public static func json(_ encoder: JSONEncoder) -> Snapshotting {
     var snapshotting = SimplySnapshotting.lines.pullback { (encodable: Value) in
-      try! String(decoding: encoder.encode(encodable), as: UTF8.self)
+      return try! String(decoding: encoder.encode(encodable), as: UTF8.self).replacingOccurrences(of: "\\", with: "")
     }
     snapshotting.pathExtension = "json"
     return snapshotting
