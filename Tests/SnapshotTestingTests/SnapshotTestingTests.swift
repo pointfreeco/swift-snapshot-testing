@@ -139,6 +139,19 @@ final class SnapshotTestingTests: XCTestCase {
     assertSnapshot(matching: user, as: .plist)
   }
 
+  func testStringWithEscapedQuotesAsJson() {
+    let dict = ["key": "value"]
+    let value = [dict.description]
+    if #available(iOS 11.0, macOS 10.13, tvOS 11.0, *) {
+      assertSnapshot(matching: value, as: .json)
+      _assertInlineSnapshot(matching: value, as: .json, with: """
+      [
+        "[\"key\": \"value\"]"
+      ]
+      """)
+    }
+  }
+
   func testMixedViews() {
     #if os(iOS) || os(macOS)
     // NB: CircleCI crashes while trying to instantiate SKView.
