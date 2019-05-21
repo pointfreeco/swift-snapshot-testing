@@ -1,0 +1,3 @@
+_assertInlineSnapshot(matching: post, as: .raw(pretty: true), with: """
+NEW_SNAPSHOT
+""")

@@ -16,11 +16,7 @@ class InlineSnapshotTests: XCTestCase {
     """#
     let writingFunction = writeInlineSnapshot(diffable: "NEW_SNAPSHOT", fileName: "filename", lineIndex: 1)
     let newSource = writingFunction(pure(source)).eval([:])
-    XCTAssertEqual(newSource, """
-    _assertInlineSnapshot(matching: post, as: .raw(pretty: true), with: \"""
-    NEW_SNAPSHOT
-    \""")
-    """)
+    assertSnapshot(matching: newSource, as: .lines)
   }
 
   func testCreateSnapshotMultiLine() {
@@ -30,11 +26,7 @@ class InlineSnapshotTests: XCTestCase {
     """
     let writingFunction = writeInlineSnapshot(diffable: "NEW_SNAPSHOT", fileName: "filename", lineIndex: 1)
     let newSource = writingFunction(pure(source)).eval([:])
-    XCTAssertEqual(newSource, """
-    _assertInlineSnapshot(matching: post, as: .raw(pretty: true), with: \"""
-    NEW_SNAPSHOT
-    \""")
-    """)
+    assertSnapshot(matching: newSource, as: .lines)
   }
 
   func testUpdateSnapshot() {
@@ -45,11 +37,8 @@ class InlineSnapshotTests: XCTestCase {
     """
     let writingFunction = writeInlineSnapshot(diffable: "NEW_SNAPSHOT", fileName: "filename", lineIndex: 1)
     let newSource = writingFunction(pure(source)).eval([:])
-    XCTAssertEqual(newSource, """
-    _assertInlineSnapshot(matching: post, as: .raw(pretty: true), with: \"""
-    NEW_SNAPSHOT
-    \""")
-    """)
+
+    assertSnapshot(matching: newSource, as: .lines)
   }
 
   func testUpdateSeveralSnapshots() {
@@ -64,25 +53,14 @@ class InlineSnapshotTests: XCTestCase {
       \""")
     }
     """
-    let writingFunction1 = writeInlineSnapshot(diffable: "NEW_SNAPSHOT\nwith two lines", fileName: "filename", lineIndex: 2)
-    let writingFunction2 = writeInlineSnapshot(diffable: "NEW_SNAPSHOT", fileName: "filename", lineIndex: 6)
+    let writeSnapshot1 = writeInlineSnapshot(diffable: "NEW_SNAPSHOT\nwith two lines", fileName: "filename", lineIndex: 2)
+    let writeSnapshot2 = writeInlineSnapshot(diffable: "NEW_SNAPSHOT", fileName: "filename", lineIndex: 6)
 
     let testExecution = pure
-      >>> writingFunction1
-      >>> writingFunction2
+      >>> writeSnapshot1
+      >>> writeSnapshot2
     let newSource = testExecution(source).eval([:])
 
-    XCTAssertEqual(newSource, """
-    class InlineSnapshotTests: XCTestCase {
-      _assertInlineSnapshot(matching: post, as: .raw(pretty: true), with: \"""
-      NEW_SNAPSHOT
-      with two lines
-      \""")
-
-      _assertInlineSnapshot(matching: post, as: .raw(pretty: true), with: \"""
-      NEW_SNAPSHOT
-      \""")
-    }
-    """)
+    assertSnapshot(matching: newSource, as: .lines)
   }
 }
