@@ -105,72 +105,30 @@ public func _verifyInlineSnapshot<Value>(
       // If that diff failed, we either record or fail.
       if recording || trimmedReference.isEmpty {
         let fileName = "\(file)"
-        let sourceCodeFilePath = URL(fileURLWithPath: fileName)
-        var sourceCodeLines = try String(contentsOf: sourceCodeFilePath).split(separator: "\n", omittingEmptySubsequences: false)
         let lineIndex = Int(line)
+        let sourceCodeFilePath = URL(fileURLWithPath: fileName)
+        let sourceCode = try String(contentsOf: sourceCodeFilePath)
 
-        let otherRecordings = recordings[fileName, default: []]
-        let otherRecordingsAboveThisLine = otherRecordings.filter { $0.line < lineIndex }
-        let offsetStartIndex = otherRecordingsAboveThisLine.reduce(lineIndex) { $0 + $1.difference }
-        let functionLineIndex = offsetStartIndex - 1
-        var lineCountDifference = 0
+        let writingFunction = writeInlineSnapshot(diffable: diffable, fileName: fileName, lineIndex: lineIndex)
 
-        // Convert `""` to multi-line literal
-        if sourceCodeLines[functionLineIndex].hasSuffix(emptyStringLiteralWithCloseBrace) {
-          // Convert:
-          //    _assertInlineSnapshot(matching: value, as: .dump, with: "")
-          // to:
-          //    _assertInlineSnapshot(matching: value, as: .dump, with: """
-          //    """)
-          var functionCallLine = sourceCodeLines.remove(at: functionLineIndex)
-          functionCallLine.removeLast(emptyStringLiteralWithCloseBrace.count)
-          let indentText = indentation(of: functionCallLine)
-          sourceCodeLines.insert(contentsOf: [
-            functionCallLine + multiLineStringLiteralTerminator,
-            indentText + multiLineStringLiteralTerminator + ")",
-            ] as [String.SubSequence], at: functionLineIndex)
-          lineCountDifference += 1
-        }
+        let (modifiedSource, newRecordings) = writingFunction(pure(sourceCode)).run(recordings)
 
-        /// If they haven't got a multi-line literal by now, then just fail.
-        guard sourceCodeLines[functionLineIndex].hasSuffix(multiLineStringLiteralTerminator) else {
+        try modifiedSource
+          .data(using: String.Encoding.utf8)?
+          .write(to: sourceCodeFilePath)
+
+        if newRecordings != recordings {
+          recordings = newRecordings
+          /// If no other recording has been made, then fail!
           return """
-          To use inline snapshots, please convert the "with" argument to a multi-line literal.
+          No reference was found inline. Automatically recorded snapshot.
+
+          Re-run "\(sanitizePathComponent(testName))" to test against the newly-recorded snapshot.
           """
-        }
-
-        /// Find the end of multi-line literal and replace contents with recording.
-        if let multiLineLiteralEndIndex = sourceCodeLines[offsetStartIndex...].firstIndex(where: { $0.contains(multiLineStringLiteralTerminator) }) {
-          /// Convert actual value to Lines to insert
-          let indentText = indentation(of: sourceCodeLines[multiLineLiteralEndIndex])
-          let newDiffableLines = diffable
-            .split(separator: "\n", omittingEmptySubsequences: false)
-            .map { Substring(indentText + $0) }
-          lineCountDifference += newDiffableLines.count - (multiLineLiteralEndIndex - offsetStartIndex)
-
-          let fileRecording = FileRecording(line: lineIndex, difference: lineCountDifference)
-          recordings[fileName, default: []].append(fileRecording)
-
-          /// Insert the lines
-          sourceCodeLines.replaceSubrange(offsetStartIndex..<multiLineLiteralEndIndex, with: newDiffableLines)
-
-          try sourceCodeLines
-            .joined(separator: "\n")
-            .data(using: String.Encoding.utf8)?
-            .write(to: sourceCodeFilePath)
-
-          if otherRecordings.isEmpty {
-            /// If no other recording has been made, then fail!
-            return """
-            No reference was found inline. Automatically recorded snapshot.
-
-            Re-run "\(sanitizePathComponent(testName))" to test against the newly-recorded snapshot.
-            """
-          } else {
-            /// There is already an failure in this file,
-            /// and we don't want to write to the wrong place.
-            return nil
-          }
+        } else {
+          /// There is already an failure in this file,
+          /// and we don't want to write to the wrong place.
+          return nil
         }
       }
 
@@ -198,7 +156,83 @@ public func _verifyInlineSnapshot<Value>(
     }
 }
 
-private struct FileRecording {
+internal typealias Recordings = [String: [FileRecording]]
+
+extension Recordings {
+  func adding(_ recording: FileRecording, forFilename fileName: String) -> Recordings {
+    var recordings = self
+    recordings[fileName, default: []].append(recording)
+    return recordings
+  }
+}
+
+internal func writeInlineSnapshot(diffable: String,
+                                  fileName: String,
+                                  lineIndex: Int
+  )
+  -> (_ state: State<Recordings, String>) -> State<Recordings, String> {
+
+    return { state in
+
+      return state.mapState { sourceCode, recordings in
+
+        var sourceCodeLines = sourceCode
+          .split(separator: "\n", omittingEmptySubsequences: false)
+
+        let otherRecordings = recordings[fileName, default: []]
+        let otherRecordingsAboveThisLine = otherRecordings.filter { $0.line < lineIndex }
+        let offsetStartIndex = otherRecordingsAboveThisLine.reduce(lineIndex) { $0 + $1.difference }
+        let functionLineIndex = offsetStartIndex - 1
+        var lineCountDifference = 0
+
+        // Convert `""` to multi-line literal
+        if sourceCodeLines[functionLineIndex].hasSuffix(emptyStringLiteralWithCloseBrace) {
+          // Convert:
+          //    _assertInlineSnapshot(matching: value, as: .dump, with: "")
+          // to:
+          //    _assertInlineSnapshot(matching: value, as: .dump, with: """
+          //    """)
+          var functionCallLine = sourceCodeLines.remove(at: functionLineIndex)
+          functionCallLine.removeLast(emptyStringLiteralWithCloseBrace.count)
+          let indentText = indentation(of: functionCallLine)
+          sourceCodeLines.insert(contentsOf: [
+            functionCallLine + multiLineStringLiteralTerminator,
+            indentText + multiLineStringLiteralTerminator + ")",
+            ] as [String.SubSequence], at: functionLineIndex)
+          lineCountDifference += 1
+        }
+
+        /// If they haven't got a multi-line literal by now, then just fail.
+        guard sourceCodeLines[functionLineIndex].hasSuffix(multiLineStringLiteralTerminator) else {
+          return (result: """
+          To use inline snapshots, please convert the "with" argument to a multi-line literal.
+          """,
+                  finalState: recordings)
+        }
+
+        /// Find the end of multi-line literal and replace contents with recording.
+        if let multiLineLiteralEndIndex = sourceCodeLines[offsetStartIndex...].firstIndex(where: { $0.contains(multiLineStringLiteralTerminator) }) {
+          /// Convert actual value to Lines to insert
+          let indentText = indentation(of: sourceCodeLines[multiLineLiteralEndIndex])
+          let newDiffableLines = diffable
+            .split(separator: "\n", omittingEmptySubsequences: false)
+            .map { Substring(indentText + $0) }
+          lineCountDifference += newDiffableLines.count - (multiLineLiteralEndIndex - offsetStartIndex)
+
+          let fileRecording = FileRecording(line: lineIndex, difference: lineCountDifference)
+
+          /// Insert the lines
+          sourceCodeLines.replaceSubrange(offsetStartIndex..<multiLineLiteralEndIndex, with: newDiffableLines)
+
+          return (result: sourceCodeLines.joined(separator: "\n"), finalState: recordings.adding(fileRecording, forFilename: fileName))
+        }
+
+        return (result: sourceCodeLines.joined(separator: "\n"), finalState: recordings)
+      }
+    }
+}
+
+internal struct FileRecording: Equatable {
   let line: Int
   let difference: Int
 }
@@ -214,4 +248,8 @@ private func indentation<S: StringProtocol>(of str: S) -> String {
 
 private let emptyStringLiteralWithCloseBrace = "\"\")"
 private let multiLineStringLiteralTerminator = "\"\"\""
-private var recordings: [String: [FileRecording]] = [:]
+
+// When we modify a file, the line numbers reported by the compiler through #line are no longer
+// accurate. With the FileRecording values we keep track of we modify the files so we can adjust
+// line numbers.
+private var recordings: Recordings = [:]
