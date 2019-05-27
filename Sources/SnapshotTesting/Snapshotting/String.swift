@@ -4,6 +4,15 @@ import XCTest
 extension Snapshotting where Value == String, Format == String {
   /// A snapshot strategy for comparing strings based on equality.
   public static let lines = Snapshotting(pathExtension: "txt", diffing: .lines)
+  
+  /// A snapshot strategy for comparing nserror based on equality
+  /// This strategy remove pointer informations from NSError in order to make them retestable
+  public static let nserror: Snapshotting = Snapshotting<String, String>.lines.pullback { err -> String in
+    if let hexaRange = err.range(of: ###"(0x[\w]{9})"###, options: .regularExpression) {
+      return err.replacingCharacters(in: hexaRange, with: "<pointer_info>")
+    }
+    return err
+  }
 }
 
 extension Diffing where Value == String {
