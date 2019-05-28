@@ -109,6 +109,11 @@ final class SnapshotTestingTests: XCTestCase {
           - name: "Stephen"
     """)
   }
+  
+  func testNSError() {
+    assertSnapshot(matching: "Lorem ipsum 0x123456789 sit amet, consectetur 0x1a34e6789 adipiscing elit, sed do", as: .nserror)
+    assertSnapshot(matching: "Lorem ipsum sit amet, consectetur", as: .nserror)
+  }
 
   func testCaseIterable() {
     enum Direction: String, CaseIterable {
