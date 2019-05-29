@@ -5,27 +5,28 @@ extension Snapshotting where Value == String, Format == String {
   /// A snapshot strategy for comparing strings based on equality.
   public static let lines = Snapshotting(pathExtension: "txt", diffing: .lines)
   
-  public enum linesModes {
+  /// Represent the type of content to remove
+  public enum LinesTypeOfContentToRemove {
     case regexes([String])
-    case pointerAddressRemoval
+    case pointerAddress
     
     var regex : [String] {
       switch self {
       case .regexes(let regexes):
         return regexes
-      case .pointerAddressRemoval:
+      case .pointerAddress:
         return [###"(0x[\w]+)"###]
       }
     }
   }
   
-  /// A snapshot strategy for comparing images based on pixel equality.
+  /// A snapshot strategy for comparing strings based on equality.
   ///
-  /// - Parameter precision: The percentage of pixels that must match.
-  public static func lines( _ mode: linesModes) -> Snapshotting {
+  /// - Parameter mode: The typ of parsing regex or pointerAddressRemoval.
+  public static func lines( _ contentType: LinesTypeOfContentToRemove) -> Snapshotting {
     return Snapshotting<String, String>.lines.pullback { err -> String in
       var localErr : Substring = err[...]
-      for aRegex in mode.regex {
+      for aRegex in contentType.regex {
         var shouldContinue = true
         while shouldContinue {
           if let hexaRange = localErr.range(of: aRegex, options: .regularExpression) {

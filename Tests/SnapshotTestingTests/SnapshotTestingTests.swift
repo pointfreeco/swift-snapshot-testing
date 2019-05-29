@@ -114,11 +114,11 @@ final class SnapshotTestingTests: XCTestCase {
     /// Simple
     assertSnapshot(matching: """
 Error Domain=NSCocoaErrorDomain Code=513 "You don’t have permission to save the file “toto” in the folder “bar”." UserInfo={NSFilePath=/etc/foo/bar/toto/, NSUnderlyingError=0x1234e678a {Error Domain=NSPOSIXErrorDomain Code=13 "Permission denied"}}
-""", as: .lines(.pointerAddressRemoval))
+""", as: .lines(.pointerAddress))
     /// Multiple
-    assertSnapshot(matching: "Lorem ipsum 0x123456789 sit amet, consectetur 0x1a34e6789 adipiscing elit, sed do", as: .lines(.pointerAddressRemoval))
+    assertSnapshot(matching: "Lorem ipsum 0x123456789 sit amet, consectetur 0x1a34e6789 adipiscing elit, sed do", as: .lines(.pointerAddress))
     /// None
-    assertSnapshot(matching: "Lorem ipsum sit amet, consectetur", as: .lines(.pointerAddressRemoval))
+    assertSnapshot(matching: "Lorem ipsum sit amet, consectetur", as: .lines(.pointerAddress))
   }
   
   func testLinesWithRegex() {
