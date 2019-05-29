@@ -105,13 +105,19 @@ public func _verifyInlineSnapshot<Value>(
       // If that diff failed, we either record or fail.
       if recording || trimmedReference.isEmpty {
         let fileName = "\(file)"
-        let lineIndex = Int(line)
         let sourceCodeFilePath = URL(fileURLWithPath: fileName)
         let sourceCode = try String(contentsOf: sourceCodeFilePath)
+        var newRecordings = recordings
 
-        let writingFunction = writeInlineSnapshot(diffable: diffable, fileName: fileName, lineIndex: lineIndex)
-
-        let (modifiedSource, newRecordings) = writingFunction(pure(sourceCode)).run(recordings)
+        let modifiedSource = writeInlineSnapshot(
+          &newRecordings,
+          Context(
+            sourceCode: sourceCode,
+            diffable: diffable,
+            fileName: fileName,
+            lineIndex: Int(line)
+          )
+        ).sourceCode
 
         try modifiedSource
           .data(using: String.Encoding.utf8)?
@@ -158,78 +164,76 @@ public func _verifyInlineSnapshot<Value>(
 
 internal typealias Recordings = [String: [FileRecording]]
 
-extension Recordings {
-  func adding(_ recording: FileRecording, forFilename fileName: String) -> Recordings {
-    var recordings = self
-    recordings[fileName, default: []].append(recording)
-    return recordings
+internal struct Context {
+  let sourceCode: String
+  let diffable: String
+  let fileName: String
+  let lineIndex: Int
+
+  func setSourceCode(_ newSourceCode: String) -> Context {
+    return Context(
+      sourceCode: newSourceCode,
+      diffable: diffable,
+      fileName: fileName,
+      lineIndex: lineIndex
+    )
   }
 }
 
-internal func writeInlineSnapshot(diffable: String,
-                                  fileName: String,
-                                  lineIndex: Int
-  )
-  -> (_ state: State<Recordings, String>) -> State<Recordings, String> {
+internal func writeInlineSnapshot(_ recordings: inout Recordings,
+                                  _ context: Context) -> Context {
+  var sourceCodeLines = context.sourceCode
+    .split(separator: "\n", omittingEmptySubsequences: false)
 
-    return { state in
+  let otherRecordings = recordings[context.fileName, default: []]
+  let otherRecordingsAboveThisLine = otherRecordings.filter { $0.line < context.lineIndex }
+  let offsetStartIndex = otherRecordingsAboveThisLine.reduce(context.lineIndex) { $0 + $1.difference }
+  let functionLineIndex = offsetStartIndex - 1
+  var lineCountDifference = 0
 
-      return state.mapState { sourceCode, recordings in
+  // Convert `""` to multi-line literal
+  if sourceCodeLines[functionLineIndex].hasSuffix(emptyStringLiteralWithCloseBrace) {
+    // Convert:
+    //    _assertInlineSnapshot(matching: value, as: .dump, with: "")
+    // to:
+    //    _assertInlineSnapshot(matching: value, as: .dump, with: """
+    //    """)
+    var functionCallLine = sourceCodeLines.remove(at: functionLineIndex)
+    functionCallLine.removeLast(emptyStringLiteralWithCloseBrace.count)
+    let indentText = indentation(of: functionCallLine)
+    sourceCodeLines.insert(contentsOf: [
+      functionCallLine + multiLineStringLiteralTerminator,
+      indentText + multiLineStringLiteralTerminator + ")",
+      ] as [String.SubSequence], at: functionLineIndex)
+    lineCountDifference += 1
+  }
 
-        var sourceCodeLines = sourceCode
-          .split(separator: "\n", omittingEmptySubsequences: false)
-
-        let otherRecordings = recordings[fileName, default: []]
-        let otherRecordingsAboveThisLine = otherRecordings.filter { $0.line < lineIndex }
-        let offsetStartIndex = otherRecordingsAboveThisLine.reduce(lineIndex) { $0 + $1.difference }
-        let functionLineIndex = offsetStartIndex - 1
-        var lineCountDifference = 0
-
-        // Convert `""` to multi-line literal
-        if sourceCodeLines[functionLineIndex].hasSuffix(emptyStringLiteralWithCloseBrace) {
-          // Convert:
-          //    _assertInlineSnapshot(matching: value, as: .dump, with: "")
-          // to:
-          //    _assertInlineSnapshot(matching: value, as: .dump, with: """
-          //    """)
-          var functionCallLine = sourceCodeLines.remove(at: functionLineIndex)
-          functionCallLine.removeLast(emptyStringLiteralWithCloseBrace.count)
-          let indentText = indentation(of: functionCallLine)
-          sourceCodeLines.insert(contentsOf: [
-            functionCallLine + multiLineStringLiteralTerminator,
-            indentText + multiLineStringLiteralTerminator + ")",
-            ] as [String.SubSequence], at: functionLineIndex)
-          lineCountDifference += 1
-        }
-
-        /// If they haven't got a multi-line literal by now, then just fail.
-        guard sourceCodeLines[functionLineIndex].hasSuffix(multiLineStringLiteralTerminator) else {
-          return (result: """
+  /// If they haven't got a multi-line literal by now, then just fail.
+  guard sourceCodeLines[functionLineIndex].hasSuffix(multiLineStringLiteralTerminator) else {
+    return context.setSourceCode("""
           To use inline snapshots, please convert the "with" argument to a multi-line literal.
-          """,
-                  finalState: recordings)
-        }
+          """)
+  }
 
-        /// Find the end of multi-line literal and replace contents with recording.
-        if let multiLineLiteralEndIndex = sourceCodeLines[offsetStartIndex...].firstIndex(where: { $0.contains(multiLineStringLiteralTerminator) }) {
-          /// Convert actual value to Lines to insert
-          let indentText = indentation(of: sourceCodeLines[multiLineLiteralEndIndex])
-          let newDiffableLines = diffable
-            .split(separator: "\n", omittingEmptySubsequences: false)
-            .map { Substring(indentText + $0) }
-          lineCountDifference += newDiffableLines.count - (multiLineLiteralEndIndex - offsetStartIndex)
+  /// Find the end of multi-line literal and replace contents with recording.
+  if let multiLineLiteralEndIndex = sourceCodeLines[offsetStartIndex...].firstIndex(where: { $0.contains(multiLineStringLiteralTerminator) }) {
+    /// Convert actual value to Lines to insert
+    let indentText = indentation(of: sourceCodeLines[multiLineLiteralEndIndex])
+    let newDiffableLines = context.diffable
+      .split(separator: "\n", omittingEmptySubsequences: false)
+      .map { Substring(indentText + $0) }
+    lineCountDifference += newDiffableLines.count - (multiLineLiteralEndIndex - offsetStartIndex)
 
-          let fileRecording = FileRecording(line: lineIndex, difference: lineCountDifference)
+    let fileRecording = FileRecording(line: context.lineIndex, difference: lineCountDifference)
 
-          /// Insert the lines
-          sourceCodeLines.replaceSubrange(offsetStartIndex..<multiLineLiteralEndIndex, with: newDiffableLines)
+    /// Insert the lines
+    sourceCodeLines.replaceSubrange(offsetStartIndex..<multiLineLiteralEndIndex, with: newDiffableLines)
 
-          return (result: sourceCodeLines.joined(separator: "\n"), finalState: recordings.adding(fileRecording, forFilename: fileName))
-        }
+    recordings[context.fileName, default: []].append(fileRecording)
+    return context.setSourceCode(sourceCodeLines.joined(separator: "\n"))
+  }
 
-        return (result: sourceCodeLines.joined(separator: "\n"), finalState: recordings)
-      }
-    }
+  return context.setSourceCode(sourceCodeLines.joined(separator: "\n"))
 }
 
 internal struct FileRecording: Equatable {

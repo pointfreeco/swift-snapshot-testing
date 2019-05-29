@@ -14,8 +14,13 @@ class InlineSnapshotTests: XCTestCase {
     let source = #"""
     _assertInlineSnapshot(matching: post, as: .raw(pretty: true), with: "")
     """#
-    let writingFunction = writeInlineSnapshot(diffable: "NEW_SNAPSHOT", fileName: "filename", lineIndex: 1)
-    let newSource = writingFunction(pure(source)).eval([:])
+
+    var recordings: Recordings = [:]
+    let newSource = writeInlineSnapshot(
+      &recordings,
+      Context(sourceCode: source, diffable: "NEW_SNAPSHOT", fileName: "filename", lineIndex: 1)
+    ).sourceCode
+
     assertSnapshot(matching: newSource, as: .lines)
   }
 
@@ -24,8 +29,13 @@ class InlineSnapshotTests: XCTestCase {
     _assertInlineSnapshot(matching: post, as: .raw(pretty: true), with: \"""
     \""")
     """
-    let writingFunction = writeInlineSnapshot(diffable: "NEW_SNAPSHOT", fileName: "filename", lineIndex: 1)
-    let newSource = writingFunction(pure(source)).eval([:])
+
+    var recordings: Recordings = [:]
+    let newSource = writeInlineSnapshot(
+      &recordings,
+      Context(sourceCode: source, diffable: "NEW_SNAPSHOT", fileName: "filename", lineIndex: 1)
+    ).sourceCode
+
     assertSnapshot(matching: newSource, as: .lines)
   }
 
@@ -35,8 +45,12 @@ class InlineSnapshotTests: XCTestCase {
     OLD_SNAPSHOT
     \""")
     """
-    let writingFunction = writeInlineSnapshot(diffable: "NEW_SNAPSHOT", fileName: "filename", lineIndex: 1)
-    let newSource = writingFunction(pure(source)).eval([:])
+
+    var recordings: Recordings = [:]
+    let newSource = writeInlineSnapshot(
+      &recordings,
+      Context(sourceCode: source, diffable: "NEW_SNAPSHOT", fileName: "filename", lineIndex: 1)
+    ).sourceCode
 
     assertSnapshot(matching: newSource, as: .lines)
   }
@@ -53,13 +67,17 @@ class InlineSnapshotTests: XCTestCase {
       \""")
     }
     """
-    let writeSnapshot1 = writeInlineSnapshot(diffable: "NEW_SNAPSHOT\nwith two lines", fileName: "filename", lineIndex: 2)
-    let writeSnapshot2 = writeInlineSnapshot(diffable: "NEW_SNAPSHOT", fileName: "filename", lineIndex: 6)
 
-    let testExecution = pure
-      >>> writeSnapshot1
-      >>> writeSnapshot2
-    let newSource = testExecution(source).eval([:])
+    let context1 = Context(sourceCode: source, diffable: "NEW_SNAPSHOT\nwith two lines", fileName: "filename", lineIndex: 2)
+    let context2 = { (context: Context) in
+      Context(sourceCode: context.sourceCode, diffable: "NEW_SNAPSHOT", fileName: "filename", lineIndex: 6)
+    }
+
+    let testExecution = context1 >>> writeInlineSnapshot
+      >>> context2 >>> writeInlineSnapshot
+
+    var recordings: Recordings = [:]
+    let newSource = testExecution(&recordings).sourceCode
 
     assertSnapshot(matching: newSource, as: .lines)
   }
