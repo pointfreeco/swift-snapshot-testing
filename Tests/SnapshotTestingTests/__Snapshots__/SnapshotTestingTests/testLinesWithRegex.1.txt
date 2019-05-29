@@ -1,0 +1,1 @@
+Error Domain=NSCocoaErrorDomain Code=513 "You don’t have permission to save the file “toto” in the folder “bar”." UserInfo={NSFilePath=/etc/foo/bar/toto/, NSUnderlyingError= {Error Domain=NSPOSIXErrorDomain Code=13 "Permission denied"}}

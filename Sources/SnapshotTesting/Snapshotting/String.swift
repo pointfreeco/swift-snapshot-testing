@@ -5,19 +5,38 @@ extension Snapshotting where Value == String, Format == String {
   /// A snapshot strategy for comparing strings based on equality.
   public static let lines = Snapshotting(pathExtension: "txt", diffing: .lines)
   
-  /// A snapshot strategy for comparing nserror based on equality
-  /// This strategy remove pointer informations from NSError in order to make them retestable
-  public static let nserror: Snapshotting = Snapshotting<String, String>.lines.pullback { err -> String in
-    var localErr : Substring = err[...]
-    var shouldContinue = true
-    while shouldContinue {
-      if let hexaRange = localErr.range(of: ###"(0x[\w]{9})"###, options: .regularExpression) {
-        localErr.removeSubrange(hexaRange)
-      } else {
-        shouldContinue = false
+  public enum linesModes {
+    case regexes([String])
+    case pointerAddressRemoval
+    
+    var regex : [String] {
+      switch self {
+      case .regexes(let regexes):
+        return regexes
+      case .pointerAddressRemoval:
+        return [###"(0x[\w]+)"###]
       }
     }
-    return String(localErr)
+  }
+  
+  /// A snapshot strategy for comparing images based on pixel equality.
+  ///
+  /// - Parameter precision: The percentage of pixels that must match.
+  public static func lines( _ mode: linesModes) -> Snapshotting {
+    return Snapshotting<String, String>.lines.pullback { err -> String in
+      var localErr : Substring = err[...]
+      for aRegex in mode.regex {
+        var shouldContinue = true
+        while shouldContinue {
+          if let hexaRange = localErr.range(of: aRegex, options: .regularExpression) {
+            localErr.removeSubrange(hexaRange)
+          } else {
+            shouldContinue = false
+          }
+        }
+      }
+      return String(localErr)
+    }
   }
 }
 

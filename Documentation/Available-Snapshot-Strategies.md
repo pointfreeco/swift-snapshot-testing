@@ -445,21 +445,12 @@ A snapshot strategy for comparing strings based on equality.
 
 ``` swift
 assertSnapshot(matching: htmlString, as: .lines)
-```
-
-### `.nserror`
-
-A snapshot strategy for comparing strings that contain pointer addresses based on equality.
-
-**Format:** `String`
-
-#### Example:
-
-``` swift
 assertSnapshot(matching: """
 Error Domain=NSCocoaErrorDomain Code=513 "You don’t have permission to save the file “toto” in the folder “bar”." UserInfo={NSFilePath=/etc/foo/bar/toto/, NSUnderlyingError=0x1234e678a {Error Domain=NSPOSIXErrorDomain Code=13 "Permission denied"}}
-""", as: .nserror)
+""", as: .lines(.pointerAddressRemoval))
+assertSnapshot(matching: "Lorem ipsum 0x123456789 sit amet, consectetur 0x1a34e6789 adipiscing elit, sed do", as: .lines(.regexes([###"(0x[\w]{9})"###])))
 ```
+
 ## UIImage
 
 **Platforms:** iOS, tvOS
