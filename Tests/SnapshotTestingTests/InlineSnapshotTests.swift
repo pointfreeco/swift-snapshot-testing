@@ -68,16 +68,12 @@ class InlineSnapshotTests: XCTestCase {
     }
     """
 
-    let context1 = Context(sourceCode: source, diffable: "NEW_SNAPSHOT\nwith two lines", fileName: "filename", lineIndex: 2)
-    let context2 = { (context: Context) in
-      Context(sourceCode: context.sourceCode, diffable: "NEW_SNAPSHOT", fileName: "filename", lineIndex: 6)
-    }
-
-    let testExecution = context1 >>> writeInlineSnapshot
-      >>> context2 >>> writeInlineSnapshot
-
     var recordings: Recordings = [:]
-    let newSource = testExecution(&recordings).sourceCode
+    let context1 = Context(sourceCode: source, diffable: "NEW_SNAPSHOT\nwith two lines", fileName: "filename", lineIndex: 2)
+    let contextAfterFirstSnapshot = writeInlineSnapshot(&recordings, context1)
+
+    let context2 = Context(sourceCode: contextAfterFirstSnapshot.sourceCode, diffable: "NEW_SNAPSHOT", fileName: "filename", lineIndex: 6)
+    let newSource = writeInlineSnapshot(&recordings, context2).sourceCode
 
     assertSnapshot(matching: newSource, as: .lines)
   }
