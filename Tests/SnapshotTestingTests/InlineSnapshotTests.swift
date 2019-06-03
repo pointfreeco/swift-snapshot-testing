@@ -1,10 +1,3 @@
-//
-//  InlineSnapshotTests.swift
-//  SnapshotTesting
-//
-//  Created by Ferran Pujol Camins on 21/05/2019.
-//
-
 import XCTest
 @testable import SnapshotTesting
 
