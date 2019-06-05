@@ -225,7 +225,7 @@ final class SnapshotTestingTests: XCTestCase {
       sphereNode.position = SCNVector3Zero
       scene.rootNode.addChildNode(sphereNode)
 
-      sphereGeometry.firstMaterial?.diffuse.contents = URL(fileURLWithPath: String(#file))
+      sphereGeometry.firstMaterial?.diffuse.contents = URL(fileURLWithPath: String(#file), isDirectory: false)
         .deletingLastPathComponent()
         .appendingPathComponent("__Fixtures__/earth.png")
 
@@ -661,7 +661,7 @@ final class SnapshotTestingTests: XCTestCase {
 
   func testWebView() throws {
     #if os(iOS) || os(macOS)
-    let fixtureUrl = URL(fileURLWithPath: String(#file))
+    let fixtureUrl = URL(fileURLWithPath: String(#file), isDirectory: false)
       .deletingLastPathComponent()
       .appendingPathComponent("__Fixtures__/pointfree.html")
     let html = try String(contentsOf: fixtureUrl)

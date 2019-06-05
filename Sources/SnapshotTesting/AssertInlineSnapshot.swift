@@ -105,7 +105,7 @@ public func _verifyInlineSnapshot<Value>(
       // If that diff failed, we either record or fail.
       if recording || trimmedReference.isEmpty {
         let fileName = "\(file)"
-        let sourceCodeFilePath = URL(fileURLWithPath: fileName)
+        let sourceCodeFilePath = URL(fileURLWithPath: fileName, isDirectory: false)
         let sourceCode = try String(contentsOf: sourceCodeFilePath)
         var newRecordings = recordings
 
