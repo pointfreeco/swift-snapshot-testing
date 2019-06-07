@@ -168,10 +168,10 @@ public func verifySnapshot<Value, Format>(
     let recording = recording || record
 
     do {
-      let fileUrl = URL(fileURLWithPath: "\(file)")
+      let fileUrl = URL(fileURLWithPath: "\(file)", isDirectory: false)
       let fileName = fileUrl.deletingPathExtension().lastPathComponent
 
-      let snapshotDirectoryUrl = snapshotDirectory.map(URL.init(fileURLWithPath:))
+      let snapshotDirectoryUrl = snapshotDirectory.map { URL(fileURLWithPath: $0, isDirectory: true) }
         ?? fileUrl
           .deletingLastPathComponent()
           .appendingPathComponent("__Snapshots__")
@@ -250,7 +250,7 @@ public func verifySnapshot<Value, Format>(
       }
 
       let artifactsUrl = URL(
-        fileURLWithPath: ProcessInfo.processInfo.environment["SNAPSHOT_ARTIFACTS"] ?? NSTemporaryDirectory()
+        fileURLWithPath: ProcessInfo.processInfo.environment["SNAPSHOT_ARTIFACTS"] ?? NSTemporaryDirectory(), isDirectory: true
       )
       let artifactsSubUrl = artifactsUrl.appendingPathComponent(fileName)
       try fileManager.createDirectory(at: artifactsSubUrl, withIntermediateDirectories: true)
