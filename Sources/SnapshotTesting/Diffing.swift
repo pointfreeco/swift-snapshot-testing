@@ -12,6 +12,34 @@ public struct Diffing<Value> {
   /// Compares two values. If the values do not match, returns a failure message and artifacts describing the failure.
   public var diff: (Value, Value) -> (String, [XCTAttachment])?
 
+
+  func imap<NewValue>(
+    _ f: @escaping (Value) -> NewValue,
+    _ g: @escaping (NewValue) -> Value
+    ) -> Diffing<NewValue> {
+
+    return Diffing<NewValue>(
+      toData: { newValue in self.toData(g(newValue)) },
+      fromData: { newValue in f(self.fromData(newValue)) },
+      diff: { lhs, rhs in
+        self.diff(g(lhs), g(rhs))
+    }
+    )
+  }
+
+  func test() {
+
+    Diffing<String>.lines.imap(
+      { str in str.replacingOccurrences(of: " #\\d+", with: "", options: .regularExpression) },
+      { $0 }
+    )
+
+//    Snapshotting<String, String>.lines.imap(removePointers, id)
+
+  }
+
+
+
   /// Creates a new `Diffing` on `Value`.
   ///
   /// - Parameters:
