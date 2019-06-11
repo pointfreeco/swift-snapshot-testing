@@ -21,6 +21,30 @@ final class SnapshotTestingTests: XCTestCase {
     super.tearDown()
   }
 
+  func testInt() {
+    let int: Int = 1234
+    assertSnapshot(matching: int, as: .int)
+  }
+
+  func testHashable() {
+    struct User: Hashable { let id: Int, name: String, bio: String }
+    let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
+    let hashValue = user.hashValue
+    assertSnapshot(matching: hashValue, as: .int)
+    assertSnapshot(matching: user, as: SimplySnapshotting.hash)
+
+    struct UnhashableUser { let id: Int, name: String, bio: String }
+    let unashableUser = UnhashableUser(id: 1, name: "Blobby", bio: "Blobbed around the world.")
+    assertSnapshot(
+      matching: unashableUser,
+      as: Snapshotting<UnhashableUser, String>.hash(from: { $0.name })
+    )
+    assertSnapshot(
+      matching: unashableUser,
+      as: Snapshotting<UnhashableUser, String>.hash(from: { Async(value: $0.name) })
+    )
+  }
+
   func testAny() {
     struct User { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
@@ -597,6 +621,18 @@ final class SnapshotTestingTests: XCTestCase {
     let view = UIButton(type: .contactAdd)
     assertSnapshot(matching: view, as: .image)
     assertSnapshot(matching: view, as: .recursiveDescription)
+    assertSnapshot(matching: view, as: .pixel)
+    assertSnapshot(matching: view, as: .pixelsHash)
+
+    // Comparing UIView straight hashes is not relevent as UIView hash does not only depends on its pixels
+    // This is the same for UIImage
+    // Thoses assertions should fail
+//    let view = UIButton(type: .contactAdd)
+//    assertSnapshot(matching: view, as: .hash)
+//    assertSnapshot(
+//      matching: view,
+//      as: Snapshotting<UIView, UIImage>.hash(from: .image)
+//    )
     #endif
   }
 
