@@ -168,6 +168,7 @@ internal struct Context {
   let sourceCode: String
   let diffable: String
   let fileName: String
+  // First line of a file is line 1 (as with the #line macro)
   let lineIndex: Int
 
   func setSourceCode(_ newSourceCode: String) -> Context {
