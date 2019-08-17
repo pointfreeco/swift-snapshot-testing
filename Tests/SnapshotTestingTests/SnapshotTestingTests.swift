@@ -7,6 +7,7 @@ import SceneKit
 #endif
 #if canImport(SpriteKit)
 import SpriteKit
+import SwiftUI
 #endif
 #if canImport(WebKit)
 import WebKit
@@ -835,6 +836,17 @@ final class SnapshotTestingTests: XCTestCase {
       )
     }
     #endif
+  }
+    
+  @available(iOS 13.0.0, *)
+  func testSwiftUIView() {
+    struct MyView: SwiftUI.View {
+            
+      var body: some SwiftUI.View {
+        Text("Hello World")
+      }
+    }
+    assertSnapshot(matching: MyView(), as: .image(on: .iPhoneSe))
   }
 }
 
