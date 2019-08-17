@@ -126,7 +126,7 @@ If your data can be represented as an image, text, or data, you can write a snap
 
 ## Snapshot Inline
 
-Text-based snapshots can be rendered inline in your test file. Write your snapshot test as you would otherwise, but replace the `assertSnapshot` function name with `assertInlineSnapshot`, and add the `with` parameter set to an empty string.
+Text-based snapshots can be rendered inline in your test file, making it particularly easy to verify a snapshot without loading it up elsewhere. Write your snapshot test as you would otherwise, but replace the `assertSnapshot` function name with `assertInlineSnapshot`, and add the `with` parameter set to an empty string.
 
 ``` swift
 assertInlineSnapshot(matching: user, as: .dump, with: """
