@@ -194,7 +194,7 @@ public func _verifyInlineSnapshot<Value>(
   testName: String = #function,
   line: UInt = #line
 ) -> String? {
-  verifyInlineSnapshot(
+  return verifyInlineSnapshot(
     matching: try value(),
     as: snapshotting,
     record: recording,
