@@ -843,7 +843,14 @@ final class SnapshotTestingTests: XCTestCase {
     struct MyView: SwiftUI.View {
             
       var body: some SwiftUI.View {
-        Text("Hello World")
+        VStack {
+          Text("Hello World")
+          List {
+            Text("1")
+            Text("2")
+            Text("3")
+          }
+        }
       }
     }
     assertSnapshot(matching: MyView(), as: .image(on: .iPhoneSe))
