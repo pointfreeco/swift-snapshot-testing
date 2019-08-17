@@ -6,7 +6,7 @@ extension InlineSnapshotsValidityTests {
     NEW_SNAPSHOT
     """#######
 
-    _assertInlineSnapshot(matching: diffable, as: .lines, with: """
+    assertInlineSnapshot(matching: diffable, as: .lines, with: """
     NEW_SNAPSHOT
     """)
   }

@@ -2,11 +2,15 @@ import XCTest
 @testable import SnapshotTesting
 
 class InlineSnapshotTests: XCTestCase {
+  override func setUp() {
+    super.setUp()
+//    record = true
+  }
 
   func testCreateSnapshotSingleLine() {
     let diffable = "NEW_SNAPSHOT"
     let source = """
-    _assertInlineSnapshot(matching: diffable, as: .lines, with: "")
+    assertInlineSnapshot(matching: diffable, as: .lines, with: "")
     """
 
     var recordings: Recordings = [:]
@@ -21,7 +25,7 @@ class InlineSnapshotTests: XCTestCase {
   func testCreateSnapshotMultiLine() {
     let diffable = "NEW_SNAPSHOT"
     let source = #"""
-    _assertInlineSnapshot(matching: diffable, as: .lines, with: """
+    assertInlineSnapshot(matching: diffable, as: .lines, with: """
     """)
     """#
 
@@ -37,7 +41,7 @@ class InlineSnapshotTests: XCTestCase {
   func testUpdateSnapshot() {
     let diffable = "NEW_SNAPSHOT"
     let source = #"""
-    _assertInlineSnapshot(matching: diffable, as: .lines, with: """
+    assertInlineSnapshot(matching: diffable, as: .lines, with: """
     OLD_SNAPSHOT
     """)
     """#
@@ -54,7 +58,7 @@ class InlineSnapshotTests: XCTestCase {
   func testUpdateSnapshotWithMoreLines() {
     let diffable = "NEW_SNAPSHOT\nNEW_SNAPSHOT"
     let source = #"""
-    _assertInlineSnapshot(matching: diffable, as: .lines, with: """
+    assertInlineSnapshot(matching: diffable, as: .lines, with: """
     OLD_SNAPSHOT
     """)
     """#
@@ -71,7 +75,7 @@ class InlineSnapshotTests: XCTestCase {
   func testUpdateSnapshotWithLessLines() {
     let diffable = "NEW_SNAPSHOT"
     let source = #"""
-    _assertInlineSnapshot(matching: diffable, as: .lines, with: """
+    assertInlineSnapshot(matching: diffable, as: .lines, with: """
     OLD_SNAPSHOT
     OLD_SNAPSHOT
     """)
@@ -89,7 +93,7 @@ class InlineSnapshotTests: XCTestCase {
   func testCreateSnapshotWithExtendedDelimiterSingleLine1() {
     let diffable = #"\""#
     let source = """
-    _assertInlineSnapshot(matching: diffable, as: .lines, with: "")
+    assertInlineSnapshot(matching: diffable, as: .lines, with: "")
     """
 
     var recordings: Recordings = [:]
@@ -107,7 +111,7 @@ class InlineSnapshotTests: XCTestCase {
     cde \
     """#
     let source = """
-    _assertInlineSnapshot(matching: diffable, as: .lines, with: "")
+    assertInlineSnapshot(matching: diffable, as: .lines, with: "")
     """
 
     var recordings: Recordings = [:]
@@ -122,7 +126,7 @@ class InlineSnapshotTests: XCTestCase {
   func testCreateSnapshotWithExtendedDelimiterSingleLine2() {
     let diffable = ##"\"""#"##
     let source = ##"""
-    _assertInlineSnapshot(matching: diffable, as: .lines, with: "")
+    assertInlineSnapshot(matching: diffable, as: .lines, with: "")
     """##
 
     var recordings: Recordings = [:]
@@ -137,7 +141,7 @@ class InlineSnapshotTests: XCTestCase {
   func testCreateSnapshotWithExtendedDelimiter1() {
     let diffable = #"\""#
     let source = ##"""
-    _assertInlineSnapshot(matching: diffable, as: .lines, with: #"""
+    assertInlineSnapshot(matching: diffable, as: .lines, with: #"""
     """#)
     """##
 
@@ -153,7 +157,7 @@ class InlineSnapshotTests: XCTestCase {
   func testCreateSnapshotWithExtendedDelimiter2() {
     let diffable = ##"\"""#"##
     let source = ###"""
-    _assertInlineSnapshot(matching: diffable, as: .lines, with: ##"""
+    assertInlineSnapshot(matching: diffable, as: .lines, with: ##"""
     """##)
     """###
 
@@ -169,7 +173,7 @@ class InlineSnapshotTests: XCTestCase {
   func testCreateSnapshotWithLongerExtendedDelimiter1() {
     let diffable =  #"\""#
     let source = ###"""
-    _assertInlineSnapshot(matching: diffable, as: .lines, with: ##"""
+    assertInlineSnapshot(matching: diffable, as: .lines, with: ##"""
     """##)
     """###
 
@@ -185,7 +189,7 @@ class InlineSnapshotTests: XCTestCase {
   func testCreateSnapshotWithLongerExtendedDelimiter2() {
     let diffable = ##"\"""#"##
     let source = ####"""
-    _assertInlineSnapshot(matching: diffable, as: .lines, with: ###"""
+    assertInlineSnapshot(matching: diffable, as: .lines, with: ###"""
     """###)
     """####
 
@@ -201,7 +205,7 @@ class InlineSnapshotTests: XCTestCase {
   func testCreateSnapshotWithShorterExtendedDelimiter1() {
     let diffable = #"\""#
     let source = #"""
-    _assertInlineSnapshot(matching: diffable, as: .lines, with: """
+    assertInlineSnapshot(matching: diffable, as: .lines, with: """
     """)
     """#
 
@@ -217,7 +221,7 @@ class InlineSnapshotTests: XCTestCase {
   func testCreateSnapshotWithShorterExtendedDelimiter2() {
     let diffable = ##"\"""#"##
     let source = ##"""
-    _assertInlineSnapshot(matching: diffable, as: .lines, with: #"""
+    assertInlineSnapshot(matching: diffable, as: .lines, with: #"""
     """#)
     """##
 
@@ -233,7 +237,7 @@ class InlineSnapshotTests: XCTestCase {
   func testUpdateSnapshotWithExtendedDelimiter1() {
     let diffable = #"\""#
     let source = ##"""
-    _assertInlineSnapshot(matching: diffable, as: .lines, with: #"""
+    assertInlineSnapshot(matching: diffable, as: .lines, with: #"""
     \"
     """#)
     """##
@@ -250,7 +254,7 @@ class InlineSnapshotTests: XCTestCase {
   func testUpdateSnapshotWithExtendedDelimiter2() {
     let diffable = ##"\"""#"##
     let source = ###"""
-    _assertInlineSnapshot(matching: diffable, as: .lines, with: ##"""
+    assertInlineSnapshot(matching: diffable, as: .lines, with: ##"""
     "#
     """##)
     """###
@@ -267,7 +271,7 @@ class InlineSnapshotTests: XCTestCase {
   func testUpdateSnapshotWithLongerExtendedDelimiter1() {
     let diffable = #"\""#
     let source = #"""
-    _assertInlineSnapshot(matching: diffable, as: .lines, with: """
+    assertInlineSnapshot(matching: diffable, as: .lines, with: """
     \"
     """)
     """#
@@ -284,7 +288,7 @@ class InlineSnapshotTests: XCTestCase {
   func testUpdateSnapshotWithLongerExtendedDelimiter2() {
     let diffable = ##"\"""#"##
     let source = ##"""
-    _assertInlineSnapshot(matching: diffable, as: .lines, with: #"""
+    assertInlineSnapshot(matching: diffable, as: .lines, with: #"""
     "#
     """#)
     """##
@@ -301,7 +305,7 @@ class InlineSnapshotTests: XCTestCase {
   func testUpdateSnapshotWithShorterExtendedDelimiter1() {
     let diffable = #"\""#
     let source = ###"""
-    _assertInlineSnapshot(matching: diffable, as: .lines, with: ##"""
+    assertInlineSnapshot(matching: diffable, as: .lines, with: ##"""
     \"
     """##)
     """###
@@ -318,7 +322,7 @@ class InlineSnapshotTests: XCTestCase {
   func testUpdateSnapshotWithShorterExtendedDelimiter2() {
     let diffable = ##"\"""#"##
     let source = ####"""
-    _assertInlineSnapshot(matching: diffable, as: .lines, with: ###"""
+    assertInlineSnapshot(matching: diffable, as: .lines, with: ###"""
     "#
     """###)
     """####
@@ -341,11 +345,11 @@ class InlineSnapshotTests: XCTestCase {
     let diffable2 = "NEW_SNAPSHOT"
 
     let source = """
-    _assertInlineSnapshot(matching: diffable, as: .lines, with: \"""
+    assertInlineSnapshot(matching: diffable, as: .lines, with: \"""
     OLD_SNAPSHOT
     \""")
 
-    _assertInlineSnapshot(matching: diffable2, as: .lines, with: \"""
+    assertInlineSnapshot(matching: diffable2, as: .lines, with: \"""
     OLD_SNAPSHOT
     \""")
     """
@@ -372,12 +376,12 @@ class InlineSnapshotTests: XCTestCase {
     let diffable2 = "NEW_SNAPSHOT"
 
     let source = """
-    _assertInlineSnapshot(matching: diffable, as: .lines, with: \"""
+    assertInlineSnapshot(matching: diffable, as: .lines, with: \"""
     OLD_SNAPSHOT
     with two lines
     \""")
 
-    _assertInlineSnapshot(matching: diffable2, as: .lines, with: \"""
+    assertInlineSnapshot(matching: diffable2, as: .lines, with: \"""
     OLD_SNAPSHOT
     \""")
     """
@@ -407,11 +411,11 @@ class InlineSnapshotTests: XCTestCase {
     """
 
     let source = """
-    _assertInlineSnapshot(matching: diffable, as: .lines, with: \"""
+    assertInlineSnapshot(matching: diffable, as: .lines, with: \"""
     OLD_SNAPSHOT
     \""")
 
-    _assertInlineSnapshot(matching: diffable2, as: .lines, with: \"""
+    assertInlineSnapshot(matching: diffable2, as: .lines, with: \"""
     OLD_SNAPSHOT
     with two lines
     \""")
@@ -442,12 +446,12 @@ class InlineSnapshotTests: XCTestCase {
     """
 
     let source = """
-    _assertInlineSnapshot(matching: diffable, as: .lines, with: \"""
+    assertInlineSnapshot(matching: diffable, as: .lines, with: \"""
     OLD_SNAPSHOT
     with two lines
     \""")
 
-    _assertInlineSnapshot(matching: diffable2, as: .lines, with: \"""
+    assertInlineSnapshot(matching: diffable2, as: .lines, with: \"""
     OLD_SNAPSHOT
     \""")
     """
@@ -475,7 +479,7 @@ class InlineSnapshotTests: XCTestCase {
     """##
 
     let source = ######"""
-    _assertInlineSnapshot(matching: diffable, as: .lines, with: #####"""
+    assertInlineSnapshot(matching: diffable, as: .lines, with: #####"""
     """#####)
     """######
 
@@ -540,11 +544,8 @@ extension Snapshotting where Value == String, Format == String {
   }
 }
 
-// Class that is extended with the generated code to check that it builds.
-// Besides that, the generated code is a test itself, which tests that the
-// snapshotted value is equal to the original value.
-// With this test we check that we escaped correctly
-// e.g. if we enclose \" in """ """ instead of #""" """#,
-// the character sequence will be interpreted as " instead of \"
-// The generated tests check this issues.
+// Class that is extended with the generated code to check that it builds. Besides that, the generated code
+// is a test itself, which tests that the snapshot is equal to the original value. With this test we check
+// that we escaped correctly, _e.g._, if we enclose \" in """ """ instead of #""" """#, the character
+// sequence will be interpreted as " instead of \". The generated tests check this issues.
 class InlineSnapshotsValidityTests: XCTestCase {}

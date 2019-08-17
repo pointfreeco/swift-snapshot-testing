@@ -6,7 +6,7 @@ import XCTest
 ///
 /// Usage:
 /// ```
-/// _assertInlineSnapshot(matching: value, as: .dump, with: """
+/// assertInlineSnapshot(matching: value, as: .dump, with: """
 /// """)
 /// ```
 ///
@@ -18,7 +18,7 @@ import XCTest
 ///   - reference: The expected output of snapshotting.
 ///   - file: The file in which failure occurred. Defaults to the file name of the test case in which this function was called.
 ///   - line: The line number on which failure occurred. Defaults to the line number on which this function was called.
-public func _assertInlineSnapshot<Value>(
+public func assertInlineSnapshot<Value>(
   matching value: @autoclosure () throws -> Value,
   as snapshotting: Snapshotting<Value, String>,
   record recording: Bool = false,
@@ -27,9 +27,9 @@ public func _assertInlineSnapshot<Value>(
   file: StaticString = #file,
   testName: String = #function,
   line: UInt = #line
-  ) {
+) {
 
-  let failure = _verifyInlineSnapshot(
+  let failure = verifyInlineSnapshot(
     matching: try value(),
     as: snapshotting,
     record: recording,
@@ -41,6 +41,29 @@ public func _assertInlineSnapshot<Value>(
   )
   guard let message = failure else { return }
   XCTFail(message, file: file, line: line)
+}
+
+@available(*, deprecated, renamed: "assertInlineSnapshot")
+public func _assertInlineSnapshot<Value>(
+  matching value: @autoclosure () throws -> Value,
+  as snapshotting: Snapshotting<Value, String>,
+  record recording: Bool = false,
+  timeout: TimeInterval = 5,
+  with reference: String,
+  file: StaticString = #file,
+  testName: String = #function,
+  line: UInt = #line
+) {
+  assertInlineSnapshot(
+    matching: try value(),
+    as: snapshotting,
+    record: recording,
+    timeout: timeout,
+    with: reference,
+    file: file,
+    testName: testName,
+    line: line
+  )
 }
 
 /// Verifies that a given value matches a string literal.
@@ -57,6 +80,110 @@ public func _assertInlineSnapshot<Value>(
 ///   - testName: The name of the test in which failure occurred. Defaults to the function name of the test case in which this function was called.
 ///   - line: The line number on which failure occurred. Defaults to the line number on which this function was called.
 /// - Returns: A failure message or, if the value matches, nil.
+public func verifyInlineSnapshot<Value>(
+  matching value: @autoclosure () throws -> Value,
+  as snapshotting: Snapshotting<Value, String>,
+  record recording: Bool = false,
+  timeout: TimeInterval = 5,
+  with reference: String,
+  file: StaticString = #file,
+  testName: String = #function,
+  line: UInt = #line
+) -> String? {
+
+  let recording = recording || record
+
+  do {
+    let tookSnapshot = XCTestExpectation(description: "Took snapshot")
+    var optionalDiffable: String?
+    snapshotting.snapshot(try value()).run { b in
+      optionalDiffable = b
+      tookSnapshot.fulfill()
+    }
+    let result = XCTWaiter.wait(for: [tookSnapshot], timeout: timeout)
+    switch result {
+    case .completed:
+      break
+    case .timedOut:
+      return "Exceeded timeout of \(timeout) seconds waiting for snapshot"
+    case .incorrectOrder, .invertedFulfillment, .interrupted:
+      return "Couldn't snapshot value"
+    @unknown default:
+      return "Couldn't snapshot value"
+    }
+
+    let trimmingChars = CharacterSet.whitespacesAndNewlines.union(CharacterSet(charactersIn: "\u{FEFF}"))
+    guard let diffable = optionalDiffable?.trimmingCharacters(in: trimmingChars) else {
+      return "Couldn't snapshot value"
+    }
+
+    let trimmedReference = reference.trimmingCharacters(in: .whitespacesAndNewlines)
+
+    // Always perform diff and return early on success
+    guard let (failure, attachments) = snapshotting.diffing.diff(trimmedReference, diffable) else {
+      return nil
+    }
+
+    // If that diff failed, we either record or fail
+    if recording || trimmedReference.isEmpty {
+      let fileName = "\(file)"
+      let sourceCodeFilePath = URL(fileURLWithPath: fileName, isDirectory: false)
+      let sourceCode = try String(contentsOf: sourceCodeFilePath)
+      var newRecordings = recordings
+
+      let modifiedSource = writeInlineSnapshot(
+        &newRecordings,
+        Context(
+          sourceCode: sourceCode,
+          diffable: diffable,
+          fileName: fileName,
+          lineIndex: Int(line)
+        )
+      ).sourceCode
+
+      try modifiedSource
+        .data(using: String.Encoding.utf8)?
+        .write(to: sourceCodeFilePath)
+
+      if newRecordings != recordings {
+        recordings = newRecordings
+        // If no other recording has been made, fail
+        return """
+        No reference was found inline. Automatically recorded snapshot.
+
+        Re-run "\(sanitizePathComponent(testName))" to test against the newly-recorded snapshot.
+        """
+      } else {
+        // There is already an failure in this file and we don't want to write to the wrong place
+        return nil
+      }
+    }
+
+    // Did not successfully record, so we will fail
+    if !attachments.isEmpty {
+      #if !os(Linux)
+      if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
+        XCTContext.runActivity(named: "Attached Failure Diff") { activity in
+          attachments.forEach {
+            activity.add($0)
+          }
+        }
+      }
+      #endif
+    }
+
+    return """
+    Snapshot does not match reference.
+
+    \(failure.trimmingCharacters(in: .whitespacesAndNewlines))
+    """
+
+  } catch {
+    return error.localizedDescription
+  }
+}
+
+@available(*, deprecated, renamed: "verifyInlineSnapshot")
 public func _verifyInlineSnapshot<Value>(
   matching value: @autoclosure () throws -> Value,
   as snapshotting: Snapshotting<Value, String>,
@@ -66,100 +193,17 @@ public func _verifyInlineSnapshot<Value>(
   file: StaticString = #file,
   testName: String = #function,
   line: UInt = #line
+) -> String? {
+  verifyInlineSnapshot(
+    matching: try value(),
+    as: snapshotting,
+    record: recording,
+    timeout: timeout,
+    with: reference,
+    file: file,
+    testName: testName,
+    line: line
   )
-  -> String? {
-
-    let recording = recording || record
-
-    do {
-      let tookSnapshot = XCTestExpectation(description: "Took snapshot")
-      var optionalDiffable: String?
-      snapshotting.snapshot(try value()).run { b in
-        optionalDiffable = b
-        tookSnapshot.fulfill()
-      }
-      let result = XCTWaiter.wait(for: [tookSnapshot], timeout: timeout)
-      switch result {
-      case .completed:
-        break
-      case .timedOut:
-        return "Exceeded timeout of \(timeout) seconds waiting for snapshot"
-      case .incorrectOrder, .invertedFulfillment, .interrupted:
-        return "Couldn't snapshot value"
-      @unknown default:
-        return "Couldn't snapshot value"
-      }
-
-      let trimmingChars = CharacterSet.whitespacesAndNewlines.union(CharacterSet(charactersIn: "\u{FEFF}"))
-      guard let diffable = optionalDiffable?.trimmingCharacters(in: trimmingChars) else {
-        return "Couldn't snapshot value"
-      }
-
-      let trimmedReference = reference.trimmingCharacters(in: .whitespacesAndNewlines)
-
-      // Always perform diff, and return early on success!
-      guard let (failure, attachments) = snapshotting.diffing.diff(trimmedReference, diffable) else {
-        return nil
-      }
-
-      // If that diff failed, we either record or fail.
-      if recording || trimmedReference.isEmpty {
-        let fileName = "\(file)"
-        let sourceCodeFilePath = URL(fileURLWithPath: fileName, isDirectory: false)
-        let sourceCode = try String(contentsOf: sourceCodeFilePath)
-        var newRecordings = recordings
-
-        let modifiedSource = writeInlineSnapshot(
-          &newRecordings,
-          Context(
-            sourceCode: sourceCode,
-            diffable: diffable,
-            fileName: fileName,
-            lineIndex: Int(line)
-          )
-        ).sourceCode
-
-        try modifiedSource
-          .data(using: String.Encoding.utf8)?
-          .write(to: sourceCodeFilePath)
-
-        if newRecordings != recordings {
-          recordings = newRecordings
-          /// If no other recording has been made, then fail!
-          return """
-          No reference was found inline. Automatically recorded snapshot.
-
-          Re-run "\(sanitizePathComponent(testName))" to test against the newly-recorded snapshot.
-          """
-        } else {
-          /// There is already an failure in this file,
-          /// and we don't want to write to the wrong place.
-          return nil
-        }
-      }
-
-      /// Did not successfully record, so we will fail.
-      if !attachments.isEmpty {
-        #if !os(Linux)
-        if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
-          XCTContext.runActivity(named: "Attached Failure Diff") { activity in
-            attachments.forEach {
-              activity.add($0)
-            }
-          }
-        }
-        #endif
-      }
-
-      return """
-      Snapshot does not match reference.
-
-      \(failure.trimmingCharacters(in: .whitespacesAndNewlines))
-      """
-
-    } catch {
-      return error.localizedDescription
-    }
 }
 
 internal typealias Recordings = [String: [FileRecording]]
@@ -168,7 +212,7 @@ internal struct Context {
   let sourceCode: String
   let diffable: String
   let fileName: String
-  // First line of a file is line 1 (as with the #line macro)
+  /// First line of a file is line 1 (as with the `#line` macro)
   let lineIndex: Int
 
   func setSourceCode(_ newSourceCode: String) -> Context {
@@ -195,9 +239,9 @@ internal func writeInlineSnapshot(_ recordings: inout Recordings,
   // Convert `""` to multi-line literal
   if sourceCodeLines[functionLineIndex].hasSuffix(emptyStringLiteralWithCloseBrace) {
     // Convert:
-    //    _assertInlineSnapshot(matching: value, as: .dump, with: "")
+    //    assertInlineSnapshot(matching: value, as: .dump, with: "")
     // to:
-    //    _assertInlineSnapshot(matching: value, as: .dump, with: """
+    //    assertInlineSnapshot(matching: value, as: .dump, with: """
     //    """)
     var functionCallLine = sourceCodeLines.remove(at: functionLineIndex)
     functionCallLine.removeLast(emptyStringLiteralWithCloseBrace.count)
@@ -209,24 +253,24 @@ internal func writeInlineSnapshot(_ recordings: inout Recordings,
     lineCountDifference += 1
   }
 
-  /// If they haven't got a multi-line literal by now, then just fail.
+  // If they haven't got a multi-line literal by now, then just fail.
   guard sourceCodeLines[functionLineIndex].hasSuffix(multiLineStringLiteralTerminator) else {
     return context.setSourceCode("""
           To use inline snapshots, please convert the "with" argument to a multi-line literal.
           """)
   }
 
-  /// Find the end of multi-line literal and replace contents with recording.
+  // Find the end of multi-line literal and replace contents with recording.
   if let multiLineLiteralEndIndex = sourceCodeLines[offsetStartIndex...].firstIndex(where: { $0.hasClosingMultilineStringDelimiter() }) {
 
     let diffableLines = context.diffable.split(separator: "\n")
 
-    // Add #'s to the multiline string literal if needed
+    // Add `#`s to the multiline string literal if needed
     let numberSigns: String
     if context.diffable.hasEscapedSpecialCharactersLiteral() {
       numberSigns = String(repeating: "#", count: context.diffable.numberOfNumberSignsNeeded())
     } else if nil != diffableLines.first(where: { $0.endsInBackslash() }) {
-      // We want to avoid \ being interpreted as an escaped newline in the recorded inline snapshot
+      // We want to avoid `\` being interpreted as an escaped newline in the recorded inline snapshot
       numberSigns = "#"
     } else {
       numberSigns = ""
@@ -234,19 +278,19 @@ internal func writeInlineSnapshot(_ recordings: inout Recordings,
     let multiLineStringLiteralTerminatorPre = numberSigns + multiLineStringLiteralTerminator
     let multiLineStringLiteralTerminatorPost = multiLineStringLiteralTerminator + numberSigns
 
-    // Update opening (#...)"""
+    // Update opening `(#...)"""`
     sourceCodeLines[functionLineIndex].replaceFirstOccurrence(
       of: extendedOpeningStringDelimitersPattern,
       with: multiLineStringLiteralTerminatorPre
     )
 
-    // Update closing """(#...)
+    // Update closing `"""(#...)`
     sourceCodeLines[multiLineLiteralEndIndex].replaceFirstOccurrence(
       of: extendedClosingStringDelimitersPattern,
       with: multiLineStringLiteralTerminatorPost
     )
 
-    /// Convert actual value to Lines to insert
+    // Convert actual value to lines to insert
     let indentText = indentation(of: sourceCodeLines[multiLineLiteralEndIndex])
     let newDiffableLines = context.diffable
       .split(separator: "\n", omittingEmptySubsequences: false)
@@ -255,7 +299,7 @@ internal func writeInlineSnapshot(_ recordings: inout Recordings,
 
     let fileRecording = FileRecording(line: context.lineIndex, difference: lineCountDifference)
 
-    /// Insert the lines
+    // Insert the lines
     sourceCodeLines.replaceSubrange(offsetStartIndex..<multiLineLiteralEndIndex, with: newDiffableLines)
 
     recordings[context.fileName, default: []].append(fileRecording)
@@ -306,7 +350,6 @@ private let multiLineStringLiteralTerminator = "\"\"\""
 private let extendedOpeningStringDelimitersPattern = #"#{0,}\"\"\""#
 private let extendedClosingStringDelimitersPattern = ##"\"\"\"#{0,}"##
 
-// When we modify a file, the line numbers reported by the compiler through #line are no longer
-// accurate. With the FileRecording values we keep track of we modify the files so we can adjust
-// line numbers.
+/// When we modify a file, the line numbers reported by the compiler through `#line` are no longer accurate.
+/// With the `FileRecording` values we keep track of we modify the files so we can adjust line numbers.
 private var recordings: Recordings = [:]

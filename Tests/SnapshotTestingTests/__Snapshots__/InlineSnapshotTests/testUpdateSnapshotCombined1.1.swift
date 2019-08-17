@@ -9,7 +9,7 @@ extension InlineSnapshotsValidityTests {
       - name: "Bl#\"\"#obby"
     """#######
 
-    _assertInlineSnapshot(matching: diffable, as: .lines, with: ##"""
+    assertInlineSnapshot(matching: diffable, as: .lines, with: ##"""
     ▿ User
       - bio: "Blobbed around the world."
       - id: 1
