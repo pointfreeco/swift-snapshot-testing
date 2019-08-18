@@ -1,8 +1,11 @@
 
 import Foundation
+#if canImport(SwiftUI)
 import SwiftUI
+#endif
 
-@available(iOS 13.0, *)
+
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, *)
 extension Snapshotting where Value: SwiftUI.View, Format == UIImage {
      
   public static var image: Snapshotting {

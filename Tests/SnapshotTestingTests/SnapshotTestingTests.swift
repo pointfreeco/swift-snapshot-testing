@@ -838,7 +838,7 @@ final class SnapshotTestingTests: XCTestCase {
     #endif
   }
     
-  @available(iOS 13.0.0, *)
+  @available(iOS 13.0, macOS 10.15, tvOS 13.0, *)
   func testSwiftUIView() {
     struct MyView: SwiftUI.View {
             
