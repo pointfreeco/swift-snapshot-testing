@@ -838,8 +838,9 @@ final class SnapshotTestingTests: XCTestCase {
     #endif
   }
     
-  @available(iOS 13.0, macOS 10.15, tvOS 13.0, *)
-  func testSwiftUIView() {
+  @available(iOS 13.0, *)
+  func testSwiftUIView_iOS() {
+    #if os(iOS)
     struct MyView: SwiftUI.View {
             
       var body: some SwiftUI.View {
@@ -854,6 +855,27 @@ final class SnapshotTestingTests: XCTestCase {
       }
     }
     assertSnapshot(matching: MyView(), as: .image(on: .iPhoneSe))
+    #endif
+  }
+   
+  @available(tvOS 13.0, *)
+  func testSwiftUIView_tvOS() {
+    #if os(tvOS)
+    struct MyView: SwiftUI.View {
+              
+      var body: some SwiftUI.View {
+        VStack {
+          Text("What's the point?")
+          List {
+            Text("1")
+            Text("2")
+            Text("3")
+          }
+        }
+      }
+    }
+    assertSnapshot(matching: MyView(), as: .image(size: .init(width: 800, height: 600)))
+    #endif
   }
 }
 
