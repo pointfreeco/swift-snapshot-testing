@@ -844,7 +844,7 @@ final class SnapshotTestingTests: XCTestCase {
             
       var body: some SwiftUI.View {
         VStack {
-          Text("Hello World")
+          Text("What's the point?")
           List {
             Text("1")
             Text("2")
