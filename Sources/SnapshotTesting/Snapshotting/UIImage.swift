@@ -26,9 +26,13 @@ extension Diffing where Value == UIImage {
       newAttachment.name = "failure"
       let differenceAttachment = XCTAttachment(image: difference)
       differenceAttachment.name = "difference"
+
+      let cgDifferenceAttachment = XCTAttachment(image: SnapshotTesting.cgDiff(old, new))
+      cgDifferenceAttachment.name = "cg_difference"
+
       return (
         message,
-        [oldAttachment, newAttachment, differenceAttachment]
+        [oldAttachment, newAttachment, differenceAttachment, cgDifferenceAttachment]
       )
     }
   }
