@@ -16,7 +16,7 @@ extension Diffing where Value == UIImage {
       fromData: { UIImage(data: $0, scale: UIScreen.main.scale)! }
     ) { old, new in
       guard !compare(old, new, precision: precision) else { return nil }
-//      let difference = SnapshotTesting.diff(old, new)
+      let difference = SnapshotTesting.diff(old, new)
       let message = new.size == old.size
         ? "Newly-taken snapshot does not match reference."
         : "Newly-taken snapshot@\(new.size) does not match reference@\(old.size)."
@@ -24,15 +24,11 @@ extension Diffing where Value == UIImage {
       oldAttachment.name = "reference"
       let newAttachment = XCTAttachment(image: new)
       newAttachment.name = "failure"
-//      let differenceAttachment = XCTAttachment(image: difference)
-//      differenceAttachment.name = "difference"
-
-      let cgDifferenceAttachment = XCTAttachment(image: SnapshotTesting.cgDiff(old, new))
-      cgDifferenceAttachment.name = "cg_difference"
-
+      let differenceAttachment = XCTAttachment(image: difference)
+      differenceAttachment.name = "difference"
       return (
         message,
-        [oldAttachment, newAttachment, cgDifferenceAttachment]
+        [oldAttachment, newAttachment, differenceAttachment]
       )
     }
   }
@@ -106,7 +102,7 @@ private func context(for cgImage: CGImage, data: UnsafeMutableRawPointer? = nil)
   return context
 }
 
-private func cgDiff(_ old: UIImage, _ new: UIImage) -> UIImage {
+private func diff(_ old: UIImage, _ new: UIImage) -> UIImage {
   let width = max(old.size.width, new.size.width)
   let height = max(old.size.height, new.size.height)
   UIGraphicsBeginImageContextWithOptions(CGSize(width: width, height: height), true, 0)
@@ -115,17 +111,5 @@ private func cgDiff(_ old: UIImage, _ new: UIImage) -> UIImage {
   let differenceImage = UIGraphicsGetImageFromCurrentImageContext()!
   UIGraphicsEndImageContext()
   return differenceImage
-}
-
-private func diff(_ old: UIImage, _ new: UIImage) -> UIImage {
-  let oldCiImage = CIImage(cgImage: old.cgImage!)
-  let newCiImage = CIImage(cgImage: new.cgImage!)
-  let differenceFilter = CIFilter(name: "CIDifferenceBlendMode")!
-  differenceFilter.setValue(oldCiImage, forKey: kCIInputImageKey)
-  differenceFilter.setValue(newCiImage, forKey: kCIInputBackgroundImageKey)
-  let differenceCiImage = differenceFilter.outputImage!
-  let context = CIContext()
-  let differenceCgImage = context.createCGImage(differenceCiImage, from: differenceCiImage.extent)!
-  return UIImage(cgImage: differenceCgImage)
 }
 #endif
