@@ -61,8 +61,9 @@ private func compare(_ old: UIImage, _ new: UIImage, precision: Float) -> Bool {
   guard newCgImage.height != 0 else { return false }
   guard oldCgImage.height == newCgImage.height else { return false }
   // Values between images may differ due to padding to multiple of 64 bytes per row,
-  // e.g. freshly taken view snapshot may differ from one stored as PNG.
-  // At this point we're sure that size of both images is the same, so we can go with minimal `bytesPerRow` value.
+  // because of that a freshly taken view snapshot may differ from one stored as PNG.
+  // At this point we're sure that size of both images is the same, so we can go with minimal `bytesPerRow` value
+  // and use it to create contexts.
   let minBytesPerRow = min(oldCgImage.bytesPerRow, newCgImage.bytesPerRow)
   let byteCount = minBytesPerRow * oldCgImage.height
 
