@@ -32,7 +32,20 @@ public struct ViewImageConfig {
     case landscape(splitView: LandscapeSplits)
     case portrait(splitView: PortraitSplits)
   }
-
+  public enum InterfaceStyle {
+    case light
+    case dark
+    
+    @available(iOS 12.0, *)
+    var userInterfaceStyle: UIUserInterfaceStyle {
+      switch self {
+      case .light:
+        return .light
+      case .dark:
+        return .dark
+      }
+    }
+  }
   public var safeArea: UIEdgeInsets
   public var size: CGSize?
   public var traits: UITraitCollection
@@ -50,7 +63,7 @@ public struct ViewImageConfig {
   #if os(iOS)
   public static let iPhoneSe = ViewImageConfig.iPhoneSe(.portrait)
 
-  public static func iPhoneSe(_ orientation: Orientation) -> ViewImageConfig {
+  public static func iPhoneSe(_ orientation: Orientation, _ interfaceStyle: InterfaceStyle = .light) -> ViewImageConfig {
     let safeArea: UIEdgeInsets
     let size: CGSize
     switch orientation {
@@ -61,7 +74,7 @@ public struct ViewImageConfig {
       safeArea = .init(top: 20, left: 0, bottom: 0, right: 0)
       size = .init(width: 320, height: 568)
     }
-    return .init(safeArea: safeArea, size: size, traits: .iPhoneSe(orientation))
+    return .init(safeArea: safeArea, size: size, traits: .iPhoneSe(orientation, interfaceStyle))
   }
 
   public static let iPhone8 = ViewImageConfig.iPhone8(.portrait)
@@ -342,9 +355,10 @@ public struct ViewImageConfig {
 
 extension UITraitCollection {
   #if os(iOS)
-  public static func iPhoneSe(_ orientation: ViewImageConfig.Orientation)
+  public static func iPhoneSe(_ orientation: ViewImageConfig.Orientation, _ interfaceStyle: ViewImageConfig.InterfaceStyle)
     -> UITraitCollection {
-      let base: [UITraitCollection] = [
+      
+      var base: [UITraitCollection] = [
 //        .init(displayGamut: .SRGB),
 //        .init(displayScale: 2),
         .init(forceTouchCapability: .available),
@@ -352,6 +366,13 @@ extension UITraitCollection {
         .init(preferredContentSizeCategory: .medium),
         .init(userInterfaceIdiom: .phone)
       ]
+      
+      if #available(iOS 12.0, *) {
+        base += [
+          .init(userInterfaceStyle: interfaceStyle.userInterfaceStyle)
+        ]
+      }
+      
       switch orientation {
       case .landscape:
         return .init(
