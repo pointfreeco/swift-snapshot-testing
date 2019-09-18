@@ -108,14 +108,13 @@ private func context(for cgImage: CGImage, bytesPerRow: Int, data: UnsafeMutable
 }
 
 private func diff(_ old: UIImage, _ new: UIImage) -> UIImage {
-  let oldCiImage = CIImage(cgImage: old.cgImage!)
-  let newCiImage = CIImage(cgImage: new.cgImage!)
-  let differenceFilter = CIFilter(name: "CIDifferenceBlendMode")!
-  differenceFilter.setValue(oldCiImage, forKey: kCIInputImageKey)
-  differenceFilter.setValue(newCiImage, forKey: kCIInputBackgroundImageKey)
-  let differenceCiImage = differenceFilter.outputImage!
-  let context = CIContext()
-  let differenceCgImage = context.createCGImage(differenceCiImage, from: differenceCiImage.extent)!
-  return UIImage(cgImage: differenceCgImage)
+  let width = max(old.size.width, new.size.width)
+  let height = max(old.size.height, new.size.height)
+  UIGraphicsBeginImageContextWithOptions(CGSize(width: width, height: height), true, 0)
+  new.draw(at: .zero)
+  old.draw(at: .zero, blendMode: .difference, alpha: 1)
+  let differenceImage = UIGraphicsGetImageFromCurrentImageContext()!
+  UIGraphicsEndImageContext()
+  return differenceImage
 }
 #endif
