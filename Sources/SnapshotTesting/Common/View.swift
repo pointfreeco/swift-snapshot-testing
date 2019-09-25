@@ -17,6 +17,18 @@ public struct ViewImageConfig {
     case landscape
     case portrait
   }
+
+  public enum InterfaceStyle {
+    case light
+    case dark
+
+    @available(iOS 12.0, *) var userInterfaceStyle: UIUserInterfaceStyle {
+      switch self {
+      case .light: return .light
+      case .dark: return .dark
+      }
+    }
+  }
   public enum TabletOrientation {
     public enum PortraitSplits {
       case oneThird
@@ -98,7 +110,7 @@ public struct ViewImageConfig {
 
   public static let iPhoneX = ViewImageConfig.iPhoneX(.portrait)
 
-  public static func iPhoneX(_ orientation: Orientation) -> ViewImageConfig {
+  public static func iPhoneX(_ orientation: Orientation, _ interfaceStyle: InterfaceStyle = .light) -> ViewImageConfig {
     let safeArea: UIEdgeInsets
     let size: CGSize
     switch orientation {
@@ -109,7 +121,7 @@ public struct ViewImageConfig {
       safeArea = .init(top: 44, left: 0, bottom: 34, right: 0)
       size = .init(width: 375, height: 812)
     }
-    return .init(safeArea: safeArea, size: size, traits: .iPhoneX(orientation))
+    return .init(safeArea: safeArea, size: size, traits: .iPhoneX(orientation, interfaceStyle))
   }
 
   public static let iPhoneXsMax = ViewImageConfig.iPhoneXsMax(.portrait)
@@ -378,7 +390,7 @@ extension UITraitCollection {
         .init(forceTouchCapability: .available),
         .init(layoutDirection: .leftToRight),
         .init(preferredContentSizeCategory: .medium),
-        .init(userInterfaceIdiom: .phone)
+        .init(userInterfaceIdiom: .phone),
       ]
       switch orientation {
       case .landscape:
@@ -426,9 +438,9 @@ extension UITraitCollection {
       }
   }
 
-  public static func iPhoneX(_ orientation: ViewImageConfig.Orientation)
+  public static func iPhoneX(_ orientation: ViewImageConfig.Orientation, _ interfaceStyle: ViewImageConfig.InterfaceStyle)
     -> UITraitCollection {
-      let base: [UITraitCollection] = [
+      var base: [UITraitCollection] = [
 //        .init(displayGamut: .P3),
 //        .init(displayScale: 3),
         .init(forceTouchCapability: .available),
@@ -436,6 +448,11 @@ extension UITraitCollection {
         .init(preferredContentSizeCategory: .medium),
         .init(userInterfaceIdiom: .phone)
       ]
+
+      if #available(iOS 12.0, *) {
+        base.append(.init(userInterfaceStyle: interfaceStyle.userInterfaceStyle))
+      }
+
       switch orientation {
       case .landscape:
         return .init(
