@@ -1,5 +1,8 @@
 @testable import SnapshotTesting
 import XCTest
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 #if os(iOS) || os(macOS) || os(tvOS)
 import SceneKit
