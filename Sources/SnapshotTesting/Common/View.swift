@@ -761,14 +761,14 @@ private func add(traits: UITraitCollection, viewController: UIViewController, to
   viewController.didMove(toParent: rootViewController)
   window.rootViewController = rootViewController
 
+  rootViewController.beginAppearanceTransition(true, animated: false)
+  rootViewController.endAppearanceTransition()
+
   viewController.view.setNeedsLayout()
   viewController.view.layoutIfNeeded()
 
   rootViewController.view.setNeedsLayout()
   rootViewController.view.layoutIfNeeded()
-
-  rootViewController.beginAppearanceTransition(true, animated: false)
-  rootViewController.endAppearanceTransition()
 }
 
 private final class Window: UIWindow {
