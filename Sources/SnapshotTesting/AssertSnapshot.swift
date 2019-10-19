@@ -178,8 +178,8 @@ public func verifySnapshot<Value, Format>(
         ?? fileUrl
           .deletingLastPathComponent()
           .appendingPathComponent("__Snapshots__")
-          .appendingPathComponentIfExists(configurationName)
           .appendingPathComponent(fileName)
+          .appendingPathComponentIfExists(configurationName)
 
       let identifier: String
       if let name = name {
