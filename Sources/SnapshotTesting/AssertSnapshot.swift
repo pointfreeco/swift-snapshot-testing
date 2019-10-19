@@ -170,11 +170,15 @@ public func verifySnapshot<Value, Format>(
     do {
       let fileUrl = URL(fileURLWithPath: "\(file)", isDirectory: false)
       let fileName = fileUrl.deletingPathExtension().lastPathComponent
+      
+      /// Support for Xcode 11 test plans and running tests multiple times with different configurations
+      let configurationName = ProcessInfo.processInfo.environment["SNAPSHOT_CONFIGURATION_NAME"]
 
       let snapshotDirectoryUrl = snapshotDirectory.map { URL(fileURLWithPath: $0, isDirectory: true) }
         ?? fileUrl
           .deletingLastPathComponent()
           .appendingPathComponent("__Snapshots__")
+          .appendingPathComponentIfExists(configurationName)
           .appendingPathComponent(fileName)
 
       let identifier: String
@@ -293,4 +297,12 @@ func sanitizePathComponent(_ string: String) -> String {
   return string
     .replacingOccurrences(of: "\\W+", with: "-", options: .regularExpression)
     .replacingOccurrences(of: "^-|-$", with: "", options: .regularExpression)
+}
+
+private extension URL {
+  func appendingPathComponentIfExists(_ pathComponent: String?) -> URL {
+    guard let pathComponent = pathComponent else { return self }
+    
+    return appendingPathComponent(pathComponent)
+  }
 }
