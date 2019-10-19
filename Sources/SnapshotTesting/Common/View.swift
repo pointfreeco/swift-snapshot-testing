@@ -11,6 +11,12 @@ import UIKit
 import WebKit
 #endif
 
+// Explanation for not providing `layoutDirection` trait in base traits for devices:
+// .init(layoutDirection: .leftToRight) is commented out because of http://www.openradar.me/radar?id=5044259694575616
+// When tests are ran with RTL language (e.g. Arabic), this override does not fully change layout to LTR (due to issue linked above)
+// which causes layout to not be correct on snapshots.
+// When tests are ran with LTR langauge (e.g. English), this override is not needed.
+
 #if os(iOS) || os(tvOS)
 public struct ViewImageConfig {
   public enum Orientation {
@@ -347,8 +353,8 @@ extension UITraitCollection {
       let base: [UITraitCollection] = [
 //        .init(displayGamut: .SRGB),
 //        .init(displayScale: 2),
+//        .init(layoutDirection: .leftToRight), // See explanation at the beginning of the file
         .init(forceTouchCapability: .available),
-        .init(layoutDirection: .leftToRight),
         .init(preferredContentSizeCategory: .medium),
         .init(userInterfaceIdiom: .phone)
       ]
@@ -375,8 +381,8 @@ extension UITraitCollection {
       let base: [UITraitCollection] = [
 //        .init(displayGamut: .P3),
 //        .init(displayScale: 2),
+//        .init(layoutDirection: .leftToRight), // See explanation at the beginning of the file
         .init(forceTouchCapability: .available),
-        .init(layoutDirection: .leftToRight),
         .init(preferredContentSizeCategory: .medium),
         .init(userInterfaceIdiom: .phone)
       ]
@@ -403,8 +409,8 @@ extension UITraitCollection {
       let base: [UITraitCollection] = [
 //        .init(displayGamut: .P3),
 //        .init(displayScale: 3),
+//        .init(layoutDirection: .leftToRight), // See explanation at the beginning of the file
         .init(forceTouchCapability: .available),
-        .init(layoutDirection: .leftToRight),
         .init(preferredContentSizeCategory: .medium),
         .init(userInterfaceIdiom: .phone)
       ]
@@ -431,8 +437,8 @@ extension UITraitCollection {
       let base: [UITraitCollection] = [
 //        .init(displayGamut: .P3),
 //        .init(displayScale: 3),
+//        .init(layoutDirection: .leftToRight), // See explanation at the beginning of the file
         .init(forceTouchCapability: .available),
-        .init(layoutDirection: .leftToRight),
         .init(preferredContentSizeCategory: .medium),
         .init(userInterfaceIdiom: .phone)
       ]
@@ -459,8 +465,8 @@ extension UITraitCollection {
       let base: [UITraitCollection] = [
 //        .init(displayGamut: .P3),
 //        .init(displayScale: 2),
+//        .init(layoutDirection: .leftToRight), // See explanation at the beginning of the file
         .init(forceTouchCapability: .unavailable),
-        .init(layoutDirection: .leftToRight),
         .init(preferredContentSizeCategory: .medium),
         .init(userInterfaceIdiom: .phone)
       ]
@@ -487,8 +493,8 @@ extension UITraitCollection {
       let base: [UITraitCollection] = [
 //        .init(displayGamut: .P3),
 //        .init(displayScale: 3),
+//        .init(layoutDirection: .leftToRight), // See explanation at the beginning of the file
         .init(forceTouchCapability: .available),
-        .init(layoutDirection: .leftToRight),
         .init(preferredContentSizeCategory: .medium),
         .init(userInterfaceIdiom: .phone)
       ]
