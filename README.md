@@ -149,13 +149,8 @@ Next, add `SnapshotTesting` as a dependency of your test target:
 
 ```swift
 targets: [
-    .target(
-        name: "MyApp",
-        dependencies: [],
-        path: "Sources"),
-    .testTarget(
-        name: "MyAppTests",
-        dependencies: ["MyApp", "SnapshotTesting"])
+  .target(name: "MyApp", dependencies: [], path: "Sources"),
+  .testTarget(name: "MyAppTests", dependencies: ["MyApp", "SnapshotTesting"])
 ]
 ```
 
