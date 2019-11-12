@@ -145,6 +145,15 @@ dependencies: [
 ]
 ```
 
+Next, add `SnapshotTesting` as a dependency of your test target:
+
+```swift
+targets: [
+  .target(name: "MyApp", dependencies: [], path: "Sources"),
+  .testTarget(name: "MyAppTests", dependencies: ["MyApp", "SnapshotTesting"])
+]
+```
+
 ### Carthage
 
 If you use [Carthage](https://github.com/Carthage/Carthage), you can add the following dependency to your `Cartfile`:
