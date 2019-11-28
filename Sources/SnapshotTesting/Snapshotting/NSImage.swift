@@ -15,15 +15,22 @@ extension Diffing where Value == NSImage {
       toData: { NSImagePNGRepresentation($0)! },
       fromData: { NSImage(data: $0)! }
     ) { old, new in
-      guard !compare(old, new, precision: precision) else { return nil }
+      let oldAttachment = XCTAttachment(image: old)
+      oldAttachment.name = "reference"
+      guard !compare(old, new, precision: precision) else {
+        return .success([ oldAttachment ])
+      }
       let difference = SnapshotTesting.diff(old, new)
       let message = new.size == old.size
         ? "Newly-taken snapshot does not match reference."
         : "Newly-taken snapshot@\(new.size) does not match reference@\(old.size)."
-      return (
-        message,
-        [XCTAttachment(image: old), XCTAttachment(image: new), XCTAttachment(image: difference)]
-      )
+      let newAttachment = XCTAttachment(image: new)
+      newAttachment.name = "failure"
+      let differenceAttachment = XCTAttachment(image: difference)
+      differenceAttachment.name = "difference"
+      return .failure(FailureError(reason: message, artifacts: [
+        oldAttachment, newAttachment, differenceAttachment
+      ]))
     }
   }
 }

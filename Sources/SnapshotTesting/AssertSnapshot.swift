@@ -240,7 +240,7 @@ public func verifySnapshot<Value, Format>(
       let data = try Data(contentsOf: snapshotFileUrl)
       let reference = snapshotting.diffing.fromData(data)
 
-      guard let (failure, attachments) = snapshotting.diffing.diff(reference, diffable) else {
+      guard let (failure, attachments) = snapshotting.diffing.diff(reference, diffable)?.error else {
         return nil
       }
 
