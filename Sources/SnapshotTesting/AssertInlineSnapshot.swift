@@ -102,26 +102,9 @@ public func _verifyInlineSnapshot<Value>(
       let trimmedReference = reference.trimmingCharacters(in: .whitespacesAndNewlines)
       let diffResult = snapshotting.diffing.diff(reference, diffable)
       
-      if let result = diffResult, !result.attachments.isEmpty {
-        #if !os(Linux)
-        if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
-          XCTContext.runActivity(named: "Attached " + (result.isSuccessful ? "Reference" : "Failure Diff")) { activity in
-            result.attachments.forEach {
-              if result.isSuccessful, attachReferenceImages {
-                // If the diff passed, and attachReferenceImages is enabled, then add attachment
-                $0.lifetime = .keepAlways
-                activity.add($0)
-              } else if !result.isSuccessful {
-                // If the diff failed, then add attachment
-                activity.add($0)
-              }
-            }
-          }
-        }
-        #endif
-      }
+      addTestArtifacts(from: diffResult, named: nil, attachReferenceImages: attachReferenceImages)
       
-      guard let failure = diffResult?.error else {
+      guard let failure = diffResult.error else {
         return nil
       }
 
