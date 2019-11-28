@@ -686,6 +686,11 @@ final class SnapshotTestingTests: XCTestCase {
     }
     """)
   }
+  
+  func testURLRequestWithReferenceImagesAttached() {
+    let get = URLRequest(url: URL(string: "https://www.pointfree.co/")!)
+    assertSnapshot(matching: get, as: .curl, named: "get-curl", attachReferenceImages: true)
+  }
 
   func testWebView() throws {
     #if os(iOS) || os(macOS)

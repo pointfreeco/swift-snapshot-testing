@@ -1,0 +1,2 @@
+curl \
+	"https://www.pointfree.co/"
