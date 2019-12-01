@@ -8,6 +8,9 @@ import SpriteKit
 #if os(iOS) || os(macOS)
 import WebKit
 #endif
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 final class SnapshotTestingTests: XCTestCase {
   override func setUp() {
