@@ -1,13 +1,19 @@
-@testable import SnapshotTesting
-import XCTest
-
-#if os(iOS) || os(macOS) || os(tvOS)
+import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
+#if canImport(SceneKit)
 import SceneKit
+#endif
+#if canImport(SpriteKit)
 import SpriteKit
 #endif
-#if os(iOS) || os(macOS)
+#if canImport(WebKit)
 import WebKit
 #endif
+import XCTest
+
+@testable import SnapshotTesting
 
 final class SnapshotTestingTests: XCTestCase {
   override func setUp() {
