@@ -451,12 +451,12 @@
 		D37322FEADE9539AF927F08CE34CEAC7 /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				98267920238FE83A00EBC3E0 /* AttachmentActivity.swift */,
 				F479E2BD835B9641B85EB51E990659C5 /* Internal.swift */,
 				D3B960E2B6E4AAE0BA50F27B51BEFED6 /* PlistEncoder.swift */,
 				D49092873A7A5D6DA623E352891425CD /* String+SpecialCharacters.swift */,
 				0F6B5B3AB021FA3CD751973309F966A6 /* View.swift */,
 				4BE8DE5E8A102E1012CD0C95EC731CF2 /* XCTAttachment.swift */,
-				98267920238FE83A00EBC3E0 /* AttachmentActivity.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";

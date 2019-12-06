@@ -20,6 +20,9 @@ func addTestArtifacts(
     if let name = name {
       message += " - \(name)"
     }
+    if !attachReferenceImages && result.isSuccessful {
+      return
+    }
     XCTContext.runActivity(named: message) { activity in
       result.attachments.forEach {
         if result.isSuccessful, attachReferenceImages {
