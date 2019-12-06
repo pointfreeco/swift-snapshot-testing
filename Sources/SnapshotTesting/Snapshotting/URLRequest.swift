@@ -1,4 +1,7 @@
 import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 extension Snapshotting where Value == URLRequest, Format == String {
   /// A snapshot strategy for comparing requests based on raw equality.
