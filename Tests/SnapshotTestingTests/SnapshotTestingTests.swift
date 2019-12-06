@@ -637,6 +637,14 @@ final class SnapshotTestingTests: XCTestCase {
     post.httpBody = Data("pricing[billing]=monthly&pricing[lane]=individual".utf8)
     assertSnapshot(matching: post, as: .raw, named: "post")
     assertSnapshot(matching: post, as: .curl, named: "post-curl")
+    
+    var postWithJSON = URLRequest(url: URL(string: "http://dummy.restapiexample.com/api/v1/create")!)
+    postWithJSON.httpMethod = "POST"
+    postWithJSON.addValue("application/json", forHTTPHeaderField: "Content-Type")
+    postWithJSON.addValue("application/json", forHTTPHeaderField: "Accept")
+    postWithJSON.httpBody = Data("{\"name\":\"tammy134235345235\", \"salary\":0, \"age\":\"tammy133\"}".utf8)
+    assertSnapshot(matching: postWithJSON, as: .raw, named: "post-with-json")
+    assertSnapshot(matching: postWithJSON, as: .curl, named: "post-with-json-curl")
 
     var head = URLRequest(url: URL(string: "https://www.pointfree.co/")!)
     head.httpMethod = "HEAD"

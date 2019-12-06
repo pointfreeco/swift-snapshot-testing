@@ -66,7 +66,7 @@ extension Snapshotting where Value == URLRequest, Format == String {
       var escapedBody = httpBody.replacingOccurrences(of: "\\\"", with: "\\\\\"")
       escapedBody = escapedBody.replacingOccurrences(of: "\"", with: "\\\"")
       
-      components.append("--data '\(escapedBody)'")
+      components.append("--data \"\(escapedBody)\"")
     }
     
     // Cookies
