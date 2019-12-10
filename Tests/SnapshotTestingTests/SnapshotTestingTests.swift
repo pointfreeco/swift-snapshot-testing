@@ -192,6 +192,20 @@ final class SnapshotTestingTests: XCTestCase {
     }
     #endif
   }
+  
+  func testNSViewWithLayer() {
+    #if os(macOS)
+    let view = NSView()
+    view.frame = CGRect(x: 0.0, y: 0.0, width: 10.0, height: 10.0)
+    view.wantsLayer = true
+    view.layer?.backgroundColor = NSColor.green.cgColor
+    view.layer?.cornerRadius = 5
+    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
+      assertSnapshot(matching: view, as: .image)
+      assertSnapshot(matching: view, as: .recursiveDescription)
+    }
+    #endif
+  }
 
   func testPrecision() {
     #if os(iOS) || os(macOS) || os(tvOS)
