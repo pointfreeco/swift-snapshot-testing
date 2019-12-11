@@ -141,7 +141,7 @@ If you want to use SnapshotTesting in any other project that uses [SwiftPM](http
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", from: "1.6.0"),
+  .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", from: "1.7.0"),
 ]
 ```
 
@@ -177,7 +177,7 @@ If your project uses [CocoaPods](https://cocoapods.org), add the pod to any appl
 
 ```ruby
 target 'MyAppTests' do
-  pod 'SnapshotTesting', '~> 1.6'
+  pod 'SnapshotTesting', '~> 1.7'
 end
 ```
 
