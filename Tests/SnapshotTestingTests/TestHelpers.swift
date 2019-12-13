@@ -2,7 +2,11 @@
 import XCTest
 
 #if os(iOS)
+#if targetEnvironment(macCatalyst)
+let platform = "maccatalyst"
+#else
 let platform = "ios"
+#endif
 #elseif os(tvOS)
 let platform = "tvos"
 #elseif os(macOS)
