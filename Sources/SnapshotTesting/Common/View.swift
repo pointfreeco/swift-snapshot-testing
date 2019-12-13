@@ -629,7 +629,7 @@ extension View {
     return nil
   }
   #if os(iOS)
-  func asImage() -> UIImage {
+  func asImage() -> Image {
     let renderer = UIGraphicsImageRenderer(bounds: bounds)
     return renderer.image { rendererContext in
       layer.render(in: rendererContext.cgContext)
