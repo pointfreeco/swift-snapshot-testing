@@ -214,10 +214,10 @@ public func verifySnapshot<Value, Format>(
         return "Couldn't snapshot value"
       }
 
-      guard let diffable = optionalDiffable else {
+      guard var diffable = optionalDiffable else {
         return "Couldn't snapshot value"
       }
-
+      
       guard !recording, fileManager.fileExists(atPath: snapshotFileUrl.path) else {
         try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)
         return recording
@@ -239,6 +239,11 @@ public func verifySnapshot<Value, Format>(
 
       let data = try Data(contentsOf: snapshotFileUrl)
       let reference = snapshotting.diffing.fromData(data)
+
+      // If the image generation fails for the diffable part use the reference
+      if let localDiff = diffable as? UIImage, localDiff.size == .zero {
+        diffable = reference
+      }
 
       guard let (failure, attachments) = snapshotting.diffing.diff(reference, diffable) else {
         return nil

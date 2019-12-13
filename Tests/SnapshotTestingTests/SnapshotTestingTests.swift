@@ -11,6 +11,9 @@ import SpriteKit
 #if canImport(WebKit)
 import WebKit
 #endif
+#if canImport(UIKit)
+import UIKit.UIView
+#endif
 import XCTest
 
 @testable import SnapshotTesting
@@ -702,6 +705,25 @@ final class SnapshotTestingTests: XCTestCase {
         named: platform
       )
     }
+    #endif
+  }
+  
+  func testViewWithZeroHeightOrWidth() {
+    #if os(iOS)
+    var rect = CGRect(x: 0, y: 0, width: 350, height: 0)
+    var view = UIView(frame: rect)
+    view.backgroundColor = .red
+    assertSnapshot(matching: view, as: .image, named: "noHeight")
+    
+    rect = CGRect(x: 0, y: 0, width: 0, height: 350)
+    view = UIView(frame: rect)
+    view.backgroundColor = .green
+    assertSnapshot(matching: view, as: .image, named: "noWidth")
+
+    rect = CGRect(x: 0, y: 0, width: 0, height: 0)
+    view = UIView(frame: rect)
+    view.backgroundColor = .blue
+    assertSnapshot(matching: view, as: .image, named: "noWidth.noHeight")
     #endif
   }
 }
