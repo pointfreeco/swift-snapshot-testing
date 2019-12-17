@@ -628,7 +628,7 @@ extension View {
     #endif
     return nil
   }
-  #if os(iOS)
+  #if os(iOS) || os(tvOS)
   func asImage() -> Image {
     let renderer = UIGraphicsImageRenderer(bounds: bounds)
     return renderer.image { rendererContext in
