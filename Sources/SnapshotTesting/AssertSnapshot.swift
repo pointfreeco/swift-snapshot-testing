@@ -240,7 +240,7 @@ public func verifySnapshot<Value, Format>(
       let data = try Data(contentsOf: snapshotFileUrl)
       let reference = snapshotting.diffing.fromData(data)
 
-      #if os(iOS)
+      #if os(iOS) || os(tvOS)
       // If the image generation fails for the diffable part use the reference
       if let localDiff = diffable as? UIImage, localDiff.size == .zero {
         diffable = reference
