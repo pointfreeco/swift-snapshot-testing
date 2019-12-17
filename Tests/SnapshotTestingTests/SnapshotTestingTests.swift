@@ -709,7 +709,7 @@ final class SnapshotTestingTests: XCTestCase {
   }
   
   func testViewWithZeroHeightOrWidth() {
-    #if os(iOS)
+    #if os(iOS) || os(tvOS)
     var rect = CGRect(x: 0, y: 0, width: 350, height: 0)
     var view = UIView(frame: rect)
     view.backgroundColor = .red
