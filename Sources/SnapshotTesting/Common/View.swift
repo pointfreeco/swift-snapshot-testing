@@ -764,11 +764,11 @@ private func add(traits: UITraitCollection, viewController: UIViewController, to
   rootViewController.beginAppearanceTransition(true, animated: false)
   rootViewController.endAppearanceTransition()
 
-  viewController.view.setNeedsLayout()
-  viewController.view.layoutIfNeeded()
-
   rootViewController.view.setNeedsLayout()
   rootViewController.view.layoutIfNeeded()
+
+  viewController.view.setNeedsLayout()
+  viewController.view.layoutIfNeeded()
 }
 
 private final class Window: UIWindow {
