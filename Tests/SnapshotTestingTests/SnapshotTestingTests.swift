@@ -148,7 +148,7 @@ final class SnapshotTestingTests: XCTestCase {
   func testMixedViews() {
 //    #if os(iOS) || os(macOS)
 //    // NB: CircleCI crashes while trying to instantiate SKView.
-//    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
+//    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
 //      let webView = WKWebView(frame: .init(x: 0, y: 0, width: 50, height: 50))
 //      webView.loadHTMLString("🌎", baseURL: nil)
 //
@@ -186,7 +186,7 @@ final class SnapshotTestingTests: XCTestCase {
     button.bezelStyle = .rounded
     button.title = "Push Me"
     button.sizeToFit()
-    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
       assertSnapshot(matching: button, as: .image)
       assertSnapshot(matching: button, as: .recursiveDescription)
     }
@@ -200,7 +200,7 @@ final class SnapshotTestingTests: XCTestCase {
     view.wantsLayer = true
     view.layer?.backgroundColor = NSColor.green.cgColor
     view.layer?.cornerRadius = 5
-    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
       assertSnapshot(matching: view, as: .image)
       assertSnapshot(matching: view, as: .recursiveDescription)
     }
@@ -224,7 +224,7 @@ final class SnapshotTestingTests: XCTestCase {
     label.isBezeled = false
     label.isEditable = false
     #endif
-    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
       label.text = "Hello."
       assertSnapshot(matching: label, as: .image(precision: 0.9), named: platform)
       label.text = "Hello"
@@ -236,7 +236,7 @@ final class SnapshotTestingTests: XCTestCase {
   func testSCNView() {
 //    #if os(iOS) || os(macOS) || os(tvOS)
 //    // NB: CircleCI crashes while trying to instantiate SCNView.
-//    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
+//    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
 //      let scene = SCNScene()
 //
 //      let sphereGeometry = SCNSphere(radius: 3)
@@ -273,7 +273,7 @@ final class SnapshotTestingTests: XCTestCase {
   func testSKView() {
 //    #if os(iOS) || os(macOS) || os(tvOS)
 //    // NB: CircleCI crashes while trying to instantiate SKView.
-//    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
+//    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
 //      let scene = SKScene(size: .init(width: 50, height: 50))
 //      let node = SKShapeNode(circleOfRadius: 15)
 //      node.fillColor = .red
@@ -775,7 +775,7 @@ final class SnapshotTestingTests: XCTestCase {
     let html = try String(contentsOf: fixtureUrl)
     let webView = WKWebView()
     webView.loadHTMLString(html, baseURL: nil)
-    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
       assertSnapshot(
         matching: webView,
         as: .image(size: .init(width: 800, height: 600)),
