@@ -593,6 +593,86 @@ final class SnapshotTestingTests: XCTestCase {
     #endif
   }
 
+  func testCollectionViewsWithMultipleScreenSizes() {
+    #if os(iOS)
+
+    final class CollectionViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+
+      let flowLayout: UICollectionViewFlowLayout = {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        layout.minimumLineSpacing = 20
+        return layout
+      }()
+
+      lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
+
+      override func viewDidLoad() {
+        super.viewDidLoad()
+
+        view.backgroundColor = .white
+        view.addSubview(collectionView)
+
+        collectionView.backgroundColor = .white
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "Cell")
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+          collectionView.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+          collectionView.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
+          collectionView.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+          collectionView.bottomAnchor.constraint(equalTo: view.layoutMarginsGuide.bottomAnchor)
+        ])
+
+        collectionView.reloadData()
+      }
+
+      override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        collectionView.collectionViewLayout.invalidateLayout()
+      }
+
+      override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        collectionView.collectionViewLayout.invalidateLayout()
+      }
+
+      func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath)
+        cell.contentView.backgroundColor = .orange
+        return cell
+      }
+
+      func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return 20
+      }
+
+      func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        sizeForItemAt indexPath: IndexPath
+        ) -> CGSize {
+        return CGSize(
+          width: min(collectionView.frame.width - 50, 300),
+          height: collectionView.frame.height
+        )
+      }
+
+    }
+
+    let viewController = CollectionViewController()
+
+    assertSnapshots(matching: viewController, as: [
+      "ipad": .image(on: .iPadPro12_9),
+      "iphoneSe": .image(on: .iPhoneSe),
+      "iphone8": .image(on: .iPhone8),
+      "iphoneMax": .image(on: .iPhoneXsMax)
+    ])
+    #endif
+  }
+
   func testTraitsWithView() {
     #if os(iOS)
     if #available(iOS 11.0, *) {
