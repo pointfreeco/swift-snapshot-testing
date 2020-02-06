@@ -26,7 +26,8 @@ public func _assertInlineSnapshot<Value>(
   with reference: String,
   file: StaticString = #file,
   testName: String = #function,
-  line: UInt = #line
+  line: UInt = #line,
+  attachReferenceImages: Bool = false
   ) {
 
   let failure = _verifyInlineSnapshot(
@@ -37,7 +38,8 @@ public func _assertInlineSnapshot<Value>(
     with: reference,
     file: file,
     testName: testName,
-    line: line
+    line: line,
+    attachReferenceImages: attachReferenceImages
   )
   guard let message = failure else { return }
   XCTFail(message, file: file, line: line)
@@ -56,6 +58,7 @@ public func _assertInlineSnapshot<Value>(
 ///   - file: The file in which failure occurred. Defaults to the file name of the test case in which this function was called.
 ///   - testName: The name of the test in which failure occurred. Defaults to the function name of the test case in which this function was called.
 ///   - line: The line number on which failure occurred. Defaults to the line number on which this function was called.
+///   - attachReferenceImages: If enabled, reference data will always be added irrespective of whether the test passes or fails.
 /// - Returns: A failure message or, if the value matches, nil.
 public func _verifyInlineSnapshot<Value>(
   matching value: @autoclosure () throws -> Value,
@@ -65,7 +68,8 @@ public func _verifyInlineSnapshot<Value>(
   with reference: String,
   file: StaticString = #file,
   testName: String = #function,
-  line: UInt = #line
+  line: UInt = #line,
+  attachReferenceImages: Bool = false
   )
   -> String? {
 
@@ -96,9 +100,11 @@ public func _verifyInlineSnapshot<Value>(
       }
 
       let trimmedReference = reference.trimmingCharacters(in: .whitespacesAndNewlines)
-
-      // Always perform diff, and return early on success!
-      guard let (failure, attachments) = snapshotting.diffing.diff(trimmedReference, diffable) else {
+      let diffResult = snapshotting.diffing.diff(reference, diffable)
+      
+      addTestArtifacts(from: diffResult, named: nil, attachReferenceImages: attachReferenceImages)
+      
+      guard let failure = diffResult.error else {
         return nil
       }
 
@@ -136,19 +142,6 @@ public func _verifyInlineSnapshot<Value>(
           /// and we don't want to write to the wrong place.
           return nil
         }
-      }
-
-      /// Did not successfully record, so we will fail.
-      if !attachments.isEmpty {
-        #if !os(Linux)
-        if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
-          XCTContext.runActivity(named: "Attached Failure Diff") { activity in
-            attachments.forEach {
-              activity.add($0)
-            }
-          }
-        }
-        #endif
       }
 
       return """

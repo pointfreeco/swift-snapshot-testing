@@ -27,7 +27,8 @@ public func assertSnapshot<Value, Format>(
   timeout: TimeInterval = 5,
   file: StaticString = #file,
   testName: String = #function,
-  line: UInt = #line
+  line: UInt = #line,
+  attachReferenceImages: Bool = false
   ) {
 
   let failure = verifySnapshot(
@@ -38,7 +39,8 @@ public func assertSnapshot<Value, Format>(
     timeout: timeout,
     file: file,
     testName: testName,
-    line: line
+    line: line,
+    attachReferenceImages: attachReferenceImages
   )
   guard let message = failure else { return }
   XCTFail(message, file: file, line: line)
@@ -61,7 +63,8 @@ public func assertSnapshots<Value, Format>(
   timeout: TimeInterval = 5,
   file: StaticString = #file,
   testName: String = #function,
-  line: UInt = #line
+  line: UInt = #line,
+  attachReferenceImages: Bool = false
   ) {
 
   try? strategies.forEach { name, strategy in
@@ -73,7 +76,8 @@ public func assertSnapshots<Value, Format>(
       timeout: timeout,
       file: file,
       testName: testName,
-      line: line
+      line: line,
+      attachReferenceImages: attachReferenceImages
     )
   }
 }
@@ -95,7 +99,8 @@ public func assertSnapshots<Value, Format>(
   timeout: TimeInterval = 5,
   file: StaticString = #file,
   testName: String = #function,
-  line: UInt = #line
+  line: UInt = #line,
+  attachReferenceImages: Bool = false
   ) {
 
   try? strategies.forEach { strategy in
@@ -106,7 +111,8 @@ public func assertSnapshots<Value, Format>(
       timeout: timeout,
       file: file,
       testName: testName,
-      line: line
+      line: line,
+      attachReferenceImages: attachReferenceImages
     )
   }
 }
@@ -151,6 +157,7 @@ public func assertSnapshots<Value, Format>(
 ///   - file: The file in which failure occurred. Defaults to the file name of the test case in which this function was called.
 ///   - testName: The name of the test in which failure occurred. Defaults to the function name of the test case in which this function was called.
 ///   - line: The line number on which failure occurred. Defaults to the line number on which this function was called.
+///   - attachReferenceImages: If enabled, reference data will always be added irrespective of whether the test passes or fails.
 /// - Returns: A failure message or, if the value matches, nil.
 public func verifySnapshot<Value, Format>(
   matching value: @autoclosure () throws -> Value,
@@ -161,7 +168,8 @@ public func verifySnapshot<Value, Format>(
   timeout: TimeInterval = 5,
   file: StaticString = #file,
   testName: String = #function,
-  line: UInt = #line
+  line: UInt = #line,
+  attachReferenceImages: Bool = false
   )
   -> String? {
 
@@ -239,8 +247,11 @@ public func verifySnapshot<Value, Format>(
 
       let data = try Data(contentsOf: snapshotFileUrl)
       let reference = snapshotting.diffing.fromData(data)
-
-      guard let (failure, attachments) = snapshotting.diffing.diff(reference, diffable) else {
+      let diffResult = snapshotting.diffing.diff(reference, diffable)
+      
+      addTestArtifacts(from: diffResult, named: name, attachReferenceImages: attachReferenceImages)
+      
+      guard let failure = diffResult.error else {
         return nil
       }
 
@@ -251,18 +262,6 @@ public func verifySnapshot<Value, Format>(
       try fileManager.createDirectory(at: artifactsSubUrl, withIntermediateDirectories: true)
       let failedSnapshotFileUrl = artifactsSubUrl.appendingPathComponent(snapshotFileUrl.lastPathComponent)
       try snapshotting.diffing.toData(diffable).write(to: failedSnapshotFileUrl)
-
-      if !attachments.isEmpty {
-        #if !os(Linux)
-        if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
-          XCTContext.runActivity(named: "Attached Failure Diff") { activity in
-            attachments.forEach {
-              activity.add($0)
-            }
-          }
-        }
-        #endif
-      }
 
       let diffMessage = diffTool
         .map { "\($0) \"\(snapshotFileUrl.path)\" \"\(failedSnapshotFileUrl.path)\"" }

@@ -6,11 +6,11 @@ extension Snapshotting where Value == Data, Format == Data {
     return .init(
       pathExtension: nil,
       diffing: .init(toData: { $0 }, fromData: { $0 }) { old, new in
-        guard old != new else { return nil }
+        guard old != new else { return .success(nil) }
         let message = old.count == new.count
           ? "Expected data to match"
           : "Expected \(new) to match \(old)"
-        return (message, [])
+        return .failure(FailureError(reason: message, artifacts: []))
       }
     )
   }

@@ -12,7 +12,11 @@ extension Diffing where Value == String {
     toData: { Data($0.utf8) },
     fromData: { String(decoding: $0, as: UTF8.self) }
   ) { old, new in
-    guard old != new else { return nil }
+    guard old != new else {
+      let oldAttachment = XCTAttachment(data: Data(old.utf8), uniformTypeIdentifier: "public.plain-text")
+      oldAttachment.name = "reference"
+      return .success([ oldAttachment ])
+    }
     let hunks = chunk(diff: SnapshotTesting.diff(
       old.split(separator: "\n", omittingEmptySubsequences: false).map(String.init),
       new.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
@@ -21,6 +25,6 @@ extension Diffing where Value == String {
       .flatMap { [$0.patchMark] + $0.lines }
       .joined(separator: "\n")
     let attachment = XCTAttachment(data: Data(failure.utf8), uniformTypeIdentifier: "public.patch-file")
-    return (failure, [attachment])
+    return .failure(FailureError(reason: failure, artifacts: [ attachment ]))
   }
 }
