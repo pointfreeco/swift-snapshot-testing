@@ -172,6 +172,12 @@
 		EBAAEFBC5AE04EC3344F24F238DE8F60 /* Any.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F831EAAFB97204ECD0B87999C0BFF9 /* Any.swift */; };
 		EC029EFEA549BA5847A110F3236BF0D9 /* TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C676C30FCAE10DB1773832024B59EA /* TestHelpers.swift */; };
 		ED0F07BDB79D93B6EB1B5D7BDC5F9EA5 /* SceneKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5580E7AC2CEBEA656780C7A91CD9CBAC /* SceneKit.swift */; };
+		ED9EF6D323F2FD1500FA67EF /* WaitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED9EF6D223F2FD1500FA67EF /* WaitTests.swift */; };
+		ED9EF6D423F2FD2000FA67EF /* WaitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED9EF6D223F2FD1500FA67EF /* WaitTests.swift */; };
+		ED9EF6D523F2FD2000FA67EF /* WaitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED9EF6D223F2FD1500FA67EF /* WaitTests.swift */; };
+		ED9EF6D623F2FD2800FA67EF /* Wait.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED9EF6D023F2FD0300FA67EF /* Wait.swift */; };
+		ED9EF6D723F2FD2800FA67EF /* Wait.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED9EF6D023F2FD0300FA67EF /* Wait.swift */; };
+		ED9EF6D823F2FD2900FA67EF /* Wait.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED9EF6D023F2FD0300FA67EF /* Wait.swift */; };
 		EE4B3645171C4A35C2A8850AB77BADF3 /* testCreateSnapshotWithExtendedDelimiter1.1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FB18BB1F44D13D5C5FE09A6435464AC /* testCreateSnapshotWithExtendedDelimiter1.1.swift */; };
 		EE74C4F1AD535AF467764F6AEFA8FB3F /* testCreateSnapshotMultiLine.1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C685ECE195C23560AFD14568EDCA0C9 /* testCreateSnapshotMultiLine.1.swift */; };
 		EEEE60F34586C230F83C40E0201ACE75 /* TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C676C30FCAE10DB1773832024B59EA /* TestHelpers.swift */; };
@@ -302,6 +308,8 @@
 		E9D57E3B929139A0C14AEBA771BE0BDB /* NSView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSView.swift; sourceTree = "<group>"; };
 		EA789F513A8B1E8EF5BF81E23C94CD06 /* SnapshotTestingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotTestingTests.swift; sourceTree = "<group>"; };
 		ECEC001D7DB94ECB4F5A2CF9A14966F0 /* testUpdateSeveralSnapshotsWithMoreLines.1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = testUpdateSeveralSnapshotsWithMoreLines.1.swift; sourceTree = "<group>"; };
+		ED9EF6D023F2FD0300FA67EF /* Wait.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Wait.swift; sourceTree = "<group>"; };
+		ED9EF6D223F2FD1500FA67EF /* WaitTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaitTests.swift; sourceTree = "<group>"; };
 		EE91B5904B3F67A3A01610C82A0409B8 /* testCreateSnapshotWithShorterExtendedDelimiter1.1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = testCreateSnapshotWithShorterExtendedDelimiter1.1.swift; sourceTree = "<group>"; };
 		F479E2BD835B9641B85EB51E990659C5 /* Internal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Internal.swift; sourceTree = "<group>"; };
 		F4D7D0D81B7E35C6284A3E65021CD886 /* testUpdateSnapshotWithExtendedDelimiter1.1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = testUpdateSnapshotWithExtendedDelimiter1.1.swift; sourceTree = "<group>"; };
@@ -362,6 +370,7 @@
 				5CD2F74288CF52A13C9BB497FD0CD954 /* SnapshotTestCase.swift */,
 				9D7D5B93AE097C0B92B78931A6CF4051 /* Snapshotting.swift */,
 				D37322FEADE9539AF927F08CE34CEAC7 /* Common */,
+				ED9EF6CF23F2FD0300FA67EF /* Extensions */,
 				F9BB85DCB605867FAE2159445EC3BA7B /* Snapshotting */,
 			);
 			path = SnapshotTesting;
@@ -414,6 +423,7 @@
 		5F415AF65AF138E223C5D65054E2622F /* SnapshotTestingTests */ = {
 			isa = PBXGroup;
 			children = (
+				ED9EF6D223F2FD1500FA67EF /* WaitTests.swift */,
 				F6D3BC50BC4692DC6D9FAE0F715F03AC /* InlineSnapshotTests.swift */,
 				EA789F513A8B1E8EF5BF81E23C94CD06 /* SnapshotTestingTests.swift */,
 				49C676C30FCAE10DB1773832024B59EA /* TestHelpers.swift */,
@@ -458,6 +468,14 @@
 				5F415AF65AF138E223C5D65054E2622F /* SnapshotTestingTests */,
 			);
 			path = Tests;
+			sourceTree = "<group>";
+		};
+		ED9EF6CF23F2FD0300FA67EF /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				ED9EF6D023F2FD0300FA67EF /* Wait.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 		F9BB85DCB605867FAE2159445EC3BA7B /* Snapshotting */ = {
@@ -627,6 +645,7 @@
 				27893B953501E9EC4283A3593072E8F8 /* CaseIterable.swift in Sources */,
 				09A2FA1AFA4FEF02565F6D4B40D0098E /* Codable.swift in Sources */,
 				1EE5DFDD3FEECAFEAF5B56F8486D2597 /* Data.swift in Sources */,
+				ED9EF6D723F2FD2800FA67EF /* Wait.swift in Sources */,
 				2B383FA2A6810F2B04351F153639887D /* Description.swift in Sources */,
 				2C546DB9308BBA10797792666185D13B /* Diff.swift in Sources */,
 				6913EF15669B52F7EE68830FB88CE869 /* Diffing.swift in Sources */,
@@ -662,6 +681,7 @@
 				8D6CE128BCC2F391F543026459725279 /* CaseIterable.swift in Sources */,
 				198737E4B1460A82A2BEFBBEDEC954CF /* Codable.swift in Sources */,
 				DB033E3C335D74B1CBD2B556CB246B9C /* Data.swift in Sources */,
+				ED9EF6D623F2FD2800FA67EF /* Wait.swift in Sources */,
 				7A8584A6DB5EE3B1050875732463507D /* Description.swift in Sources */,
 				F8DF68BE061BFD45EB35A4476CFDBD68 /* Diff.swift in Sources */,
 				99848560C9BED9C8F028AE6A1F0E2411 /* Diffing.swift in Sources */,
@@ -717,6 +737,7 @@
 				44BB1AAB0D472E91813CE4CD57D2B255 /* testUpdateSnapshotWithMoreLines.1.swift in Sources */,
 				E508D58B9FFAF1925A74C1557C8EA6BB /* testUpdateSnapshotWithShorterExtendedDelimiter1.1.swift in Sources */,
 				40A52B373963FA358A0CDC4A0F5E6CF5 /* testUpdateSnapshotWithShorterExtendedDelimiter2.1.swift in Sources */,
+				ED9EF6D423F2FD2000FA67EF /* WaitTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -752,6 +773,7 @@
 				2BC5D286F4F02EC4B4D7CDEC23CAF1C8 /* testUpdateSnapshotWithMoreLines.1.swift in Sources */,
 				B2E5C49B4DE57C6B8AB51B7C9583E5E0 /* testUpdateSnapshotWithShorterExtendedDelimiter1.1.swift in Sources */,
 				E78D9F029E2F13A0F300A850FF70EF98 /* testUpdateSnapshotWithShorterExtendedDelimiter2.1.swift in Sources */,
+				ED9EF6D523F2FD2000FA67EF /* WaitTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -767,6 +789,7 @@
 				0AC11BB902884E53C89720DA9473D80C /* CaseIterable.swift in Sources */,
 				149A08C2781CE62F76AC3C59CE5E5BF9 /* Codable.swift in Sources */,
 				6D07B2D533E06D51EF90BEB7D92A3B1F /* Data.swift in Sources */,
+				ED9EF6D823F2FD2900FA67EF /* Wait.swift in Sources */,
 				6A8D897904DD6C28C513957B03BAA1CC /* Description.swift in Sources */,
 				1A05DFC1498FD7ED1808505EAE9DF9BA /* Diff.swift in Sources */,
 				29D31B69837B82862BC646F824321B25 /* Diffing.swift in Sources */,
@@ -817,6 +840,7 @@
 				0F298991F3714D119C59FAF2BABD5EDF /* testUpdateSnapshotWithExtendedDelimiter1.1.swift in Sources */,
 				42CF9720F8690ED43D028C7910C80C53 /* testUpdateSnapshotWithExtendedDelimiter2.1.swift in Sources */,
 				9AC9BCFE676106D006B2D6A776F8FC61 /* testUpdateSnapshotWithLessLines.1.swift in Sources */,
+				ED9EF6D323F2FD1500FA67EF /* WaitTests.swift in Sources */,
 				AB230F3BF5ED7AACE543E7461511883E /* testUpdateSnapshotWithLongerExtendedDelimiter1.1.swift in Sources */,
 				DD2F2E09A92FB18E6B8A0E38FA3B41FE /* testUpdateSnapshotWithLongerExtendedDelimiter2.1.swift in Sources */,
 				880825900BB38CDC2DDE79EB596DA851 /* testUpdateSnapshotWithMoreLines.1.swift in Sources */,
