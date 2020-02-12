@@ -309,6 +309,30 @@ final class SnapshotTestingTests: XCTestCase {
     assertSnapshot(matching: tableViewController, as: .image(on: .iPhoneSe))
     #endif
   }
+    
+  func testTableViewControllerTraits() {
+    #if os(iOS)
+    class TableViewController: UITableViewController {
+      override func viewDidLoad() {
+        super.viewDidLoad()
+        self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
+      }
+      override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 10
+      }
+      override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+        cell.textLabel?.font = .preferredFont(forTextStyle: .body)
+        cell.textLabel?.adjustsFontForContentSizeCategory = true
+        cell.textLabel?.text = "\(indexPath.row)"
+        return cell
+      }
+    }
+    let tableViewController = TableViewController()
+    assertSnapshots(matching: tableViewController, as: [.image(on: .iPhoneSe), .image(on: .iPhoneSe, traits: .init(preferredContentSizeCategory: .accessibilityExtraExtraExtraLarge))])
+    #endif
+  }
+
 
   func testAssertMultipleSnapshot() {
     #if os(iOS)
