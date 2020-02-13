@@ -769,11 +769,6 @@ private func add(traits: UITraitCollection, viewController: UIViewController, to
 
   viewController.view.setNeedsLayout()
   viewController.view.layoutIfNeeded()
-    
-  viewController.view.subviews.forEach {
-      $0.setNeedsLayout()
-      $0.layoutIfNeeded()
-  }
 }
 
 private final class Window: UIWindow {
