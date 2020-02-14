@@ -17,6 +17,17 @@ public struct ViewImageConfig {
     case landscape
     case portrait
   }
+  public enum InterfaceStyle {
+    case light
+    case dark
+
+     @available(iOS 12.0, *) var userInterfaceStyle: UIUserInterfaceStyle {
+      switch self {
+      case .light: return .light
+      case .dark: return .dark
+      }
+    }
+  }
   public enum TabletOrientation {
     public enum PortraitSplits {
       case oneThird
@@ -50,7 +61,7 @@ public struct ViewImageConfig {
   #if os(iOS)
   public static let iPhoneSe = ViewImageConfig.iPhoneSe(.portrait)
 
-  public static func iPhoneSe(_ orientation: Orientation) -> ViewImageConfig {
+  public static func iPhoneSe(_ orientation: Orientation, _ interfaceStyle: InterfaceStyle = .light) -> ViewImageConfig {
     let safeArea: UIEdgeInsets
     let size: CGSize
     switch orientation {
@@ -61,12 +72,12 @@ public struct ViewImageConfig {
       safeArea = .init(top: 20, left: 0, bottom: 0, right: 0)
       size = .init(width: 320, height: 568)
     }
-    return .init(safeArea: safeArea, size: size, traits: .iPhoneSe(orientation))
+    return .init(safeArea: safeArea, size: size, traits: .iPhoneSe(orientation, interfaceStyle))
   }
 
   public static let iPhone8 = ViewImageConfig.iPhone8(.portrait)
 
-  public static func iPhone8(_ orientation: Orientation) -> ViewImageConfig {
+  public static func iPhone8(_ orientation: Orientation, _ interfaceStyle: InterfaceStyle = .light) -> ViewImageConfig {
     let safeArea: UIEdgeInsets
     let size: CGSize
     switch orientation {
@@ -77,12 +88,12 @@ public struct ViewImageConfig {
       safeArea = .init(top: 20, left: 0, bottom: 0, right: 0)
       size = .init(width: 375, height: 667)
     }
-    return .init(safeArea: safeArea, size: size, traits: .iPhone8(orientation))
+    return .init(safeArea: safeArea, size: size, traits: .iPhone8(orientation, interfaceStyle))
   }
 
   public static let iPhone8Plus = ViewImageConfig.iPhone8Plus(.portrait)
 
-  public static func iPhone8Plus(_ orientation: Orientation) -> ViewImageConfig {
+  public static func iPhone8Plus(_ orientation: Orientation, _ interfaceStyle: InterfaceStyle = .light) -> ViewImageConfig {
     let safeArea: UIEdgeInsets
     let size: CGSize
     switch orientation {
@@ -93,12 +104,12 @@ public struct ViewImageConfig {
       safeArea = .init(top: 20, left: 0, bottom: 0, right: 0)
       size = .init(width: 414, height: 736)
     }
-    return .init(safeArea: safeArea, size: size, traits: .iPhone8Plus(orientation))
+    return .init(safeArea: safeArea, size: size, traits: .iPhone8Plus(orientation, interfaceStyle))
   }
 
   public static let iPhoneX = ViewImageConfig.iPhoneX(.portrait)
 
-  public static func iPhoneX(_ orientation: Orientation) -> ViewImageConfig {
+  public static func iPhoneX(_ orientation: Orientation, _ interfaceStyle: InterfaceStyle = .light) -> ViewImageConfig {
     let safeArea: UIEdgeInsets
     let size: CGSize
     switch orientation {
@@ -109,12 +120,12 @@ public struct ViewImageConfig {
       safeArea = .init(top: 44, left: 0, bottom: 34, right: 0)
       size = .init(width: 375, height: 812)
     }
-    return .init(safeArea: safeArea, size: size, traits: .iPhoneX(orientation))
+    return .init(safeArea: safeArea, size: size, traits: .iPhoneX(orientation, interfaceStyle))
   }
 
   public static let iPhoneXsMax = ViewImageConfig.iPhoneXsMax(.portrait)
 
-  public static func iPhoneXsMax(_ orientation: Orientation) -> ViewImageConfig {
+  public static func iPhoneXsMax(_ orientation: Orientation, _ interfaceStyle: InterfaceStyle = .light) -> ViewImageConfig {
     let safeArea: UIEdgeInsets
     let size: CGSize
     switch orientation {
@@ -125,14 +136,14 @@ public struct ViewImageConfig {
       safeArea = .init(top: 44, left: 0, bottom: 34, right: 0)
       size = .init(width: 414, height: 896)
     }
-    return .init(safeArea: safeArea, size: size, traits: .iPhoneXsMax(orientation))
+    return .init(safeArea: safeArea, size: size, traits: .iPhoneXsMax(orientation, interfaceStyle))
   }
 
   @available(iOS 11.0, *)
   public static let iPhoneXr = ViewImageConfig.iPhoneXr(.portrait)
 
   @available(iOS 11.0, *)
-  public static func iPhoneXr(_ orientation: Orientation) -> ViewImageConfig {
+  public static func iPhoneXr(_ orientation: Orientation, _ interfaceStyle: InterfaceStyle = .light) -> ViewImageConfig {
     let safeArea: UIEdgeInsets
     let size: CGSize
     switch orientation {
@@ -143,12 +154,12 @@ public struct ViewImageConfig {
       safeArea = .init(top: 44, left: 0, bottom: 34, right: 0)
       size = .init(width: 414, height: 896)
     }
-    return .init(safeArea: safeArea, size: size, traits: .iPhoneXr(orientation))
+    return .init(safeArea: safeArea, size: size, traits: .iPhoneXr(orientation, interfaceStyle))
   }
 
   public static let iPadMini = ViewImageConfig.iPadMini(.landscape)
 
-  public static func iPadMini(_ orientation: Orientation) -> ViewImageConfig {
+  public static func iPadMini(_ orientation: Orientation, _ interfaceStyle: InterfaceStyle = .light) -> ViewImageConfig {
     switch orientation {
     case .landscape:
       return ViewImageConfig.iPadMini(.landscape(splitView: .full))
@@ -157,7 +168,7 @@ public struct ViewImageConfig {
     }
   }
   
-  public static func iPadMini(_ orientation: TabletOrientation) -> ViewImageConfig {
+  public static func iPadMini(_ orientation: TabletOrientation, _ interfaceStyle: InterfaceStyle = .light) -> ViewImageConfig {
     let size: CGSize
     let traits: UITraitCollection
     switch orientation {
@@ -189,21 +200,29 @@ public struct ViewImageConfig {
         traits = .iPadMini
       }
     }
-    return .init(safeArea: .init(top: 20, left: 0, bottom: 0, right: 0), size: size, traits: traits)
+        
+    if #available(iOS 12.0, *) {
+       let userInterfaceStyle = UITraitCollection(userInterfaceStyle: interfaceStyle.userInterfaceStyle)
+       let traitsWithInterfaceStyle = UITraitCollection(traitsFrom: [traits] + [userInterfaceStyle])
+
+        return .init(safeArea: .init(top: 20, left: 0, bottom: 0, right: 0), size: size, traits: traitsWithInterfaceStyle)
+     } else {
+       return .init(safeArea: .init(top: 20, left: 0, bottom: 0, right: 0), size: size, traits: traits)
+     }
   }
 
   public static let iPadPro10_5 = ViewImageConfig.iPadPro10_5(.landscape)
 
-  public static func iPadPro10_5(_ orientation: Orientation) -> ViewImageConfig {
+  public static func iPadPro10_5(_ orientation: Orientation, _ interfaceStyle: InterfaceStyle = .light) -> ViewImageConfig {
     switch orientation {
     case .landscape:
-      return ViewImageConfig.iPadPro10_5(.landscape(splitView: .full))
+      return ViewImageConfig.iPadPro10_5(.landscape(splitView: .full), interfaceStyle)
     case .portrait:
-      return ViewImageConfig.iPadPro10_5(.portrait(splitView: .full))
+      return ViewImageConfig.iPadPro10_5(.portrait(splitView: .full), interfaceStyle)
     }
   }
   
-  public static func iPadPro10_5(_ orientation: TabletOrientation) -> ViewImageConfig {
+  public static func iPadPro10_5(_ orientation: TabletOrientation, _ interfaceStyle: InterfaceStyle = .light) -> ViewImageConfig {
     let size: CGSize
     let traits: UITraitCollection
     switch orientation {
@@ -235,21 +254,30 @@ public struct ViewImageConfig {
         traits = .iPadPro10_5
       }
     }
-    return .init(safeArea: .init(top: 20, left: 0, bottom: 0, right: 0), size: size, traits: traits)
+    
+     
+    if #available(iOS 12.0, *) {
+      let userInterfaceStyle = UITraitCollection(userInterfaceStyle: interfaceStyle.userInterfaceStyle)
+      let traitsWithInterfaceStyle = UITraitCollection(traitsFrom: [traits] + [userInterfaceStyle])
+
+        return .init(safeArea: .init(top: 20, left: 0, bottom: 0, right: 0), size: size, traits: traitsWithInterfaceStyle)
+    } else {
+      return .init(safeArea: .init(top: 20, left: 0, bottom: 0, right: 0), size: size, traits: traits)
+    }
   }
   
   public static let iPadPro11 = ViewImageConfig.iPadPro11(.landscape)
   
-  public static func iPadPro11(_ orientation: Orientation) -> ViewImageConfig {
+  public static func iPadPro11(_ orientation: Orientation, _ interfaceStyle: InterfaceStyle = .light) -> ViewImageConfig {
     switch orientation {
     case .landscape:
-      return ViewImageConfig.iPadPro11(.landscape(splitView: .full))
+      return ViewImageConfig.iPadPro11(.landscape(splitView: .full), interfaceStyle)
     case .portrait:
-      return ViewImageConfig.iPadPro11(.portrait(splitView: .full))
+      return ViewImageConfig.iPadPro11(.portrait(splitView: .full), interfaceStyle)
     }
   }
   
-  public static func iPadPro11(_ orientation: TabletOrientation) -> ViewImageConfig {
+  public static func iPadPro11(_ orientation: TabletOrientation, _ interfaceStyle: InterfaceStyle = .light) -> ViewImageConfig {
     let size: CGSize
     let traits: UITraitCollection
     switch orientation {
@@ -286,16 +314,16 @@ public struct ViewImageConfig {
 
   public static let iPadPro12_9 = ViewImageConfig.iPadPro12_9(.landscape)
 
-  public static func iPadPro12_9(_ orientation: Orientation) -> ViewImageConfig {
+  public static func iPadPro12_9(_ orientation: Orientation, _ interfaceStyle: InterfaceStyle = .light) -> ViewImageConfig {
     switch orientation {
     case .landscape:
-      return ViewImageConfig.iPadPro12_9(.landscape(splitView: .full))
+      return ViewImageConfig.iPadPro12_9(.landscape(splitView: .full), interfaceStyle)
     case .portrait:
-      return ViewImageConfig.iPadPro12_9(.portrait(splitView: .full))
+      return ViewImageConfig.iPadPro12_9(.portrait(splitView: .full), interfaceStyle)
     }
   }
   
-  public static func iPadPro12_9(_ orientation: TabletOrientation) -> ViewImageConfig {
+  public static func iPadPro12_9(_ orientation: TabletOrientation, _ interfaceStyle: InterfaceStyle = .light) -> ViewImageConfig {
     let size: CGSize
     let traits: UITraitCollection
     switch orientation {
@@ -329,7 +357,15 @@ public struct ViewImageConfig {
       }
       
     }
-    return .init(safeArea: .init(top: 20, left: 0, bottom: 0, right: 0), size: size, traits: traits)
+    
+    if #available(iOS 12.0, *) {
+      let userInterfaceStyle = UITraitCollection(userInterfaceStyle: interfaceStyle.userInterfaceStyle)
+      let traitsWithInterfaceStyle = UITraitCollection(traitsFrom: [traits] + [userInterfaceStyle])
+
+       return .init(safeArea: .init(top: 20, left: 0, bottom: 0, right: 0), size: size, traits: traitsWithInterfaceStyle)
+    } else {
+      return .init(safeArea: .init(top: 20, left: 0, bottom: 0, right: 0), size: size, traits: traits)
+    }
   }
   #elseif os(tvOS)
   public static let tv = ViewImageConfig(
@@ -342,9 +378,9 @@ public struct ViewImageConfig {
 
 extension UITraitCollection {
   #if os(iOS)
-  public static func iPhoneSe(_ orientation: ViewImageConfig.Orientation)
+  public static func iPhoneSe(_ orientation: ViewImageConfig.Orientation, _ interfaceStyle: ViewImageConfig.InterfaceStyle)
     -> UITraitCollection {
-      let base: [UITraitCollection] = [
+      var base: [UITraitCollection] = [
 //        .init(displayGamut: .SRGB),
 //        .init(displayScale: 2),
         .init(forceTouchCapability: .available),
@@ -352,6 +388,11 @@ extension UITraitCollection {
         .init(preferredContentSizeCategory: .medium),
         .init(userInterfaceIdiom: .phone)
       ]
+      
+      if #available(iOS 12.0, *) {
+         base.append(.init(userInterfaceStyle: interfaceStyle.userInterfaceStyle))
+       }
+      
       switch orientation {
       case .landscape:
         return .init(
@@ -370,9 +411,9 @@ extension UITraitCollection {
       }
   }
 
-  public static func iPhone8(_ orientation: ViewImageConfig.Orientation)
+  public static func iPhone8(_ orientation: ViewImageConfig.Orientation, _ interfaceStyle: ViewImageConfig.InterfaceStyle)
     -> UITraitCollection {
-      let base: [UITraitCollection] = [
+      var base: [UITraitCollection] = [
 //        .init(displayGamut: .P3),
 //        .init(displayScale: 2),
         .init(forceTouchCapability: .available),
@@ -380,6 +421,11 @@ extension UITraitCollection {
         .init(preferredContentSizeCategory: .medium),
         .init(userInterfaceIdiom: .phone)
       ]
+      
+      if #available(iOS 12.0, *) {
+         base.append(.init(userInterfaceStyle: interfaceStyle.userInterfaceStyle))
+       }
+      
       switch orientation {
       case .landscape:
         return .init(
@@ -398,9 +444,9 @@ extension UITraitCollection {
       }
   }
 
-  public static func iPhone8Plus(_ orientation: ViewImageConfig.Orientation)
+  public static func iPhone8Plus(_ orientation: ViewImageConfig.Orientation, _ interfaceStyle: ViewImageConfig.InterfaceStyle)
     -> UITraitCollection {
-      let base: [UITraitCollection] = [
+      var base: [UITraitCollection] = [
 //        .init(displayGamut: .P3),
 //        .init(displayScale: 3),
         .init(forceTouchCapability: .available),
@@ -408,6 +454,11 @@ extension UITraitCollection {
         .init(preferredContentSizeCategory: .medium),
         .init(userInterfaceIdiom: .phone)
       ]
+      
+      if #available(iOS 12.0, *) {
+         base.append(.init(userInterfaceStyle: interfaceStyle.userInterfaceStyle))
+       }
+      
       switch orientation {
       case .landscape:
         return .init(
@@ -426,9 +477,9 @@ extension UITraitCollection {
       }
   }
 
-  public static func iPhoneX(_ orientation: ViewImageConfig.Orientation)
+  public static func iPhoneX(_ orientation: ViewImageConfig.Orientation, _ interfaceStyle: ViewImageConfig.InterfaceStyle)
     -> UITraitCollection {
-      let base: [UITraitCollection] = [
+      var base: [UITraitCollection] = [
 //        .init(displayGamut: .P3),
 //        .init(displayScale: 3),
         .init(forceTouchCapability: .available),
@@ -436,6 +487,11 @@ extension UITraitCollection {
         .init(preferredContentSizeCategory: .medium),
         .init(userInterfaceIdiom: .phone)
       ]
+      
+      if #available(iOS 12.0, *) {
+         base.append(.init(userInterfaceStyle: interfaceStyle.userInterfaceStyle))
+       }
+      
       switch orientation {
       case .landscape:
         return .init(
@@ -454,9 +510,9 @@ extension UITraitCollection {
       }
   }
 
-  public static func iPhoneXr(_ orientation: ViewImageConfig.Orientation)
+  public static func iPhoneXr(_ orientation: ViewImageConfig.Orientation, _ interfaceStyle: ViewImageConfig.InterfaceStyle)
     -> UITraitCollection {
-      let base: [UITraitCollection] = [
+      var base: [UITraitCollection] = [
 //        .init(displayGamut: .P3),
 //        .init(displayScale: 2),
         .init(forceTouchCapability: .unavailable),
@@ -464,6 +520,11 @@ extension UITraitCollection {
         .init(preferredContentSizeCategory: .medium),
         .init(userInterfaceIdiom: .phone)
       ]
+      
+      if #available(iOS 12.0, *) {
+         base.append(.init(userInterfaceStyle: interfaceStyle.userInterfaceStyle))
+       }
+      
       switch orientation {
       case .landscape:
         return .init(
@@ -482,9 +543,9 @@ extension UITraitCollection {
       }
   }
 
-  public static func iPhoneXsMax(_ orientation: ViewImageConfig.Orientation)
+  public static func iPhoneXsMax(_ orientation: ViewImageConfig.Orientation, _ interfaceStyle: ViewImageConfig.InterfaceStyle)
     -> UITraitCollection {
-      let base: [UITraitCollection] = [
+      var base: [UITraitCollection] = [
 //        .init(displayGamut: .P3),
 //        .init(displayScale: 3),
         .init(forceTouchCapability: .available),
@@ -492,6 +553,11 @@ extension UITraitCollection {
         .init(preferredContentSizeCategory: .medium),
         .init(userInterfaceIdiom: .phone)
       ]
+      
+      if #available(iOS 12.0, *) {
+         base.append(.init(userInterfaceStyle: interfaceStyle.userInterfaceStyle))
+       }
+      
       switch orientation {
       case .landscape:
         return .init(
