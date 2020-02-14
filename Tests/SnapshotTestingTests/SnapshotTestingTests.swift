@@ -307,6 +307,7 @@ final class SnapshotTestingTests: XCTestCase {
     }
     let tableViewController = TableViewController()
     assertSnapshot(matching: tableViewController, as: .image(on: .iPhoneSe))
+    assertSnapshot(matching: tableViewController, as: .image(on: .iPhoneSe(.portrait, .dark)))
     #endif
   }
 
