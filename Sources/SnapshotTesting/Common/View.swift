@@ -653,7 +653,7 @@ func prepareView(
   traits: UITraitCollection,
   view: UIView,
   viewController: UIViewController
-  ) {
+  ) -> () -> () {
   let size = config.size ?? viewController.view.frame.size
   view.frame.size = size
   if view != viewController.view {
@@ -674,7 +674,7 @@ func prepareView(
       viewController: viewController
     )
   }
-  add(traits: traits, viewController: viewController, to: window)
+  let dispose = add(traits: traits, viewController: viewController, to: window)
 
   if size.width == 0 || size.height == 0 {
     // Try to call sizeToFit() if the view still has invalid size
@@ -686,6 +686,8 @@ func prepareView(
   guard view.frame.size.width > 0, view.frame.size.height > 0 else {
     fatalError("View not renderable to image at size \(size)")
   }
+
+  return dispose
 }
 
 func snapshotView(
@@ -697,7 +699,7 @@ func snapshotView(
   )
   -> Async<UIImage> {
     let initialFrame = view.frame
-    prepareView(
+    let dispose = prepareView(
       config: config,
       drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
       traits: traits,
@@ -706,7 +708,8 @@ func snapshotView(
     )
     // NB: Avoid safe area influence.
     if config.safeArea == .zero { view.frame.origin = .init(x: offscreen, y: offscreen) }
-    return view.snapshot ?? Async { callback in
+
+    return (view.snapshot ?? Async { callback in
       addImagesForRenderedViews(view).sequence().run { views in
         callback(
           renderer(bounds: view.bounds, for: traits).image { ctx in
@@ -720,7 +723,7 @@ func snapshotView(
         views.forEach { $0.removeFromSuperview() }
         view.frame = initialFrame
       }
-    }
+    }).map { dispose(); return $0 }
 }
 
 private let offscreen: CGFloat = 10_000
@@ -735,7 +738,7 @@ func renderer(bounds: CGRect, for traits: UITraitCollection) -> UIGraphicsImageR
   return renderer
 }
 
-private func add(traits: UITraitCollection, viewController: UIViewController, to window: UIWindow) {
+private func add(traits: UITraitCollection, viewController: UIViewController, to window: UIWindow) -> () -> () {
   let rootViewController = UIViewController()
   rootViewController.view.backgroundColor = .clear
   rootViewController.view.frame = window.frame
@@ -769,6 +772,12 @@ private func add(traits: UITraitCollection, viewController: UIViewController, to
 
   viewController.view.setNeedsLayout()
   viewController.view.layoutIfNeeded()
+
+  return {
+    rootViewController.beginAppearanceTransition(false, animated: false)
+    rootViewController.endAppearanceTransition()
+    window.rootViewController = nil
+  }
 }
 
 private final class Window: UIWindow {
