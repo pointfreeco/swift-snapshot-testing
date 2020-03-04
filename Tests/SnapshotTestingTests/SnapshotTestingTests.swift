@@ -701,6 +701,7 @@ final class SnapshotTestingTests: XCTestCase {
   }
 
   func testUIViewControllerLifeCycle() {
+    #if os(iOS)
     class ViewController: UIViewController {
       let viewDidLoadExpectation: XCTestExpectation
       let viewWillAppearExpectation: XCTestExpectation
@@ -772,6 +773,7 @@ final class SnapshotTestingTests: XCTestCase {
       viewWillDisappearExpectation,
       viewDidDisappearExpectation,
     ], timeout: 1.0, enforceOrder: true)
+    #endif
   }
 
   func testViewControllerHierarchy() {
