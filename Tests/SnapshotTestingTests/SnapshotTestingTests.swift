@@ -480,6 +480,8 @@ final class SnapshotTestingTests: XCTestCase {
       #elseif os(tvOS)
       assertSnapshot(
         matching: viewController, as: .image(on: .tv), named: "tv")
+      assertSnapshot(
+        matching: viewController, as: .image(on: .tv4K), named: "tv4k")
       #endif
     }
     #endif
