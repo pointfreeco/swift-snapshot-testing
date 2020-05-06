@@ -483,6 +483,8 @@ final class SnapshotTestingTests: XCTestCase {
       #elseif os(tvOS)
       assertSnapshot(
         matching: viewController, as: .image(on: .tv), named: "tv")
+      assertSnapshot(
+        matching: viewController, as: .image(on: .tv4K), named: "tv4k")
       #endif
     }
     #endif
@@ -695,11 +697,61 @@ final class SnapshotTestingTests: XCTestCase {
     #endif
   }
 
+  func testTraitsWithViewController() {
+    #if os(iOS)
+    let label = UILabel()
+    label.font = .preferredFont(forTextStyle: .title1)
+    label.adjustsFontForContentSizeCategory = true
+    label.text = "What's the point?"
+
+    let viewController = UIViewController()
+    viewController.view.addSubview(label)
+
+    label.translatesAutoresizingMaskIntoConstraints = false
+    NSLayoutConstraint.activate([
+      label.leadingAnchor.constraint(equalTo: viewController.view.layoutMarginsGuide.leadingAnchor),
+      label.topAnchor.constraint(equalTo: viewController.view.layoutMarginsGuide.topAnchor),
+      label.trailingAnchor.constraint(equalTo: viewController.view.layoutMarginsGuide.trailingAnchor)
+    ])
+
+    allContentSizes.forEach { name, contentSize in
+      assertSnapshot(
+        matching: viewController,
+        as: .recursiveDescription(on: .iPhoneSe, traits: .init(preferredContentSizeCategory: contentSize)),
+        named: "label-\(name)"
+      )
+    }
+    #endif
+  }
+
   func testUIView() {
     #if os(iOS)
     let view = UIButton(type: .contactAdd)
     assertSnapshot(matching: view, as: .image)
     assertSnapshot(matching: view, as: .recursiveDescription)
+    #endif
+  }
+
+  func testCALayer() {
+    #if os(iOS)
+    let layer = CALayer()
+    layer.frame = CGRect(x: 0, y: 0, width: 100, height: 100)
+    layer.backgroundColor = UIColor.red.cgColor
+    layer.borderWidth = 4.0
+    layer.borderColor = UIColor.black.cgColor
+    assertSnapshot(matching: layer, as: .image)
+    #endif
+  }
+
+  func testCALayerWithGradient() {
+    #if os(iOS)
+    let baseLayer = CALayer()
+    baseLayer.frame = CGRect(x: 0, y: 0, width: 100, height: 100)
+    let gradientLayer = CAGradientLayer()
+    gradientLayer.colors = [UIColor.red.cgColor, UIColor.yellow.cgColor]
+    gradientLayer.frame = baseLayer.frame
+    baseLayer.addSublayer(gradientLayer)
+    assertSnapshot(matching: baseLayer, as: .image)
     #endif
   }
 

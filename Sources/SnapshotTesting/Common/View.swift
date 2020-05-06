@@ -337,6 +337,11 @@ public struct ViewImageConfig {
     size: .init(width: 1920, height: 1080),
     traits: .init()
   )
+  public static let tv4K = ViewImageConfig(
+    safeArea: .init(top: 120, left: 180, bottom: 120, right: 180),
+    size: .init(width: 3840, height: 2160),
+    traits: .init()
+  )
   #endif
 }
 
@@ -576,7 +581,7 @@ extension View {
       #endif
       return perform()
     }
-    #if os(iOS) || os(tvOS)
+    #if (os(iOS) && !targetEnvironment(macCatalyst)) || os(tvOS)
     if let glkView = self as? GLKView {
       return Async(value: inWindow { glkView.snapshot })
     }
