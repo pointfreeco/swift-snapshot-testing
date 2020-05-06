@@ -337,6 +337,11 @@ public struct ViewImageConfig {
     size: .init(width: 1920, height: 1080),
     traits: .init()
   )
+  public static let tv4K = ViewImageConfig(
+    safeArea: .init(top: 120, left: 180, bottom: 120, right: 180),
+    size: .init(width: 3840, height: 2160),
+    traits: .init()
+  )
   #endif
 }
 
