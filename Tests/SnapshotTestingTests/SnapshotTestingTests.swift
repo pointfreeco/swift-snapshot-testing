@@ -7,6 +7,7 @@ import SceneKit
 #endif
 #if canImport(SpriteKit)
 import SpriteKit
+import SwiftUI
 #endif
 #if canImport(WebKit)
 import WebKit
@@ -839,7 +840,7 @@ final class SnapshotTestingTests: XCTestCase {
     }
     #endif
   }
-  
+
   func testViewWithZeroHeightOrWidth() {
     #if os(iOS) || os(tvOS)
     var rect = CGRect(x: 0, y: 0, width: 350, height: 0)
@@ -856,6 +857,46 @@ final class SnapshotTestingTests: XCTestCase {
     view = UIView(frame: rect)
     view.backgroundColor = .blue
     assertSnapshot(matching: view, as: .image, named: "noWidth.noHeight")
+  }
+
+  @available(iOS 13.0, *)
+  func testSwiftUIView_iOS() {
+    #if os(iOS)
+    struct MyView: SwiftUI.View {
+            
+      var body: some SwiftUI.View {
+        VStack {
+          Text("What's the point?")
+          List {
+            Text("1")
+            Text("2")
+            Text("3")
+          }
+        }
+      }
+    }
+//    record = true
+    assertSnapshot(matching: MyView(), as: .image(on: .iPhoneSe))
+    #endif
+  }
+
+  @available(tvOS 13.0, *)
+  func testSwiftUIView_tvOS() {
+    #if os(tvOS)
+    struct MyView: SwiftUI.View {
+              
+      var body: some SwiftUI.View {
+        VStack {
+          Text("What's the point?")
+          List {
+            Text("1")
+            Text("2")
+            Text("3")
+          }
+        }
+      }
+    }
+    assertSnapshot(matching: MyView(), as: .image(size: .init(width: 800, height: 600)))
     #endif
   }
 }
