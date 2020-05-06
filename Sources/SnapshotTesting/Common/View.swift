@@ -48,6 +48,9 @@ public struct ViewImageConfig {
   }
 
   #if os(iOS)
+  #if targetEnvironment(macCatalyst)
+  public static let mac = ViewImageConfig(size: .init(width: 480, height: 270))
+  #else
   public static let iPhoneSe = ViewImageConfig.iPhoneSe(.portrait)
 
   public static func iPhoneSe(_ orientation: Orientation) -> ViewImageConfig {
@@ -331,6 +334,7 @@ public struct ViewImageConfig {
     }
     return .init(safeArea: .init(top: 20, left: 0, bottom: 0, right: 0), size: size, traits: traits)
   }
+  #endif
   #elseif os(tvOS)
   public static let tv = ViewImageConfig(
     safeArea: .init(top: 60, left: 90, bottom: 60, right: 90),

@@ -84,7 +84,7 @@ final class SnapshotTestingTests: XCTestCase {
       subview.leftAnchor.constraint(equalTo: vc.view.leftAnchor),
       subview.rightAnchor.constraint(equalTo: vc.view.rightAnchor),
       ])
-    assertSnapshot(matching: vc, as: .image)
+    assertSnapshot(matching: vc, as: .image, named: platform)
     #endif
   }
 
@@ -306,7 +306,11 @@ final class SnapshotTestingTests: XCTestCase {
       }
     }
     let tableViewController = TableViewController()
-    assertSnapshot(matching: tableViewController, as: .image(on: .iPhoneSe))
+    #if targetEnvironment(macCatalyst)
+    assertSnapshot(matching: tableViewController, as: .image(on: .mac), named: platform)
+    #else
+    assertSnapshot(matching: tableViewController, as: .image(on: .iPhoneSe), named: platform)
+    #endif
     #endif
   }
 
@@ -327,8 +331,12 @@ final class SnapshotTestingTests: XCTestCase {
       }
     }
     let tableViewController = TableViewController()
+    #if targetEnvironment(macCatalyst)
+    assertSnapshot(matching: tableViewController, as: .image(on: .mac), named: platform)
+    #else
     assertSnapshots(matching: tableViewController, as: ["iPhoneSE-image" : .image(on: .iPhoneSe), "iPad-image" : .image(on: .iPadMini)])
     assertSnapshots(matching: tableViewController, as: [.image(on: .iPhoneX), .image(on: .iPhoneXsMax)])
+    #endif
     #endif
   }
 
@@ -391,7 +399,9 @@ final class SnapshotTestingTests: XCTestCase {
 
       let viewController = MyViewController()
 
-      #if os(iOS)
+      #if os(iOS) && targetEnvironment(macCatalyst)
+      assertSnapshot(matching: viewController, as: .image(on: .mac), named: platform)
+      #elseif os(iOS) && !targetEnvironment(macCatalyst)
       assertSnapshot(matching: viewController, as: .image(on: .iPhoneSe), named: "iphone-se")
       assertSnapshot(matching: viewController, as: .image(on: .iPhone8), named: "iphone-8")
       assertSnapshot(matching: viewController, as: .image(on: .iPhone8Plus), named: "iphone-8-plus")
@@ -549,6 +559,9 @@ final class SnapshotTestingTests: XCTestCase {
       let viewController = UITabBarController()
       viewController.setViewControllers([navController], animated: false)
 
+      #if targetEnvironment(macCatalyst)
+      assertSnapshot(matching: viewController, as: .image(on: .mac), named: platform)
+      #else
       assertSnapshot(matching: viewController, as: .image(on: .iPhoneSe), named: "iphone-se")
       assertSnapshot(matching: viewController, as: .image(on: .iPhone8), named: "iphone-8")
       assertSnapshot(matching: viewController, as: .image(on: .iPhone8Plus), named: "iphone-8-plus")
@@ -591,6 +604,7 @@ final class SnapshotTestingTests: XCTestCase {
         matching: viewController, as: .image(on: .iPadPro11(.portrait)), named: "ipad-pro-11-alternative")
       assertSnapshot(
         matching: viewController, as: .image(on: .iPadPro12_9(.portrait)), named: "ipad-pro-12-9-alternative")
+      #endif
     }
     #endif
   }
@@ -687,7 +701,7 @@ final class SnapshotTestingTests: XCTestCase {
         assertSnapshot(
           matching: label,
           as: .image(traits: .init(preferredContentSizeCategory: contentSize)),
-          named: "label-\(name)"
+          named: "label-\(name)-\(platform)"
         )
       }
     }
@@ -724,8 +738,8 @@ final class SnapshotTestingTests: XCTestCase {
   func testUIView() {
     #if os(iOS)
     let view = UIButton(type: .contactAdd)
-    assertSnapshot(matching: view, as: .image)
-    assertSnapshot(matching: view, as: .recursiveDescription)
+    assertSnapshot(matching: view, as: .image, named: platform)
+    assertSnapshot(matching: view, as: .recursiveDescription, named: platform)
     #endif
   }
 
