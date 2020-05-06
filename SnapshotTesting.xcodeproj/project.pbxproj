@@ -634,7 +634,6 @@
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				Base,
 				en,
 			);
 			mainGroup = 56185AD4FE1BBC443C9CFDDE;
@@ -1310,7 +1309,7 @@
 				40A5D28387BCBCA2CC1FE11C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "";
+			defaultConfigurationName = Debug;
 		};
 		45828BACEEB05CF377BFF48C /* Build configuration list for PBXNativeTarget "SnapshotTesting_tvOS" */ = {
 			isa = XCConfigurationList;
@@ -1319,7 +1318,7 @@
 				F5C56FCFB9CA36D38912B3F7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "";
+			defaultConfigurationName = Debug;
 		};
 		53535ECD7578718495DC8DA7 /* Build configuration list for PBXNativeTarget "SnapshotTesting_iOS" */ = {
 			isa = XCConfigurationList;
@@ -1328,7 +1327,7 @@
 				D9FF7D396CC20A3E59EB1145 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "";
+			defaultConfigurationName = Debug;
 		};
 		67DF8F8EE0829CEC5997C47A /* Build configuration list for PBXNativeTarget "SnapshotTesting_macOS" */ = {
 			isa = XCConfigurationList;
@@ -1337,7 +1336,7 @@
 				97BC453D0A2FD987C257005F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "";
+			defaultConfigurationName = Debug;
 		};
 		6EDB60BF7A99F33EB1FD5F4A /* Build configuration list for PBXNativeTarget "SnapshotTestingTests_tvOS" */ = {
 			isa = XCConfigurationList;
@@ -1346,7 +1345,7 @@
 				EE2EEFC9F90E51027AEC6732 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "";
+			defaultConfigurationName = Debug;
 		};
 		8C8E718FA8686D70ECC68A56 /* Build configuration list for PBXNativeTarget "SnapshotTestingTests_macOS" */ = {
 			isa = XCConfigurationList;
@@ -1355,7 +1354,7 @@
 				FFBA36D8171A8AF1E78CE7BE /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "";
+			defaultConfigurationName = Debug;
 		};
 		D9A4BF45876C849A308801A2 /* Build configuration list for PBXProject "SnapshotTesting" */ = {
 			isa = XCConfigurationList;
