@@ -854,6 +854,7 @@ final class SnapshotTestingTests: XCTestCase {
         }
       }
     }
+//    record = true
     assertSnapshot(matching: MyView(), as: .image(on: .iPhoneSe))
     #endif
   }
