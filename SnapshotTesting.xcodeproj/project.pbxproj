@@ -56,7 +56,6 @@
 		42B1EA1619E926A4391D176F /* Description.swift in Sources */ = {isa = PBXBuildFile; fileRef = A76261A778A1B8C06EB7E1B4 /* Description.swift */; };
 		42BCD8FC5433734A7BD80486 /* SnapshotTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CD2F74288CF52A13C9BB497 /* SnapshotTestCase.swift */; };
 		431F526524633AAD00F256F4 /* SwiftUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 431F526124633A9D00F256F4 /* SwiftUIView.swift */; };
-		431F526624633AAE00F256F4 /* SwiftUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 431F526124633A9D00F256F4 /* SwiftUIView.swift */; };
 		431F526724633AAE00F256F4 /* SwiftUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 431F526124633A9D00F256F4 /* SwiftUIView.swift */; };
 		436C10BC8313288D84733DC5 /* UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D04C79E5D44F1874BBACB11 /* UIView.swift */; };
 		4521C5D2FE3CE1784C44A210 /* XCTAttachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE8DE5E8A102E1012CD0C95 /* XCTAttachment.swift */; };
@@ -700,7 +699,6 @@
 				4A95F6990FFA0B2F52CAC260 /* Internal.swift in Sources */,
 				785ECE356ECA7C1564D99932 /* NSImage.swift in Sources */,
 				3FDA79CD7E2D26217A5132DA /* NSView.swift in Sources */,
-				431F526624633AAE00F256F4 /* SwiftUIView.swift in Sources */,
 				08C8278A038756916D597D02 /* NSViewController.swift in Sources */,
 				9399D33F028C4B110119B641 /* PlistEncoder.swift in Sources */,
 				D5483007C407B1AC42A9E391 /* SceneKit.swift in Sources */,
