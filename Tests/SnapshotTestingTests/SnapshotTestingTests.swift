@@ -692,6 +692,33 @@ final class SnapshotTestingTests: XCTestCase {
     #endif
   }
 
+  func testTraitsWithViewController() {
+    #if os(iOS)
+    let label = UILabel()
+    label.font = .preferredFont(forTextStyle: .title1)
+    label.adjustsFontForContentSizeCategory = true
+    label.text = "What's the point?"
+
+    let viewController = UIViewController()
+    viewController.view.addSubview(label)
+
+    label.translatesAutoresizingMaskIntoConstraints = false
+    NSLayoutConstraint.activate([
+      label.leadingAnchor.constraint(equalTo: viewController.view.layoutMarginsGuide.leadingAnchor),
+      label.topAnchor.constraint(equalTo: viewController.view.layoutMarginsGuide.topAnchor),
+      label.trailingAnchor.constraint(equalTo: viewController.view.layoutMarginsGuide.trailingAnchor)
+    ])
+
+    allContentSizes.forEach { name, contentSize in
+      assertSnapshot(
+        matching: viewController,
+        as: .recursiveDescription(on: .iPhoneSe, traits: .init(preferredContentSizeCategory: contentSize)),
+        named: "label-\(name)"
+      )
+    }
+    #endif
+  }
+
   func testUIView() {
     #if os(iOS)
     let view = UIButton(type: .contactAdd)
