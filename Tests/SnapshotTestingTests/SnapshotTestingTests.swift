@@ -729,6 +729,29 @@ final class SnapshotTestingTests: XCTestCase {
     #endif
   }
 
+  func testCALayer() {
+    #if os(iOS)
+    let layer = CALayer()
+    layer.frame = CGRect(x: 0, y: 0, width: 100, height: 100)
+    layer.backgroundColor = UIColor.red.cgColor
+    layer.borderWidth = 4.0
+    layer.borderColor = UIColor.black.cgColor
+    assertSnapshot(matching: layer, as: .image)
+    #endif
+  }
+
+  func testCALayerWithGradient() {
+    #if os(iOS)
+    let baseLayer = CALayer()
+    baseLayer.frame = CGRect(x: 0, y: 0, width: 100, height: 100)
+    let gradientLayer = CAGradientLayer()
+    gradientLayer.colors = [UIColor.red.cgColor, UIColor.yellow.cgColor]
+    gradientLayer.frame = baseLayer.frame
+    baseLayer.addSublayer(gradientLayer)
+    assertSnapshot(matching: baseLayer, as: .image)
+    #endif
+  }
+
   func testViewControllerHierarchy() {
     #if os(iOS)
     let page = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal)
