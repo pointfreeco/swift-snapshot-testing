@@ -893,7 +893,33 @@ final class SnapshotTestingTests: XCTestCase {
     }
     #endif
   }
-    
+
+  func testEmbeddedWebView() throws {
+    #if os(iOS)
+    let label = UILabel()
+    label.text = "Hello, Blob!"
+
+    let fixtureUrl = URL(fileURLWithPath: String(#file), isDirectory: false)
+      .deletingLastPathComponent()
+      .appendingPathComponent("__Fixtures__/pointfree.html")
+    let html = try String(contentsOf: fixtureUrl)
+    let webView = WKWebView()
+    webView.loadHTMLString(html, baseURL: nil)
+    webView.isHidden = true
+
+    let stackView = UIStackView(arrangedSubviews: [label, webView])
+    stackView.axis = .vertical
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(
+        matching: stackView,
+        as: .image(size: .init(width: 800, height: 600)),
+        named: platform
+      )
+    }
+    #endif
+  }
+
   @available(iOS 13.0, *)
   func testSwiftUIView_iOS() {
     #if os(iOS)

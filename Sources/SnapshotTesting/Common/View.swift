@@ -608,6 +608,10 @@ extension View {
         let work = {
           if #available(iOS 11.0, macOS 10.13, *) {
             inWindow {
+              guard wkWebView.frame.width != 0, wkWebView.frame.height != 0 else {
+                callback(Image())
+                return
+              }
               wkWebView.takeSnapshot(with: nil) { image, _ in
                 _ = delegate
                 callback(image!)
