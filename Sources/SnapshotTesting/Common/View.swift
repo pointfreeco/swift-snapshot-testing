@@ -341,6 +341,11 @@ public struct ViewImageConfig {
     size: .init(width: 1920, height: 1080),
     traits: .init()
   )
+  public static let tv4K = ViewImageConfig(
+    safeArea: .init(top: 120, left: 180, bottom: 120, right: 180),
+    size: .init(width: 3840, height: 2160),
+    traits: .init()
+  )
   #endif
 }
 
@@ -580,7 +585,7 @@ extension View {
       #endif
       return perform()
     }
-    #if (os(iOS) || os(tvOS)) && !targetEnvironment(macCatalyst)
+    #if (os(iOS) && !targetEnvironment(macCatalyst)) || os(tvOS)
     if let glkView = self as? GLKView {
       return Async(value: inWindow { glkView.snapshot })
     }
@@ -746,8 +751,11 @@ private func add(traits: UITraitCollection, viewController: UIViewController, to
   rootViewController.view.translatesAutoresizingMaskIntoConstraints =
     viewController.view.translatesAutoresizingMaskIntoConstraints
   rootViewController.preferredContentSize = rootViewController.view.frame.size
+
+  rootViewController.addChild(viewController)
   viewController.view.frame = rootViewController.view.frame
   rootViewController.view.addSubview(viewController.view)
+
   if viewController.view.translatesAutoresizingMaskIntoConstraints {
     viewController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
   } else {
@@ -758,14 +766,18 @@ private func add(traits: UITraitCollection, viewController: UIViewController, to
       viewController.view.trailingAnchor.constraint(equalTo: rootViewController.view.trailingAnchor),
       ])
   }
-  rootViewController.addChild(viewController)
   rootViewController.setOverrideTraitCollection(traits, forChild: viewController)
   viewController.didMove(toParent: rootViewController)
+  window.rootViewController = rootViewController
+
   rootViewController.beginAppearanceTransition(true, animated: false)
   rootViewController.endAppearanceTransition()
-  window.rootViewController = rootViewController
+
   rootViewController.view.setNeedsLayout()
   rootViewController.view.layoutIfNeeded()
+
+  viewController.view.setNeedsLayout()
+  viewController.view.layoutIfNeeded()
 }
 
 private final class Window: UIWindow {

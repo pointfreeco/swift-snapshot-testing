@@ -148,7 +148,7 @@ final class SnapshotTestingTests: XCTestCase {
   func testMixedViews() {
 //    #if os(iOS) || os(macOS)
 //    // NB: CircleCI crashes while trying to instantiate SKView.
-//    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
+//    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
 //      let webView = WKWebView(frame: .init(x: 0, y: 0, width: 50, height: 50))
 //      webView.loadHTMLString("🌎", baseURL: nil)
 //
@@ -186,7 +186,7 @@ final class SnapshotTestingTests: XCTestCase {
     button.bezelStyle = .rounded
     button.title = "Push Me"
     button.sizeToFit()
-    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
       assertSnapshot(matching: button, as: .image)
       assertSnapshot(matching: button, as: .recursiveDescription)
     }
@@ -200,7 +200,7 @@ final class SnapshotTestingTests: XCTestCase {
     view.wantsLayer = true
     view.layer?.backgroundColor = NSColor.green.cgColor
     view.layer?.cornerRadius = 5
-    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
       assertSnapshot(matching: view, as: .image)
       assertSnapshot(matching: view, as: .recursiveDescription)
     }
@@ -224,7 +224,7 @@ final class SnapshotTestingTests: XCTestCase {
     label.isBezeled = false
     label.isEditable = false
     #endif
-    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
       label.text = "Hello."
       assertSnapshot(matching: label, as: .image(precision: 0.9), named: platform)
       label.text = "Hello"
@@ -236,7 +236,7 @@ final class SnapshotTestingTests: XCTestCase {
   func testSCNView() {
 //    #if os(iOS) || os(macOS) || os(tvOS)
 //    // NB: CircleCI crashes while trying to instantiate SCNView.
-//    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
+//    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
 //      let scene = SCNScene()
 //
 //      let sphereGeometry = SCNSphere(radius: 3)
@@ -273,7 +273,7 @@ final class SnapshotTestingTests: XCTestCase {
   func testSKView() {
 //    #if os(iOS) || os(macOS) || os(tvOS)
 //    // NB: CircleCI crashes while trying to instantiate SKView.
-//    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
+//    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
 //      let scene = SKScene(size: .init(width: 50, height: 50))
 //      let node = SKShapeNode(circleOfRadius: 15)
 //      node.fillColor = .red
@@ -490,6 +490,8 @@ final class SnapshotTestingTests: XCTestCase {
       #elseif os(tvOS)
       assertSnapshot(
         matching: viewController, as: .image(on: .tv), named: "tv")
+      assertSnapshot(
+        matching: viewController, as: .image(on: .tv4K), named: "tv4k")
       #endif
     }
     #endif
@@ -607,6 +609,86 @@ final class SnapshotTestingTests: XCTestCase {
     #endif
   }
 
+  func testCollectionViewsWithMultipleScreenSizes() {
+    #if os(iOS)
+
+    final class CollectionViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+
+      let flowLayout: UICollectionViewFlowLayout = {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        layout.minimumLineSpacing = 20
+        return layout
+      }()
+
+      lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
+
+      override func viewDidLoad() {
+        super.viewDidLoad()
+
+        view.backgroundColor = .white
+        view.addSubview(collectionView)
+
+        collectionView.backgroundColor = .white
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "Cell")
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+          collectionView.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+          collectionView.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
+          collectionView.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+          collectionView.bottomAnchor.constraint(equalTo: view.layoutMarginsGuide.bottomAnchor)
+        ])
+
+        collectionView.reloadData()
+      }
+
+      override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        collectionView.collectionViewLayout.invalidateLayout()
+      }
+
+      override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        collectionView.collectionViewLayout.invalidateLayout()
+      }
+
+      func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath)
+        cell.contentView.backgroundColor = .orange
+        return cell
+      }
+
+      func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return 20
+      }
+
+      func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        sizeForItemAt indexPath: IndexPath
+        ) -> CGSize {
+        return CGSize(
+          width: min(collectionView.frame.width - 50, 300),
+          height: collectionView.frame.height
+        )
+      }
+
+    }
+
+    let viewController = CollectionViewController()
+
+    assertSnapshots(matching: viewController, as: [
+      "ipad": .image(on: .iPadPro12_9),
+      "iphoneSe": .image(on: .iPhoneSe),
+      "iphone8": .image(on: .iPhone8),
+      "iphoneMax": .image(on: .iPhoneXsMax)
+    ])
+    #endif
+  }
+
   func testTraitsWithView() {
     #if os(iOS)
     if #available(iOS 11.0, *) {
@@ -622,6 +704,33 @@ final class SnapshotTestingTests: XCTestCase {
           named: "label-\(name)-\(platform)"
         )
       }
+    }
+    #endif
+  }
+
+  func testTraitsWithViewController() {
+    #if os(iOS)
+    let label = UILabel()
+    label.font = .preferredFont(forTextStyle: .title1)
+    label.adjustsFontForContentSizeCategory = true
+    label.text = "What's the point?"
+
+    let viewController = UIViewController()
+    viewController.view.addSubview(label)
+
+    label.translatesAutoresizingMaskIntoConstraints = false
+    NSLayoutConstraint.activate([
+      label.leadingAnchor.constraint(equalTo: viewController.view.layoutMarginsGuide.leadingAnchor),
+      label.topAnchor.constraint(equalTo: viewController.view.layoutMarginsGuide.topAnchor),
+      label.trailingAnchor.constraint(equalTo: viewController.view.layoutMarginsGuide.trailingAnchor)
+    ])
+
+    allContentSizes.forEach { name, contentSize in
+      assertSnapshot(
+        matching: viewController,
+        as: .recursiveDescription(on: .iPhoneSe, traits: .init(preferredContentSizeCategory: contentSize)),
+        named: "label-\(name)"
+      )
     }
     #endif
   }
@@ -709,7 +818,7 @@ final class SnapshotTestingTests: XCTestCase {
     let html = try String(contentsOf: fixtureUrl)
     let webView = WKWebView()
     webView.loadHTMLString(html, baseURL: nil)
-    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
       assertSnapshot(
         matching: webView,
         as: .image(size: .init(width: 800, height: 600)),
