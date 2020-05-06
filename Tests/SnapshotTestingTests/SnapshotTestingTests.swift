@@ -924,40 +924,46 @@ final class SnapshotTestingTests: XCTestCase {
   func testSwiftUIView_iOS() {
     #if os(iOS)
     struct MyView: SwiftUI.View {
-            
       var body: some SwiftUI.View {
-        VStack {
-          Text("What's the point?")
-          List {
-            Text("1")
-            Text("2")
-            Text("3")
-          }
+        HStack {
+          Image(systemName: "checkmark.circle.fill")
+            Text("Checked").fixedSize()
         }
+        .padding(5)
+        .background(RoundedRectangle(cornerRadius: 5.0).fill(Color.blue))
+        .padding(10)
       }
     }
-//    record = true
-    assertSnapshot(matching: MyView(), as: .image(on: .iPhoneSe))
+
+    let view = MyView().background(Color.yellow)
+
+    assertSnapshot(matching: view, as: .image(traits: .init(userInterfaceStyle: .light)))
+    assertSnapshot(matching: view, as: .image(layout: .sizeThatFits, traits: .init(userInterfaceStyle: .light)), named: "size-that-fits")
+    assertSnapshot(matching: view, as: .image(layout: .fixed(width: 200.0, height: 100.0), traits: .init(userInterfaceStyle: .light)), named: "fixed")
+    assertSnapshot(matching: view, as: .image(layout: .device(config: .iPhoneSe), traits: .init(userInterfaceStyle: .light)), named: "device")
     #endif
   }
-   
+
   @available(tvOS 13.0, *)
   func testSwiftUIView_tvOS() {
     #if os(tvOS)
     struct MyView: SwiftUI.View {
-              
       var body: some SwiftUI.View {
-        VStack {
-          Text("What's the point?")
-          List {
-            Text("1")
-            Text("2")
-            Text("3")
-          }
+        HStack {
+          Image(systemName: "checkmark.circle.fill")
+            Text("Checked").fixedSize()
         }
+        .padding(5)
+        .background(RoundedRectangle(cornerRadius: 5.0).fill(Color.blue))
+        .padding(10)
       }
     }
-    assertSnapshot(matching: MyView(), as: .image(size: .init(width: 800, height: 600)))
+    let view = MyView().background(Color.yellow)
+
+    assertSnapshot(matching: view, as: .image())
+    assertSnapshot(matching: view, as: .image(layout: .sizeThatFits), named: "size-that-fits")
+    assertSnapshot(matching: view, as: .image(layout: .fixed(width: 300.0, height: 100.0)), named: "fixed")
+    assertSnapshot(matching: view, as: .image(layout: .device(config: .tv)), named: "device")
     #endif
   }
 }
