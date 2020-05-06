@@ -857,6 +857,7 @@ final class SnapshotTestingTests: XCTestCase {
     view = UIView(frame: rect)
     view.backgroundColor = .blue
     assertSnapshot(matching: view, as: .image, named: "noWidth.noHeight")
+    #endif
   }
 
   @available(iOS 13.0, *)
