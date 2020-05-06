@@ -136,6 +136,29 @@ final class SnapshotTestingTests: XCTestCase {
     )
   }
 
+  func testCGPath() {
+    #if os(iOS) || os(tvOS) || os(macOS)
+    let path = CGPath.heart
+
+    let osName: String
+    #if os(iOS)
+    osName = "iOS"
+    #elseif os(tvOS)
+    osName = "tvOS"
+    #elseif os(macOS)
+    osName = "macOS"
+    #endif
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(matching: path, as: .image, named: osName)
+    }
+
+    if #available(iOS 11.0, OSX 10.13, tvOS 11.0, *) {
+      assertSnapshot(matching: path, as: .elementsDescription, named: osName)
+    }
+    #endif
+  }
+
   func testEncodable() {
     struct User: Encodable { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
@@ -179,6 +202,18 @@ final class SnapshotTestingTests: XCTestCase {
     struct User { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
     assertSnapshot(matching: user, as: .dump, named: "named")
+  }
+
+  func testNSBezierPath() {
+    #if os(macOS)
+    let path = NSBezierPath.heart
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(matching: path, as: .image, named: "macOS")
+    }
+
+    assertSnapshot(matching: path, as: .elementsDescription, named: "macOS")
+    #endif
   }
 
   func testNSView() {
@@ -718,6 +753,27 @@ final class SnapshotTestingTests: XCTestCase {
         as: .recursiveDescription(on: .iPhoneSe, traits: .init(preferredContentSizeCategory: contentSize)),
         named: "label-\(name)"
       )
+    }
+    #endif
+  }
+
+  func testUIBezierPath() {
+    #if os(iOS) || os(tvOS)
+    let path = UIBezierPath.heart
+
+    let osName: String
+    #if os(iOS)
+    osName = "iOS"
+    #elseif os(tvOS)
+    osName = "tvOS"
+    #endif
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(matching: path, as: .image, named: osName)
+    }
+
+    if #available(iOS 11.0, tvOS 11.0, *) {
+      assertSnapshot(matching: path, as: .elementsDescription, named: osName)
     }
     #endif
   }
