@@ -139,6 +139,29 @@ final class SnapshotTestingTests: XCTestCase {
     )
   }
 
+  func testCGPath() {
+    #if os(iOS) || os(tvOS) || os(macOS)
+    let path = CGPath.heart
+
+    let osName: String
+    #if os(iOS)
+    osName = "iOS"
+    #elseif os(tvOS)
+    osName = "tvOS"
+    #elseif os(macOS)
+    osName = "macOS"
+    #endif
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(matching: path, as: .image, named: osName)
+    }
+
+    if #available(iOS 11.0, OSX 10.13, tvOS 11.0, *) {
+      assertSnapshot(matching: path, as: .elementsDescription, named: osName)
+    }
+    #endif
+  }
+
   func testEncodable() {
     struct User: Encodable { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
@@ -182,6 +205,18 @@ final class SnapshotTestingTests: XCTestCase {
     struct User { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
     assertSnapshot(matching: user, as: .dump, named: "named")
+  }
+
+  func testNSBezierPath() {
+    #if os(macOS)
+    let path = NSBezierPath.heart
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(matching: path, as: .image, named: "macOS")
+    }
+
+    assertSnapshot(matching: path, as: .elementsDescription, named: "macOS")
+    #endif
   }
 
   func testNSView() {
@@ -725,6 +760,27 @@ final class SnapshotTestingTests: XCTestCase {
     #endif
   }
 
+  func testUIBezierPath() {
+    #if os(iOS) || os(tvOS)
+    let path = UIBezierPath.heart
+
+    let osName: String
+    #if os(iOS)
+    osName = "iOS"
+    #elseif os(tvOS)
+    osName = "tvOS"
+    #endif
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(matching: path, as: .image, named: osName)
+    }
+
+    if #available(iOS 11.0, tvOS 11.0, *) {
+      assertSnapshot(matching: path, as: .elementsDescription, named: osName)
+    }
+    #endif
+  }
+
   func testUIView() {
     #if os(iOS)
     let view = UIButton(type: .contactAdd)
@@ -860,24 +916,53 @@ final class SnapshotTestingTests: XCTestCase {
     #endif
   }
 
+  func testEmbeddedWebView() throws {
+    #if os(iOS)
+    let label = UILabel()
+    label.text = "Hello, Blob!"
+
+    let fixtureUrl = URL(fileURLWithPath: String(#file), isDirectory: false)
+      .deletingLastPathComponent()
+      .appendingPathComponent("__Fixtures__/pointfree.html")
+    let html = try String(contentsOf: fixtureUrl)
+    let webView = WKWebView()
+    webView.loadHTMLString(html, baseURL: nil)
+    webView.isHidden = true
+
+    let stackView = UIStackView(arrangedSubviews: [label, webView])
+    stackView.axis = .vertical
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(
+        matching: stackView,
+        as: .image(size: .init(width: 800, height: 600)),
+        named: platform
+      )
+    }
+    #endif
+  }
+
   @available(iOS 13.0, *)
   func testSwiftUIView_iOS() {
     #if os(iOS)
     struct MyView: SwiftUI.View {
-            
       var body: some SwiftUI.View {
-        VStack {
-          Text("What's the point?")
-          List {
-            Text("1")
-            Text("2")
-            Text("3")
-          }
+        HStack {
+          Image(systemName: "checkmark.circle.fill")
+            Text("Checked").fixedSize()
         }
+        .padding(5)
+        .background(RoundedRectangle(cornerRadius: 5.0).fill(Color.blue))
+        .padding(10)
       }
     }
-//    record = true
-    assertSnapshot(matching: MyView(), as: .image(on: .iPhoneSe))
+
+    let view = MyView().background(Color.yellow)
+
+    assertSnapshot(matching: view, as: .image(traits: .init(userInterfaceStyle: .light)))
+    assertSnapshot(matching: view, as: .image(layout: .sizeThatFits, traits: .init(userInterfaceStyle: .light)), named: "size-that-fits")
+    assertSnapshot(matching: view, as: .image(layout: .fixed(width: 200.0, height: 100.0), traits: .init(userInterfaceStyle: .light)), named: "fixed")
+    assertSnapshot(matching: view, as: .image(layout: .device(config: .iPhoneSe), traits: .init(userInterfaceStyle: .light)), named: "device")
     #endif
   }
 
@@ -885,19 +970,22 @@ final class SnapshotTestingTests: XCTestCase {
   func testSwiftUIView_tvOS() {
     #if os(tvOS)
     struct MyView: SwiftUI.View {
-              
       var body: some SwiftUI.View {
-        VStack {
-          Text("What's the point?")
-          List {
-            Text("1")
-            Text("2")
-            Text("3")
-          }
+        HStack {
+          Image(systemName: "checkmark.circle.fill")
+            Text("Checked").fixedSize()
         }
+        .padding(5)
+        .background(RoundedRectangle(cornerRadius: 5.0).fill(Color.blue))
+        .padding(10)
       }
     }
-    assertSnapshot(matching: MyView(), as: .image(size: .init(width: 800, height: 600)))
+    let view = MyView().background(Color.yellow)
+
+    assertSnapshot(matching: view, as: .image())
+    assertSnapshot(matching: view, as: .image(layout: .sizeThatFits), named: "size-that-fits")
+    assertSnapshot(matching: view, as: .image(layout: .fixed(width: 300.0, height: 100.0)), named: "fixed")
+    assertSnapshot(matching: view, as: .image(layout: .device(config: .tv)), named: "device")
     #endif
   }
 }

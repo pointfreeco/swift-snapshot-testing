@@ -2,8 +2,12 @@ xcodeproj:
 	PF_DEVELOP=1 swift run xcodegen
 
 test-linux:
-	docker build --tag snapshot-testing . \
-		&& docker run --rm snapshot-testing
+	docker run \
+		--rm \
+		-v "$(PWD):$(PWD)" \
+		-w "$(PWD)" \
+		swift:5.2 \
+		bash -c 'make test-swift'
 
 test-macos:
 	set -o pipefail && \
@@ -18,7 +22,9 @@ test-ios:
 		-destination platform="iOS Simulator,name=iPhone 11 Pro Max,OS=13.3" \
 
 test-swift:
-	swift test
+	swift test \
+		--enable-pubgrub-resolver \
+		--parallel
 
 test-tvos:
 	set -o pipefail && \
