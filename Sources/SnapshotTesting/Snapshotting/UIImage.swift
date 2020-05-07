@@ -38,7 +38,7 @@ extension Diffing where Value == UIImage {
   private static func emptyImage() -> UIImage {
     let label = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 30))
     label.backgroundColor = .red
-    label.text = "NO IMAGE GENERATED"
+    label.text = "Error: No image could be generated for this view as its size was zero. Please set an explicit size in the test."
     label.textAlignment = .center
     return label.asImage()
   }
