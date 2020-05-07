@@ -47,13 +47,14 @@ extension Snapshotting where Value == UIView, Format == String {
     )
     -> Snapshotting<UIView, String> {
       return SimplySnapshotting.lines.pullback { view in
-        prepareView(
+        let dispose = prepareView(
           config: .init(safeArea: .zero, size: size ?? view.frame.size, traits: traits),
           drawHierarchyInKeyWindow: false,
           traits: .init(),
           view: view,
           viewController: .init()
         )
+        defer { dispose() }
         return purgePointers(
           view.perform(Selector(("recursiveDescription"))).retain().takeUnretainedValue()
             as! String
