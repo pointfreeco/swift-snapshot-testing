@@ -757,14 +757,17 @@ private func add(traits: UITraitCollection, viewController: UIViewController, to
       ])
     }
     rootViewController.addChild(viewController)
-    rootViewController.setOverrideTraitCollection(traits, forChild: viewController)
-    viewController.didMove(toParent: rootViewController)
-    rootViewController.beginAppearanceTransition(true, animated: false)
-    rootViewController.endAppearanceTransition()
   } else {
     rootViewController = viewController
   }
+  rootViewController.setOverrideTraitCollection(traits, forChild: viewController)
+  viewController.didMove(toParent: rootViewController)
+
   window.rootViewController = rootViewController
+
+  rootViewController.beginAppearanceTransition(true, animated: false)
+  rootViewController.endAppearanceTransition()
+
   rootViewController.view.setNeedsLayout()
   rootViewController.view.layoutIfNeeded()
 
