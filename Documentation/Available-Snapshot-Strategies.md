@@ -12,31 +12,40 @@ If you'd like to submit your own custom strategy, see [Contributing](../CONTRIBU
   - [`CALayer`](#calayer)
       - [`.image`](#image)
   - [`CaseIterable`](#caseiterable)
+  - [`CGPath`](#cgpath)
+      - [`.image`](#image-1)
+      - [`.elementsDescription`](#elementsdescription)
   - [`Encodable`](#encodable)
       - [`.json`](#json)
       - [`.plist`](#plist)
-  - [`NSImage`](#nsimage)
-      - [`.image`](#image-1)
-  - [`NSView`](#nsview)
+  - [`NSBezierPath`](#nsbezierpath)
       - [`.image`](#image-2)
+      - [`.elementsDescription`](#elementsdescription-1)
+  - [`NSImage`](#nsimage)
+      - [`.image`](#image-3)
+  - [`NSView`](#nsview)
+      - [`.image`](#image-4)
       - [`.recursiveDescription`](#recursivedescription)
   - [`NSViewController`](#nsviewcontroller)
-      - [`.image`](#image-3)
+      - [`.image`](#image-5)
       - [`.recursiveDescription`](#recursivedescription-1)
   - [`SCNScene`](#scnscene)
-      - [`.image`](#image-4)
+      - [`.image`](#image-6)
   - [`SKScene`](#skscene)
-      - [`.image`](#image-5)
+      - [`.image`](#image-7)
   - [`String`](#string)
       - [`.lines`](#lines)
+  - [`UIBezierPath`](#uibezierpath)
+      - [`.image`](#image-8)
+      - [`.elementsDescription`](#elementsdescription-2)
   - [`UIImage`](#uiimage)
-      - [`.image`](#image-6)
+      - [`.image`](#image-9)
   - [`UIView`](#uiview)
-      - [`.image`](#image-7)
+      - [`.image`](#image-10)
       - [`.recursiveDescription`](#recursivedescription-2)
   - [`UIViewController`](#uiviewcontroller)
       - [`.hierarchy`](#hierarchy)
-      - [`.image`](#image-8)
+      - [`.image`](#image-11)
       - [`.recursiveDescription`](#recursivedescription-3)
   - [`URLRequest`](#urlrequest)
       - [`.curl`](#curl)
@@ -163,6 +172,54 @@ Records:
 "right","up" 
 ```
 
+## CGPath
+
+**Platforms:** iOS, macOS, tvOS
+
+### `.image`
+
+A snapshot strategy for comparing paths based on pixel equality.
+
+**Format:** `NSImage`, `UIImage`
+
+#### Parameters:
+
+  - `precision: Float = 1`
+
+    The percentage of pixels that must match.
+
+#### Example:
+
+``` swift
+// Match reference perfectly.
+assertSnapshot(matching: path, as: .image)
+
+// Allow for a 1% pixel difference.
+assertSnapshot(matching: path, as: .image(precision: 0.99))
+```
+
+### `.elementsDescription`
+
+A snapshot strategy for comparing paths based on a description of their elements.
+
+**Format:** `String`
+
+#### Parameters:
+
+  - `numberFormatter: NumberFormatter`
+
+    The number formatter used for formatting points (default: 1-3 fraction digits).
+
+#### Example:
+
+``` swift
+// Match reference perfectly.
+assertSnapshot(matching: path, as: .elementsDescription)
+
+// Match reference as formatted by formatter.
+assertSnapshot(matching: path, as: .elementsDescription(numberFormatter: NumberFormatter()))
+```
+
 ## Encodable
 
 **Platforms:** All
@@ -224,6 +281,54 @@ Records:
 	<string>Blobby</string>
 </dict>
 </plist>
+```
+
+## NSBezierPath
+
+**Platforms:** macOS
+
+### `.image`
+
+A snapshot strategy for comparing paths based on pixel equality.
+
+**Format:** `NSImage`
+
+#### Parameters:
+
+  - `precision: Float = 1`
+
+    The percentage of pixels that must match.
+
+#### Example:
+
+``` swift
+// Match reference perfectly.
+assertSnapshot(matching: path, as: .image)
+
+// Allow for a 1% pixel difference.
+assertSnapshot(matching: path, as: .image(precision: 0.99))
+```
+
+### `.elementsDescription`
+
+A snapshot strategy for comparing paths based on a description of their elements.
+
+**Format:** `String`
+
+#### Parameters:
+
+  - `numberFormatter: NumberFormatter`
+
+    The number formatter used for formatting points (default: 1-3 fraction digits).
+
+#### Example:
+
+``` swift
+// Match reference perfectly.
+assertSnapshot(matching: path, as: .elementsDescription)
+
+// Match reference as formatted by formatter.
+assertSnapshot(matching: path, as: .elementsDescription(numberFormatter: NumberFormatter()))
 ```
 
 ## NSImage
@@ -444,6 +549,54 @@ A snapshot strategy for comparing strings based on equality.
 
 ``` swift
 assertSnapshot(matching: htmlString, as: .lines)
+```
+
+## UIBezierPath
+
+**Platforms:** iOS, tvOS
+
+### `.image`
+
+A snapshot strategy for comparing paths based on pixel equality.
+
+**Format:** `UIImage`
+
+#### Parameters:
+
+  - `precision: Float = 1`
+
+    The percentage of pixels that must match.
+
+#### Example:
+
+``` swift
+// Match reference perfectly.
+assertSnapshot(matching: path, as: .image)
+
+// Allow for a 1% pixel difference.
+assertSnapshot(matching: path, as: .image(precision: 0.99))
+```
+
+### `.elementsDescription`
+
+A snapshot strategy for comparing paths based on a description of their elements.
+
+**Format:** `String`
+
+#### Parameters:
+
+  - `numberFormatter: NumberFormatter`
+
+    The number formatter used for formatting points (default: 1-3 fraction digits).
+
+#### Example:
+
+``` swift
+// Match reference perfectly.
+assertSnapshot(matching: path, as: .elementsDescription)
+
+// Match reference as formatted by formatter.
+assertSnapshot(matching: path, as: .elementsDescription(numberFormatter: NumberFormatter()))
 ```
 
 ## UIImage

@@ -207,7 +207,14 @@ public func verifySnapshot<Value, Format>(
       case .completed:
         break
       case .timedOut:
-        return "Exceeded timeout of \(timeout) seconds waiting for snapshot"
+        return """
+          Exceeded timeout of \(timeout) seconds waiting for snapshot.
+
+          This can happen when an asynchronously rendered view (like a web view) has not loaded. \
+          Ensure that every subview of the view hierarchy has loaded to avoid timeouts, or, if a \
+          timeout is unavoidable, consider setting the "timeout" parameter of "assertSnapshot" to \
+          a higher value.
+          """
       case .incorrectOrder, .invertedFulfillment, .interrupted:
         return "Couldn't snapshot value"
       @unknown default:
