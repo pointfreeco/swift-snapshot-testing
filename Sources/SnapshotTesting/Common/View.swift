@@ -653,7 +653,7 @@ func prepareView(
   traits: UITraitCollection,
   view: UIView,
   viewController: UIViewController
-  ) -> () -> () {
+  ) -> () -> Void {
   let size = config.size ?? viewController.view.frame.size
   view.frame.size = size
   if view != viewController.view {
@@ -738,7 +738,7 @@ func renderer(bounds: CGRect, for traits: UITraitCollection) -> UIGraphicsImageR
   return renderer
 }
 
-private func add(traits: UITraitCollection, viewController: UIViewController, to window: UIWindow) -> () -> () {
+private func add(traits: UITraitCollection, viewController: UIViewController, to window: UIWindow) -> () -> Void {
   let rootViewController = UIViewController()
   rootViewController.view.backgroundColor = .clear
   rootViewController.view.frame = window.frame
