@@ -35,7 +35,7 @@ When an assertion first runs, a snapshot is automatically recorded to disk and t
 >
 > Re-run "testMyViewController" to test against the newly-recorded snapshot.
 
-Repeat test runs will load this reference and compare it with the runtime value. If they don't match, the test will fail and describe the difference.
+Repeat test runs will load this reference and compare it with the runtime value. If they don't match, the test will fail and describe the difference. Failures can be inspected from Xcode's Report Navigator or by inspecting the file URLs of the failure.
 
 You can record a new reference by setting the `record` mode to `true` on the assertion or globally.
 
