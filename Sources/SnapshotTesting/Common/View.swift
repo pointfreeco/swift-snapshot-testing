@@ -637,6 +637,14 @@ extension View {
     #endif
     return nil
   }
+  #if os(iOS) || os(tvOS)
+  func asImage() -> Image {
+    let renderer = UIGraphicsImageRenderer(bounds: bounds)
+    return renderer.image { rendererContext in
+      layer.render(in: rendererContext.cgContext)
+    }
+  }
+  #endif
 }
 
 #if os(iOS) || os(macOS)
@@ -690,10 +698,6 @@ func prepareView(
     view.sizeToFit()
     view.setNeedsLayout()
     view.layoutIfNeeded()
-  }
-
-  guard view.frame.size.width > 0, view.frame.size.height > 0 else {
-    fatalError("View not renderable to image at size \(size)")
   }
 }
 
