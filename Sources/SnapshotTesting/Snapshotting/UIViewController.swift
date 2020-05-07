@@ -99,7 +99,7 @@ extension Snapshotting where Value == UIViewController, Format == String {
         let dispose = prepareView(
           config: .init(safeArea: config.safeArea, size: size ?? config.size, traits: config.traits),
           drawHierarchyInKeyWindow: false,
-          traits: .init(),
+          traits: traits,
           view: viewController.view,
           viewController: viewController
         )

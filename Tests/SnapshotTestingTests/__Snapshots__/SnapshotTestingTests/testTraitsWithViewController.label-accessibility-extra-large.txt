@@ -1,0 +1,2 @@
+<UIView; frame = (0 0; 320 568); autoresize = W+H; layer = <CALayer>>
+   | <UILabel; frame = (16 20; 288 57.3333); text = 'What's the point?'; userInteractionEnabled = NO; layer = <_UILabelLayer>>
