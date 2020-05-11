@@ -22,7 +22,7 @@ extension Snapshotting where Value == UIView, Format == UIImage {
     )
     -> Snapshotting {
 
-      return SimplySnapshotting.image(precision: precision).asyncPullback { view in
+      return SimplySnapshotting.image(precision: precision, scale: traits.displayScale).asyncPullback { view in
         snapshotView(
           config: .init(safeArea: .zero, size: size ?? view.frame.size, traits: .init()),
           drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
