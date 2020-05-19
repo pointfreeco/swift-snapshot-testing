@@ -1069,8 +1069,8 @@ final class SnapshotTestingTests: XCTestCase {
     #if os(iOS)
     let view = UIButton(type: .contactAdd)
 
-    // When record mode is off the default behavior is verifying a snapshot will write the snapshot to disk,
-    // which passes the second time the test is run.
+    // When record mode is off the default behavior when verifying a non-existing snapshot is that it will write
+    // the snapshot to disk. This means it will pass the second time the test is run.
     XCTAssertNotNil(verifySnapshot(matching: view, as: .image, named: "should-pass"))
     XCTAssertNil(verifySnapshot(matching: view, as: .image, named: "should-pass"))
 
