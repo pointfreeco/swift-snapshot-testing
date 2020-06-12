@@ -664,6 +664,18 @@ private final class NavigationDelegate: NSObject, WKNavigationDelegate {
 #endif
 
 #if os(iOS) || os(tvOS)
+extension UIApplication {
+    static var sharedIfAvailable: UIApplication? {
+      let sharedSelector = NSSelectorFromString("shared")
+      guard UIApplication.responds(to: sharedSelector) else {
+        return nil
+      }
+      
+      let shared = UIApplication.perform(sharedSelector)
+      return shared?.takeUnretainedValue() as! UIApplication?
+  }
+}
+
 func prepareView(
   config: ViewImageConfig,
   drawHierarchyInKeyWindow: Bool,
@@ -680,7 +692,7 @@ func prepareView(
   let traits = UITraitCollection(traitsFrom: [config.traits, traits])
   let window: UIWindow
   if drawHierarchyInKeyWindow {
-    guard let keyWindow = UIApplication.shared.keyWindow else {
+    guard let keyWindow = UIApplication.sharedIfAvailable?.keyWindow else {
       fatalError("'drawHierarchyInKeyWindow' requires tests to be run in a host application")
     }
     window = keyWindow
