@@ -346,6 +346,7 @@ final class SnapshotTestingTests: XCTestCase {
     }
     let tableViewController = TableViewController()
     assertSnapshot(matching: tableViewController, as: .image(on: .iPhoneSe))
+    assertSnapshot(matching: tableViewController, as: .image(on: .iPhoneX(.portrait, .dark)))
     #endif
   }
 
@@ -454,15 +455,25 @@ final class SnapshotTestingTests: XCTestCase {
       assertSnapshot(matching: viewController, as: .recursiveDescription(on: .iPadPro12_9), named: "ipad-pro-12-9")
 
       assertSnapshot(matching: viewController, as: .image(on: .iPhoneSe(.portrait)), named: "iphone-se")
+      assertSnapshot(matching: viewController, as: .image(on: .iPhoneSe(.portrait, .dark)), named: "iphone-se-dark")
       assertSnapshot(matching: viewController, as: .image(on: .iPhone8(.portrait)), named: "iphone-8")
+      assertSnapshot(matching: viewController, as: .image(on: .iPhone8(.portrait, .dark)), named: "iphone-8-dark")
       assertSnapshot(matching: viewController, as: .image(on: .iPhone8Plus(.portrait)), named: "iphone-8-plus")
+      assertSnapshot(matching: viewController, as: .image(on: .iPhone8Plus(.portrait, .dark)), named: "iphone-8-plus-dark")
       assertSnapshot(matching: viewController, as: .image(on: .iPhoneX(.portrait)), named: "iphone-x")
+      assertSnapshot(matching: viewController, as: .image(on: .iPhoneX(.portrait, .dark)), named: "iphone-x-dark")
       assertSnapshot(matching: viewController, as: .image(on: .iPhoneXr(.portrait)), named: "iphone-xr")
+      assertSnapshot(matching: viewController, as: .image(on: .iPhoneXr(.portrait, .dark)), named: "iphone-xr-dark")
       assertSnapshot(matching: viewController, as: .image(on: .iPhoneXsMax(.portrait)), named: "iphone-xs-max")
+      assertSnapshot(matching: viewController, as: .image(on: .iPhoneXsMax(.portrait, .dark)), named: "iphone-xs-max-dark")
       assertSnapshot(matching: viewController, as: .image(on: .iPadMini(.landscape)), named: "ipad-mini")
+      assertSnapshot(matching: viewController, as: .image(on: .iPadMini(.landscape, .dark)), named: "ipad-mini-dark")
       assertSnapshot(matching: viewController, as: .image(on: .iPadPro10_5(.landscape)), named: "ipad-pro-10-5")
+      assertSnapshot(matching: viewController, as: .image(on: .iPadPro10_5(.landscape, .dark)), named: "ipad-pro-10-5-dark")
       assertSnapshot(matching: viewController, as: .image(on: .iPadPro11(.landscape)), named: "ipad-pro-11")
+      assertSnapshot(matching: viewController, as: .image(on: .iPadPro11(.landscape, .dark)), named: "ipad-pro-11-dark")
       assertSnapshot(matching: viewController, as: .image(on: .iPadPro12_9(.landscape)), named: "ipad-pro-12-9")
+      assertSnapshot(matching: viewController, as: .image(on: .iPadPro12_9(.landscape, .dark)), named: "ipad-pro-12-9-dark")
 
       assertSnapshot(matching: viewController, as: .image(on: .iPadMini(.landscape(splitView: .oneThird))), named: "ipad-mini-33-split-landscape")
       assertSnapshot(matching: viewController, as: .image(on: .iPadMini(.landscape(splitView: .oneHalf))), named: "ipad-mini-50-split-landscape")

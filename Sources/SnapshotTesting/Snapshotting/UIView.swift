@@ -21,7 +21,6 @@ extension Snapshotting where Value == UIView, Format == UIImage {
     traits: UITraitCollection = .init()
     )
     -> Snapshotting {
-
       return SimplySnapshotting.image(precision: precision).asyncPullback { view in
         snapshotView(
           config: .init(safeArea: .zero, size: size ?? view.frame.size, traits: .init()),
@@ -32,6 +31,31 @@ extension Snapshotting where Value == UIView, Format == UIImage {
         )
       }
   }
+
+  /// A snapshot strategy for comparing views based on pixel equality.
+  ///
+  /// - Parameters:
+  ///   - config: A set of device configuration settings.
+  ///   - drawHierarchyInKeyWindow: Utilize the simulator's key window in order to render `UIAppearance` and `UIVisualEffect`s. This option requires a host application for your tests and will _not_ work for framework test targets.
+  ///   - precision: The percentage of pixels that must match.
+  ///   - size: A view size override.
+  public static func image(
+    on config: ViewImageConfig,
+    drawHierarchyInKeyWindow: Bool = false,
+    precision: Float = 1,
+    size: CGSize? = nil
+    )
+    -> Snapshotting {
+      return SimplySnapshotting.image(precision: precision).asyncPullback { view in
+        snapshotView(
+            config: .init(safeArea: config.safeArea, size: size ?? view.frame.size, traits: config.traits),
+          drawHierarchyInKeyWindow: false,
+          traits: config.traits,
+          view: view,
+          viewController: .init()
+          )
+        }
+    }
 }
 
 extension Snapshotting where Value == UIView, Format == String {
