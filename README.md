@@ -143,7 +143,7 @@ If you want to use SnapshotTesting in any other project that uses [SwiftPM](http
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", from: "1.7.2"),
+  .package(name: "SnapshotTesting", url: "https://github.com/pointfreeco/swift-snapshot-testing.git", from: "1.8.0"),
 ]
 ```
 
@@ -161,7 +161,7 @@ targets: [
 If you use [Carthage](https://github.com/Carthage/Carthage), you can add the following dependency to your `Cartfile`:
 
 ``` ruby
-github "pointfreeco/swift-snapshot-testing" ~> 1.7.2
+github "pointfreeco/swift-snapshot-testing" ~> 1.8.0
 ```
 
 > ⚠️ Warning: Carthage instructs you to drag frameworks into your Xcode project. Xcode may automatically attempt to link these frameworks to your app target. `SnapshotTesting.framework` is only compatible with test targets, so when you first add it to your project:
@@ -179,7 +179,7 @@ If your project uses [CocoaPods](https://cocoapods.org), add the pod to any appl
 
 ```ruby
 target 'MyAppTests' do
-  pod 'SnapshotTesting', '~> 1.7.2'
+  pod 'SnapshotTesting', '~> 1.8.0'
 end
 ```
 
@@ -204,6 +204,8 @@ end
   - [swift-html](https://github.com/pointfreeco/swift-html) is a Swift DSL for type-safe, extensible, and transformable HTML documents and includes an `HtmlSnapshotTesting` module to snapshot test its HTML documents.
   
   - [GRDBSnapshotTesting](https://github.com/SebastianOsinski/GRDBSnapshotTesting) adds snapshot strategy for testing SQLite database migrations made with [GRDB](https://github.com/groue/GRDB.swift).
+  
+  - [AccessibilitySnapshot+SnapshotTesting](https://github.com/Sherlouk/AccessibilitySnapshot-SnapshotTesting) adds [AccessibilitySnapshot](https://github.com/cashapp/AccessibilitySnapshot) support for SnapshotTesting.
 
 Have you written your own SnapshotTesting plug-in? [Add it here](https://github.com/pointfreeco/swift-snapshot-testing/edit/master/README.md) and submit a pull request!
   

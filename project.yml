@@ -15,6 +15,7 @@ targets:
       ENABLE_BITCODE: false
       FRAMEWORK_SEARCH_PATHS: $(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks
       SWIFT_VERSION: 5.0
+      APPLICATION_EXTENSION_API_ONLY: 'YES'
     scheme:
       environmentVariables:
         SNAPSHOT_ARTIFACTS: /tmp/__SnapshotArtifacts__
@@ -26,6 +27,7 @@ targets:
     platform: [macOS, iOS, tvOS]
     settings:
       SWIFT_VERSION: 5.0
+      APPLICATION_EXTENSION_API_ONLY: 'YES'
     sources:
       - path: Tests
         excludes:
