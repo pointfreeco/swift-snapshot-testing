@@ -6,7 +6,7 @@ import XCTest
 public var diffTool: String? = nil
 
 /// Whether or not to record all new references.
-public var record = false
+public var isRecording = false
 
 /// Asserts that a given value matches a reference on disk.
 ///
@@ -165,7 +165,7 @@ public func verifySnapshot<Value, Format>(
   )
   -> String? {
 
-    let recording = recording || record
+    let recording = recording || isRecording
 
     do {
       let fileUrl = URL(fileURLWithPath: "\(file)", isDirectory: false)

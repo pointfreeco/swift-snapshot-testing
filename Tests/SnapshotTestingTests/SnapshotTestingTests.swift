@@ -23,11 +23,11 @@ final class SnapshotTestingTests: XCTestCase {
   override func setUp() {
     super.setUp()
     diffTool = "ksdiff"
-//    record = true
+//    isRecording = true
   }
 
   override func tearDown() {
-    record = false
+    isRecording = false
     super.tearDown()
   }
 
