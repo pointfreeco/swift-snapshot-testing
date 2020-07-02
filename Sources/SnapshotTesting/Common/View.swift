@@ -691,8 +691,7 @@ func prepareView(
   ///
   /// Example: `Unbalanced calls to begin/end appearance transitions for <UIViewController: *>`.
   if let window = view as? UIWindow {
-    let dispose = add(traits: traits, viewController: window.rootViewController!, to: window)
-    return dispose
+    return {}
   }
 
   let size = config.size ?? viewController.view.frame.size
