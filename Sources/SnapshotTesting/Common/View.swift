@@ -749,7 +749,7 @@ func snapshotView(
       addImagesForRenderedViews(view).sequence().run { views in
         callback(
           renderer(bounds: view.bounds, for: traits).image { ctx in
-            if drawHierarchyInKeyWindow {
+            if view is UIWindow || drawHierarchyInKeyWindow {
               view.drawHierarchy(in: view.bounds, afterScreenUpdates: true)
             } else {
               view.layer.render(in: ctx.cgContext)
