@@ -666,7 +666,7 @@ private final class NavigationDelegate: NSObject, WKNavigationDelegate {
 #if os(iOS) || os(tvOS)
 extension UIApplication {
     static var sharedIfAvailable: UIApplication? {
-      let sharedSelector = NSSelectorFromString("shared")
+      let sharedSelector = NSSelectorFromString("sharedApplication")
       guard UIApplication.responds(to: sharedSelector) else {
         return nil
       }
