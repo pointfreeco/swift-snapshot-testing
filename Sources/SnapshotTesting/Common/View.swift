@@ -156,7 +156,7 @@ public struct ViewImageConfig {
       return ViewImageConfig.iPadMini(.portrait(splitView: .full))
     }
   }
-  
+
   public static func iPadMini(_ orientation: TabletOrientation) -> ViewImageConfig {
     let size: CGSize
     let traits: UITraitCollection
@@ -202,7 +202,7 @@ public struct ViewImageConfig {
       return ViewImageConfig.iPadPro10_5(.portrait(splitView: .full))
     }
   }
-  
+
   public static func iPadPro10_5(_ orientation: TabletOrientation) -> ViewImageConfig {
     let size: CGSize
     let traits: UITraitCollection
@@ -237,9 +237,9 @@ public struct ViewImageConfig {
     }
     return .init(safeArea: .init(top: 20, left: 0, bottom: 0, right: 0), size: size, traits: traits)
   }
-  
+
   public static let iPadPro11 = ViewImageConfig.iPadPro11(.landscape)
-  
+
   public static func iPadPro11(_ orientation: Orientation) -> ViewImageConfig {
     switch orientation {
     case .landscape:
@@ -248,7 +248,7 @@ public struct ViewImageConfig {
       return ViewImageConfig.iPadPro11(.portrait(splitView: .full))
     }
   }
-  
+
   public static func iPadPro11(_ orientation: TabletOrientation) -> ViewImageConfig {
     let size: CGSize
     let traits: UITraitCollection
@@ -294,7 +294,7 @@ public struct ViewImageConfig {
       return ViewImageConfig.iPadPro12_9(.portrait(splitView: .full))
     }
   }
-  
+
   public static func iPadPro12_9(_ orientation: TabletOrientation) -> ViewImageConfig {
     let size: CGSize
     let traits: UITraitCollection
@@ -314,7 +314,7 @@ public struct ViewImageConfig {
         size = .init(width: 1366, height: 1024)
         traits = .iPadPro12_9
       }
-      
+
     case .portrait(let splitView):
       switch splitView {
       case .oneThird:
@@ -327,7 +327,7 @@ public struct ViewImageConfig {
         size = .init(width: 1024, height: 1366)
         traits = .iPadPro12_9
       }
-      
+
     }
     return .init(safeArea: .init(top: 20, left: 0, bottom: 0, right: 0), size: size, traits: traits)
   }
@@ -532,7 +532,7 @@ extension UITraitCollection {
       .init(userInterfaceIdiom: .pad)
     ]
   )
-  
+
   private static let iPadCompactSplitView = UITraitCollection(
     traitsFrom: [
       .init(horizontalSizeClass: .compact),
@@ -666,11 +666,11 @@ private final class NavigationDelegate: NSObject, WKNavigationDelegate {
 #if os(iOS) || os(tvOS)
 extension UIApplication {
     static var sharedIfAvailable: UIApplication? {
-      let sharedSelector = NSSelectorFromString("shared")
+      let sharedSelector = NSSelectorFromString("sharedApplication")
       guard UIApplication.responds(to: sharedSelector) else {
         return nil
       }
-      
+
       let shared = UIApplication.perform(sharedSelector)
       return shared?.takeUnretainedValue() as! UIApplication?
   }
@@ -692,7 +692,7 @@ func prepareView(
   let traits = UITraitCollection(traitsFrom: [config.traits, traits])
   let window: UIWindow
   if drawHierarchyInKeyWindow {
-    guard let keyWindow = UIApplication.sharedIfAvailable?.keyWindow else {
+    guard let keyWindow = getKeyWindow() else {
       fatalError("'drawHierarchyInKeyWindow' requires tests to be run in a host application")
     }
     window = keyWindow
@@ -807,6 +807,16 @@ private func add(traits: UITraitCollection, viewController: UIViewController, to
     rootViewController.endAppearanceTransition()
     window.rootViewController = nil
   }
+}
+
+private func getKeyWindow() -> UIWindow? {
+  var window: UIWindow?
+  if #available(iOS 13.0, *) {
+      window = UIApplication.sharedIfAvailable?.windows.first { $0.isKeyWindow }
+  } else {
+      window = UIApplication.sharedIfAvailable?.keyWindow
+  }
+  return window
 }
 
 private final class Window: UIWindow {
