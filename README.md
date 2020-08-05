@@ -37,14 +37,14 @@ When an assertion first runs, a snapshot is automatically recorded to disk and t
 
 Repeat test runs will load this reference and compare it with the runtime value. If they don't match, the test will fail and describe the difference. Failures can be inspected from Xcode's Report Navigator or by inspecting the file URLs of the failure.
 
-You can record a new reference by setting the `record` mode to `true` on the assertion or globally.
+You can record a new reference by setting the `record` parameter to `true` on the assertion or setting `isRecording` globally.
 
 ``` swift
 assertSnapshot(matching: vc, as: .image, record: true)
 
 // or globally
 
-record = true
+isRecording = true
 assertSnapshot(matching: vc, as: .image)
 ```
 
@@ -143,7 +143,7 @@ If you want to use SnapshotTesting in any other project that uses [SwiftPM](http
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", from: "1.8.0"),
+  .package(name: "SnapshotTesting", url: "https://github.com/pointfreeco/swift-snapshot-testing.git", from: "1.8.1"),
 ]
 ```
 
@@ -179,7 +179,7 @@ If your project uses [CocoaPods](https://cocoapods.org), add the pod to any appl
 
 ```ruby
 target 'MyAppTests' do
-  pod 'SnapshotTesting', '~> 1.8.0'
+  pod 'SnapshotTesting', '~> 1.8.1'
 end
 ```
 
@@ -188,7 +188,7 @@ end
   - [**Dozens of snapshot strategies**](Documentation/Available-Snapshot-Strategies.md). Snapshot testing isn't just for `UIView`s and `CALayer`s. Write snapshots against _any_ value.
   - [**Write your own snapshot strategies**](Documentation/Defining-Custom-Snapshot-Strategies.md). If you can convert it to an image, string, data, or your own diffable format, you can snapshot test it! Build your own snapshot strategies from scratch or transform existing ones.
   - **No configuration required.** Don't fuss with scheme settings and environment variables. Snapshots are automatically saved alongside your tests.
-  - **More hands-off.** New snapshots are recorded whether `record` mode is `true` or not.
+  - **More hands-off.** New snapshots are recorded whether `isRecording` mode is `true` or not.
   - **Subclass-free.** Assert from any XCTest case or Quick spec.
   - **Device-agnostic snapshots.** Render views and view controllers for specific devices and trait collections from a single simulator.
   - **First-class Xcode support.** Image differences are captured as XCTest attachments. Text differences are rendered in inline error messages.
@@ -204,6 +204,8 @@ end
   - [swift-html](https://github.com/pointfreeco/swift-html) is a Swift DSL for type-safe, extensible, and transformable HTML documents and includes an `HtmlSnapshotTesting` module to snapshot test its HTML documents.
   
   - [GRDBSnapshotTesting](https://github.com/SebastianOsinski/GRDBSnapshotTesting) adds snapshot strategy for testing SQLite database migrations made with [GRDB](https://github.com/groue/GRDB.swift).
+  
+  - [AccessibilitySnapshot+SnapshotTesting](https://github.com/Sherlouk/AccessibilitySnapshot-SnapshotTesting) adds [AccessibilitySnapshot](https://github.com/cashapp/AccessibilitySnapshot) support for SnapshotTesting.
 
 Have you written your own SnapshotTesting plug-in? [Add it here](https://github.com/pointfreeco/swift-snapshot-testing/edit/master/README.md) and submit a pull request!
   
