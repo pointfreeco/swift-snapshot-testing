@@ -35,4 +35,8 @@ test-tvos:
 test-all: test-linux test-macos test-ios
 
 format:
-	swift format --in-place --recursive ./Package.swift ./Sources ./Tests
+	swift format --in-place --recursive \
+		./Package.swift \
+		./Sources \
+		./Tests/*.swift \
+		./Tests/SnapshotTestingTests/*.swift
