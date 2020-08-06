@@ -7,9 +7,13 @@ import SceneKit
 #endif
 #if canImport(SpriteKit)
 import SpriteKit
+import SwiftUI
 #endif
 #if canImport(WebKit)
 import WebKit
+#endif
+#if canImport(UIKit)
+import UIKit.UIView
 #endif
 import XCTest
 
@@ -135,6 +139,29 @@ final class SnapshotTestingTests: XCTestCase {
     )
   }
 
+  func testCGPath() {
+    #if os(iOS) || os(tvOS) || os(macOS)
+    let path = CGPath.heart
+
+    let osName: String
+    #if os(iOS)
+    osName = "iOS"
+    #elseif os(tvOS)
+    osName = "tvOS"
+    #elseif os(macOS)
+    osName = "macOS"
+    #endif
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(matching: path, as: .image, named: osName)
+    }
+
+    if #available(iOS 11.0, OSX 10.13, tvOS 11.0, *) {
+      assertSnapshot(matching: path, as: .elementsDescription, named: osName)
+    }
+    #endif
+  }
+
   func testEncodable() {
     struct User: Encodable { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
@@ -178,6 +205,18 @@ final class SnapshotTestingTests: XCTestCase {
     struct User { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
     assertSnapshot(matching: user, as: .dump, named: "named")
+  }
+
+  func testNSBezierPath() {
+    #if os(macOS)
+    let path = NSBezierPath.heart
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(matching: path, as: .image, named: "macOS")
+    }
+
+    assertSnapshot(matching: path, as: .elementsDescription, named: "macOS")
+    #endif
   }
 
   func testNSView() {
@@ -480,6 +519,8 @@ final class SnapshotTestingTests: XCTestCase {
       #elseif os(tvOS)
       assertSnapshot(
         matching: viewController, as: .image(on: .tv), named: "tv")
+      assertSnapshot(
+        matching: viewController, as: .image(on: .tv4K), named: "tv4k")
       #endif
     }
     #endif
@@ -692,11 +733,158 @@ final class SnapshotTestingTests: XCTestCase {
     #endif
   }
 
+  func testTraitsWithViewController() {
+    #if os(iOS)
+    let label = UILabel()
+    label.font = .preferredFont(forTextStyle: .title1)
+    label.adjustsFontForContentSizeCategory = true
+    label.text = "What's the point?"
+
+    let viewController = UIViewController()
+    viewController.view.addSubview(label)
+
+    label.translatesAutoresizingMaskIntoConstraints = false
+    NSLayoutConstraint.activate([
+      label.leadingAnchor.constraint(equalTo: viewController.view.layoutMarginsGuide.leadingAnchor),
+      label.topAnchor.constraint(equalTo: viewController.view.layoutMarginsGuide.topAnchor),
+      label.trailingAnchor.constraint(equalTo: viewController.view.layoutMarginsGuide.trailingAnchor)
+    ])
+
+    allContentSizes.forEach { name, contentSize in
+      assertSnapshot(
+        matching: viewController,
+        as: .recursiveDescription(on: .iPhoneSe, traits: .init(preferredContentSizeCategory: contentSize)),
+        named: "label-\(name)"
+      )
+    }
+    #endif
+  }
+
+  func testUIBezierPath() {
+    #if os(iOS) || os(tvOS)
+    let path = UIBezierPath.heart
+
+    let osName: String
+    #if os(iOS)
+    osName = "iOS"
+    #elseif os(tvOS)
+    osName = "tvOS"
+    #endif
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(matching: path, as: .image, named: osName)
+    }
+
+    if #available(iOS 11.0, tvOS 11.0, *) {
+      assertSnapshot(matching: path, as: .elementsDescription, named: osName)
+    }
+    #endif
+  }
+
   func testUIView() {
     #if os(iOS)
     let view = UIButton(type: .contactAdd)
     assertSnapshot(matching: view, as: .image)
     assertSnapshot(matching: view, as: .recursiveDescription)
+    #endif
+  }
+
+  func testUIViewControllerLifeCycle() {
+    #if os(iOS)
+    class ViewController: UIViewController {
+      let viewDidLoadExpectation: XCTestExpectation
+      let viewWillAppearExpectation: XCTestExpectation
+      let viewDidAppearExpectation: XCTestExpectation
+      let viewWillDisappearExpectation: XCTestExpectation
+      let viewDidDisappearExpectation: XCTestExpectation
+      init(viewDidLoadExpectation: XCTestExpectation,
+           viewWillAppearExpectation: XCTestExpectation,
+           viewDidAppearExpectation: XCTestExpectation,
+           viewWillDisappearExpectation: XCTestExpectation,
+           viewDidDisappearExpectation: XCTestExpectation){
+        self.viewDidLoadExpectation = viewDidLoadExpectation
+        self.viewWillAppearExpectation = viewWillAppearExpectation
+        self.viewDidAppearExpectation = viewDidAppearExpectation
+        self.viewWillDisappearExpectation = viewWillDisappearExpectation
+        self.viewDidDisappearExpectation = viewDidDisappearExpectation
+        super.init(nibName: nil, bundle: nil)
+      }
+      required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+      }
+      override func viewDidLoad() {
+        super.viewDidLoad()
+        viewDidLoadExpectation.fulfill()
+      }
+      override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        viewWillAppearExpectation.fulfill()
+      }
+      override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        viewDidAppearExpectation.fulfill()
+      }
+      override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        viewWillDisappearExpectation.fulfill()
+      }
+      override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        viewDidDisappearExpectation.fulfill()
+      }
+    }
+
+    let viewDidLoadExpectation = expectation(description: "viewDidLoad")
+    let viewWillAppearExpectation = expectation(description: "viewWillAppear")
+    let viewDidAppearExpectation = expectation(description: "viewDidAppear")
+    let viewWillDisappearExpectation = expectation(description: "viewWillDisappear")
+    let viewDidDisappearExpectation = expectation(description: "viewDidDisappear")
+    viewWillAppearExpectation.expectedFulfillmentCount = 4
+    viewDidAppearExpectation.expectedFulfillmentCount = 4
+    viewWillDisappearExpectation.expectedFulfillmentCount = 4
+    viewDidDisappearExpectation.expectedFulfillmentCount = 4
+
+    let viewController = ViewController(
+      viewDidLoadExpectation: viewDidLoadExpectation,
+      viewWillAppearExpectation: viewWillAppearExpectation,
+      viewDidAppearExpectation: viewDidAppearExpectation,
+      viewWillDisappearExpectation: viewWillDisappearExpectation,
+      viewDidDisappearExpectation: viewDidDisappearExpectation
+    )
+
+    assertSnapshot(matching: viewController, as: .image)
+    assertSnapshot(matching: viewController, as: .image)
+
+    wait(for: [
+      viewDidLoadExpectation,
+      viewWillAppearExpectation,
+      viewDidAppearExpectation,
+      viewWillDisappearExpectation,
+      viewDidDisappearExpectation,
+    ], timeout: 1.0, enforceOrder: true)
+    #endif
+  }
+
+  func testCALayer() {
+    #if os(iOS)
+    let layer = CALayer()
+    layer.frame = CGRect(x: 0, y: 0, width: 100, height: 100)
+    layer.backgroundColor = UIColor.red.cgColor
+    layer.borderWidth = 4.0
+    layer.borderColor = UIColor.black.cgColor
+    assertSnapshot(matching: layer, as: .image)
+    #endif
+  }
+
+  func testCALayerWithGradient() {
+    #if os(iOS)
+    let baseLayer = CALayer()
+    baseLayer.frame = CGRect(x: 0, y: 0, width: 100, height: 100)
+    let gradientLayer = CAGradientLayer()
+    gradientLayer.colors = [UIColor.red.cgColor, UIColor.yellow.cgColor]
+    gradientLayer.frame = baseLayer.frame
+    baseLayer.addSublayer(gradientLayer)
+    assertSnapshot(matching: baseLayer, as: .image)
     #endif
   }
 
@@ -782,6 +970,98 @@ final class SnapshotTestingTests: XCTestCase {
         named: platform
       )
     }
+    #endif
+  }
+
+  func testViewWithZeroHeightOrWidth() {
+    #if os(iOS) || os(tvOS)
+    var rect = CGRect(x: 0, y: 0, width: 350, height: 0)
+    var view = UIView(frame: rect)
+    view.backgroundColor = .red
+    assertSnapshot(matching: view, as: .image, named: "noHeight")
+    
+    rect = CGRect(x: 0, y: 0, width: 0, height: 350)
+    view = UIView(frame: rect)
+    view.backgroundColor = .green
+    assertSnapshot(matching: view, as: .image, named: "noWidth")
+
+    rect = CGRect(x: 0, y: 0, width: 0, height: 0)
+    view = UIView(frame: rect)
+    view.backgroundColor = .blue
+    assertSnapshot(matching: view, as: .image, named: "noWidth.noHeight")
+    #endif
+  }
+
+  func testEmbeddedWebView() throws {
+    #if os(iOS)
+    let label = UILabel()
+    label.text = "Hello, Blob!"
+
+    let fixtureUrl = URL(fileURLWithPath: String(#file), isDirectory: false)
+      .deletingLastPathComponent()
+      .appendingPathComponent("__Fixtures__/pointfree.html")
+    let html = try String(contentsOf: fixtureUrl)
+    let webView = WKWebView()
+    webView.loadHTMLString(html, baseURL: nil)
+    webView.isHidden = true
+
+    let stackView = UIStackView(arrangedSubviews: [label, webView])
+    stackView.axis = .vertical
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(
+        matching: stackView,
+        as: .image(size: .init(width: 800, height: 600)),
+        named: platform
+      )
+    }
+    #endif
+  }
+
+  @available(iOS 13.0, *)
+  func testSwiftUIView_iOS() {
+    #if os(iOS)
+    struct MyView: SwiftUI.View {
+      var body: some SwiftUI.View {
+        HStack {
+          Image(systemName: "checkmark.circle.fill")
+            Text("Checked").fixedSize()
+        }
+        .padding(5)
+        .background(RoundedRectangle(cornerRadius: 5.0).fill(Color.blue))
+        .padding(10)
+      }
+    }
+
+    let view = MyView().background(Color.yellow)
+
+    assertSnapshot(matching: view, as: .image(traits: .init(userInterfaceStyle: .light)))
+    assertSnapshot(matching: view, as: .image(layout: .sizeThatFits, traits: .init(userInterfaceStyle: .light)), named: "size-that-fits")
+    assertSnapshot(matching: view, as: .image(layout: .fixed(width: 200.0, height: 100.0), traits: .init(userInterfaceStyle: .light)), named: "fixed")
+    assertSnapshot(matching: view, as: .image(layout: .device(config: .iPhoneSe), traits: .init(userInterfaceStyle: .light)), named: "device")
+    #endif
+  }
+
+  @available(tvOS 13.0, *)
+  func testSwiftUIView_tvOS() {
+    #if os(tvOS)
+    struct MyView: SwiftUI.View {
+      var body: some SwiftUI.View {
+        HStack {
+          Image(systemName: "checkmark.circle.fill")
+            Text("Checked").fixedSize()
+        }
+        .padding(5)
+        .background(RoundedRectangle(cornerRadius: 5.0).fill(Color.blue))
+        .padding(10)
+      }
+    }
+    let view = MyView().background(Color.yellow)
+
+    assertSnapshot(matching: view, as: .image())
+    assertSnapshot(matching: view, as: .image(layout: .sizeThatFits), named: "size-that-fits")
+    assertSnapshot(matching: view, as: .image(layout: .fixed(width: 300.0, height: 100.0)), named: "fixed")
+    assertSnapshot(matching: view, as: .image(layout: .device(config: .tv)), named: "device")
     #endif
   }
 }

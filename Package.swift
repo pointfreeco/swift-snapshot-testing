@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
   name: "SnapshotTesting",
   platforms: [
-    .iOS(.v10),
+    .iOS(.v11),
     .macOS(.v10_10),
     .tvOS(.v10)
   ],
@@ -27,7 +27,7 @@ let package = Package(
 if ProcessInfo.processInfo.environment.keys.contains("PF_DEVELOP") {
   package.dependencies.append(
     contentsOf: [
-      .package(url: "https://github.com/yonaskolb/XcodeGen.git", .exact("2.13.1")),
+      .package(url: "https://github.com/yonaskolb/XcodeGen.git", .exact("2.15.1")),
     ]
   )
 }

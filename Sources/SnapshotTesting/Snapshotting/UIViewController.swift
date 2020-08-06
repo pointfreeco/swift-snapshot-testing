@@ -64,13 +64,14 @@ extension Snapshotting where Value == UIViewController, Format == String {
   /// A snapshot strategy for comparing view controllers based on their embedded controller hierarchy.
   public static var hierarchy: Snapshotting {
     return Snapshotting<String, String>.lines.pullback { viewController in
-      prepareView(
+      let dispose = prepareView(
         config: .init(),
         drawHierarchyInKeyWindow: false,
         traits: .init(),
         view: viewController.view,
         viewController: viewController
       )
+      defer { dispose() }
       return purgePointers(
         viewController.perform(Selector(("_printHierarchy"))).retain().takeUnretainedValue() as! String
       )
@@ -95,13 +96,14 @@ extension Snapshotting where Value == UIViewController, Format == String {
     )
     -> Snapshotting<UIViewController, String> {
       return SimplySnapshotting.lines.pullback { viewController in
-        prepareView(
+        let dispose = prepareView(
           config: .init(safeArea: config.safeArea, size: size ?? config.size, traits: config.traits),
           drawHierarchyInKeyWindow: false,
-          traits: .init(),
+          traits: traits,
           view: viewController.view,
           viewController: viewController
         )
+        defer { dispose() }
         return purgePointers(
           viewController.view.perform(Selector(("recursiveDescription"))).retain().takeUnretainedValue()
             as! String

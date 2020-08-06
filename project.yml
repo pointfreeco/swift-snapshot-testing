@@ -2,7 +2,7 @@ name: SnapshotTesting
 options:
   bundleIdPrefix: co.pointfree
   deploymentTarget:
-    iOS: 10.0
+    iOS: 11.0
     macOS: '10.10'
     tvOS: 10.0
   indentWidth: 2
@@ -15,6 +15,7 @@ targets:
       ENABLE_BITCODE: false
       FRAMEWORK_SEARCH_PATHS: $(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks
       SWIFT_VERSION: 5.0
+      APPLICATION_EXTENSION_API_ONLY: 'YES'
     scheme:
       environmentVariables:
         SNAPSHOT_ARTIFACTS: /tmp/__SnapshotArtifacts__
@@ -26,6 +27,7 @@ targets:
     platform: [macOS, iOS, tvOS]
     settings:
       SWIFT_VERSION: 5.0
+      APPLICATION_EXTENSION_API_ONLY: 'YES'
     sources:
       - path: Tests
         excludes:
