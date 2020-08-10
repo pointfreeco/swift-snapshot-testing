@@ -37,14 +37,14 @@ When an assertion first runs, a snapshot is automatically recorded to disk and t
 
 Repeat test runs will load this reference and compare it with the runtime value. If they don't match, the test will fail and describe the difference. Failures can be inspected from Xcode's Report Navigator or by inspecting the file URLs of the failure.
 
-You can record a new reference by setting the `record` mode to `true` on the assertion or globally.
+You can record a new reference by setting the `record` parameter to `true` on the assertion or setting `isRecording` globally.
 
 ``` swift
 assertSnapshot(matching: vc, as: .image, record: true)
 
 // or globally
 
-record = true
+isRecording = true
 assertSnapshot(matching: vc, as: .image)
 ```
 
@@ -188,7 +188,7 @@ end
   - [**Dozens of snapshot strategies**](Documentation/Available-Snapshot-Strategies.md). Snapshot testing isn't just for `UIView`s and `CALayer`s. Write snapshots against _any_ value.
   - [**Write your own snapshot strategies**](Documentation/Defining-Custom-Snapshot-Strategies.md). If you can convert it to an image, string, data, or your own diffable format, you can snapshot test it! Build your own snapshot strategies from scratch or transform existing ones.
   - **No configuration required.** Don't fuss with scheme settings and environment variables. Snapshots are automatically saved alongside your tests.
-  - **More hands-off.** New snapshots are recorded whether `record` mode is `true` or not.
+  - **More hands-off.** New snapshots are recorded whether `isRecording` mode is `true` or not.
   - **Subclass-free.** Assert from any XCTest case or Quick spec.
   - **Device-agnostic snapshots.** Render views and view controllers for specific devices and trait collections from a single simulator.
   - **First-class Xcode support.** Image differences are captured as XCTest attachments. Text differences are rendered in inline error messages.
