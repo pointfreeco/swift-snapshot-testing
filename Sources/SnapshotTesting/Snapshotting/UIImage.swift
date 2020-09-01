@@ -4,16 +4,24 @@ import XCTest
 
 extension Diffing where Value == UIImage {
   /// A pixel-diffing strategy for UIImage's which requires a 100% match.
-  public static let image = Diffing.image(precision: 1)
+  public static let image = Diffing.image(precision: 1, scale: nil)
 
   /// A pixel-diffing strategy for UIImage that allows customizing how precise the matching must be.
   ///
   /// - Parameter precision: A value between 0 and 1, where 1 means the images must match 100% of their pixels.
+  /// - Parameter scale: Scale to use when loading the reference image from disk. If `nil` or the `UITraitCollection`s default value of `0.0`, the screens scale is used.
   /// - Returns: A new diffing strategy.
-  public static func image(precision: Float) -> Diffing {
+  public static func image(precision: Float, scale: CGFloat?) -> Diffing {
+    let imageScale: CGFloat
+    if let scale = scale, scale != 0.0 {
+      imageScale = scale
+    } else {
+        imageScale = UIScreen.main.scale
+    }
+
     return Diffing(
       toData: { $0.pngData() ?? emptyImage().pngData()! },
-      fromData: { UIImage(data: $0, scale: UIScreen.main.scale)! }
+      fromData: { UIImage(data: $0, scale: imageScale)! }
     ) { old, new in
       guard !compare(old, new, precision: precision) else { return nil }
       let difference = SnapshotTesting.diff(old, new)
@@ -48,16 +56,17 @@ extension Diffing where Value == UIImage {
 extension Snapshotting where Value == UIImage, Format == UIImage {
   /// A snapshot strategy for comparing images based on pixel equality.
   public static var image: Snapshotting {
-    return .image(precision: 1)
+    return .image(precision: 1, scale: nil)
   }
 
   /// A snapshot strategy for comparing images based on pixel equality.
   ///
   /// - Parameter precision: The percentage of pixels that must match.
-  public static func image(precision: Float) -> Snapshotting {
+  /// - Parameter scale: The scale of the reference image stored on disk.
+  public static func image(precision: Float, scale: CGFloat?) -> Snapshotting {
     return .init(
       pathExtension: "png",
-      diffing: .image(precision: precision)
+      diffing: .image(precision: precision, scale: scale)
     )
   }
 }
