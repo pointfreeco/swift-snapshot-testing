@@ -315,7 +315,7 @@ func sanitizePathComponent(_ string: String) -> String {
 }
 
 func isSimulatorAllowed() -> String? {
-  let processInfo = ProcessInfo()
+  let processInfo = ProcessInfo.processInfo
 
   guard let referenceDevice = referenceDevice,
         let referenceVersion = referenceMajorOSVersion,
