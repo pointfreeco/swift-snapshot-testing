@@ -2,7 +2,7 @@ import Foundation
 import XCTest
 
 extension Snapshotting where Value == Data, Format == Data {
-  static var data: Snapshotting {
+  public static var data: Snapshotting {
     return .init(
       pathExtension: nil,
       diffing: .init(toData: { $0 }, fromData: { $0 }) { old, new in

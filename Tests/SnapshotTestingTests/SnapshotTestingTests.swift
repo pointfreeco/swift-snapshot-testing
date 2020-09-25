@@ -162,6 +162,12 @@ final class SnapshotTestingTests: XCTestCase {
     #endif
   }
 
+  func testData() {
+    let data = Data([0xDE, 0xAD, 0xBE, 0xEF])
+
+    assertSnapshot(matching: data, as: .data)
+  }
+
   func testEncodable() {
     struct User: Encodable { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")

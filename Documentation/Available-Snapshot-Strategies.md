@@ -15,6 +15,8 @@ If you'd like to submit your own custom strategy, see [Contributing](../CONTRIBU
   - [`CGPath`](#cgpath)
       - [`.image`](#image-1)
       - [`.elementsDescription`](#elementsdescription)
+  - [`Data`](#data)
+      - [`.data`](#data=1)
   - [`Encodable`](#encodable)
       - [`.json`](#json)
       - [`.plist`](#plist)
@@ -218,6 +220,20 @@ assertSnapshot(matching: path, as: .elementsDescription)
 
 // Match reference as formatted by formatter.
 assertSnapshot(matching: path, as: .elementsDescription(numberFormatter: NumberFormatter()))
+```
+
+## Data
+
+**Platforms:** All
+
+### `.data`
+
+A snapshot strategy for comparing bare binary data.
+
+#### Example:
+
+``` swift
+assertSnapshot(matching: data, as: .data)
 ```
 
 ## Encodable
