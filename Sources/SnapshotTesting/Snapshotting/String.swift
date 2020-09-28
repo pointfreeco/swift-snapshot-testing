@@ -6,6 +6,13 @@ extension Snapshotting where Value == String, Format == String {
   public static let lines = Snapshotting(pathExtension: "txt", diffing: .lines)
 }
 
+extension Formatting where Value == String, Format == String {
+  /// A format strategy for converting strings to strings.
+  public static var lines: Formatting {
+    return Formatting(format: { $0 })
+  }
+}
+
 extension Diffing where Value == String {
   /// A line-diffing strategy for UTF-8 text.
   public static let lines = Diffing(
