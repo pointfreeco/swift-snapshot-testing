@@ -32,8 +32,8 @@ extension Diffing where Value == UIImage {
       )
     }
   }
-  
-  
+
+
   /// Used when the image size has no width or no height to generated the default empty image
   private static func emptyImage() -> UIImage {
     let label = UILabel(frame: CGRect(x: 0, y: 0, width: 400, height: 80))
