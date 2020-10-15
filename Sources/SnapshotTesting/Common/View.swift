@@ -683,6 +683,13 @@ func prepareView(
   view: UIView,
   viewController: UIViewController
   ) -> () -> Void {
+  if let window = view as? UIWindow {
+    if let rootViewController = window.rootViewController {
+      return add(traits: traits, viewController: rootViewController, to: window)
+    } else {
+      return {}
+    }
+  }
   let size = config.size ?? viewController.view.frame.size
   view.frame.size = size
   if view != viewController.view {
