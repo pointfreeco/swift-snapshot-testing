@@ -684,7 +684,7 @@ func prepareView(
   viewController: UIViewController
   ) -> () -> Void {
   if let window = view as? UIWindow {
-    if let rootViewController = window.rootViewController {
+    if let rootViewController = window.rootViewController, rootViewController.traitCollection != traits {
       return add(traits: traits, viewController: rootViewController, to: window)
     } else {
       return {}
