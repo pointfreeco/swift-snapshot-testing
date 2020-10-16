@@ -10,7 +10,7 @@ extension Snapshotting where Value == Data, Format == Data {
         let message = old.count == new.count
           ? "Expected data to match"
           : "Expected \(new) to match \(old)"
-        return (message, [])
+        return Diff(failureMessage: message, attachments: [], data: nil)
       }
     )
   }

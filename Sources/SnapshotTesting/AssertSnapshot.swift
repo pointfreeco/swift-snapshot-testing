@@ -262,7 +262,7 @@ public func verifySnapshot<Value, Format>(
       }
       #endif
 
-      guard let (failure, attachments) = snapshotting.diffing.diff(reference, diffable) else {
+      guard let diff = snapshotting.diffing.diff(reference, diffable) else {
         return nil
       }
 
@@ -274,11 +274,17 @@ public func verifySnapshot<Value, Format>(
       let failedSnapshotFileUrl = artifactsSubUrl.appendingPathComponent(snapshotFileUrl.lastPathComponent)
       try snapshotting.diffing.toData(diffable).write(to: failedSnapshotFileUrl)
 
-      if !attachments.isEmpty {
+      if let diffData = diff.data {
+        let failedSnapshotPathExtension = failedSnapshotFileUrl.pathExtension
+        let diffUrl = failedSnapshotFileUrl.deletingPathExtension().appendingPathExtension("diff").appendingPathExtension(failedSnapshotPathExtension)
+        try diffData.write(to: diffUrl)
+      }
+
+      if !diff.attachments.isEmpty {
         #if !os(Linux)
         if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
           XCTContext.runActivity(named: "Attached Failure Diff") { activity in
-            attachments.forEach {
+            diff.attachments.forEach {
               activity.add($0)
             }
           }
@@ -294,7 +300,7 @@ public func verifySnapshot<Value, Format>(
 
       \(diffMessage)
 
-      \(failure.trimmingCharacters(in: .whitespacesAndNewlines))
+      \(diff.failureMessage.trimmingCharacters(in: .whitespacesAndNewlines))
       """
     } catch {
       return error.localizedDescription
