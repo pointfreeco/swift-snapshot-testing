@@ -95,7 +95,7 @@ private func compare(_ old: UIImage, _ new: UIImage, precision: Float) -> Bool {
   var differentPixelCount = 0
   let threshold = 1 - precision
   for byte in 0..<byteCount {
-    if oldBytes[byte] != newerBytes[byte] { differentPixelCount += 1 }
+    if oldBytes[byte] != newerBytes[byte] && abs(Float(oldBytes[byte] - newerBytes[byte])) / 255.0 > threshold { differentPixelCount += 1 }
     if Float(differentPixelCount) / Float(byteCount) > threshold { return false}
   }
   return true
