@@ -274,8 +274,11 @@ public func verifySnapshot<Value, Format>(
       let failedSnapshotFileUrl = artifactsSubUrl.appendingPathComponent(snapshotFileUrl.lastPathComponent)
       try snapshotting.diffing.toData(diffable).write(to: failedSnapshotFileUrl)
 
+      let failedSnapshotPathExtension = failedSnapshotFileUrl.pathExtension
+      let referenceUrl = failedSnapshotFileUrl.deletingPathExtension().appendingPathExtension("reference").appendingPathExtension(failedSnapshotPathExtension)
+      try data.write(to: referenceUrl)
+
       if let diffData = diff.data {
-        let failedSnapshotPathExtension = failedSnapshotFileUrl.pathExtension
         let diffUrl = failedSnapshotFileUrl.deletingPathExtension().appendingPathExtension("diff").appendingPathExtension(failedSnapshotPathExtension)
         try diffData.write(to: diffUrl)
       }
