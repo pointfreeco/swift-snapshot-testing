@@ -1,3 +1,4 @@
+#if !os(Linux)
 import XCTest
 import SnapshotTesting
 import UIKit
@@ -13,3 +14,4 @@ extension Snapshotting where Value: XCUIElement, Format == UIImage {
     }
   }
 }
+#endif
