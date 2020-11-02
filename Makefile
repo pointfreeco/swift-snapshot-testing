@@ -6,7 +6,7 @@ test-linux:
 		--rm \
 		-v "$(PWD):$(PWD)" \
 		-w "$(PWD)" \
-		swift:5.2 \
+		swift:5.3 \
 		bash -c 'make test-swift'
 
 test-macos:
@@ -23,7 +23,6 @@ test-ios:
 
 test-swift:
 	swift test \
-		--enable-pubgrub-resolver \
 		--parallel
 
 test-tvos:
