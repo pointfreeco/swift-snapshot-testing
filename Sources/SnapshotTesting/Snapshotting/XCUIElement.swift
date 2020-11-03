@@ -1,4 +1,4 @@
-#if !os(Linux)
+#if os(macOS)
 import XCTest
 import SnapshotTesting
 import UIKit
