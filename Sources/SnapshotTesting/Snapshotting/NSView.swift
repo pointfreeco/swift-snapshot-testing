@@ -26,10 +26,12 @@ extension Snapshotting where Value == NSView, Format == NSImage {
   /// - Parameters:
   ///   - precision: The percentage of pixels that must match.
   ///   - size: A view size override.
+  ///   - appearance: The appearance to use when drawing the view. Pass `nil` to use the view’s existing appearance.
   ///   - windowForDrawing: The choice of window to use when drawing the view.
   public static func image(
     precision: Float = 1,
     size: CGSize? = nil,
+    appearance: NSAppearance? = NSAppearance(named: .aqua),
     windowForDrawing: WindowForDrawing = .newWindow(backingScaleFactor: 1)
   ) -> Snapshotting {
     return SimplySnapshotting.image(precision: precision).asyncPullback { view in
@@ -60,6 +62,11 @@ extension Snapshotting where Value == NSView, Format == NSImage {
         newWindow = nil
       }
 
+      let originalAppearance = view.appearance
+      if let appearance = appearance {
+        view.appearance = appearance
+      }
+
       if let size = size { view.frame.size = size }
       view.layoutSubtreeIfNeeded()
       guard view.frame.width > 0, view.frame.height > 0 else {
@@ -77,6 +84,7 @@ extension Snapshotting where Value == NSView, Format == NSImage {
 
           views.forEach { $0.removeFromSuperview() }
           if newWindow != nil { view.removeFromSuperview() }
+          view.appearance = originalAppearance
           view.frame = originalFrame
         }
       }
