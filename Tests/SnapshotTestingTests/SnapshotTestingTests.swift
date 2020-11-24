@@ -227,30 +227,68 @@ final class SnapshotTestingTests: XCTestCase {
 
   func testNSView() {
     #if os(macOS)
-    let button = NSButton()
-    button.bezelStyle = .rounded
-    button.title = "Push Me"
-    button.sizeToFit()
-    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
-      assertSnapshot(matching: button, as: .image)
-      assertSnapshot(matching: button, as: .recursiveDescription)
-    }
-    #endif
-  }
-  
-  func testNSViewWithLayer() {
-    #if os(macOS)
-    let view = NSView()
-    view.frame = CGRect(x: 0.0, y: 0.0, width: 10.0, height: 10.0)
-    view.wantsLayer = true
-    view.layer?.backgroundColor = NSColor.green.cgColor
-    view.layer?.cornerRadius = 5
+    let view = makeViewForNSViewTest()
     if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
       assertSnapshot(matching: view, as: .image)
       assertSnapshot(matching: view, as: .recursiveDescription)
     }
     #endif
   }
+
+  func testNSViewAt2x() {
+    #if os(macOS)
+    let view = makeViewForNSViewTest()
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(
+        matching: view,
+        as: .image(windowForDrawing: .newWindow(backingScaleFactor: 2))
+      )
+    }
+    #endif
+  }
+
+  #if os(macOS)
+  private func makeViewForNSViewTest() -> NSView {
+    let button = NSButton()
+    button.bezelStyle = .rounded
+    button.title = "Push Me"
+    button.sizeToFit()
+    return button
+  }
+  #endif
+  
+  func testNSViewWithLayer() {
+    #if os(macOS)
+    let view = makeViewForNSViewWithLayerTest()
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(matching: view, as: .image)
+      assertSnapshot(matching: view, as: .recursiveDescription)
+    }
+    #endif
+  }
+
+  func testNSViewWithLayerAt2x() {
+    #if os(macOS)
+    let view = makeViewForNSViewWithLayerTest()
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(
+        matching: view,
+        as: .image(windowForDrawing: .newWindow(backingScaleFactor: 2))
+      )
+    }
+    #endif
+  }
+
+  #if os(macOS)
+  private func makeViewForNSViewWithLayerTest() -> NSView {
+    let view = NSView()
+    view.frame = CGRect(x: 0.0, y: 0.0, width: 10.0, height: 10.0)
+    view.wantsLayer = true
+    view.layer?.backgroundColor = NSColor.green.cgColor
+    view.layer?.cornerRadius = 5
+    return view
+  }
+  #endif
 
   func testPrecision() {
     #if os(iOS) || os(macOS) || os(tvOS)
@@ -263,11 +301,7 @@ final class SnapshotTestingTests: XCTestCase {
     #endif
     label.backgroundColor = .white
     #elseif os(macOS)
-    let label = NSTextField()
-    label.frame = CGRect(origin: .zero, size: CGSize(width: 37, height: 16))
-    label.backgroundColor = .white
-    label.isBezeled = false
-    label.isEditable = false
+    let label = makeLabelForMacOSPrecisionTest()
     #endif
     if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
       label.text = "Hello."
@@ -277,6 +311,44 @@ final class SnapshotTestingTests: XCTestCase {
     }
     #endif
   }
+
+  func testPrecisionAt2x() {
+    #if os(macOS)
+    let label = makeLabelForMacOSPrecisionTest()
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      label.text = "Hello."
+      assertSnapshot(
+        matching: label,
+        as: .image(
+          precision: 0.9,
+          windowForDrawing: .newWindow(backingScaleFactor: 2)
+        ),
+        named: platform
+      )
+      label.text = "Hello"
+      assertSnapshot(
+        matching: label,
+        as: .image(
+          precision: 0.9,
+          windowForDrawing: .newWindow(backingScaleFactor: 2)
+        ),
+        named: platform
+      )
+    }
+    #endif
+  }
+
+  #if os(macOS)
+  private func makeLabelForMacOSPrecisionTest() -> NSTextField {
+    let label = NSTextField()
+    label.frame = CGRect(origin: .zero, size: CGSize(width: 37, height: 16))
+    label.textColor = .black
+    label.backgroundColor = .white
+    label.isBezeled = false
+    label.isEditable = false
+    return label
+  }
+  #endif
 
   func testSCNView() {
 //    #if os(iOS) || os(macOS) || os(tvOS)
@@ -963,12 +1035,7 @@ final class SnapshotTestingTests: XCTestCase {
 
   func testWebView() throws {
     #if os(iOS) || os(macOS)
-    let fixtureUrl = URL(fileURLWithPath: String(#file), isDirectory: false)
-      .deletingLastPathComponent()
-      .appendingPathComponent("__Fixtures__/pointfree.html")
-    let html = try String(contentsOf: fixtureUrl)
-    let webView = WKWebView()
-    webView.loadHTMLString(html, baseURL: nil)
+    let webView = try makeWebViewForWebViewTest()
     if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
       assertSnapshot(
         matching: webView,
@@ -978,6 +1045,34 @@ final class SnapshotTestingTests: XCTestCase {
     }
     #endif
   }
+
+  func testWebViewAt2x() throws {
+    #if os(macOS)
+    let webView = try makeWebViewForWebViewTest()
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(
+        matching: webView,
+        as: .image(
+          size: .init(width: 800, height: 600),
+          windowForDrawing: .newWindow(backingScaleFactor: 2)
+        ),
+        named: platform
+      )
+    }
+    #endif
+  }
+
+  #if os(iOS) || os(macOS)
+  private func makeWebViewForWebViewTest() throws -> WKWebView {
+    let fixtureUrl = URL(fileURLWithPath: String(#file), isDirectory: false)
+      .deletingLastPathComponent()
+      .appendingPathComponent("__Fixtures__/pointfree.html")
+    let html = try String(contentsOf: fixtureUrl)
+    let webView = WKWebView()
+    webView.loadHTMLString(html, baseURL: nil)
+    return webView
+  }
+  #endif
 
   func testViewWithZeroHeightOrWidth() {
     #if os(iOS) || os(tvOS)
