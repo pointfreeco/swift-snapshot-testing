@@ -572,12 +572,10 @@ extension View {
   var snapshot: Async<Image>? {
     func inWindow<T>(_ perform: () -> T) -> T {
       #if os(macOS)
-      let superview = self.superview
-      defer { superview?.addSubview(self) }
-      let window = ScaledWindow()
-      window.contentView = NSView()
-      window.contentView?.addSubview(self)
-      window.makeKey()
+      precondition(
+         self.window != nil,
+         "The view must have a window in order for the custom rendering to work."
+      )
       #endif
       return perform()
     }
@@ -855,16 +853,6 @@ private final class Window: UIWindow {
     if removeTopInset { return .zero }
     #endif
     return self.config.safeArea
-  }
-}
-#endif
-
-#if os(macOS)
-import Cocoa
-
-private final class ScaledWindow: NSWindow {
-  override var backingScaleFactor: CGFloat {
-    return 2
   }
 }
 #endif
