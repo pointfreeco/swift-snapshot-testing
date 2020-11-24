@@ -15,10 +15,13 @@ extension Snapshotting where Value == NSView, Format == NSImage {
   public static func image(precision: Float = 1, size: CGSize? = nil) -> Snapshotting {
     return SimplySnapshotting.image(precision: precision).asyncPullback { view in
       let initialSize = view.frame.size
+
       if let size = size { view.frame.size = size }
+      view.layoutSubtreeIfNeeded()
       guard view.frame.width > 0, view.frame.height > 0 else {
         fatalError("View not renderable to image at size \(view.frame.size)")
       }
+
       return view.snapshot ?? Async { callback in
         addImagesForRenderedViews(view).sequence().run { views in
           let bitmapRep = view.bitmapImageRepForCachingDisplay(in: view.bounds)!
