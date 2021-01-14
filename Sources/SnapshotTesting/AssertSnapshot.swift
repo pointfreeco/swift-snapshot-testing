@@ -172,6 +172,34 @@ public func verifySnapshot<Value, Format>(
   line: UInt = #line
   )
   -> String? {
+  return verifySnapshotDetailed(matching: try value(), as: snapshotting, named: name, record: recording, snapshotDirectory: snapshotDirectory, timeout: timeout, file: file, testName: testName, line: line).message
+}
+
+/// Verifies that a given value matches a reference on disk.
+///
+/// - Parameters:
+///   - value: A value to compare against a reference.
+///   - snapshotting: A strategy for serializing, deserializing, and comparing values.
+///   - name: An optional description of the snapshot.
+///   - recording: Whether or not to record a new reference.
+///   - snapshotDirectory: Optional directory to save snapshots. By default snapshots will be saved in a directory with the same name as the test file, and that directory will sit inside a directory `__Snapshots__` that sits next to your test file.
+///   - timeout: The amount of time a snapshot must be generated in.
+///   - file: The file in which failure occurred. Defaults to the file name of the test case in which this function was called.
+///   - testName: The name of the test in which failure occurred. Defaults to the function name of the test case in which this function was called.
+///   - line: The line number on which failure occurred. Defaults to the line number on which this function was called.
+/// - Returns: A `SnapshotResult` struct
+public func verifySnapshotDetailed<Value, Format>(
+  matching value: @autoclosure () throws -> Value,
+  as snapshotting: Snapshotting<Value, Format>,
+  named name: String? = nil,
+  record recording: Bool = false,
+  snapshotDirectory: String? = nil,
+  timeout: TimeInterval = 5,
+  file: StaticString = #file,
+  testName: String = #function,
+  line: UInt = #line
+  )
+  -> SnapshotResult {
 
     let recording = recording || isRecording
 
@@ -215,27 +243,27 @@ public func verifySnapshot<Value, Format>(
       case .completed:
         break
       case .timedOut:
-        return """
+        return .init(message: """
           Exceeded timeout of \(timeout) seconds waiting for snapshot.
 
           This can happen when an asynchronously rendered view (like a web view) has not loaded. \
           Ensure that every subview of the view hierarchy has loaded to avoid timeouts, or, if a \
           timeout is unavoidable, consider setting the "timeout" parameter of "assertSnapshot" to \
           a higher value.
-          """
+          """)
       case .incorrectOrder, .invertedFulfillment, .interrupted:
-        return "Couldn't snapshot value"
+        return .init(message: "Couldn't snapshot value", snapshotFileUrl: snapshotFileUrl)
       @unknown default:
-        return "Couldn't snapshot value"
+        return .init(message: "Couldn't snapshot value", snapshotFileUrl: snapshotFileUrl)
       }
 
       guard var diffable = optionalDiffable else {
-        return "Couldn't snapshot value"
+        return .init(message: "Couldn't snapshot value", snapshotFileUrl: snapshotFileUrl)
       }
       
       guard !recording, fileManager.fileExists(atPath: snapshotFileUrl.path) else {
         try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)
-        return recording
+        return .init(message: recording
           ? """
             Record mode is on. Turn record mode off and re-run "\(testName)" to test against the newly-recorded snapshot.
 
@@ -249,7 +277,7 @@ public func verifySnapshot<Value, Format>(
             open "\(snapshotFileUrl.path)"
 
             Re-run "\(testName)" to test against the newly-recorded snapshot.
-            """
+            """, snapshotFileUrl: snapshotFileUrl)
       }
 
       let data = try Data(contentsOf: snapshotFileUrl)
@@ -263,7 +291,7 @@ public func verifySnapshot<Value, Format>(
       #endif
 
       guard let (failure, attachments) = snapshotting.diffing.diff(reference, diffable) else {
-        return nil
+        return .init(message: nil, snapshotFileUrl: snapshotFileUrl)
       }
 
       let artifactsUrl = URL(
@@ -289,16 +317,24 @@ public func verifySnapshot<Value, Format>(
       let diffMessage = diffTool
         .map { "\($0) \"\(snapshotFileUrl.path)\" \"\(failedSnapshotFileUrl.path)\"" }
         ?? "@\(minus)\n\"\(snapshotFileUrl.path)\"\n@\(plus)\n\"\(failedSnapshotFileUrl.path)\""
-      return """
+        return .init(message: """
       Snapshot does not match reference.
 
       \(diffMessage)
 
       \(failure.trimmingCharacters(in: .whitespacesAndNewlines))
-      """
+      """, snapshotFileUrl: snapshotFileUrl, failedSnapshotFileUrl: failedSnapshotFileUrl)
     } catch {
-      return error.localizedDescription
+        return .init(message: error.localizedDescription)
     }
+}
+
+public struct SnapshotResult {
+    var message: String?
+    var snapshotFileUrl: URL?
+    var failedSnapshotFileUrl: URL?
+    
+    var succeeded: Bool { message == nil }
 }
 
 // MARK: - Private
