@@ -950,8 +950,10 @@ final class SnapshotTestingTests: XCTestCase {
     session.dataTask(with: post).resume()
     wait(for: [exp], timeout: 0.1)
 
+    #if os(iOS) || os(tvOS) || os(macOS)
     assertSnapshot(matching: processedRequest, as: .raw, named: "processed-post")
     assertSnapshot(matching: processedRequest, as: .curl, named: "processed-post-curl")
+    #endif
     
     var postWithJSON = URLRequest(url: URL(string: "http://dummy.restapiexample.com/api/v1/create")!)
     postWithJSON.httpMethod = "POST"
@@ -966,8 +968,10 @@ final class SnapshotTestingTests: XCTestCase {
     session.dataTask(with: postWithJSON).resume()
     wait(for: [exp], timeout: 0.1)
 
+    #if os(iOS) || os(tvOS) || os(macOS)
     assertSnapshot(matching: processedRequest, as: .raw, named: "processed-post-with-json")
     assertSnapshot(matching: processedRequest, as: .curl, named: "processed-post-with-json-curl")
+    #endif
 
     var head = URLRequest(url: URL(string: "https://www.pointfree.co/")!)
     head.httpMethod = "HEAD"

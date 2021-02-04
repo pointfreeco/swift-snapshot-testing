@@ -1,3 +1,7 @@
+import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 @testable import SnapshotTesting
 import XCTest
 
@@ -110,6 +114,10 @@ extension NSBezierPath {
 class URLProtocolStub: URLProtocol {
 
   private static var requestObserver: ((URLRequest) -> Void)?
+  private static let anyResponse = URLResponse(url: URL(string: "www.testing.com")!,
+                                               mimeType: "",
+                                               expectedContentLength: 0,
+                                               textEncodingName: "")
 
   /**
    Sets the request observer closure to use when processing requests.
@@ -123,7 +131,7 @@ class URLProtocolStub: URLProtocol {
   static func observeRequests(observer: @escaping (URLRequest) -> Void) { requestObserver = observer }
 
   /// Registers `Self` with the `URL loading system` to begin receiving requests.
-  static func startInterceptingRequests() { URLProtocol.registerClass(URLProtocolStub.self) }
+  static func startInterceptingRequests() { _ = URLProtocol.registerClass(URLProtocolStub.self) }
 
   /// Unregisters `Self` from the `URL loading system` to stop receiving requests.
   /// Additionally, it removes the configured request observer closure, if any.
@@ -138,6 +146,8 @@ class URLProtocolStub: URLProtocol {
 
   override func startLoading() {
     Self.requestObserver.map { $0(request) }
+    client?.urlProtocol(self, didLoad: .init())
+    client?.urlProtocol(self, didReceive: Self.anyResponse, cacheStoragePolicy: .notAllowed)
     client?.urlProtocolDidFinishLoading(self)
   }
 
