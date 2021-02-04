@@ -1,0 +1,6 @@
+curl \
+	--request POST \
+	--header "Accept: application/json" \
+	--header "Content-Length: 58" \
+	--header "Content-Type: application/json" \
+	"http://dummy.restapiexample.com/api/v1/create"

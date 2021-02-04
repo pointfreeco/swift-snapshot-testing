@@ -1,0 +1,6 @@
+curl \
+	--request POST \
+	--header "Accept: text/html" \
+	--header "Content-Length: 49" \
+	--cookie "pf_session={\"user_id\":\"0\"}" \
+	"https://www.pointfree.co/subscribe"
