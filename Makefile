@@ -23,8 +23,7 @@ test-ios:
 
 test-swift:
 	swift test \
-		--enable-pubgrub-resolver \
-		--parallel
+		--enable-test-discovery
 
 test-tvos:
 	set -o pipefail && \
