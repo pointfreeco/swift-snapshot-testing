@@ -237,6 +237,40 @@ final class SnapshotTestingTests: XCTestCase {
     }
     #endif
   }
+    
+  func testNSImageWithPrecisionUnderOne() {
+    #if os(macOS)
+        
+    func makeView(skipOne: Bool) -> NSView {
+      let view = NSView()
+      view.frame = CGRect(x: 0.0, y: 0.0, width: 30.0, height: 30.0)
+      for i in 0..<3 {
+        for j in 0..<3 {
+          if i == 2 && j == 0 && skipOne {
+            continue
+          }
+          let subview = NSView()
+          subview.frame = CGRect(x: 10.0 * Double(i), y: 10.0 * Double(j), width: 10.0, height: 10.0)
+          subview.wantsLayer = true
+          subview.layer?.backgroundColor = NSColor.green.cgColor
+          subview.layer?.cornerRadius = 5
+          view.addSubview(subview)
+        }
+      }
+      return view
+    }
+  
+    let view1 = makeView(skipOne: false)
+    let view2 = makeView(skipOne: true)
+  
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(matching: view1, as: .image(precision: 0.9), named: "1")
+      XCTExpectFailure {
+        assertSnapshot(matching: view2, as: .image(precision: 0.9), named: "1")
+      }
+    }
+    #endif
+  }
   
   func testNSViewWithLayer() {
     #if os(macOS)
