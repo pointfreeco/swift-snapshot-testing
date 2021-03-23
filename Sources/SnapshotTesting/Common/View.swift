@@ -604,7 +604,6 @@ extension View {
     #if os(iOS) || os(macOS)
     if let wkWebView = self as? WKWebView {
       return Async<Image> { callback in
-        let delegate = ForwardingWKNavigationDelegate(originalDelegate: wkWebView.navigationDelegate)
         let work = {
           if #available(iOS 11.0, macOS 10.13, *) {
             inWindow {
@@ -613,7 +612,6 @@ extension View {
                 return
               }
               wkWebView.takeSnapshot(with: nil) { image, _ in
-                _ = delegate
                 callback(image!)
               }
             }
@@ -627,8 +625,14 @@ extension View {
         }
 
         if wkWebView.isLoading {
-          delegate.didFinish = work
-          wkWebView.navigationDelegate = delegate
+          var subscription: NSKeyValueObservation?
+          subscription = wkWebView.observe(\.isLoading, options: [.initial, .new]) { (webview, change) in
+            subscription?.invalidate()
+            subscription = nil
+            if change.newValue == false {
+              work()
+            }
+          }
         } else {
           work()
         }
