@@ -16,7 +16,7 @@ extension Diffing where Value == UIImage {
     if let scale = scale, scale != 0.0 {
       imageScale = scale
     } else {
-        imageScale = UIScreen.main.scale
+      imageScale = UIScreen.main.scale
     }
 
     return Diffing(
