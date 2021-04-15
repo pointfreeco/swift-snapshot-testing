@@ -80,11 +80,8 @@ private func compare(_ old: NSImage, _ new: NSImage, precision: Float) -> Bool {
   let threshold = (1 - precision) * Float(pixelCount)
   let p1: UnsafeMutablePointer<UInt8> = oldRep.bitmapData!
   let p2: UnsafeMutablePointer<UInt8> = newRep.bitmapData!
-  for offset in 0 ..< pixelCount {
-    if p1[offset] != p2[offset]
-        || p1[offset + 1] != p2[offset + 1]
-        || p1[offset + 2] != p2[offset + 2]
-        || p1[offset + 3] != p2[offset + 3] {
+  for offset in 0 ..< pixelCount * 4 {
+    if p1[offset] != p2[offset] {
         differentPixelCount += 1
     }
     if Float(differentPixelCount) > threshold { return false }
