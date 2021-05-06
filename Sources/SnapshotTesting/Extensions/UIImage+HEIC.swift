@@ -1,6 +1,8 @@
+#if os(iOS) || os(tvOS)
 import AVFoundation
 import UIKit
 
+@available(tvOSApplicationExtension 11.0, *)
 extension UIImage {
   func heicData(compressionQuality: Float = 1.0) -> Data? {
     let data = NSMutableData()
@@ -26,3 +28,4 @@ extension UIImage {
     return data as Data
   }
 }
+#endif
