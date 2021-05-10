@@ -293,9 +293,9 @@ public func verifySnapshot<Value, Format>(
         "\(snapshotFileUrl.path)"
         @\(plus)
         "\(failedSnapshotFileUrl.path)"
-      
+
         To configure output for a custom diff tool, like Kaleidoscope:
-      
+
             SnapshotTesting.diffTool = "ksdiff"
         """
       return """
