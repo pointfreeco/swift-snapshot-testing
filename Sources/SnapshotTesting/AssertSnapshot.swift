@@ -201,8 +201,6 @@ public func verifySnapshot<Value, Format>(
       let snapshotFileUrl = snapshotDirectoryUrl
         .appendingPathComponent("\(testName).\(identifier)")
         .appendingPathExtension(snapshotting.pathExtension ?? "")
-      let fileManager = FileManager.default
-      try fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
 
       let tookSnapshot = XCTestExpectation(description: "Took snapshot")
       var optionalDiffable: Format?
@@ -232,27 +230,48 @@ public func verifySnapshot<Value, Format>(
       guard var diffable = optionalDiffable else {
         return "Couldn't snapshot value"
       }
-      
-      guard !recording, fileManager.fileExists(atPath: snapshotFileUrl.path) else {
-        try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)
+
+      let fileManager = FileManager.default
+
+      var treatRecordingsAsArtifacts = false
+      if let recordingsAsArtifacts = ProcessInfo.processInfo.environment["TREAT_RECORDINGS_AS_ARTIFACTS"] {
+        treatRecordingsAsArtifacts = (recordingsAsArtifacts as NSString).boolValue
+      }
+
+      let artifactsUrl = URL(
+        fileURLWithPath: ProcessInfo.processInfo.environment["SNAPSHOT_ARTIFACTS"] ?? NSTemporaryDirectory(), isDirectory: true
+      )
+      let artifactsSubUrl = artifactsUrl.appendingPathComponent(fileName)
+      let failedSnapshotFileUrl = artifactsSubUrl.appendingPathComponent(snapshotFileUrl.lastPathComponent)
+
+      var writeToUrl = snapshotFileUrl
+      if treatRecordingsAsArtifacts {
+        writeToUrl = failedSnapshotFileUrl
+        try fileManager.createDirectory(at: artifactsSubUrl, withIntermediateDirectories: true)
+      } else {
+        try fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
+      }
+
+      guard !recording, fileManager.fileExists(atPath: writeToUrl.path) else {
+        try snapshotting.diffing.toData(diffable).write(to: writeToUrl)
         return recording
           ? """
             Record mode is on. Turn record mode off and re-run "\(testName)" to test against the newly-recorded snapshot.
 
-            open "\(snapshotFileUrl.path)"
+            open "\(writeToUrl.path)"
 
             Recorded snapshot: …
             """
           : """
             No reference was found on disk. Automatically recorded snapshot: …
 
-            open "\(snapshotFileUrl.path)"
+            open "\(writeToUrl.path)"
 
             Re-run "\(testName)" to test against the newly-recorded snapshot.
             """
       }
 
-      let data = try Data(contentsOf: snapshotFileUrl)
+      let data = try Data(contentsOf: writeToUrl)
       let reference = snapshotting.diffing.fromData(data)
 
       #if os(iOS) || os(tvOS)
@@ -266,13 +285,8 @@ public func verifySnapshot<Value, Format>(
         return nil
       }
 
-      let artifactsUrl = URL(
-        fileURLWithPath: ProcessInfo.processInfo.environment["SNAPSHOT_ARTIFACTS"] ?? NSTemporaryDirectory(), isDirectory: true
-      )
-      let artifactsSubUrl = artifactsUrl.appendingPathComponent(fileName)
       try fileManager.createDirectory(at: artifactsSubUrl, withIntermediateDirectories: true)
-      let failedSnapshotFileUrl = artifactsSubUrl.appendingPathComponent(snapshotFileUrl.lastPathComponent)
-      try snapshotting.diffing.toData(diffable).write(to: failedSnapshotFileUrl)
+      try snapshotting.diffing.toData(diffable).write(to: writeToUrl)
 
       if !attachments.isEmpty {
         #if !os(Linux)
