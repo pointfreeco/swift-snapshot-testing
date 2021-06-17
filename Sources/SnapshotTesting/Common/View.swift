@@ -638,8 +638,8 @@ extension View {
     return nil
   }
   #if os(iOS) || os(tvOS)
-  func asImage() -> Image {
-    let renderer = UIGraphicsImageRenderer(bounds: bounds)
+  func asImage(traits: UITraitCollection? = nil) -> Image {
+    let renderer = imageRenderer(bounds: bounds, traits: traits)
     return renderer.image { rendererContext in
       layer.render(in: rendererContext.cgContext)
     }
@@ -737,7 +737,7 @@ func snapshotView(
     return (view.snapshot ?? Async { callback in
       addImagesForRenderedViews(view).sequence().run { views in
         callback(
-          renderer(bounds: view.bounds, for: traits).image { ctx in
+          imageRenderer(bounds: view.bounds, traits: traits).image { ctx in
             if drawHierarchyInKeyWindow {
               view.drawHierarchy(in: view.bounds, afterScreenUpdates: true)
             } else {
@@ -753,12 +753,21 @@ func snapshotView(
 
 private let offscreen: CGFloat = 10_000
 
-func renderer(bounds: CGRect, for traits: UITraitCollection) -> UIGraphicsImageRenderer {
+func imageRenderer(bounds: CGRect, format: UIGraphicsImageRendererFormat?) -> UIGraphicsImageRenderer {
+    if let format = format {
+        return UIGraphicsImageRenderer(bounds: bounds, format: format)
+    } else {
+        return UIGraphicsImageRenderer(bounds: bounds)
+    }
+}
+
+func imageRenderer(bounds: CGRect, traits: UITraitCollection?) -> UIGraphicsImageRenderer {
   let renderer: UIGraphicsImageRenderer
   if #available(iOS 11.0, tvOS 11.0, *) {
-    renderer = UIGraphicsImageRenderer(bounds: bounds, format: .init(for: traits))
+    let format = traits.map({ UIGraphicsImageRendererFormat(for: $0) })
+    renderer = imageRenderer(bounds: bounds, format: format)
   } else {
-    renderer = UIGraphicsImageRenderer(bounds: bounds)
+    renderer = imageRenderer(bounds: bounds, format: nil)
   }
   return renderer
 }
