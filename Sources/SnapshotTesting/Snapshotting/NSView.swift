@@ -19,7 +19,7 @@ extension Snapshotting where Value == NSView, Format == NSImage {
       guard view.frame.width > 0, view.frame.height > 0 else {
         fatalError("View not renderable to image at size \(view.frame.size)")
       }
-      return view.snapshot ?? Async { callback in
+      return view.snapshotImage ?? Async { callback in
         addImagesForRenderedViews(view).sequence().run { views in
           let bitmapRep = view.bitmapImageRepForCachingDisplay(in: view.bounds)!
           view.cacheDisplay(in: view.bounds, to: bitmapRep)

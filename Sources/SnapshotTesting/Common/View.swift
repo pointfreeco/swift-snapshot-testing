@@ -9,6 +9,7 @@ import UIKit
 #endif
 #if os(iOS) || os(macOS)
 import WebKit
+import PDFKit
 #endif
 
 #if os(iOS) || os(tvOS)
@@ -547,7 +548,7 @@ extension UITraitCollection {
 #endif
 
 func addImagesForRenderedViews(_ view: View) -> [Async<View>] {
-  return view.snapshot
+  return view.snapshotImage
     .map { async in
       [
         Async { callback in
@@ -568,8 +569,33 @@ func addImagesForRenderedViews(_ view: View) -> [Async<View>] {
     ?? view.subviews.flatMap(addImagesForRenderedViews)
 }
 
+#if os(iOS)
+@available(iOS 11.0, macOS 10.4, *)
+func addPDFsForRenderedViews(_ view: View) -> [Async<View>] {
+  return view.snapshotPDF
+    .map { async in
+      [
+        Async { callback in
+          async.run { document in
+            let pdfView = PDFView()
+            pdfView.document = document
+            pdfView.frame = view.frame
+            #if os(macOS)
+            view.superview?.addSubview(pdfView, positioned: .above, relativeTo: view)
+            #elseif os(iOS) || os(tvOS)
+            view.superview?.insertSubview(pdfView, aboveSubview: view)
+            #endif
+            callback(pdfView)
+          }
+        }
+      ]
+    }
+    ?? view.subviews.flatMap(addImagesForRenderedViews)
+}
+#endif
+
 extension View {
-  var snapshot: Async<Image>? {
+  var snapshotImage: Async<Image>? {
     func inWindow<T>(_ perform: () -> T) -> T {
       #if os(macOS)
       let superview = self.superview
@@ -647,6 +673,34 @@ extension View {
   #endif
 }
 
+#if os(iOS)
+@available(iOS 11.0, macOS 10.4, *)
+extension View {
+  var snapshotPDF: Async<PDFDocument>? {
+    snapshotImage.map { snapshot in
+      snapshot.map { image in
+        let bounds = CGRect(origin: .zero, size: image.size)
+        let renderer = pdfRenderer(bounds: bounds)
+        let data = renderer.pdfData { ctx in
+          ctx.beginPage()
+          image.draw(in: bounds)
+        }
+        return PDFDocument(data: data)!
+      }
+    }
+  }
+  
+  func asPDF() -> PDFDocument {
+    let renderer = pdfRenderer(bounds: bounds)
+    let data = renderer.pdfData { ctx in
+      ctx.beginPage()
+      layer.render(in: ctx.cgContext)
+    }
+    return PDFDocument(data: data)!
+  }
+}
+#endif
+
 #if os(iOS) || os(macOS)
 private final class NavigationDelegate: NSObject, WKNavigationDelegate {
   var didFinish: () -> Void
@@ -715,7 +769,7 @@ func prepareView(
   return dispose
 }
 
-func snapshotView(
+func snapshotViewAsImage(
   config: ViewImageConfig,
   drawHierarchyInKeyWindow: Bool,
   traits: UITraitCollection,
@@ -734,7 +788,7 @@ func snapshotView(
     // NB: Avoid safe area influence.
     if config.safeArea == .zero { view.frame.origin = .init(x: offscreen, y: offscreen) }
 
-    return (view.snapshot ?? Async { callback in
+    return (view.snapshotImage ?? Async { callback in
       addImagesForRenderedViews(view).sequence().run { views in
         callback(
           imageRenderer(bounds: view.bounds, traits: traits).image { ctx in
@@ -750,7 +804,50 @@ func snapshotView(
       }
     }).map { dispose(); return $0 }
 }
+#endif
 
+#if os(iOS)
+@available(iOS 11.0, *)
+func snapshotViewAsPDF(
+  config: ViewImageConfig,
+  drawHierarchyInKeyWindow: Bool,
+  traits: UITraitCollection,
+  view: UIView,
+  viewController: UIViewController
+  )
+  -> Async<PDFDocument> {
+    let initialFrame = view.frame
+    let dispose = prepareView(
+      config: config,
+      drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+      traits: traits,
+      view: view,
+      viewController: viewController
+    )
+    // NB: Avoid safe area influence.
+    if config.safeArea == .zero { view.frame.origin = .init(x: offscreen, y: offscreen) }
+
+    return (view.snapshotPDF ?? Async { callback in
+      addPDFsForRenderedViews(view).sequence().run { views in
+        let data = pdfRenderer(bounds: view.bounds).pdfData { ctx in
+          ctx.beginPage()
+          if drawHierarchyInKeyWindow {
+            view.drawHierarchy(in: view.bounds, afterScreenUpdates: true)
+          } else {
+            view.layer.setNeedsLayout()
+            view.layer.layoutIfNeeded()
+            view.layer.render(in: ctx.cgContext)
+          }
+        }
+        callback(PDFDocument(data: data)!)
+        views.forEach { $0.removeFromSuperview() }
+        view.frame = initialFrame
+      }
+    }).map { dispose(); return $0 }
+}
+#endif
+
+#if os(iOS) || os(tvOS)
 private let offscreen: CGFloat = 10_000
 
 func imageRenderer(bounds: CGRect, format: UIGraphicsImageRendererFormat?) -> UIGraphicsImageRenderer {
@@ -770,6 +867,18 @@ func imageRenderer(bounds: CGRect, traits: UITraitCollection?) -> UIGraphicsImag
     renderer = imageRenderer(bounds: bounds, format: nil)
   }
   return renderer
+}
+
+func pdfRenderer(bounds: CGRect, format: UIGraphicsPDFRendererFormat?) -> UIGraphicsPDFRenderer {
+    if let format = format {
+        return UIGraphicsPDFRenderer(bounds: bounds, format: format)
+    } else {
+        return UIGraphicsPDFRenderer(bounds: bounds)
+    }
+}
+
+func pdfRenderer(bounds: CGRect) -> UIGraphicsPDFRenderer {
+  return pdfRenderer(bounds: bounds, format: nil)
 }
 
 private func add(traits: UITraitCollection, viewController: UIViewController, to window: UIWindow) -> () -> Void {
