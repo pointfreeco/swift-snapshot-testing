@@ -9,6 +9,7 @@ import UIKit
 #endif
 #if os(iOS) || os(macOS)
 import WebKit
+import PDFKit
 #endif
 
 #if os(iOS) || os(tvOS)
@@ -156,7 +157,7 @@ public struct ViewImageConfig {
       return ViewImageConfig.iPadMini(.portrait(splitView: .full))
     }
   }
-  
+
   public static func iPadMini(_ orientation: TabletOrientation) -> ViewImageConfig {
     let size: CGSize
     let traits: UITraitCollection
@@ -202,7 +203,7 @@ public struct ViewImageConfig {
       return ViewImageConfig.iPadPro10_5(.portrait(splitView: .full))
     }
   }
-  
+
   public static func iPadPro10_5(_ orientation: TabletOrientation) -> ViewImageConfig {
     let size: CGSize
     let traits: UITraitCollection
@@ -237,9 +238,9 @@ public struct ViewImageConfig {
     }
     return .init(safeArea: .init(top: 20, left: 0, bottom: 0, right: 0), size: size, traits: traits)
   }
-  
+
   public static let iPadPro11 = ViewImageConfig.iPadPro11(.landscape)
-  
+
   public static func iPadPro11(_ orientation: Orientation) -> ViewImageConfig {
     switch orientation {
     case .landscape:
@@ -248,7 +249,7 @@ public struct ViewImageConfig {
       return ViewImageConfig.iPadPro11(.portrait(splitView: .full))
     }
   }
-  
+
   public static func iPadPro11(_ orientation: TabletOrientation) -> ViewImageConfig {
     let size: CGSize
     let traits: UITraitCollection
@@ -294,7 +295,7 @@ public struct ViewImageConfig {
       return ViewImageConfig.iPadPro12_9(.portrait(splitView: .full))
     }
   }
-  
+
   public static func iPadPro12_9(_ orientation: TabletOrientation) -> ViewImageConfig {
     let size: CGSize
     let traits: UITraitCollection
@@ -314,7 +315,7 @@ public struct ViewImageConfig {
         size = .init(width: 1366, height: 1024)
         traits = .iPadPro12_9
       }
-      
+
     case .portrait(let splitView):
       switch splitView {
       case .oneThird:
@@ -327,7 +328,7 @@ public struct ViewImageConfig {
         size = .init(width: 1024, height: 1366)
         traits = .iPadPro12_9
       }
-      
+
     }
     return .init(safeArea: .init(top: 20, left: 0, bottom: 0, right: 0), size: size, traits: traits)
   }
@@ -532,7 +533,7 @@ extension UITraitCollection {
       .init(userInterfaceIdiom: .pad)
     ]
   )
-  
+
   private static let iPadCompactSplitView = UITraitCollection(
     traitsFrom: [
       .init(horizontalSizeClass: .compact),
@@ -547,7 +548,7 @@ extension UITraitCollection {
 #endif
 
 func addImagesForRenderedViews(_ view: View) -> [Async<View>] {
-  return view.snapshot
+  return view.snapshotImage
     .map { async in
       [
         Async { callback in
@@ -568,8 +569,33 @@ func addImagesForRenderedViews(_ view: View) -> [Async<View>] {
     ?? view.subviews.flatMap(addImagesForRenderedViews)
 }
 
+#if os(iOS)
+@available(iOS 11.0, macOS 10.4, *)
+func addPDFsForRenderedViews(_ view: View) -> [Async<View>] {
+  return view.snapshotPDF
+    .map { async in
+      [
+        Async { callback in
+          async.run { document in
+            let pdfView = PDFView()
+            pdfView.document = document
+            pdfView.frame = view.frame
+            #if os(macOS)
+            view.superview?.addSubview(pdfView, positioned: .above, relativeTo: view)
+            #elseif os(iOS) || os(tvOS)
+            view.superview?.insertSubview(pdfView, aboveSubview: view)
+            #endif
+            callback(pdfView)
+          }
+        }
+      ]
+    }
+    ?? view.subviews.flatMap(addImagesForRenderedViews)
+}
+#endif
+
 extension View {
-  var snapshot: Async<Image>? {
+  var snapshotImage: Async<Image>? {
     func inWindow<T>(_ perform: () -> T) -> T {
       #if os(macOS)
       let superview = self.superview
@@ -638,14 +664,42 @@ extension View {
     return nil
   }
   #if os(iOS) || os(tvOS)
-  func asImage() -> Image {
-    let renderer = UIGraphicsImageRenderer(bounds: bounds)
+  func asImage(traits: UITraitCollection? = nil) -> Image {
+    let renderer = imageRenderer(bounds: bounds, traits: traits)
     return renderer.image { rendererContext in
       layer.render(in: rendererContext.cgContext)
     }
   }
   #endif
 }
+
+#if os(iOS)
+@available(iOS 11.0, macOS 10.4, *)
+extension View {
+  var snapshotPDF: Async<PDFDocument>? {
+    snapshotImage.map { snapshot in
+      snapshot.map { image in
+        let bounds = CGRect(origin: .zero, size: image.size)
+        let renderer = pdfRenderer(bounds: bounds)
+        let data = renderer.pdfData { ctx in
+          ctx.beginPage()
+          image.draw(in: bounds)
+        }
+        return PDFDocument(data: data)!
+      }
+    }
+  }
+  
+  func asPDF() -> PDFDocument {
+    let renderer = pdfRenderer(bounds: bounds)
+    let data = renderer.pdfData { ctx in
+      ctx.beginPage()
+      layer.render(in: ctx.cgContext)
+    }
+    return PDFDocument(data: data)!
+  }
+}
+#endif
 
 #if os(iOS) || os(macOS)
 private final class NavigationDelegate: NSObject, WKNavigationDelegate {
@@ -666,11 +720,11 @@ private final class NavigationDelegate: NSObject, WKNavigationDelegate {
 #if os(iOS) || os(tvOS)
 extension UIApplication {
     static var sharedIfAvailable: UIApplication? {
-      let sharedSelector = NSSelectorFromString("shared")
+      let sharedSelector = NSSelectorFromString("sharedApplication")
       guard UIApplication.responds(to: sharedSelector) else {
         return nil
       }
-      
+
       let shared = UIApplication.perform(sharedSelector)
       return shared?.takeUnretainedValue() as! UIApplication?
   }
@@ -692,7 +746,7 @@ func prepareView(
   let traits = UITraitCollection(traitsFrom: [config.traits, traits])
   let window: UIWindow
   if drawHierarchyInKeyWindow {
-    guard let keyWindow = UIApplication.sharedIfAvailable?.keyWindow else {
+    guard let keyWindow = getKeyWindow() else {
       fatalError("'drawHierarchyInKeyWindow' requires tests to be run in a host application")
     }
     window = keyWindow
@@ -715,7 +769,7 @@ func prepareView(
   return dispose
 }
 
-func snapshotView(
+func snapshotViewAsImage(
   config: ViewImageConfig,
   drawHierarchyInKeyWindow: Bool,
   traits: UITraitCollection,
@@ -734,10 +788,10 @@ func snapshotView(
     // NB: Avoid safe area influence.
     if config.safeArea == .zero { view.frame.origin = .init(x: offscreen, y: offscreen) }
 
-    return (view.snapshot ?? Async { callback in
+    return (view.snapshotImage ?? Async { callback in
       addImagesForRenderedViews(view).sequence().run { views in
         callback(
-          renderer(bounds: view.bounds, for: traits).image { ctx in
+          imageRenderer(bounds: view.bounds, traits: traits).image { ctx in
             if drawHierarchyInKeyWindow {
               view.drawHierarchy(in: view.bounds, afterScreenUpdates: true)
             } else {
@@ -750,17 +804,81 @@ func snapshotView(
       }
     }).map { dispose(); return $0 }
 }
+#endif
 
+#if os(iOS)
+@available(iOS 11.0, *)
+func snapshotViewAsPDF(
+  config: ViewImageConfig,
+  drawHierarchyInKeyWindow: Bool,
+  traits: UITraitCollection,
+  view: UIView,
+  viewController: UIViewController
+  )
+  -> Async<PDFDocument> {
+    let initialFrame = view.frame
+    let dispose = prepareView(
+      config: config,
+      drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+      traits: traits,
+      view: view,
+      viewController: viewController
+    )
+    // NB: Avoid safe area influence.
+    if config.safeArea == .zero { view.frame.origin = .init(x: offscreen, y: offscreen) }
+
+    return (view.snapshotPDF ?? Async { callback in
+      addPDFsForRenderedViews(view).sequence().run { views in
+        let data = pdfRenderer(bounds: view.bounds).pdfData { ctx in
+          ctx.beginPage()
+          if drawHierarchyInKeyWindow {
+            view.drawHierarchy(in: view.bounds, afterScreenUpdates: true)
+          } else {
+            view.layer.setNeedsLayout()
+            view.layer.layoutIfNeeded()
+            view.layer.render(in: ctx.cgContext)
+          }
+        }
+        callback(PDFDocument(data: data)!)
+        views.forEach { $0.removeFromSuperview() }
+        view.frame = initialFrame
+      }
+    }).map { dispose(); return $0 }
+}
+#endif
+
+#if os(iOS) || os(tvOS)
 private let offscreen: CGFloat = 10_000
 
-func renderer(bounds: CGRect, for traits: UITraitCollection) -> UIGraphicsImageRenderer {
+func imageRenderer(bounds: CGRect, format: UIGraphicsImageRendererFormat?) -> UIGraphicsImageRenderer {
+    if let format = format {
+        return UIGraphicsImageRenderer(bounds: bounds, format: format)
+    } else {
+        return UIGraphicsImageRenderer(bounds: bounds)
+    }
+}
+
+func imageRenderer(bounds: CGRect, traits: UITraitCollection?) -> UIGraphicsImageRenderer {
   let renderer: UIGraphicsImageRenderer
   if #available(iOS 11.0, tvOS 11.0, *) {
-    renderer = UIGraphicsImageRenderer(bounds: bounds, format: .init(for: traits))
+    let format = traits.map({ UIGraphicsImageRendererFormat(for: $0) })
+    renderer = imageRenderer(bounds: bounds, format: format)
   } else {
-    renderer = UIGraphicsImageRenderer(bounds: bounds)
+    renderer = imageRenderer(bounds: bounds, format: nil)
   }
   return renderer
+}
+
+func pdfRenderer(bounds: CGRect, format: UIGraphicsPDFRendererFormat?) -> UIGraphicsPDFRenderer {
+    if let format = format {
+        return UIGraphicsPDFRenderer(bounds: bounds, format: format)
+    } else {
+        return UIGraphicsPDFRenderer(bounds: bounds)
+    }
+}
+
+func pdfRenderer(bounds: CGRect) -> UIGraphicsPDFRenderer {
+  return pdfRenderer(bounds: bounds, format: nil)
 }
 
 private func add(traits: UITraitCollection, viewController: UIViewController, to window: UIWindow) -> () -> Void {
@@ -807,6 +925,16 @@ private func add(traits: UITraitCollection, viewController: UIViewController, to
     rootViewController.endAppearanceTransition()
     window.rootViewController = nil
   }
+}
+
+private func getKeyWindow() -> UIWindow? {
+  var window: UIWindow?
+  if #available(iOS 13.0, *) {
+      window = UIApplication.sharedIfAvailable?.windows.first { $0.isKeyWindow }
+  } else {
+      window = UIApplication.sharedIfAvailable?.keyWindow
+  }
+  return window
 }
 
 private final class Window: UIWindow {

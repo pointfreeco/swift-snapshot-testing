@@ -15,6 +15,9 @@ import WebKit
 #if canImport(UIKit)
 import UIKit.UIView
 #endif
+#if canImport(PDFKit)
+import PDFKit
+#endif
 import XCTest
 
 @testable import SnapshotTesting
@@ -23,11 +26,11 @@ final class SnapshotTestingTests: XCTestCase {
   override func setUp() {
     super.setUp()
     diffTool = "ksdiff"
-//    record = true
+//    isRecording = true
   }
 
   override func tearDown() {
-    record = false
+    isRecording = false
     super.tearDown()
   }
 
@@ -160,6 +163,12 @@ final class SnapshotTestingTests: XCTestCase {
       assertSnapshot(matching: path, as: .elementsDescription, named: osName)
     }
     #endif
+  }
+
+  func testData() {
+    let data = Data([0xDE, 0xAD, 0xBE, 0xEF])
+
+    assertSnapshot(matching: data, as: .data)
   }
 
   func testEncodable() {
@@ -714,6 +723,37 @@ final class SnapshotTestingTests: XCTestCase {
     #endif
   }
 
+  func testPDFDocument() {
+    #if os(iOS)
+    if #available(iOS 11.0, *) {
+      let bounds = CGRect(origin: .zero, size: .init(width: 800.0, height: 800.0))
+      let renderer = UIGraphicsPDFRenderer(bounds: bounds)
+      let data = renderer.pdfData { ctx in
+        // Page 1:
+        ctx.beginPage()
+        UIColor.red.set()
+        ctx.fill(bounds.insetBy(dx: 100.0, dy: 100.0))
+        UIColor.green.set()
+        ctx.fill(bounds.insetBy(dx: 200.0, dy: 200.0))
+        UIColor.blue.set()
+        ctx.fill(bounds.insetBy(dx: 300.0, dy: 300.0))
+
+        // Page 2:
+        ctx.beginPage()
+        UIColor.yellow.set()
+        ctx.fill(bounds.insetBy(dx: 100.0, dy: 100.0))
+        UIColor.orange.set()
+        ctx.fill(bounds.insetBy(dx: 200.0, dy: 200.0))
+        UIColor.red.set()
+        ctx.fill(bounds.insetBy(dx: 300.0, dy: 300.0))
+      }
+      let document = PDFDocument(data: data)!
+
+      assertSnapshot(matching: document, as: .rasterized, named: "rasterized")
+    }
+    #endif
+  }
+
   func testTraitsWithView() {
     #if os(iOS)
     if #available(iOS 11.0, *) {
@@ -784,8 +824,11 @@ final class SnapshotTestingTests: XCTestCase {
   func testUIView() {
     #if os(iOS)
     let view = UIButton(type: .contactAdd)
-    assertSnapshot(matching: view, as: .image)
-    assertSnapshot(matching: view, as: .recursiveDescription)
+    assertSnapshot(matching: view, as: .image, named: "image")
+    if #available(iOS 11.0, *) {
+      assertSnapshot(matching: view, as: .pdf, named: "pdf")
+    }
+    assertSnapshot(matching: view, as: .recursiveDescription, named: "recursiveDescription")
     #endif
   }
 
@@ -872,19 +915,22 @@ final class SnapshotTestingTests: XCTestCase {
     layer.backgroundColor = UIColor.red.cgColor
     layer.borderWidth = 4.0
     layer.borderColor = UIColor.black.cgColor
-    assertSnapshot(matching: layer, as: .image)
+    assertSnapshot(matching: layer, as: .image, named: "image")
+    if #available(iOS 11.0, *) {
+      assertSnapshot(matching: layer, as: .pdf, named: "pdf")
+    }
     #endif
   }
 
   func testCALayerWithGradient() {
     #if os(iOS)
-    let baseLayer = CALayer()
-    baseLayer.frame = CGRect(x: 0, y: 0, width: 100, height: 100)
     let gradientLayer = CAGradientLayer()
+    gradientLayer.frame = CGRect(x: 0, y: 0, width: 100, height: 100)
     gradientLayer.colors = [UIColor.red.cgColor, UIColor.yellow.cgColor]
-    gradientLayer.frame = baseLayer.frame
-    baseLayer.addSublayer(gradientLayer)
-    assertSnapshot(matching: baseLayer, as: .image)
+    assertSnapshot(matching: gradientLayer, as: .image, named: "image")
+    if #available(iOS 11.0, *) {
+      assertSnapshot(matching: gradientLayer, as: .pdf, named: "pdf")
+    }
     #endif
   }
 
@@ -1063,6 +1109,15 @@ final class SnapshotTestingTests: XCTestCase {
     assertSnapshot(matching: view, as: .image(layout: .fixed(width: 300.0, height: 100.0)), named: "fixed")
     assertSnapshot(matching: view, as: .image(layout: .device(config: .tv)), named: "device")
     #endif
+  }
+
+  @available(*, deprecated)
+  func testIsRecordingProxy() {
+    SnapshotTesting.record = true
+    XCTAssertEqual(isRecording, true)
+
+    SnapshotTesting.record = false
+    XCTAssertEqual(isRecording, false)
   }
 }
 

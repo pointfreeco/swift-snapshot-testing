@@ -49,7 +49,7 @@ extension Snapshotting where Value == CGPath, Format == UIImage {
         format = UIGraphicsImageRendererFormat.default()
       }
       format.scale = scale
-      return UIGraphicsImageRenderer(bounds: bounds, format: format).image { ctx in
+      return imageRenderer(bounds: bounds, format: format).image { ctx in
         let cgContext = ctx.cgContext
         cgContext.addPath(path)
         cgContext.drawPath(using: drawingMode)

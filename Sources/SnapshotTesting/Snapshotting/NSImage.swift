@@ -77,12 +77,14 @@ private func compare(_ old: NSImage, _ new: NSImage, precision: Float) -> Bool {
   let newRep = NSBitmapImageRep(cgImage: newerCgImage)
   var differentPixelCount = 0
   let pixelCount = oldRep.pixelsWide * oldRep.pixelsHigh
-  let threshold = 1 - precision
-  for x in 0..<oldRep.pixelsWide {
-    for y in 0..<oldRep.pixelsHigh {
-      if oldRep.colorAt(x: x, y: y) != newRep.colorAt(x: x, y: y) { differentPixelCount += 1 }
-      if Float(differentPixelCount) / Float(pixelCount) > threshold { return false}
+  let threshold = (1 - precision) * Float(pixelCount)
+  let p1: UnsafeMutablePointer<UInt8> = oldRep.bitmapData!
+  let p2: UnsafeMutablePointer<UInt8> = newRep.bitmapData!
+  for offset in 0 ..< pixelCount * 4 {
+    if p1[offset] != p2[offset] {
+        differentPixelCount += 1
     }
+    if Float(differentPixelCount) > threshold { return false }
   }
   return true
 }

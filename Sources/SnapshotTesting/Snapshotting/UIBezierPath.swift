@@ -20,7 +20,7 @@ extension Snapshotting where Value == UIBezierPath, Format == UIImage {
         format = UIGraphicsImageRendererFormat.default()
       }
       format.scale = scale
-      return UIGraphicsImageRenderer(bounds: bounds, format: format).image { ctx in
+      return imageRenderer(bounds: bounds, format: format).image { ctx in
         path.fill()
       }
     }
