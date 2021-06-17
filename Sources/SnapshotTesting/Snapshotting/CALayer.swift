@@ -38,7 +38,7 @@ extension Snapshotting where Value == CALayer, Format == UIImage {
   public static func image(precision: Float = 1, traits: UITraitCollection = .init())
     -> Snapshotting {
       return SimplySnapshotting.image(precision: precision, scale: traits.displayScale).pullback { layer in
-        renderer(bounds: layer.bounds, for: traits).image { ctx in
+        imageRenderer(bounds: layer.bounds, traits: traits).image { ctx in
           layer.setNeedsLayout()
           layer.layoutIfNeeded()
           layer.render(in: ctx.cgContext)
