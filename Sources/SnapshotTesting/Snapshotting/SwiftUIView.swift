@@ -99,7 +99,7 @@ extension Snapshotting where Value: SwiftUI.View, Format == NSImage {
   public static func image(
     precision: Float = 1,
     layout: SwiftUISnapshotLayout = .sizeThatFits,
-    appearance: NSAppearance? = .init(named: .aqua)
+    appearance: NSAppearance? = .init(named: .aqua)!
   ) -> Snapshotting {
     let size: CGSize?
 
