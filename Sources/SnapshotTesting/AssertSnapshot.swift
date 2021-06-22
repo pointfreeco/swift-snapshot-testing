@@ -243,7 +243,19 @@ public func verifySnapshot<Value, Format>(
         fileURLWithPath: ProcessInfo.processInfo.environment["SNAPSHOT_ARTIFACTS"] ?? NSTemporaryDirectory(), isDirectory: true
       )
       let artifactsSubUrl = artifactsUrl.appendingPathComponent(fileName)
-      let failedSnapshotFileUrl = artifactsSubUrl.appendingPathComponent(snapshotFileUrl.lastPathComponent)
+      var additionalComponents: [String] = []
+      for component in snapshotFileUrl.pathComponents.reversed() {
+        if component != fileName {
+          additionalComponents.insert(component, at: 0)
+        } else {
+          break
+        }
+      }
+
+      var failedSnapshotFileUrl = artifactsSubUrl
+      for component in additionalComponents {
+        failedSnapshotFileUrl = failedSnapshotFileUrl.appendingPathComponent(component)
+      }
 
       guard !recording, fileManager.fileExists(atPath: snapshotFileUrl.path) else {
         let writeToUrl = treatRecordingsAsArtifacts ? failedSnapshotFileUrl : snapshotFileUrl
