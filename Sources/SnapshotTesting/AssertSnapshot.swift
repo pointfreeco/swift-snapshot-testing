@@ -242,19 +242,27 @@ public func verifySnapshot<Value, Format>(
       let artifactsUrl = URL(
         fileURLWithPath: ProcessInfo.processInfo.environment["SNAPSHOT_ARTIFACTS"] ?? NSTemporaryDirectory(), isDirectory: true
       )
-      let artifactsSubUrl = artifactsUrl.appendingPathComponent(fileName)
-      var additionalComponents: [String] = []
-      for component in snapshotFileUrl.pathComponents.reversed() {
-        if component != fileName {
-          additionalComponents.insert(component, at: 0)
-        } else {
-          break
-        }
-      }
+      var artifactsSubUrl = artifactsUrl.appendingPathComponent(fileName)
 
-      var failedSnapshotFileUrl = artifactsSubUrl
-      for component in additionalComponents {
-        failedSnapshotFileUrl = failedSnapshotFileUrl.appendingPathComponent(component)
+      var failedSnapshotFileUrl: URL
+      if treatRecordingsAsArtifacts {
+        var additionalComponents: [String] = []
+        for component in snapshotFileUrl.pathComponents.reversed() {
+          if component != fileName {
+            additionalComponents.insert(component, at: 0)
+          } else {
+            break
+          }
+        }
+
+        failedSnapshotFileUrl = artifactsSubUrl
+        for component in additionalComponents {
+          failedSnapshotFileUrl = failedSnapshotFileUrl.appendingPathComponent(component)
+          artifactsSubUrl = artifactsSubUrl.appendingPathComponent(component)
+        }
+        artifactsSubUrl = artifactsSubUrl.deletingLastPathComponent()
+      } else {
+        failedSnapshotFileUrl = artifactsSubUrl.appendingPathComponent(snapshotFileUrl.lastPathComponent)
       }
 
       guard !recording, fileManager.fileExists(atPath: snapshotFileUrl.path) else {
