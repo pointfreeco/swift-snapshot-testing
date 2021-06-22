@@ -75,16 +75,16 @@ private func compare(_ old: NSImage, _ new: NSImage, precision: Float) -> Bool {
   if precision >= 1 { return false }
   let oldRep = NSBitmapImageRep(cgImage: oldCgImage)
   let newRep = NSBitmapImageRep(cgImage: newerCgImage)
-  var differentPixelCount = 0
-  let pixelCount = oldRep.pixelsWide * oldRep.pixelsHigh
-  let threshold = (1 - precision) * Float(pixelCount)
+  var differentComponentCount = 0
+  let componentCount = oldRep.pixelsWide * oldRep.pixelsHigh * (oldRep.bitsPerPixel / 8)
+  let threshold = (1 - precision) * Float(componentCount)
   let p1: UnsafeMutablePointer<UInt8> = oldRep.bitmapData!
   let p2: UnsafeMutablePointer<UInt8> = newRep.bitmapData!
-  for offset in 0 ..< pixelCount * 4 {
+  for offset in 0 ..< componentCount {
     if p1[offset] != p2[offset] {
-        differentPixelCount += 1
+        differentComponentCount += 1
     }
-    if Float(differentPixelCount) > threshold { return false }
+    if Float(differentComponentCount) > threshold { return false }
   }
   return true
 }

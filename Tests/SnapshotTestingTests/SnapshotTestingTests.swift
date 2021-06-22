@@ -139,6 +139,55 @@ final class SnapshotTestingTests: XCTestCase {
     )
   }
 
+  func testCGImageFuzzyExact() {
+    #if os(macOS)
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(matching: CGImage.heart, as: .fuzzyImage(maxAbsoluteComponentDifference: 0.0, maxAverageAbsoluteComponentDifference: 0.0))
+    }
+    #endif
+  }
+
+  func testCGImageFuzzyComponentFail() {
+    #if os(macOS)
+
+    //XCTExpectFailure()
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(matching: NSImage.heartOffByOne, as: .fuzzyImage(maxAbsoluteComponentDifference: 1.0.nextDown, maxAverageAbsoluteComponentDifference: Double.infinity))
+    }
+    #endif
+  }
+
+  func testCGImageFuzzyComponent() {
+    #if os(macOS)
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(matching: CGImage.heartOffByOne, as: .fuzzyImage(maxAbsoluteComponentDifference: 1.0, maxAverageAbsoluteComponentDifference: Double.infinity))
+    }
+    #endif
+  }
+
+  func testCGImageFuzzyAverageFail() {
+    #if os(macOS)
+
+    //XCTExpectFailure()
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(matching: NSImage.heartOffByOne, as: .fuzzyImage(maxAbsoluteComponentDifference: Double.infinity, maxAverageAbsoluteComponentDifference: 1.0.nextDown))
+    }
+    #endif
+  }
+
+  func testCGImageFuzzyAverage() {
+    #if os(macOS)
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(matching: CGImage.heartOffByOne, as: .fuzzyImage(maxAbsoluteComponentDifference: Double.infinity, maxAverageAbsoluteComponentDifference: 2.0))
+    }
+    #endif
+  }
+
   func testCGPath() {
     #if os(iOS) || os(tvOS) || os(macOS)
     let path = CGPath.heart
@@ -222,6 +271,133 @@ final class SnapshotTestingTests: XCTestCase {
     }
 
     assertSnapshot(matching: path, as: .elementsDescription, named: "macOS")
+    #endif
+  }
+
+  func testNSImagePerformance() {
+    #if os(macOS)
+
+    let image = NSImage.largeHeart
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      measure {
+        assertSnapshot(matching: image, as: .image, named: "perf")
+      }
+    }
+    #endif
+  }
+
+  func testNSImageOffByOnePerformance() {
+    #if os(macOS)
+
+    let image = NSImage.largeHeartOffByOne
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      measure {
+        assertSnapshot(matching: image, as: .image(precision: 0.0), named: "perf")
+      }
+    }
+    #endif
+  }
+
+  func testNSImageFuzzyExact() {
+    #if os(macOS)
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(matching: NSImage.heart, as: .fuzzyImage(maxAbsoluteComponentDifference: 0.0, maxAverageAbsoluteComponentDifference: 0.0))
+    }
+    #endif
+  }
+
+  func testNSImageFuzzyExactPerformance() {
+    #if os(macOS)
+
+    let image = NSImage.largeHeart
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      measure {
+        assertSnapshot(matching: image, as: .fuzzyImage(maxAbsoluteComponentDifference: 0.0, maxAverageAbsoluteComponentDifference: 0.0), named: "perf")
+      }
+    }
+    #endif
+  }
+
+  func testNSImageFuzzyExactOffByOnePerformance() {
+    #if os(macOS)
+
+    let image = NSImage.largeHeartOffByOne
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      measure {
+        assertSnapshot(matching: image, as: .fuzzyImage(maxAbsoluteComponentDifference: 1.0, maxAverageAbsoluteComponentDifference: 1.0), named: "perf")
+      }
+    }
+    #endif
+  }
+
+  func testNSImageFuzzyComponentFail() {
+    #if os(macOS)
+
+    //XCTExpectFailure()
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(matching: NSImage.heartOffByOne, as: .fuzzyImage(maxAbsoluteComponentDifference: 1.0.nextDown, maxAverageAbsoluteComponentDifference: Double.infinity))
+    }
+    #endif
+  }
+
+  func testNSImageFuzzyComponent() {
+    #if os(macOS)
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(matching: NSImage.heartOffByOne, as: .fuzzyImage(maxAbsoluteComponentDifference: 1.0, maxAverageAbsoluteComponentDifference: Double.infinity))
+    }
+    #endif
+  }
+
+  func testNSImageFuzzyComponentPerformance() {
+    #if os(macOS)
+
+    let image = NSImage.largeHeartOffByOne
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      measure {
+        assertSnapshot(matching: image, as: .fuzzyImage(maxAbsoluteComponentDifference: 1.0, maxAverageAbsoluteComponentDifference: Double.infinity), named: "perf")
+      }
+    }
+    #endif
+  }
+
+  func testNSImageFuzzyAverageFail() {
+    #if os(macOS)
+
+    //XCTExpectFailure()
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(matching: NSImage.heartOffByOne, as: .fuzzyImage(maxAbsoluteComponentDifference: Double.infinity, maxAverageAbsoluteComponentDifference: 1.0.nextDown))
+    }
+    #endif
+  }
+
+  func testNSImageFuzzyAverage() {
+    #if os(macOS)
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(matching: NSImage.heartOffByOne, as: .fuzzyImage(maxAbsoluteComponentDifference: Double.infinity, maxAverageAbsoluteComponentDifference: 2.0))
+    }
+    #endif
+  }
+
+  func testNSImageFuzzyAveragePerformance() {
+    #if os(macOS)
+
+    let image = NSImage.largeHeartOffByOne
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      measure {
+        assertSnapshot(matching: image, as: .fuzzyImage(maxAbsoluteComponentDifference: Double.infinity, maxAverageAbsoluteComponentDifference: 2.0), named: "perf")
+      }
+    }
     #endif
   }
 
@@ -783,6 +959,168 @@ final class SnapshotTestingTests: XCTestCase {
 
     if #available(iOS 11.0, tvOS 11.0, *) {
       assertSnapshot(matching: path, as: .elementsDescription, named: osName)
+    }
+    #endif
+  }
+
+  func testUIImagePerformance() {
+    #if os(iOS) || os(tvOS)
+
+    let image = UIImage.largeHeart
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      measure {
+        assertSnapshot(matching: image, as: .image, named: "perf")
+      }
+    }
+    #endif
+  }
+
+  func testUIImageOffByOnePerformance() {
+    #if os(iOS) || os(tvOS)
+
+    let image = UIImage.largeHeartOffByOne
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      measure {
+        assertSnapshot(matching: image, as: .image(precision: 0.0, scale: nil), named: "perf")
+      }
+    }
+    #endif
+  }
+
+  func testUIImageFuzzyExact() {
+    #if os(iOS) || os(tvOS)
+
+    let osName: String
+    #if os(iOS)
+    osName = "iOS"
+    #elseif os(tvOS)
+    osName = "tvOS"
+    #endif
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(matching: UIImage.heart, as: .fuzzyImage(maxAbsoluteComponentDifference: 0.0, maxAverageAbsoluteComponentDifference: 0.0, scale: nil), named: osName)
+    }
+    #endif
+  }
+
+  func testUIImageFuzzyExactPerformance() {
+    #if os(iOS) || os(tvOS)
+
+    let image = UIImage.largeHeart
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      measure {
+        assertSnapshot(matching: image, as: .fuzzyImage(maxAbsoluteComponentDifference: 0.0, maxAverageAbsoluteComponentDifference: 0.0, scale: nil), named: "perf")
+      }
+    }
+    #endif
+  }
+
+  func testUIImageFuzzyExactOffByOnePerformance() {
+    #if os(iOS) || os(tvOS)
+
+    let image = UIImage.largeHeartOffByOne
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      measure {
+        assertSnapshot(matching: image, as: .fuzzyImage(maxAbsoluteComponentDifference: 1.0, maxAverageAbsoluteComponentDifference: 1.0, scale: nil), named: "perf")
+      }
+    }
+    #endif
+  }
+
+  func testUIImageFuzzyComponentFail() {
+    #if os(iOS) || os(tvOS)
+
+    let osName: String
+    #if os(iOS)
+    osName = "iOS"
+    #elseif os(tvOS)
+    osName = "tvOS"
+    #endif
+
+    //XCTExpectFailure()
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(matching: UIImage.heartOffByOne, as: .fuzzyImage(maxAbsoluteComponentDifference: 1.0.nextDown, maxAverageAbsoluteComponentDifference: Double.infinity, scale: nil), named: osName)
+    }
+    #endif
+  }
+
+  func testUIImageFuzzyComponent() {
+    #if os(iOS) || os(tvOS)
+
+    let osName: String
+    #if os(iOS)
+    osName = "iOS"
+    #elseif os(tvOS)
+    osName = "tvOS"
+    #endif
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(matching: UIImage.heartOffByOne, as: .fuzzyImage(maxAbsoluteComponentDifference: 1.0, maxAverageAbsoluteComponentDifference: Double.infinity, scale: nil), named: osName)
+    }
+    #endif
+  }
+
+  func testUIImageFuzzyComponentPerformance() {
+    #if os(iOS) || os(tvOS)
+
+    let image = UIImage.largeHeartOffByOne
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      measure {
+        assertSnapshot(matching: image, as: .fuzzyImage(maxAbsoluteComponentDifference: 1.0, maxAverageAbsoluteComponentDifference: Double.infinity, scale: nil), named: "perf")
+      }
+    }
+    #endif
+  }
+
+  func testUIImageFuzzyAverageOffFail() {
+    #if os(iOS) || os(tvOS)
+
+    let osName: String
+    #if os(iOS)
+    osName = "iOS"
+    #elseif os(tvOS)
+    osName = "tvOS"
+    #endif
+
+    //XCTExpectFailure()
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(matching: UIImage.heartOffByOne, as: .fuzzyImage(maxAbsoluteComponentDifference: Double.infinity, maxAverageAbsoluteComponentDifference: 1.0.nextDown, scale: nil), named: osName)
+    }
+    #endif
+  }
+
+  func testUIImageFuzzyAverage() {
+    #if os(iOS) || os(tvOS)
+
+    let osName: String
+    #if os(iOS)
+    osName = "iOS"
+    #elseif os(tvOS)
+    osName = "tvOS"
+    #endif
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(matching: UIImage.heartOffByOne, as: .fuzzyImage(maxAbsoluteComponentDifference: Double.infinity, maxAverageAbsoluteComponentDifference: 2.0, scale: nil), named: osName)
+    }
+    #endif
+  }
+
+  func testUIImageFuzzyAveragePerformance() {
+    #if os(iOS) || os(tvOS)
+
+    let image = UIImage.largeHeartOffByOne
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      measure {
+        assertSnapshot(matching: image, as: .fuzzyImage(maxAbsoluteComponentDifference: Double.infinity, maxAverageAbsoluteComponentDifference: 2.0, scale: nil), named: "perf")
+      }
     }
     #endif
   }

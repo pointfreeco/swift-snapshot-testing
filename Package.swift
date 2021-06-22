@@ -14,10 +14,13 @@ let package = Package(
       name: "SnapshotTesting",
       targets: ["SnapshotTesting"]),
   ],
+  dependencies: [
+    .package(url: "https://github.com/JWStaiert/SnapshotCompare.git", from: Version("0.1.0"))
+  ],
   targets: [
     .target(
       name: "SnapshotTesting",
-      dependencies: []),
+      dependencies: ["SnapshotCompare"]),
     .testTarget(
       name: "SnapshotTestingTests",
       dependencies: ["SnapshotTesting"]),
