@@ -179,7 +179,7 @@ If your project uses [CocoaPods](https://cocoapods.org), add the pod to any appl
 
 ```ruby
 target 'MyAppTests' do
-  pod 'SnapshotTesting', '~> 1.8.1'
+  pod 'SnapshotTesting', '~> 1.9.0'
 end
 ```
 
