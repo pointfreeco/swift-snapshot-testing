@@ -209,6 +209,8 @@ end
 
   - [AccessibilitySnapshotColorBlindness](https://github.com/Sherlouk/AccessibilitySnapshotColorBlindness) adds snapshot strategies for color blindness simulation on iOS views, view controllers and images.
 
+  - [swift-snapshot-testing-stitch](https://github.com/Sherlouk/swift-snapshot-testing-stitch/) adds the ability to stitch multiple UIView's or UIViewController's together in a single test.
+
 Have you written your own SnapshotTesting plug-in? [Add it here](https://github.com/pointfreeco/swift-snapshot-testing/edit/master/README.md) and submit a pull request!
   
 ## Related Tools
