@@ -262,13 +262,14 @@ public func verifySnapshot<Value, Format>(
         }
         artifactsSubUrl = artifactsSubUrl.deletingLastPathComponent()
       } else {
-        failedSnapshotFileUrl = artifactsSubUrl.appendingPathComponent(snapshotFileUrl.lastPathComponent)
+        failedSnapshotFileUrl = artifactsSubUrl.appendingPathComponent("failed")
+        failedSnapshotFileUrl = failedSnapshotFileUrl.appendingPathComponent(snapshotFileUrl.lastPathComponent)
       }
 
       guard !recording, fileManager.fileExists(atPath: snapshotFileUrl.path) else {
-        let writeToUrl = treatRecordingsAsArtifacts ? failedSnapshotFileUrl : snapshotFileUrl
+        let writeToUrl = failedSnapshotFileUrl
         try fileManager.createDirectory(
-          at: treatRecordingsAsArtifacts ? artifactsSubUrl : snapshotDirectoryUrl, withIntermediateDirectories: true
+          at: writeToUrl.deletingLastPathComponent(), withIntermediateDirectories: true
         )
 
         try snapshotting.diffing.toData(diffable).write(to: writeToUrl)
@@ -314,7 +315,7 @@ public func verifySnapshot<Value, Format>(
         return nil
       }
 
-      try fileManager.createDirectory(at: artifactsSubUrl, withIntermediateDirectories: true)
+      try fileManager.createDirectory(at: failedSnapshotFileUrl.deletingLastPathComponent(), withIntermediateDirectories: true)
       try snapshotting.diffing.toData(diffable).write(to: failedSnapshotFileUrl)
 
       if !attachments.isEmpty {
