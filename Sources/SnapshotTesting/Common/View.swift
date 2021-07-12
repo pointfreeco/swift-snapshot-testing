@@ -568,7 +568,7 @@ func addImagesForRenderedViews(_ view: View) -> [Async<View>] {
     ?? view.subviews.flatMap(addImagesForRenderedViews)
 }
 
-extension View {
+public extension View {
   var snapshot: Async<Image>? {
     func inWindow<T>(_ perform: () -> T) -> T {
       #if os(macOS)
