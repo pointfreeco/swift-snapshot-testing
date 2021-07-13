@@ -209,7 +209,7 @@ end
 
   - [AccessibilitySnapshotColorBlindness](https://github.com/Sherlouk/AccessibilitySnapshotColorBlindness) adds snapshot strategies for color blindness simulation on iOS views, view controllers and images.
 
-  - [SnapshotTestingEx](https://github.com/JWStaiert/SnapshotTestingEx) adds high performance pixel component diffing strategies for image related Apple SDK types, including: CGImage, NSImage, UIImage, and CGContext.
+  - [SnapshotTestingEx](https://github.com/JWStaiert/SnapshotTestingEx) adds pixel component diffing strategies with improved assertSnapshot execution times (compared to vanilla) for image related Apple SDK types, including: CGImage, NSImage, UIImage, and CGContext. These strategies will properly match images with mismatched bytesPerRow but matching width and height.
 
 Have you written your own SnapshotTesting plug-in? [Add it here](https://github.com/pointfreeco/swift-snapshot-testing/edit/master/README.md) and submit a pull request!
   
