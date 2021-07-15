@@ -238,56 +238,51 @@ public func verifySnapshot<Value, Format>(
         treatRecordingsAsArtifacts = (recordingsAsArtifacts as NSString).boolValue
       }
 
-      let artifactsUrl = URL(
+      let artifactsBaseUrl = URL(
         fileURLWithPath: ProcessInfo.processInfo.environment["SNAPSHOT_ARTIFACTS"] ?? NSTemporaryDirectory(), isDirectory: true
       )
-      var artifactsSubUrl = artifactsUrl.appendingPathComponent(fileName)
+      let artifactsSubUrl = artifactsBaseUrl.appendingPathComponent(fileName)
 
-      var failedSnapshotFileUrl: URL
-      if treatRecordingsAsArtifacts {
-        var additionalComponents: [String] = []
-        for component in snapshotFileUrl.pathComponents.reversed() {
-          if component != fileName {
-            additionalComponents.insert(component, at: 0)
-          } else {
-            break
-          }
-        }
+      if recording {
+        let writeToUrl = treatRecordingsAsArtifacts
+          ? artifactsSubUrl.appendingPathComponent(snapshotFileUrl.lastPathComponent)
+          : snapshotFileUrl
 
-        failedSnapshotFileUrl = artifactsSubUrl
-        for component in additionalComponents {
-          failedSnapshotFileUrl = failedSnapshotFileUrl.appendingPathComponent(component)
-          artifactsSubUrl = artifactsSubUrl.appendingPathComponent(component)
-        }
-        artifactsSubUrl = artifactsSubUrl.deletingLastPathComponent()
-      } else {
-        failedSnapshotFileUrl = artifactsSubUrl.appendingPathComponent("failed")
-        failedSnapshotFileUrl = failedSnapshotFileUrl.appendingPathComponent(snapshotFileUrl.lastPathComponent)
-      }
-
-      guard !recording, fileManager.fileExists(atPath: snapshotFileUrl.path) else {
-        let writeToUrl = failedSnapshotFileUrl
         try fileManager.createDirectory(
           at: writeToUrl.deletingLastPathComponent(), withIntermediateDirectories: true
         )
-
         try snapshotting.diffing.toData(diffable).write(to: writeToUrl)
 
-        return recording
+        return treatRecordingsAsArtifacts
           ? """
-            Record mode is on. Turn record mode off and re-run "\(testName)" to test against the newly-recorded snapshot.
+            Record mode is on. Treating recordings as artifacts.
 
             open "\(writeToUrl.path)"
 
             Recorded snapshot: …
             """
           : """
+            Record mode is on. Turn record mode off and re-run "\(testName)" to test against the newly-recorded snapshot.
+
+            open "\(writeToUrl.path)"
+
+            Recorded snapshot: …
+            """
+      } else {
+        if !fileManager.fileExists(atPath: snapshotFileUrl.path) {
+          let writeToUrl = snapshotFileUrl
+          try fileManager.createDirectory(
+            at: writeToUrl.deletingLastPathComponent(), withIntermediateDirectories: true
+          )
+          try snapshotting.diffing.toData(diffable).write(to: writeToUrl)
+          return """
             No reference was found on disk. Automatically recorded snapshot: …
 
             open "\(writeToUrl.path)"
 
             Re-run "\(testName)" to test against the newly-recorded snapshot.
             """
+        }
       }
 
       let data = try Data(contentsOf: snapshotFileUrl)
@@ -304,8 +299,13 @@ public func verifySnapshot<Value, Format>(
         return nil
       }
 
-      try fileManager.createDirectory(at: failedSnapshotFileUrl.deletingLastPathComponent(), withIntermediateDirectories: true)
-      try snapshotting.diffing.toData(diffable).write(to: failedSnapshotFileUrl)
+      let writeToUrl = artifactsSubUrl
+        .appendingPathComponent("failed")
+        .appendingPathComponent(snapshotFileUrl.lastPathComponent)
+      try fileManager.createDirectory(
+        at: writeToUrl.deletingLastPathComponent(), withIntermediateDirectories: true
+      )
+      try snapshotting.diffing.toData(diffable).write(to: writeToUrl)
 
       if !attachments.isEmpty {
         #if !os(Linux)
@@ -320,8 +320,8 @@ public func verifySnapshot<Value, Format>(
       }
 
       let diffMessage = diffTool
-        .map { "\($0) \"\(snapshotFileUrl.path)\" \"\(failedSnapshotFileUrl.path)\"" }
-        ?? "@\(minus)\n\"\(snapshotFileUrl.path)\"\n@\(plus)\n\"\(failedSnapshotFileUrl.path)\""
+        .map { "\($0) \"\(snapshotFileUrl.path)\" \"\(writeToUrl.path)\"" }
+        ?? "@\(minus)\n\"\(snapshotFileUrl.path)\"\n@\(plus)\n\"\(writeToUrl.path)\""
       return """
       Snapshot does not match reference.
 
