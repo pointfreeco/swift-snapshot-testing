@@ -12,7 +12,7 @@ extension Snapshotting where Value == URLRequest, Format == String {
   /// - Parameter pretty: Attempts to pretty print the body of the request (supports JSON).
   public static func raw(pretty: Bool) -> Snapshotting {
     return SimplySnapshotting.lines.pullback { (request: URLRequest) in
-      let method = "\(request.httpMethod ?? "GET") \(request.url?.absoluteString ?? "(null)")"
+      let method = "\(request.httpMethod ?? "GET") \(request.url?.sortingQueryItems()?.absoluteString ?? "(null)")"
 
       let headers = (request.allHTTPHeaderFields ?? [:])
         .map { key, value in "\(key): \(value)" }
@@ -76,8 +76,18 @@ extension Snapshotting where Value == URLRequest, Format == String {
     }
 
     // URL
-    components.append("\"\(request.url!.absoluteString)\"")
+    components.append("\"\(request.url!.sortingQueryItems()!.absoluteString)\"")
 
     return components.joined(separator: " \\\n\t")
+  }
+}
+
+private extension URL {
+  func sortingQueryItems() -> URL? {
+    var components = URLComponents(url: self, resolvingAgainstBaseURL: false)
+    let sortedQueryItems = components?.queryItems?.sorted { $0.name < $1.name }
+    components?.queryItems = sortedQueryItems
+
+    return components?.url
   }
 }

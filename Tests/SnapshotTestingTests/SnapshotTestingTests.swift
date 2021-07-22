@@ -918,6 +918,13 @@ final class SnapshotTestingTests: XCTestCase {
     assertSnapshot(matching: get, as: .raw, named: "get")
     assertSnapshot(matching: get, as: .curl, named: "get-curl")
 
+    var getWithQuery = URLRequest(url: URL(string: "https://www.pointfree.co?key_2=value_2&key_1=value_1&key_3=value_3")!)
+    getWithQuery.addValue("pf_session={}", forHTTPHeaderField: "Cookie")
+    getWithQuery.addValue("text/html", forHTTPHeaderField: "Accept")
+    getWithQuery.addValue("application/json", forHTTPHeaderField: "Content-Type")
+    assertSnapshot(matching: getWithQuery, as: .raw, named: "get-with-query")
+    assertSnapshot(matching: getWithQuery, as: .curl, named: "get-with-query-curl")
+
     var post = URLRequest(url: URL(string: "https://www.pointfree.co/subscribe")!)
     post.httpMethod = "POST"
     post.addValue("pf_session={\"user_id\":\"0\"}", forHTTPHeaderField: "Cookie")
