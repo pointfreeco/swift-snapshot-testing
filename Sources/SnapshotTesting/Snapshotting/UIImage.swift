@@ -130,7 +130,8 @@ private func context(for cgImage: CGImage, bytesPerRow: Int, data: UnsafeMutable
 private func diff(_ old: UIImage, _ new: UIImage) -> UIImage {
   let width = max(old.size.width, new.size.width)
   let height = max(old.size.height, new.size.height)
-  UIGraphicsBeginImageContextWithOptions(CGSize(width: width, height: height), true, 0)
+  let scale = max(old.scale, new.scale)
+  UIGraphicsBeginImageContextWithOptions(CGSize(width: width, height: height), true, scale)
   new.draw(at: .zero)
   old.draw(at: .zero, blendMode: .difference, alpha: 1)
   let differenceImage = UIGraphicsGetImageFromCurrentImageContext()!
