@@ -50,7 +50,7 @@ extension Snapshotting where Value == URLRequest, Format == String {
     switch httpMethod {
     case "GET": break
     case "HEAD": components.append("--head")
-    default: components.append("--request \(httpMethod)")```
+    default: components.append("--request \(httpMethod)")
     }
 
     // Headers
