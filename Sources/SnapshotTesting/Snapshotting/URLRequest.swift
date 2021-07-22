@@ -76,7 +76,7 @@ extension Snapshotting where Value == URLRequest, Format == String {
     }
 
     // URL
-    components.append("\"\(request.url!.absoluteString)\"")
+    components.append("\"\(request.url!.sortingQueryItems()!.absoluteString)\"")
 
     return components.joined(separator: " \\\n\t")
   }
