@@ -22,15 +22,33 @@ extension Snapshotting where Value == UIView, Format == UIImage {
     )
     -> Snapshotting {
 
-      return SimplySnapshotting.image(precision: precision, scale: traits.displayScale).asyncPullback { view in
-        snapshotView(
-          config: .init(safeArea: .zero, size: size ?? view.frame.size, traits: .init()),
-          drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
-          traits: traits,
-          view: view,
-          viewController: .init()
-        )
-      }
+      return SimplySnapshotting.image(precision: precision, scale: traits.displayScale)
+        .view(drawHierarchyInKeyWindow: drawHierarchyInKeyWindow, size: size, traits: traits)
+  }
+}
+
+extension Snapshotting where Value == UIImage {
+
+  /// Transform any snapshot strategy for comparing `UIImage` instances into a snapshot strategy for comparing
+  /// UIKit views.
+  /// - Parameters:
+  ///   - drawHierarchyInKeyWindow: Utilize the simulator's key window in order to render `UIAppearance` and `UIVisualEffect`s. This option requires a host application for your tests and will _not_ work for framework test targets.
+  ///   - size: A view size override.
+  ///   - traits: A trait collection override.
+  public func view(
+    drawHierarchyInKeyWindow: Bool = false,
+    size: CGSize? = nil,
+    traits: UITraitCollection = .init()
+  ) -> Snapshotting<UIView, Format> {
+    return asyncPullback { view in
+      snapshotView(
+        config: .init(safeArea: .zero, size: size ?? view.frame.size, traits: traits),
+        drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+        traits: traits,
+        view: view,
+        viewController: .init()
+      )
+    }
   }
 }
 
