@@ -270,18 +270,29 @@ public func verifySnapshot<Value, Format>(
             """
       } else {
         if !fileManager.fileExists(atPath: snapshotFileUrl.path) {
-          let writeToUrl = snapshotFileUrl
+          let writeToUrl = treatRecordingsAsArtifacts
+            ? artifactsSubUrl.appendingPathComponent(snapshotFileUrl.lastPathComponent)
+            : snapshotFileUrl
+
           try fileManager.createDirectory(
             at: writeToUrl.deletingLastPathComponent(), withIntermediateDirectories: true
           )
           try snapshotting.diffing.toData(diffable).write(to: writeToUrl)
-          return """
-            No reference was found on disk. Automatically recorded snapshot: …
+          return treatRecordingsAsArtifacts
+            ? """
+              No reference was found on disk. Treating recordings as artifacts.
 
-            open "\(writeToUrl.path)"
+              open "\(writeToUrl.path)"
 
-            Re-run "\(testName)" to test against the newly-recorded snapshot.
-            """
+              Recorded snapshot: …
+              """
+            : """
+              No reference was found on disk. Automatically recorded snapshot: …
+
+              open "\(writeToUrl.path)"
+
+              Re-run "\(testName)" to test against the newly-recorded snapshot.
+              """
         }
       }
 
@@ -321,7 +332,16 @@ public func verifySnapshot<Value, Format>(
 
       let diffMessage = diffTool
         .map { "\($0) \"\(snapshotFileUrl.path)\" \"\(writeToUrl.path)\"" }
-        ?? "@\(minus)\n\"\(snapshotFileUrl.path)\"\n@\(plus)\n\"\(writeToUrl.path)\""
+        ?? """
+        @\(minus)
+        "\(snapshotFileUrl.path)"
+        @\(plus)
+        "\(writeToUrl.path)"
+
+        To configure output for a custom diff tool, like Kaleidoscope:
+
+            SnapshotTesting.diffTool = "ksdiff"
+        """
       return """
       Snapshot does not match reference.
 
