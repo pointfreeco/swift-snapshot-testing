@@ -279,18 +279,29 @@ public func verifySnapshot<Value, Format>(
             """
       } else {
         if !fileManager.fileExists(atPath: snapshotFileUrl.path) {
-          let writeToUrl = snapshotFileUrl
+          let writeToUrl = treatRecordingsAsArtifacts
+            ? artifactsSubUrl.appendingPathComponent(snapshotFileUrl.lastPathComponent)
+            : snapshotFileUrl
+
           try fileManager.createDirectory(
             at: writeToUrl.deletingLastPathComponent(), withIntermediateDirectories: true
           )
           try snapshotting.diffing.toData(diffable).write(to: writeToUrl)
-          return """
-            No reference was found on disk. Automatically recorded snapshot: …
+          return treatRecordingsAsArtifacts
+            ? """
+              No reference was found on disk. Treating recordings as artifacts.
 
-            open "\(writeToUrl.path)"
+              open "\(writeToUrl.path)"
 
-            Re-run "\(testName)" to test against the newly-recorded snapshot.
-            """
+              Recorded snapshot: …
+              """
+            : """
+              No reference was found on disk. Automatically recorded snapshot: …
+
+              open "\(writeToUrl.path)"
+
+              Re-run "\(testName)" to test against the newly-recorded snapshot.
+              """
         }
       }
 
