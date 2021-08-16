@@ -4,16 +4,24 @@ import XCTest
 
 extension Diffing where Value == UIImage {
   /// A pixel-diffing strategy for UIImage's which requires a 100% match.
-  public static let image = Diffing.image(precision: 1)
+  public static let image = Diffing.image(precision: 1, scale: nil)
 
   /// A pixel-diffing strategy for UIImage that allows customizing how precise the matching must be.
   ///
   /// - Parameter precision: A value between 0 and 1, where 1 means the images must match 100% of their pixels.
+  /// - Parameter scale: Scale to use when loading the reference image from disk. If `nil` or the `UITraitCollection`s default value of `0.0`, the screens scale is used.
   /// - Returns: A new diffing strategy.
-  public static func image(precision: Float) -> Diffing {
+  public static func image(precision: Float, scale: CGFloat?) -> Diffing {
+    let imageScale: CGFloat
+    if let scale = scale, scale != 0.0 {
+      imageScale = scale
+    } else {
+      imageScale = UIScreen.main.scale
+    }
+
     return Diffing(
       toData: { $0.pngData() ?? emptyImage().pngData()! },
-      fromData: { UIImage(data: $0, scale: UIScreen.main.scale)! }
+      fromData: { UIImage(data: $0, scale: imageScale)! }
     ) { old, new in
       guard !compare(old, new, precision: precision) else { return nil }
       let difference = SnapshotTesting.diff(old, new)
@@ -48,19 +56,25 @@ extension Diffing where Value == UIImage {
 extension Snapshotting where Value == UIImage, Format == UIImage {
   /// A snapshot strategy for comparing images based on pixel equality.
   public static var image: Snapshotting {
-    return .image(precision: 1)
+    return .image(precision: 1, scale: nil)
   }
 
   /// A snapshot strategy for comparing images based on pixel equality.
   ///
   /// - Parameter precision: The percentage of pixels that must match.
-  public static func image(precision: Float) -> Snapshotting {
+  /// - Parameter scale: The scale of the reference image stored on disk.
+  public static func image(precision: Float, scale: CGFloat?) -> Snapshotting {
     return .init(
       pathExtension: "png",
-      diffing: .image(precision: precision)
+      diffing: .image(precision: precision, scale: scale)
     )
   }
 }
+
+// remap snapshot & reference to same colorspace
+let imageContextColorSpace = CGColorSpace(name: CGColorSpace.sRGB)
+let imageContextBitsPerComponent = 8
+let imageContextBytesPerPixel = 4
 
 private func compare(_ old: UIImage, _ new: UIImage, precision: Float) -> Bool {
   guard let oldCgImage = old.cgImage else { return false }
@@ -71,23 +85,18 @@ private func compare(_ old: UIImage, _ new: UIImage, precision: Float) -> Bool {
   guard oldCgImage.height != 0 else { return false }
   guard newCgImage.height != 0 else { return false }
   guard oldCgImage.height == newCgImage.height else { return false }
-  // Values between images may differ due to padding to multiple of 64 bytes per row,
-  // because of that a freshly taken view snapshot may differ from one stored as PNG.
-  // At this point we're sure that size of both images is the same, so we can go with minimal `bytesPerRow` value
-  // and use it to create contexts.
-  let minBytesPerRow = min(oldCgImage.bytesPerRow, newCgImage.bytesPerRow)
-  let byteCount = minBytesPerRow * oldCgImage.height
 
+  let byteCount = imageContextBytesPerPixel * oldCgImage.width * oldCgImage.height
   var oldBytes = [UInt8](repeating: 0, count: byteCount)
-  guard let oldContext = context(for: oldCgImage, bytesPerRow: minBytesPerRow, data: &oldBytes) else { return false }
+  guard let oldContext = context(for: oldCgImage, data: &oldBytes) else { return false }
   guard let oldData = oldContext.data else { return false }
-  if let newContext = context(for: newCgImage, bytesPerRow: minBytesPerRow), let newData = newContext.data {
+  if let newContext = context(for: newCgImage), let newData = newContext.data {
     if memcmp(oldData, newData, byteCount) == 0 { return true }
   }
   let newer = UIImage(data: new.pngData()!)!
   guard let newerCgImage = newer.cgImage else { return false }
   var newerBytes = [UInt8](repeating: 0, count: byteCount)
-  guard let newerContext = context(for: newerCgImage, bytesPerRow: minBytesPerRow, data: &newerBytes) else { return false }
+  guard let newerContext = context(for: newerCgImage, data: &newerBytes) else { return false }
   guard let newerData = newerContext.data else { return false }
   if memcmp(oldData, newerData, byteCount) == 0 { return true }
   if precision >= 1 { return false }
@@ -100,16 +109,17 @@ private func compare(_ old: UIImage, _ new: UIImage, precision: Float) -> Bool {
   return true
 }
 
-private func context(for cgImage: CGImage, bytesPerRow: Int, data: UnsafeMutableRawPointer? = nil) -> CGContext? {
+private func context(for cgImage: CGImage, data: UnsafeMutableRawPointer? = nil) -> CGContext? {
+  let bytesPerRow = cgImage.width * imageContextBytesPerPixel
   guard
-    let space = cgImage.colorSpace,
+    let colorSpace = imageContextColorSpace,
     let context = CGContext(
       data: data,
       width: cgImage.width,
       height: cgImage.height,
-      bitsPerComponent: cgImage.bitsPerComponent,
+      bitsPerComponent: imageContextBitsPerComponent,
       bytesPerRow: bytesPerRow,
-      space: space,
+      space: colorSpace,
       bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
     )
     else { return nil }
@@ -121,7 +131,8 @@ private func context(for cgImage: CGImage, bytesPerRow: Int, data: UnsafeMutable
 private func diff(_ old: UIImage, _ new: UIImage) -> UIImage {
   let width = max(old.size.width, new.size.width)
   let height = max(old.size.height, new.size.height)
-  UIGraphicsBeginImageContextWithOptions(CGSize(width: width, height: height), true, 0)
+  let scale = max(old.scale, new.scale)
+  UIGraphicsBeginImageContextWithOptions(CGSize(width: width, height: height), true, scale)
   new.draw(at: .zero)
   old.draw(at: .zero, blendMode: .difference, alpha: 1)
   let differenceImage = UIGraphicsGetImageFromCurrentImageContext()!
