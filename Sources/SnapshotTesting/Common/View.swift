@@ -596,7 +596,7 @@ extension UITraitCollection {
         )
       case .portrait:
         return .init(
-          traitsFrom: [
+          traitsFrom: base + [
             .init(horizontalSizeClass: .compact),
             .init(verticalSizeClass: .regular)
           ]
