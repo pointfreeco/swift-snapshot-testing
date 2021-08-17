@@ -143,7 +143,7 @@ If you want to use SnapshotTesting in any other project that uses [SwiftPM](http
 
 ```swift
 dependencies: [
-  .package(name: "SnapshotTesting", url: "https://github.com/pointfreeco/swift-snapshot-testing.git", from: "1.8.1"),
+  .package(name: "SnapshotTesting", url: "https://github.com/pointfreeco/swift-snapshot-testing.git", from: "1.9.0"),
 ]
 ```
 
@@ -161,7 +161,7 @@ targets: [
 If you use [Carthage](https://github.com/Carthage/Carthage), you can add the following dependency to your `Cartfile`:
 
 ``` ruby
-github "pointfreeco/swift-snapshot-testing" ~> 1.8.0
+github "pointfreeco/swift-snapshot-testing" ~> 1.9.0
 ```
 
 > ⚠️ Warning: Carthage instructs you to drag frameworks into your Xcode project. Xcode may automatically attempt to link these frameworks to your app target. `SnapshotTesting.framework` is only compatible with test targets, so when you first add it to your project:
