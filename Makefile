@@ -22,9 +22,7 @@ test-ios:
 		-destination platform="iOS Simulator,name=iPhone 11 Pro Max,OS=13.3" \
 
 test-swift:
-	swift test \
-		--enable-pubgrub-resolver \
-		--parallel
+	swift test
 
 test-tvos:
 	set -o pipefail && \
