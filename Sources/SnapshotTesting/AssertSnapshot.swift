@@ -5,6 +5,9 @@ import XCTest
 ///     diffTool = "ksdiff"
 public var diffTool: String? = nil
 
+/// Diff tool arguments which will be passed at the end of the command.
+public var diffToolArgs: String?
+
 /// Whether or not to record all new references.
 public var isRecording = false
 
@@ -286,9 +289,29 @@ public func verifySnapshot<Value, Format>(
         #endif
       }
 
-      let diffMessage = diffTool
-        .map { "\($0) \"\(snapshotFileUrl.path)\" \"\(failedSnapshotFileUrl.path)\"" }
-        ?? "@\(minus)\n\"\(snapshotFileUrl.path)\"\n@\(plus)\n\"\(failedSnapshotFileUrl.path)\""
+      let diffMessage: String
+
+      if let diffTool = diffTool {
+        let message = "\(diffTool) \"\(snapshotFileUrl.path)\" \"\(failedSnapshotFileUrl.path)\""
+
+        if let diffToolArgs = diffToolArgs {
+          diffMessage = message + " " + diffToolArgs
+        } else {
+          diffMessage = message
+        }
+      } else {
+        diffMessage = """
+@\(minus)
+"\(snapshotFileUrl.path)"
+@\(plus)
+"\(failedSnapshotFileUrl.path)"
+
+To configure output for a custom diff tool, like Kaleidoscope:
+
+    SnapshotTesting.diffTool = "ksdiff"
+"""
+      }
+
       return """
       Snapshot does not match reference.
 
