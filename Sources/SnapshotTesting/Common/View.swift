@@ -966,6 +966,7 @@ private final class Window: UIWindow {
 
     // NB: Safe area renders inaccurately for UI{Navigation,TabBar}Controller.
     // Fixes welcome!
+    #if false
     if viewController is UINavigationController {
       self.frame.size.height -= self.config.safeArea.top
       self.config.safeArea.top = 0
@@ -977,6 +978,7 @@ private final class Window: UIWindow {
         self.config.safeArea.top = 0
       }
     }
+    #endif
     self.isHidden = false
   }
 
