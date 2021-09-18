@@ -234,7 +234,7 @@ public func verifySnapshot<Value, Format>(
         return "Couldn't snapshot value"
       }
       
-      guard !recording, fileManager.fileExists(atPath: snapshotFileUrl.path) else {
+      guard fileManager.fileExists(atPath: snapshotFileUrl.path) else {
         try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)
         #if !os(Linux) && !os(Windows)
         if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
@@ -245,15 +245,7 @@ public func verifySnapshot<Value, Format>(
         }
         #endif
 
-        return recording
-          ? """
-            Record mode is on. Turn record mode off and re-run "\(testName)" to test against the newly-recorded snapshot.
-
-            open "\(snapshotFileUrl.absoluteString)"
-
-            Recorded snapshot: …
-            """
-          : """
+        return """
             No reference was found on disk. Automatically recorded snapshot: …
 
             open "\(snapshotFileUrl.path)"
@@ -276,6 +268,18 @@ public func verifySnapshot<Value, Format>(
 
       guard let (failure, attachments) = snapshotting.diffing.diff(reference, diffable) else {
         return nil
+      }
+      
+      guard !recording else {
+        try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)
+        return """
+            Record mode is on. Differences were found vs the previously-recorded snapshot.
+            Turn record mode off and re-run "\(testName)" to test against the newly-recorded snapshot.
+            
+            open "\(snapshotFileUrl.path)"
+            
+            Recorded snapshot: …
+            """
       }
 
       let artifactsUrl = URL(
