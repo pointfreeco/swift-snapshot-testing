@@ -267,6 +267,9 @@ public func verifySnapshot<Value, Format>(
       #endif
 
       guard let (failure, attachments) = snapshotting.diffing.diff(reference, diffable) else {
+        if recording {
+          try fileManager.setAttributes([.modificationDate: Date()], ofItemAtPath: snapshotFileUrl.path)
+        }
         return nil
       }
       
