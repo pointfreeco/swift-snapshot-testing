@@ -19,6 +19,8 @@ import XCTest
 
 @testable import SnapshotTesting
 
+// Warning: Tests have to be run with the simulator iPhone 11 Pro Max (13.4)
+
 final class SnapshotTestingTests: XCTestCase {
   override func setUp() {
     super.setUp()
