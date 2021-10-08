@@ -88,7 +88,7 @@ final class SnapshotTestingTests: XCTestCase {
       subview.leftAnchor.constraint(equalTo: vc.view.leftAnchor),
       subview.rightAnchor.constraint(equalTo: vc.view.rightAnchor),
       ])
-    assertSnapshot(matching: vc, as: .image)
+    assertSnapshot(matching: vc, as: .image(on: .iPhoneX))
     #endif
   }
 
