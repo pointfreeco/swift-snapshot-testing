@@ -17,19 +17,22 @@ extension Snapshotting where Value == UIViewController, Format == UIImage {
   public static func image(
     on config: ViewImageConfig,
     precision: Float = 1,
+    colorimetryDelta: Int = 0,
     size: CGSize? = nil,
     traits: UITraitCollection = .init()
     )
     -> Snapshotting {
 
-      return SimplySnapshotting.image(precision: precision, scale: traits.displayScale).asyncPullback { viewController in
-        snapshotView(
-          config: size.map { .init(safeArea: config.safeArea, size: $0, traits: config.traits) } ?? config,
-          drawHierarchyInKeyWindow: false,
-          traits: traits,
-          view: viewController.view,
-          viewController: viewController
-        )
+      return SimplySnapshotting
+        .image(precision: precision, colorimetryDelta: colorimetryDelta, scale: traits.displayScale)
+        .asyncPullback { viewController in
+          snapshotView(
+            config: size.map { .init(safeArea: config.safeArea, size: $0, traits: config.traits) } ?? config,
+            drawHierarchyInKeyWindow: false,
+            traits: traits,
+            view: viewController.view,
+            viewController: viewController
+          )
       }
   }
 

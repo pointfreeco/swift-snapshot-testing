@@ -1192,6 +1192,80 @@ final class SnapshotTestingTests: XCTestCase {
     SnapshotTesting.record = false
     XCTAssertEqual(isRecording, false)
   }
+
+  func testViewWithColorimetryDelta() {
+    #if os(iOS)
+    func colorFromReference(offset: Int) -> UIColor {
+      let redValue = (128.0 + CGFloat(offset)) / 255
+      return UIColor(red: redValue, green: 0, blue: 0, alpha: 1)
+    }
+
+    let delta = 5
+    let view = UIView(frame: .init(x: 0, y: 0, width: 200, height: 200))
+
+    XCTExpectFailure("The following assertions are out of the colorimetry delta and should fail") {
+      view.backgroundColor = colorFromReference(offset: -delta - 1)
+      assertSnapshot(matching: view, as: .image(colorimetryDelta: delta))
+    }
+
+    view.backgroundColor = colorFromReference(offset: -delta)
+    assertSnapshot(matching: view, as: .image(colorimetryDelta: delta))
+
+    view.backgroundColor = colorFromReference(offset: -Int(floor(Float(delta) / 2)))
+    assertSnapshot(matching: view, as: .image(colorimetryDelta: delta))
+
+    view.backgroundColor = colorFromReference(offset: 0)
+    assertSnapshot(matching: view, as: .image(colorimetryDelta: delta))
+
+    view.backgroundColor = colorFromReference(offset: Int(ceil(Float(delta) / 2)))
+    assertSnapshot(matching: view, as: .image(colorimetryDelta: delta))
+
+    view.backgroundColor = colorFromReference(offset: delta)
+    assertSnapshot(matching: view, as: .image(colorimetryDelta: delta))
+
+    XCTExpectFailure("The following assertions are out of the colorimetry delta and should fail") {
+      view.backgroundColor = colorFromReference(offset: delta + 1)
+      assertSnapshot(matching: view, as: .image(colorimetryDelta: delta))
+    }
+    #endif
+  }
+
+  func testViewControllerWithColorimetryDelta() {
+    #if os(iOS)
+    func colorFromReference(offset: Int) -> UIColor {
+      let redValue = (128.0 + CGFloat(offset)) / 255
+      return UIColor(red: redValue, green: 0, blue: 0, alpha: 1)
+    }
+
+    let delta = 5
+    let vc = UIViewController()
+
+    XCTExpectFailure("The following assertions are out of the colorimetry delta and should fail") {
+      vc.view.backgroundColor = colorFromReference(offset: -delta - 1)
+      assertSnapshot(matching: vc, as: .image(on: .iPhoneX, colorimetryDelta:-delta - 1))
+    }
+
+    vc.view.backgroundColor = colorFromReference(offset: -delta)
+    assertSnapshot(matching: vc, as: .image(on: .iPhoneX, colorimetryDelta: delta))
+
+    vc.view.backgroundColor = colorFromReference(offset: -Int(floor(Float(delta) / 2)))
+    assertSnapshot(matching: vc, as: .image(on: .iPhoneX, colorimetryDelta: delta))
+
+    vc.view.backgroundColor = colorFromReference(offset: 0)
+    assertSnapshot(matching: vc, as: .image(on: .iPhoneX, colorimetryDelta: delta))
+
+    vc.view.backgroundColor = colorFromReference(offset: Int(ceil(Float(delta) / 2)))
+    assertSnapshot(matching: vc, as: .image(on: .iPhoneX, colorimetryDelta: delta))
+
+    vc.view.backgroundColor = colorFromReference(offset: delta)
+    assertSnapshot(matching: vc, as: .image(on: .iPhoneX, colorimetryDelta: delta))
+
+    XCTExpectFailure("The following assertions are out of the colorimetry delta and should fail") {
+      vc.view.backgroundColor = colorFromReference(offset: delta + 1)
+      assertSnapshot(matching: vc, as: .image(on: .iPhoneX, colorimetryDelta: delta))
+    }
+    #endif
+  }
 }
 
 #if os(iOS)

@@ -10,8 +10,9 @@ extension Diffing where Value == UIImage {
   ///
   /// - Parameter precision: A value between 0 and 1, where 1 means the images must match 100% of their pixels.
   /// - Parameter scale: Scale to use when loading the reference image from disk. If `nil` or the `UITraitCollection`s default value of `0.0`, the screens scale is used.
+  /// - Parameter colorimetryDelta: A value between 0 and 255, where 0 means color component values must match 100%.
   /// - Returns: A new diffing strategy.
-  public static func image(precision: Float, scale: CGFloat?) -> Diffing {
+  public static func image(precision: Float, colorimetryDelta: Int = 0, scale: CGFloat?) -> Diffing {
     let imageScale: CGFloat
     if let scale = scale, scale != 0.0 {
       imageScale = scale
@@ -23,7 +24,7 @@ extension Diffing where Value == UIImage {
       toData: { $0.pngData() ?? emptyImage().pngData()! },
       fromData: { UIImage(data: $0, scale: imageScale)! }
     ) { old, new in
-      guard !compare(old, new, precision: precision) else { return nil }
+      guard !compare(old, new, precision: precision, colorimetryDelta: colorimetryDelta) else { return nil }
       let difference = SnapshotTesting.diff(old, new)
       let message = new.size == old.size
         ? "Newly-taken snapshot does not match reference."
@@ -63,10 +64,11 @@ extension Snapshotting where Value == UIImage, Format == UIImage {
   ///
   /// - Parameter precision: The percentage of pixels that must match.
   /// - Parameter scale: The scale of the reference image stored on disk.
-  public static func image(precision: Float, scale: CGFloat?) -> Snapshotting {
+  /// - Parameter colorimetryDelta: A value between 0 and 255, where 0 means color component values must match 100%.
+  public static func image(precision: Float, colorimetryDelta: Int = 0, scale: CGFloat?) -> Snapshotting {
     return .init(
       pathExtension: "png",
-      diffing: .image(precision: precision, scale: scale)
+      diffing: .image(precision: precision, colorimetryDelta: colorimetryDelta, scale: scale)
     )
   }
 }
@@ -76,7 +78,7 @@ let imageContextColorSpace = CGColorSpace(name: CGColorSpace.sRGB)
 let imageContextBitsPerComponent = 8
 let imageContextBytesPerPixel = 4
 
-private func compare(_ old: UIImage, _ new: UIImage, precision: Float) -> Bool {
+private func compare(_ old: UIImage, _ new: UIImage, precision: Float, colorimetryDelta: Int) -> Bool {
   guard let oldCgImage = old.cgImage else { return false }
   guard let newCgImage = new.cgImage else { return false }
   guard oldCgImage.width != 0 else { return false }
@@ -99,12 +101,26 @@ private func compare(_ old: UIImage, _ new: UIImage, precision: Float) -> Bool {
   guard let newerContext = context(for: newerCgImage, data: &newerBytes) else { return false }
   guard let newerData = newerContext.data else { return false }
   if memcmp(oldData, newerData, byteCount) == 0 { return true }
-  if precision >= 1 { return false }
-  var differentPixelCount = 0
+
+  let precision = min(max(precision, 0), 1)
+  let colorimetryDelta = min(max(colorimetryDelta, 0), 255)
+
+  if precision == 1 && colorimetryDelta == 0 { return false }
+  if precision == 0 || colorimetryDelta == 255 { return true }
+
   let threshold = 1 - precision
+  var differentPixelCount = 0
+
   for byte in 0..<byteCount {
-    if oldBytes[byte] != newerBytes[byte] { differentPixelCount += 1 }
-    if Float(differentPixelCount) / Float(byteCount) > threshold { return false}
+    if oldBytes[byte] != newerBytes[byte] {
+      if colorimetryDelta == 0 || abs(Int(oldBytes[byte]) - Int(newerBytes[byte])) > colorimetryDelta {
+        differentPixelCount += 1
+
+        if Float(differentPixelCount) / Float(byteCount) > threshold {
+          return false
+        }
+      }
+    }
   }
   return true
 }
