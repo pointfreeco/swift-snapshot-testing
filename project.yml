@@ -16,6 +16,7 @@ targets:
       FRAMEWORK_SEARCH_PATHS: $(inherited) $(PLATFORM_DIR)/Developer/Library/Frameworks
       SWIFT_VERSION: 5.0
       APPLICATION_EXTENSION_API_ONLY: 'YES'
+      ENABLE_TESTING_SEARCH_PATHS: 'YES'
     scheme:
       environmentVariables:
         SNAPSHOT_ARTIFACTS: /tmp/__SnapshotArtifacts__

@@ -1,0 +1,4 @@
+GET https://www.pointfree.co?key_1=value_1&key_2=value_2&key_3=value_3
+Accept: text/html
+Content-Type: application/json
+Cookie: pf_session={}
