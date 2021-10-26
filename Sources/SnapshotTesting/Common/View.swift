@@ -898,7 +898,7 @@ func renderer(bounds: CGRect, for traits: UITraitCollection) -> UIGraphicsImageR
 private func add(traits: UITraitCollection, viewController: UIViewController, to window: UIWindow) -> () -> Void {
   let rootViewController: UIViewController
   if viewController != window.rootViewController {
-    rootViewController = UIViewController()
+    rootViewController = RootViewController()
     rootViewController.view.backgroundColor = .clear
     rootViewController.view.frame = window.frame
     rootViewController.view.translatesAutoresizingMaskIntoConstraints =
@@ -925,8 +925,8 @@ private func add(traits: UITraitCollection, viewController: UIViewController, to
 
   window.rootViewController = rootViewController
 
-  rootViewController.beginAppearanceTransition(true, animated: false)
-  rootViewController.endAppearanceTransition()
+  viewController.beginAppearanceTransition(true, animated: false)
+  viewController.endAppearanceTransition()
 
   rootViewController.view.setNeedsLayout()
   rootViewController.view.layoutIfNeeded()
@@ -935,12 +935,12 @@ private func add(traits: UITraitCollection, viewController: UIViewController, to
   viewController.view.layoutIfNeeded()
 
   return {
-    rootViewController.beginAppearanceTransition(false, animated: false)
+    viewController.beginAppearanceTransition(false, animated: false)
     viewController.willMove(toParent: nil)
     viewController.view.removeFromSuperview()
     viewController.removeFromParent()
     viewController.didMove(toParent: nil)
-    rootViewController.endAppearanceTransition()
+    viewController.endAppearanceTransition()
     window.rootViewController = nil
   }
 }
@@ -992,6 +992,10 @@ private final class Window: UIWindow {
     #endif
     return self.config.safeArea
   }
+}
+
+private final class RootViewController: UIViewController {
+  override var shouldAutomaticallyForwardAppearanceMethods: Bool { false }
 }
 #endif
 
