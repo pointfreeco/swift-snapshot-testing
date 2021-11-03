@@ -17,6 +17,11 @@ extension Diffing where Value == String {
       old.split(separator: "\n", omittingEmptySubsequences: false).map(String.init),
       new.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
     ))
+    #if os(Windows)
+    let separator = "\r\n"
+    #else
+    let separator = "\n"
+    #endif
     let failure = hunks
       .flatMap { [$0.patchMark] + $0.lines }
       .joined(separator: "\n")

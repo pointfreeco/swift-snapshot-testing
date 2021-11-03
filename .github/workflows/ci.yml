@@ -10,8 +10,6 @@ on:
 
 jobs:
   build:
-    name: macOS
-    runs-on: macos-11
     strategy:
       matrix:
         xcode:
@@ -19,6 +17,9 @@ jobs:
           - "12.4"   # Swift 5.3
           - "12.5.1" # Swift 5.4
           - "13.0"   # Swift 5.5
+
+    name: macOS 11, Xcode ${{ matrix.xcode }}
+    runs-on: macos-11
     steps:
       - uses: actions/checkout@v1
       - name: Select Xcode ${{ matrix.xcode }}
@@ -39,13 +40,13 @@ jobs:
         run: make test-linux
 
   windows:
-    name: Windows
     strategy:
       matrix:
         swift:
           - "5.4"
           - "5.5"
 
+    name: Windows 2019, Swift ${{ matrix.swift }}
     runs-on: windows-2019
 
     steps:
