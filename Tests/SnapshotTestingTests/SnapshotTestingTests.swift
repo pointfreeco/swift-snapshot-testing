@@ -1210,7 +1210,7 @@ private let allContentSizes =
     ]
 #endif
 
-#if os(Linux)
+#if os(Linux) || os(Windows)
 extension SnapshotTestingTests {
   static var allTests : [(String, (SnapshotTestingTests) -> () throws -> Void)] {
     return [
