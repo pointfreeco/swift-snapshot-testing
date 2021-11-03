@@ -6,28 +6,29 @@ on:
       - main
   pull_request:
     branches:
-      - '*'
+      - "*"
 
 jobs:
   build:
     name: MacOS
     runs-on: macOS-latest
     steps:
-    - uses: actions/checkout@v1
-    - name: Select Xcode 12.4
-      run: sudo xcode-select -s /Applications/Xcode_12.4.app
-    - name: Run tests
-      run: make test-swift
+      - uses: actions/checkout@v1
+      - name: Select Xcode 12.4
+        run: sudo xcode-select -s /Applications/Xcode_12.4.app
+      - name: Run tests
+        run: make test-swift
 
   ubuntu:
     name: Ubuntu
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - name: Run tests
-      run: make test-linux
+      - uses: actions/checkout@v1
+      - name: Run tests
+        run: make test-linux
 
   windows:
+    name: Windows
     strategy:
       matrix:
         swift:
