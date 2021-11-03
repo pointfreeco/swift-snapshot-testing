@@ -26,3 +26,19 @@ jobs:
     - uses: actions/checkout@v1
     - name: Run tests
       run: make test-linux
+
+  windows:
+    strategy:
+      matrix:
+        swift:
+          - "5.4"
+          - "5.5"
+
+    runs-on: windows-2019
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: MaxDesiatov/swift-windows-action@v1
+        with:
+          shell-action: swift test
+          swift-version: ${{ matrix.swift }}
