@@ -85,6 +85,7 @@ extension Snapshotting where Value == NSBezierPath, Format == String {
 
 private let defaultNumberFormatter: NumberFormatter = {
   let numberFormatter = NumberFormatter()
+  numberFormatter.decimalSeparator = "."
   numberFormatter.minimumFractionDigits = 1
   numberFormatter.maximumFractionDigits = 3
   return numberFormatter
