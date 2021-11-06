@@ -235,7 +235,22 @@ final class SnapshotTestingTests: XCTestCase {
     if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
       assertSnapshot(matching: button, as: .image)
       assertSnapshot(matching: button, as: .recursiveDescription)
-//    }
+    }
+    #endif
+  }
+
+  func testNSViewCICompatible() {
+    #if os(macOS)
+    let button = NSButton()
+    button.bezelStyle = .rounded
+    button.title = "Push Me"
+    button.sizeToFit()
+    button.appearance = NSAppearance(named: .aqua)
+    assertSnapshot(
+      matching: button,
+      as: .image(windowForDrawing: .init(backingScaleFactor: 1, colorSpace: .genericRGB))
+    )
+    assertSnapshot(matching: button, as: .recursiveDescription)
     #endif
   }
   
