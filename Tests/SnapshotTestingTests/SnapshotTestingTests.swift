@@ -248,7 +248,10 @@ final class SnapshotTestingTests: XCTestCase {
     button.appearance = NSAppearance(named: .aqua)
     assertSnapshot(
       matching: button,
-      as: .image(windowForDrawing: .init(backingScaleFactor: 1, colorSpace: .genericRGB))
+      as: .image(
+        size: .init(width: 84, height: 32),
+        windowForDrawing: .init(backingScaleFactor: 1, colorSpace: .genericRGB)
+      )
     )
     assertSnapshot(matching: button, as: .recursiveDescription)
     #endif
