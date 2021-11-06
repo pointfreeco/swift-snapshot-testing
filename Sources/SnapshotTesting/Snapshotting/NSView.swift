@@ -123,4 +123,8 @@ public final class GenericWindow: NSWindow {
     }
   }
 }
+
+extension GenericWindow {
+  static let ci = GenericWindow(backingScaleFactor: 1.0, colorSpace: .genericRGB)
+}
 #endif
