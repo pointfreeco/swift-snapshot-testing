@@ -231,7 +231,8 @@ final class SnapshotTestingTests: XCTestCase {
     button.bezelStyle = .rounded
     button.title = "Push Me"
     button.sizeToFit()
-//    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+    button.appearance = NSAppearance(named: .aqua)
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
       assertSnapshot(matching: button, as: .image)
       assertSnapshot(matching: button, as: .recursiveDescription)
 //    }
