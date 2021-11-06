@@ -61,6 +61,9 @@ extension Snapshotting where Value == NSView, Format == NSImage {
           image.addRepresentation(bitmapRep)
           callback(image)
           views.forEach { $0.removeFromSuperview() }
+          view.appearance = initialAppearance
+          view.frame = initialFrame
+
           if windowForDrawing != nil {
             view.removeFromSuperview()
             view.layer = nil
@@ -74,10 +77,8 @@ extension Snapshotting where Value == NSView, Format == NSImage {
             // `view.needsLayout = false` does not do anything, but this does.
             let bitmapRep2 = view.bitmapImageRepForCachingDisplay(in: view.bounds)!
             view.cacheDisplay(in: view.bounds, to: bitmapRep2)
-
           }
-          view.appearance = initialAppearance
-          view.frame = initialFrame
+
         }
       }
     }

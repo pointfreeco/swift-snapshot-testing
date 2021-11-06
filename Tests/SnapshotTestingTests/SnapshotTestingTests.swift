@@ -246,12 +246,10 @@ final class SnapshotTestingTests: XCTestCase {
     button.title = "Push Me"
     button.sizeToFit()
     button.appearance = NSAppearance(named: .aqua)
+    button.frame.size = .init(width: 84, height: 32)
     assertSnapshot(
       matching: button,
-      as: .image(
-        size: .init(width: 84, height: 32),
-        windowForDrawing: .init(backingScaleFactor: 1, colorSpace: .genericRGB)
-      )
+      as: .image(windowForDrawing: .init(backingScaleFactor: 1, colorSpace: .genericRGB))
     )
     assertSnapshot(matching: button, as: .recursiveDescription)
     #endif
