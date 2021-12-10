@@ -278,8 +278,12 @@ public func verifySnapshot<Value, Format>(
         #if !os(Linux)
         if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
           XCTContext.runActivity(named: "Attached Failure Diff") { activity in
-            attachments.forEach {
-              activity.add($0)
+            attachments.forEach { attachment in
+              // Namespace the attachment name so it's easy to attribute back to this snapshot
+              if let attachmentName = attachment.name {
+                attachment.name = "\(testName)-\(identifier)-\(attachmentName)"
+              }
+              activity.add(attachment)
             }
           }
         }
