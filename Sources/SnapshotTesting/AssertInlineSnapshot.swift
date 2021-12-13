@@ -105,7 +105,10 @@ public func _verifyInlineSnapshot<Value>(
       let trimmedReference = reference.trimmingCharacters(in: .whitespacesAndNewlines)
 
       // Always perform diff, and return early on success!
-      guard let (failure, attachments) = snapshotting.diffing.diff(trimmedReference, diffable) else {
+      let artifactDiff = snapshotting.diffing.artifactDiff(trimmedReference, diffable)
+      let attachmentDiff = snapshotting.diffing.diff(trimmedReference, diffable)
+
+      guard artifactDiff != nil || attachmentDiff != nil else {
         return nil
       }
 
@@ -145,25 +148,48 @@ public func _verifyInlineSnapshot<Value>(
         }
       }
 
-      /// Did not successfully record, so we will fail.
-      if !attachments.isEmpty {
-        #if !os(Linux)
-        if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
-          XCTContext.runActivity(named: "Attached Failure Diff") { activity in
-            attachments.forEach {
-              activity.add($0)
+      var failureMessage: String!
+
+      if let (failure, artifacts) = artifactDiff {
+        failureMessage = failure
+        /// Did not successfully record, so we will fail.
+        if !artifacts.isEmpty {
+          #if !os(Linux)
+          if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
+            XCTContext.runActivity(named: "Attached Failure Diff") { activity in
+              artifacts.forEach {
+                let attachment = XCTAttachment(
+                  uniformTypeIdentifier: $0.uniformTypeIdentifier,
+                  name: $0.artifactType.rawValue,
+                  payload: $0.data
+                )
+                activity.add(attachment)
+              }
             }
           }
+          #endif
         }
-        #endif
+      } else if let (failure, attachments) = attachmentDiff {
+        failureMessage = failure
+        /// Did not successfully record, so we will fail.
+        if !attachments.isEmpty {
+          #if !os(Linux)
+          if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
+            XCTContext.runActivity(named: "Attached Failure Diff") { activity in
+              attachments.forEach {
+                activity.add($0)
+              }
+            }
+          }
+          #endif
+        }
       }
 
       return """
       Snapshot does not match reference.
 
-      \(failure.trimmingCharacters(in: .whitespacesAndNewlines))
+      \(failureMessage.trimmingCharacters(in: .whitespacesAndNewlines))
       """
-
     } catch {
       return error.localizedDescription
     }
