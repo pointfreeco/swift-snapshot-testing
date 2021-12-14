@@ -274,17 +274,7 @@ public func verifySnapshot<Value, Format>(
       let failedSnapshotFileUrl = artifactsSubUrl.appendingPathComponent(snapshotFileUrl.lastPathComponent)
       try snapshotting.diffing.toData(diffable).write(to: failedSnapshotFileUrl)
 
-      if !attachments.isEmpty {
-        #if !os(Linux)
-        if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
-          XCTContext.runActivity(named: "Attached Failure Diff") { activity in
-            attachments.forEach {
-              activity.add($0)
-            }
-          }
-        }
-        #endif
-      }
+      attachments.addAttachments(toActivityNamed: "Attached Failure Diff")
 
       let diffMessage = diffTool
         .map { "\($0) \"\(snapshotFileUrl.path)\" \"\(failedSnapshotFileUrl.path)\"" }

@@ -146,17 +146,7 @@ public func _verifyInlineSnapshot<Value>(
       }
 
       /// Did not successfully record, so we will fail.
-      if !attachments.isEmpty {
-        #if !os(Linux)
-        if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
-          XCTContext.runActivity(named: "Attached Failure Diff") { activity in
-            attachments.forEach {
-              activity.add($0)
-            }
-          }
-        }
-        #endif
-      }
+      attachments.addAttachments(toActivityNamed: "Attached Failure Diff")
 
       return """
       Snapshot does not match reference.

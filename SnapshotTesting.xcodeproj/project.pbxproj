@@ -47,6 +47,9 @@
 		3079CF3C05E4FCE8F29053AC /* XCTAttachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE8DE5E8A102E1012CD0C95 /* XCTAttachment.swift */; };
 		3375935EAD0B4B587E08D009 /* testCreateSnapshotWithShorterExtendedDelimiter2.1.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADACB597E6A3CAC5BFEEFB05 /* testCreateSnapshotWithShorterExtendedDelimiter2.1.swift */; };
 		345FB3E29989E8B1DA53617A /* NSView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D57E3B929139A0C14AEBA7 /* NSView.swift */; };
+		3509F9DE2769416500150232 /* Array+XCTAttachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3509F9DD2769416500150232 /* Array+XCTAttachment.swift */; };
+		3509F9DF2769416500150232 /* Array+XCTAttachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3509F9DD2769416500150232 /* Array+XCTAttachment.swift */; };
+		3509F9E02769416500150232 /* Array+XCTAttachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3509F9DD2769416500150232 /* Array+XCTAttachment.swift */; };
 		379DF6110162DE4D59CD48FB /* testCreateSnapshotWithExtendedDelimiterSingleLine1.1.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13AB875AB58FF3BCAC1AA66 /* testCreateSnapshotWithExtendedDelimiterSingleLine1.1.swift */; };
 		38E662FA1D63541B94FDA00F /* testUpdateSeveralSnapshotsSwapingLines2.1.swift in Sources */ = {isa = PBXBuildFile; fileRef = D77BE996AE7868E9B58D6C74 /* testUpdateSeveralSnapshotsSwapingLines2.1.swift */; };
 		38E93DA9BA1639327AEEA89E /* testUpdateSnapshotCombined1.1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94A6FCFFED1BDCF9090E5FEC /* testUpdateSnapshotCombined1.1.swift */; };
@@ -277,6 +280,7 @@
 		2A69D6A4D06EB76C77493EB7 /* testCreateSnapshotWithExtendedDelimiter2.1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = testCreateSnapshotWithExtendedDelimiter2.1.swift; sourceTree = "<group>"; };
 		32BC721A155DB7D81BE69683 /* testUpdateSeveralSnapshotsWithLessLines.1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = testUpdateSeveralSnapshotsWithLessLines.1.swift; sourceTree = "<group>"; };
 		34D7CFCA42A4D2168436F6C1 /* Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Codable.swift; sourceTree = "<group>"; };
+		3509F9DD2769416500150232 /* Array+XCTAttachment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+XCTAttachment.swift"; sourceTree = "<group>"; };
 		3BBC3220F45BA5E71F819602 /* SnapshotTesting.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SnapshotTesting.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4055310797F1D4813ABD0359 /* SpriteKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpriteKit.swift; sourceTree = "<group>"; };
 		4796690CC049B52358D7173A /* testUpdateSnapshotWithShorterExtendedDelimiter2.1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = testUpdateSnapshotWithShorterExtendedDelimiter2.1.swift; sourceTree = "<group>"; };
@@ -494,6 +498,7 @@
 				D49092873A7A5D6DA623E352 /* String+SpecialCharacters.swift */,
 				0F6B5B3AB021FA3CD7519733 /* View.swift */,
 				4BE8DE5E8A102E1012CD0C95 /* XCTAttachment.swift */,
+				3509F9DD2769416500150232 /* Array+XCTAttachment.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -708,6 +713,7 @@
 				1420B1BBC10CFF4D03C8AA67 /* Async.swift in Sources */,
 				2706E738D0BF540260D1F776 /* CALayer.swift in Sources */,
 				1AF02DC6F0CD8B36DD2CEEB5 /* CGPath.swift in Sources */,
+				3509F9DF2769416500150232 /* Array+XCTAttachment.swift in Sources */,
 				6E50CE7921A0D62C78E85637 /* CaseIterable.swift in Sources */,
 				8C4AC3C0BAAA1275BF205637 /* Codable.swift in Sources */,
 				DFAA125AE62C89E28F9762C0 /* Data.swift in Sources */,
@@ -748,6 +754,7 @@
 				29602B6DD2A43E1C13DF1D42 /* Async.swift in Sources */,
 				AAE5EED880A834F69554115C /* CALayer.swift in Sources */,
 				87B0D39F14038FF162ADA25A /* CGPath.swift in Sources */,
+				3509F9DE2769416500150232 /* Array+XCTAttachment.swift in Sources */,
 				620758875CDFB7D9C6442A75 /* CaseIterable.swift in Sources */,
 				B5DDFD7AB905028533949838 /* Codable.swift in Sources */,
 				AF4170D746DA3C5F89010291 /* Data.swift in Sources */,
@@ -860,6 +867,7 @@
 				45FAA85BB7198113155FD27F /* Async.swift in Sources */,
 				E3E64AA7C25386DE50DB0995 /* CALayer.swift in Sources */,
 				DAAEB108C97963D4BF3C74E1 /* CGPath.swift in Sources */,
+				3509F9E02769416500150232 /* Array+XCTAttachment.swift in Sources */,
 				28106F59B265148F2CB38B5B /* CaseIterable.swift in Sources */,
 				5C7623E2C040A67AEF4BE329 /* Codable.swift in Sources */,
 				B30E8815010C2E79DD90B3C0 /* Data.swift in Sources */,
