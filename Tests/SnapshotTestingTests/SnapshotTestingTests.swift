@@ -51,7 +51,7 @@ final class SnapshotTestingTests: XCTestCase {
     let data = try JSONEncoder().encode(user)
     let any = try JSONSerialization.jsonObject(with: data, options: [])
 
-    assertSnapshot(matching:any, as: .json)
+    assertSnapshot(matching: any, as: .json)
   }
 
   func testAnySnapshotStringConvertible() {
