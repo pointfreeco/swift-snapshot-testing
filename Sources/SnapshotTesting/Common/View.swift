@@ -730,11 +730,6 @@ extension View {
       #endif
       return perform()
     }
-    #if (os(iOS) && !targetEnvironment(macCatalyst)) || os(tvOS)
-    if let glkView = self as? GLKView {
-      return Async(value: inWindow { glkView.snapshot })
-    }
-    #endif
     if let scnView = self as? SCNView {
       return Async(value: inWindow { scnView.snapshot() })
     } else if let skView = self as? SKView {
