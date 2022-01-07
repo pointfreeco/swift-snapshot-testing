@@ -1,4 +1,5 @@
-// swift-tools-version:5.0
+// swift-tools-version:5.3
+
 import Foundation
 import PackageDescription
 
@@ -7,7 +8,8 @@ let package = Package(
   platforms: [
     .iOS(.v11),
     .macOS(.v10_10),
-    .tvOS(.v10)
+    .tvOS(.v11),
+    .watchOS(.v7),
   ],
   products: [
     .library(
@@ -15,12 +17,8 @@ let package = Package(
       targets: ["SnapshotTesting"]),
   ],
   targets: [
-    .target(
-      name: "SnapshotTesting",
-      dependencies: []),
-    .testTarget(
-      name: "SnapshotTestingTests",
-      dependencies: ["SnapshotTesting"]),
+    .target(name: "SnapshotTesting"),
+    .testTarget(name: "SnapshotTestingTests", dependencies: ["SnapshotTesting"]),
   ]
 )
 
