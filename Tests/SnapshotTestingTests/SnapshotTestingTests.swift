@@ -43,6 +43,17 @@ final class SnapshotTestingTests: XCTestCase {
     """)
   }
 
+  @available(macOS 10.13, *)
+  func testAnyAsJson() throws {
+    struct User: Encodable { let id: Int, name: String, bio: String }
+    let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
+
+    let data = try JSONEncoder().encode(user)
+    let any = try JSONSerialization.jsonObject(with: data, options: [])
+
+    assertSnapshot(matching: any, as: .json)
+  }
+
   func testAnySnapshotStringConvertible() {
     assertSnapshot(matching: "a" as Character, as: .dump, named: "character")
     assertSnapshot(matching: Data("Hello, world!".utf8), as: .dump, named: "data")
