@@ -65,10 +65,10 @@ extension Snapshotting where Value == URLRequest, Format == String {
     if let httpBodyData = request.httpBody, let httpBody = String(data: httpBodyData, encoding: .utf8) {
       var escapedBody = httpBody.replacingOccurrences(of: "\\\"", with: "\\\\\"")
       escapedBody = escapedBody.replacingOccurrences(of: "\"", with: "\\\"")
-      
+
       components.append("--data \"\(escapedBody)\"")
     }
-    
+
     // Cookies
     if let cookie = request.allHTTPHeaderFields?["Cookie"] {
       let escapedValue = cookie.replacingOccurrences(of: "\"", with: "\\\"")
