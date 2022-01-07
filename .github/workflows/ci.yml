@@ -13,7 +13,6 @@ jobs:
     strategy:
       matrix:
         xcode:
-          - "11.7"   # Swift 5.2
           - "12.4"   # Swift 5.3
           - "12.5.1" # Swift 5.4
           - "13.0"   # Swift 5.5
