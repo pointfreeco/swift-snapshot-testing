@@ -107,7 +107,6 @@ private func compare(_ old: UIImage, _ new: UIImage, precision: Float, pixelDiff
   for byte in 0..<byteCount {
     let diff = oldBytes[byte].diff(between: newerBytes[byte])
     if diff > pixelDiffThreshold {
-      print("[JDBG] diff of \(diff), which exceeds \(pixelDiffThreshold)")
       differentPixelCount += 1
       if Float(differentPixelCount) / Float(byteCount) > threshold {
         return false
