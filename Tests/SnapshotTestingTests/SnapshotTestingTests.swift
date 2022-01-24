@@ -824,6 +824,14 @@ final class SnapshotTestingTests: XCTestCase {
     assertSnapshot(matching: view, as: .recursiveDescription)
     #endif
   }
+  
+  func testUIViewFailsIfNewViewHasNoFrame() {
+    #if os(iOS)
+    let view = UIView(frame: .zero)
+    XCTExpectFailure()
+    assertSnapshot(matching: view, as: .image)
+    #endif
+  }
 
   func testUIViewControllerLifeCycle() {
     #if os(iOS)
