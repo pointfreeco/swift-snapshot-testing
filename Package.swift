@@ -3,7 +3,7 @@ import Foundation
 import PackageDescription
 
 let package = Package(
-  name: "SnapshotTesting",
+  name: "swift-snapshot-testing",
   platforms: [
     .iOS(.v11),
     .macOS(.v10_10),

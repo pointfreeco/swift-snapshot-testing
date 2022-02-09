@@ -146,6 +146,38 @@ public struct ViewImageConfig {
     return .init(safeArea: safeArea, size: size, traits: .iPhoneXr(orientation))
   }
 
+  public static let iPhone12 = ViewImageConfig.iPhone12(.portrait)
+
+  public static func iPhone12(_ orientation: Orientation) -> ViewImageConfig {
+    let safeArea: UIEdgeInsets
+    let size: CGSize
+    switch orientation {
+    case .landscape:
+      safeArea = .init(top: 0, left: 47, bottom: 21, right: 47)
+      size = .init(width: 844, height: 390)
+    case .portrait:
+      safeArea = .init(top: 47, left: 0, bottom: 34, right: 0)
+      size = .init(width: 390, height: 844)
+    }
+    return .init(safeArea: safeArea, size: size, traits: .iPhone12(orientation))
+  }
+
+  public static let iPhone12ProMax = ViewImageConfig.iPhone12ProMax(.portrait)
+
+  public static func iPhone12ProMax(_ orientation: Orientation) -> ViewImageConfig {
+    let safeArea: UIEdgeInsets
+    let size: CGSize
+    switch orientation {
+    case .landscape:
+      safeArea = .init(top: 0, left: 47, bottom: 21, right: 47)
+      size = .init(width: 926, height: 428)
+    case .portrait:
+      safeArea = .init(top: 47, left: 0, bottom: 34, right: 0)
+      size = .init(width: 428, height: 926)
+    }
+    return .init(safeArea: safeArea, size: size, traits: .iPhone12ProMax(orientation))
+  }
+
   public static let iPadMini = ViewImageConfig.iPadMini(.landscape)
 
   public static func iPadMini(_ orientation: Orientation) -> ViewImageConfig {
@@ -191,6 +223,63 @@ public struct ViewImageConfig {
     }
     return .init(safeArea: .init(top: 20, left: 0, bottom: 0, right: 0), size: size, traits: traits)
   }
+
+  public static let iPad9_7 = iPadMini
+
+  public static func iPad9_7(_ orientation: Orientation) -> ViewImageConfig {
+    return iPadMini(orientation)
+  }
+
+  public static func iPad9_7(_ orientation: TabletOrientation) -> ViewImageConfig {
+    return iPadMini(orientation)
+  }
+
+  public static let iPad10_2 = ViewImageConfig.iPad10_2(.landscape)
+
+  public static func iPad10_2(_ orientation: Orientation) -> ViewImageConfig {
+    switch orientation {
+    case .landscape:
+      return ViewImageConfig.iPad10_2(.landscape(splitView: .full))
+    case .portrait:
+      return ViewImageConfig.iPad10_2(.portrait(splitView: .full))
+    }
+  }
+
+  public static func iPad10_2(_ orientation: TabletOrientation) -> ViewImageConfig {
+    let size: CGSize
+    let traits: UITraitCollection
+    switch orientation {
+    case .landscape(let splitView):
+      switch splitView {
+      case .oneThird:
+        size = .init(width: 320, height: 810)
+        traits = .iPad10_2_Compact_SplitView
+      case .oneHalf:
+        size = .init(width: 535, height: 810)
+        traits = .iPad10_2_Compact_SplitView
+      case .twoThirds:
+        size = .init(width: 750, height: 810)
+        traits = .iPad10_2
+      case .full:
+        size = .init(width: 1080, height: 810)
+        traits = .iPad10_2
+      }
+    case .portrait(let splitView):
+      switch splitView {
+      case .oneThird:
+        size = .init(width: 320, height: 1080)
+        traits = .iPad10_2_Compact_SplitView
+      case .twoThirds:
+        size = .init(width: 480, height: 1080)
+        traits = .iPad10_2_Compact_SplitView
+      case .full:
+        size = .init(width: 810, height: 1080)
+        traits = .iPad10_2
+      }
+    }
+    return .init(safeArea: .init(top: 20, left: 0, bottom: 0, right: 0), size: size, traits: traits)
+  }
+
 
   public static let iPadPro10_5 = ViewImageConfig.iPadPro10_5(.landscape)
 
@@ -507,7 +596,7 @@ extension UITraitCollection {
         )
       case .portrait:
         return .init(
-          traitsFrom: [
+          traitsFrom: base + [
             .init(horizontalSizeClass: .compact),
             .init(verticalSizeClass: .regular)
           ]
@@ -515,8 +604,68 @@ extension UITraitCollection {
       }
   }
 
+  public static func iPhone12(_ orientation: ViewImageConfig.Orientation)
+  -> UITraitCollection {
+    let base: [UITraitCollection] = [
+//    .init(displayGamut: .P3),
+//    .init(displayScale: 3),
+      .init(forceTouchCapability: .available),
+      .init(layoutDirection: .leftToRight),
+      .init(preferredContentSizeCategory: .medium),
+      .init(userInterfaceIdiom: .phone)
+    ]
+    switch orientation {
+    case .landscape:
+      return .init(
+        traitsFrom: base + [
+          .init(horizontalSizeClass: .compact),
+          .init(verticalSizeClass: .compact)
+        ]
+      )
+    case .portrait:
+      return .init(
+        traitsFrom: base + [
+          .init(horizontalSizeClass: .compact),
+          .init(verticalSizeClass: .regular)
+        ]
+      )
+    }
+  }
+
+  public static func iPhone12ProMax(_ orientation: ViewImageConfig.Orientation)
+  -> UITraitCollection {
+    let base: [UITraitCollection] = [
+      //    .init(displayGamut: .P3),
+      //    .init(displayScale: 3),
+      .init(forceTouchCapability: .available),
+      .init(layoutDirection: .leftToRight),
+      .init(preferredContentSizeCategory: .medium),
+      .init(userInterfaceIdiom: .phone)
+    ]
+    switch orientation {
+    case .landscape:
+      return .init(
+        traitsFrom: base + [
+          .init(horizontalSizeClass: .regular),
+          .init(verticalSizeClass: .compact)
+        ]
+      )
+    case .portrait:
+      return .init(
+        traitsFrom: base + [
+          .init(horizontalSizeClass: .compact),
+          .init(verticalSizeClass: .regular)
+        ]
+      )
+    }
+  }
+
   public static let iPadMini = iPad
   public static let iPadMini_Compact_SplitView = iPadCompactSplitView
+  public static let iPad9_7 = iPad
+  public static let iPad9_7_Compact_SplitView = iPadCompactSplitView
+  public static let iPad10_2 = iPad
+  public static let iPad10_2_Compact_SplitView = iPadCompactSplitView
   public static let iPadPro10_5 = iPad
   public static let iPadPro10_5_Compact_SplitView = iPadCompactSplitView
   public static let iPadPro11 = iPad
@@ -581,11 +730,6 @@ extension View {
       #endif
       return perform()
     }
-    #if (os(iOS) && !targetEnvironment(macCatalyst)) || os(tvOS)
-    if let glkView = self as? GLKView {
-      return Async(value: inWindow { glkView.snapshot })
-    }
-    #endif
     if let scnView = self as? SCNView {
       return Async(value: inWindow { scnView.snapshot() })
     } else if let skView = self as? SKView {
@@ -604,7 +748,6 @@ extension View {
     #if os(iOS) || os(macOS)
     if let wkWebView = self as? WKWebView {
       return Async<Image> { callback in
-        let delegate = NavigationDelegate()
         let work = {
           if #available(iOS 11.0, macOS 10.13, *) {
             inWindow {
@@ -613,7 +756,6 @@ extension View {
                 return
               }
               wkWebView.takeSnapshot(with: nil) { image, _ in
-                _ = delegate
                 callback(image!)
               }
             }
@@ -627,8 +769,14 @@ extension View {
         }
 
         if wkWebView.isLoading {
-          delegate.didFinish = work
-          wkWebView.navigationDelegate = delegate
+          var subscription: NSKeyValueObservation?
+          subscription = wkWebView.observe(\.isLoading, options: [.initial, .new]) { (webview, change) in
+            subscription?.invalidate()
+            subscription = nil
+            if change.newValue == false {
+              work()
+            }
+          }
         } else {
           work()
         }
@@ -646,22 +794,6 @@ extension View {
   }
   #endif
 }
-
-#if os(iOS) || os(macOS)
-private final class NavigationDelegate: NSObject, WKNavigationDelegate {
-  var didFinish: () -> Void
-
-  init(didFinish: @escaping () -> Void = {}) {
-    self.didFinish = didFinish
-  }
-
-  func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-    webView.evaluateJavaScript("document.readyState") { _, _ in
-      self.didFinish()
-    }
-  }
-}
-#endif
 
 #if os(iOS) || os(tvOS)
 extension UIApplication {
@@ -804,6 +936,10 @@ private func add(traits: UITraitCollection, viewController: UIViewController, to
 
   return {
     rootViewController.beginAppearanceTransition(false, animated: false)
+    viewController.willMove(toParent: nil)
+    viewController.view.removeFromSuperview()
+    viewController.removeFromParent()
+    viewController.didMove(toParent: nil)
     rootViewController.endAppearanceTransition()
     window.rootViewController = nil
   }

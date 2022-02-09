@@ -275,7 +275,7 @@ public func verifySnapshot<Value, Format>(
       try snapshotting.diffing.toData(diffable).write(to: failedSnapshotFileUrl)
 
       if !attachments.isEmpty {
-        #if !os(Linux)
+        #if !os(Linux) && !os(Windows)
         if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
           XCTContext.runActivity(named: "Attached Failure Diff") { activity in
             attachments.forEach {
@@ -288,9 +288,26 @@ public func verifySnapshot<Value, Format>(
 
       let diffMessage = diffTool
         .map { "\($0) \"\(snapshotFileUrl.path)\" \"\(failedSnapshotFileUrl.path)\"" }
-        ?? "@\(minus)\n\"\(snapshotFileUrl.path)\"\n@\(plus)\n\"\(failedSnapshotFileUrl.path)\""
+        ?? """
+        @\(minus)
+        "\(snapshotFileUrl.path)"
+        @\(plus)
+        "\(failedSnapshotFileUrl.path)"
+
+        To configure output for a custom diff tool, like Kaleidoscope:
+
+            SnapshotTesting.diffTool = "ksdiff"
+        """
+
+      let failureMessage: String
+      if let name = name {
+        failureMessage = "Snapshot \"\(name)\" does not match reference."
+      } else {
+        failureMessage = "Snapshot does not match reference."
+      }
+
       return """
-      Snapshot does not match reference.
+      \(failureMessage)
 
       \(diffMessage)
 

@@ -7,6 +7,24 @@ extension Snapshotting where Format == String {
   }
 }
 
+@available(macOS 10.13, *)
+extension Snapshotting where Format == String {
+  /// A snapshot strategy for comparing any structure based on their JSON representation.
+  public static var json: Snapshotting {
+    let options: JSONSerialization.WritingOptions = [
+      .prettyPrinted,
+      .sortedKeys
+    ]
+
+    var snapshotting = SimplySnapshotting.lines.pullback { (data: Value) in
+      try! String(decoding: JSONSerialization.data(withJSONObject: data,
+                                                   options: options), as: UTF8.self)
+    }
+    snapshotting.pathExtension = "json"
+    return snapshotting
+  }
+}
+
 private func snap<T>(_ value: T, name: String? = nil, indent: Int = 0) -> String {
   let indentation = String(repeating: " ", count: indent)
   let mirror = Mirror(reflecting: value)
