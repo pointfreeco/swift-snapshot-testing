@@ -4,15 +4,15 @@ import XCTest
 
 extension Diffing where Value == UIImage {
   /// A pixel-diffing strategy for UIImage's which requires a 100% match.
-  public static let image = Diffing.image(precision: 1, pixelDiffThreshold: 0, scale: nil)
+  public static let image = Diffing.image(precision: 1, subpixelThreshold: 0, scale: nil)
 
   /// A pixel-diffing strategy for UIImage that allows customizing how precise the matching must be.
   ///
-  /// - Parameter precision: A value between 0 and 1, where 1 means 100% of the pixels must be within `pixelDiffThreshold`.
-  /// - Parameter pixelDiffThreshold: If any component (RGB) of a pixel has a greater difference than this value, it is considered different.
+  /// - Parameter precision: A value between 0 and 1, where 1 means 100% of the pixels must be within `subpixelThreshold`.
+  /// - Parameter subpixelThreshold: If any component (RGB) of a pixel has a greater difference than this value, it is considered different.
   /// - Parameter scale: Scale to use when loading the reference image from disk. If `nil` or the `UITraitCollection`s default value of `0.0`, the screens scale is used.
   /// - Returns: A new diffing strategy.
-  public static func image(precision: Float, pixelDiffThreshold: UInt8, scale: CGFloat?) -> Diffing {
+  public static func image(precision: Float, subpixelThreshold: UInt8, scale: CGFloat?) -> Diffing {
     let imageScale: CGFloat
     if let scale = scale, scale != 0.0 {
       imageScale = scale
@@ -24,7 +24,7 @@ extension Diffing where Value == UIImage {
       toData: { $0.pngData() ?? emptyImage().pngData()! },
       fromData: { UIImage(data: $0, scale: imageScale)! }
     ) { old, new in
-      guard !compare(old, new, precision: precision, pixelDiffThreshold: pixelDiffThreshold) else { return nil }
+      guard !compare(old, new, precision: precision, subpixelThreshold: subpixelThreshold) else { return nil }
       let difference = SnapshotTesting.diff(old, new)
       let message = new.size == old.size
         ? "Newly-taken snapshot does not match reference."
@@ -57,23 +57,23 @@ extension Diffing where Value == UIImage {
 extension Snapshotting where Value == UIImage, Format == UIImage {
   /// A snapshot strategy for comparing images based on pixel equality.
   public static var image: Snapshotting {
-    return .image(precision: 1, pixelDiffThreshold: 0, scale: nil)
+    return .image(precision: 1, subpixelThreshold: 0, scale: nil)
   }
 
   /// A snapshot strategy for comparing images based on pixel equality.
   ///
   /// - Parameter precision: The percentage of pixels that must match.
-  /// - Parameter pixelDiffThreshold: The byte-value threshold at which two pixels are considered different.
+  /// - Parameter subpixelThreshold: The byte-value threshold at which two subpixels are considered different.
   /// - Parameter scale: The scale of the reference image stored on disk.
-  public static func image(precision: Float, pixelDiffThreshold: UInt8, scale: CGFloat?) -> Snapshotting {
+  public static func image(precision: Float, subpixelThreshold: UInt8, scale: CGFloat?) -> Snapshotting {
     return .init(
       pathExtension: "png",
-      diffing: .image(precision: precision, pixelDiffThreshold: pixelDiffThreshold, scale: scale)
+      diffing: .image(precision: precision, subpixelThreshold: subpixelThreshold, scale: scale)
     )
   }
 }
 
-private func compare(_ old: UIImage, _ new: UIImage, precision: Float, pixelDiffThreshold: UInt8) -> Bool {
+private func compare(_ old: UIImage, _ new: UIImage, precision: Float, subpixelThreshold: UInt8) -> Bool {
   guard let oldCgImage = old.cgImage else { return false }
   guard let newCgImage = new.cgImage else { return false }
   guard oldCgImage.width != 0 else { return false }
@@ -101,13 +101,13 @@ private func compare(_ old: UIImage, _ new: UIImage, precision: Float, pixelDiff
   guard let newerContext = context(for: newerCgImage, bytesPerRow: minBytesPerRow, data: &newerBytes) else { return false }
   guard let newerData = newerContext.data else { return false }
   if memcmp(oldData, newerData, byteCount) == 0 { return true }
-  if precision >= 1 && pixelDiffThreshold == 0 { return false }
+  if precision >= 1 && subpixelThreshold == 0 { return false }
   var differentPixelCount = 0
   let threshold = Int(1.0 - precision * Float(byteCount))
 
   var byte = 0
   while byte < byteCount {
-    if oldBytes[byte] != newerBytes[byte] {
+    if oldBytes[byte].diff(between: newerBytes[byte]) > subpixelThreshold {
       differentPixelCount += 1
       if differentPixelCount >= threshold {
         return false

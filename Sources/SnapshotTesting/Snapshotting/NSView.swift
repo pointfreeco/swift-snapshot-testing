@@ -11,10 +11,10 @@ extension Snapshotting where Value == NSView, Format == NSImage {
   ///
   /// - Parameters:
   ///   - precision: The percentage of pixels that must match.
-  ///   - pixelDiffThreshold: The byte-value threshold at which two pixels are considered different.
+  ///   - subpixelThreshold: The byte-value threshold at which two subpixels are considered different.
   ///   - size: A view size override.
-  public static func image(precision: Float = 1, pixelDiffThreshold: UInt8 = 0, size: CGSize? = nil) -> Snapshotting {
-    return SimplySnapshotting.image(precision: precision, pixelDiffThreshold: pixelDiffThreshold).asyncPullback { view in
+  public static func image(precision: Float = 1, subpixelThreshold: UInt8 = 0, size: CGSize? = nil) -> Snapshotting {
+    return SimplySnapshotting.image(precision: precision, subpixelThreshold: subpixelThreshold).asyncPullback { view in
       let initialSize = view.frame.size
       if let size = size { view.frame.size = size }
       guard view.frame.width > 0, view.frame.height > 0 else {
