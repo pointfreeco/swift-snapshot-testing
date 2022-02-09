@@ -10,8 +10,9 @@ extension Snapshotting where Value == NSBezierPath, Format == NSImage {
   /// A snapshot strategy for comparing bezier paths based on pixel equality.
   ///
   /// - Parameter precision: The percentage of pixels that must match.
-  public static func image(precision: Float = 1) -> Snapshotting {
-    return SimplySnapshotting.image(precision: precision).pullback { path in
+  /// - Parameter pixelDiffThreshold: The byte-value threshold at which two pixels are considered different.
+  public static func image(precision: Float = 1, pixelDiffThreshold: UInt8 = 0) -> Snapshotting {
+    return SimplySnapshotting.image(precision: precision, pixelDiffThreshold: pixelDiffThreshold).pullback { path in
       // Move path info frame:
       let bounds = path.bounds
       let transform = AffineTransform(translationByX: -bounds.origin.x, byY: -bounds.origin.y)
@@ -90,4 +91,3 @@ private let defaultNumberFormatter: NumberFormatter = {
   return numberFormatter
 }()
 #endif
-

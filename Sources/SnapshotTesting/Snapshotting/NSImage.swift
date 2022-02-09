@@ -4,18 +4,19 @@ import XCTest
 
 extension Diffing where Value == NSImage {
   /// A pixel-diffing strategy for NSImage's which requires a 100% match.
-  public static let image = Diffing.image(precision: 1)
+  public static let image: Diffing = Diffing.image(precision: 1, pixelDiffThreshold: 0)
 
   /// A pixel-diffing strategy for NSImage that allows customizing how precise the matching must be.
   ///
   /// - Parameter precision: A value between 0 and 1, where 1 means the images must match 100% of their pixels.
+  /// - Parameter pixelDiffThreshold: The byte-value threshold at which two pixels are considered different.
   /// - Returns: A new diffing strategy.
-  public static func image(precision: Float) -> Diffing {
+  public static func image(precision: Float, pixelDiffThreshold: UInt8) -> Diffing {
     return .init(
       toData: { NSImagePNGRepresentation($0)! },
       fromData: { NSImage(data: $0)! }
     ) { old, new in
-      guard !compare(old, new, precision: precision) else { return nil }
+      guard !compare(old, new, precision: precision, pixelDiffThreshold: pixelDiffThreshold) else { return nil }
       let difference = SnapshotTesting.diff(old, new)
       let message = new.size == old.size
         ? "Newly-taken snapshot does not match reference."
@@ -31,16 +32,17 @@ extension Diffing where Value == NSImage {
 extension Snapshotting where Value == NSImage, Format == NSImage {
   /// A snapshot strategy for comparing images based on pixel equality.
   public static var image: Snapshotting {
-    return .image(precision: 1)
+    return .image(precision: 1, pixelDiffThreshold: 0)
   }
 
   /// A snapshot strategy for comparing images based on pixel equality.
   ///
   /// - Parameter precision: The percentage of pixels that must match.
-  public static func image(precision: Float) -> Snapshotting {
+  /// - Parameter pixelDiffThreshold: The byte-value threshold at which two pixels are considered different.
+  public static func image(precision: Float, pixelDiffThreshold: UInt8) -> Snapshotting {
     return .init(
       pathExtension: "png",
-      diffing: .image(precision: precision)
+      diffing: .image(precision: precision, pixelDiffThreshold: pixelDiffThreshold)
     )
   }
 }
@@ -52,7 +54,7 @@ private func NSImagePNGRepresentation(_ image: NSImage) -> Data? {
   return rep.representation(using: .png, properties: [:])
 }
 
-private func compare(_ old: NSImage, _ new: NSImage, precision: Float) -> Bool {
+private func compare(_ old: NSImage, _ new: NSImage, precision: Float, pixelDiffThreshold: UInt8) -> Bool {
   guard let oldCgImage = old.cgImage(forProposedRect: nil, context: nil, hints: nil) else { return false }
   guard let newCgImage = new.cgImage(forProposedRect: nil, context: nil, hints: nil) else { return false }
   guard oldCgImage.width != 0 else { return false }
@@ -81,7 +83,7 @@ private func compare(_ old: NSImage, _ new: NSImage, precision: Float) -> Bool {
   let p1: UnsafeMutablePointer<UInt8> = oldRep.bitmapData!
   let p2: UnsafeMutablePointer<UInt8> = newRep.bitmapData!
   for offset in 0 ..< pixelCount * 4 {
-    if p1[offset] != p2[offset] {
+    if p1[offset].diff(between: p2[offset]) > pixelDiffThreshold {
         differentPixelCount += 1
     }
     if Float(differentPixelCount) > threshold { return false }
