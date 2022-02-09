@@ -75,7 +75,17 @@ assertSnapshot(matching: vc, as: .image(on: .iPadMini(.portrait)))
 assertSnapshot(matching: vc, as: .recursiveDescription(on: .iPadMini(.portrait)))
 ```
 
-> ⚠️ Warning: Snapshots must be compared using a simulator with the same OS, device gamut, and scale as the simulator that originally took the reference to avoid discrepancies between images.
+> ⚠️ Warning: Snapshots may differ slightly unless compared on the same OS,
+> device gamut, and scale as the simulator that originally took the reference.
+> If this cannot be avoided, acceptance in differences can be configured by
+> setting the `subpixelThreshold`-parameter.
+>
+> Example:
+> ```swift
+> // Allow each subpixel to deviate up to 5 byte-values
+> assertSnapshot(matching: vc, as: .image(on: .iPhoneX, subpixelThreshold: 5))
+> ```
+>
 
 Better yet, SnapshotTesting isn't limited to views and view controllers! There are [a number of available snapshot strategies](Documentation/Available-Snapshot-Strategies.md) to choose from.
 
