@@ -85,10 +85,12 @@ private func compare(_ old: NSImage, _ new: NSImage, precision: Float, pixelDiff
 
   var offset = 0
   while offset < pixelCount * 4 {
-    if p1[offset].diff(between: p2[offset]) > pixelDiffThreshold {
-        differentPixelCount += 1
+    if p1[offset] != p2[offset] {
+      differentPixelCount += 1
+      if differentPixelCount > threshold {
+        return false
+      }
     }
-    if differentPixelCount > threshold { return false }
     offset += 1
   }
   return true

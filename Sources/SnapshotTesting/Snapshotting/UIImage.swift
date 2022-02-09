@@ -107,8 +107,12 @@ private func compare(_ old: UIImage, _ new: UIImage, precision: Float, pixelDiff
 
   var byte = 0
   while byte < byteCount {
-    if oldBytes[byte] != newerBytes[byte] { differentPixelCount += 1 }
-    if differentPixelCount >= threshold { return false }
+    if oldBytes[byte] != newerBytes[byte] {
+      differentPixelCount += 1
+      if differentPixelCount >= threshold {
+        return false
+      }
+    }
     byte += 1
   }
   return true
