@@ -103,7 +103,7 @@ private func compare(_ old: UIImage, _ new: UIImage, precision: Float, subpixelT
   if memcmp(oldData, newerData, byteCount) == 0 { return true }
   if precision >= 1 && subpixelThreshold == 0 { return false }
   var differentPixelCount = 0
-  let threshold = Int(1.0 - precision * Float(byteCount))
+  let threshold = Int(round((1.0 - precision) * Float(byteCount)))
 
   var byte = 0
   while byte < byteCount {
