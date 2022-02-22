@@ -2,7 +2,7 @@ import Foundation
 
 extension Snapshotting where Value: Encodable, Format == String {
   /// A snapshot strategy for comparing encodable structures based on their JSON representation.
-  @available(iOS 11.0, macOS 10.13, tvOS 11.0, *)
+  @available(iOS 11.0, macOS 10.13, tvOS 11.0, watchOS 4.0, *)
   public static var json: Snapshotting {
     let encoder = JSONEncoder()
     encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
