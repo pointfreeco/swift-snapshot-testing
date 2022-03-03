@@ -102,7 +102,7 @@ private func compare(_ old: UIImage, _ new: UIImage, precision: Float, colorPrec
   guard let newerContext = context(for: newerCgImage, data: &newerBytes) else { return false }
   guard let newerData = newerContext.data else { return false }
   if memcmp(oldData, newerData, byteCount) == 0 { return true }
-  if precision >= 1 { return false }
+  if precision >= 1 && colorPrecision >= 1 { return false }
 
   if colorPrecision >= 1 {
     var differentByteCount = 0
