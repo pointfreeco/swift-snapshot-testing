@@ -289,6 +289,28 @@ final class SnapshotTestingTests: XCTestCase {
     #endif
   }
 
+  func testColorPrecision() {
+    #if os(iOS)
+    let label = UILabel()
+    label.frame = CGRect(origin: .zero, size: CGSize(width: 43.5, height: 20.5))
+    label.backgroundColor = .white
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      label.text = "Hello."
+      label.textColor = UIColor(white: 0, alpha: 1)
+      assertSnapshot(matching: label, as: .image(precision: 1, colorPrecision: 1), named: platform)
+      label.textColor = UIColor(white: 0.09999999, alpha: 1)
+      label.backgroundColor = UIColor(white: 0.900000001, alpha: 1)
+      assertSnapshot(matching: label, as: .image(precision: 1, colorPrecision: 0.9), named: platform)
+      label.text = "Hello"
+      assertSnapshot(matching: label, as: .image(precision: 0.9, colorPrecision: 0.9), named: platform)
+      label.textColor = UIColor(white: 0, alpha: 1)
+      label.backgroundColor = .white
+      assertSnapshot(matching: label, as: .image(precision: 0.9, colorPrecision: 1), named: platform)
+    }
+    #endif
+  }
+
   func testSCNView() {
 //    #if os(iOS) || os(macOS) || os(tvOS)
 //    // NB: CircleCI crashes while trying to instantiate SCNView.
