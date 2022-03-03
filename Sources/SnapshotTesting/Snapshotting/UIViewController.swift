@@ -12,17 +12,23 @@ extension Snapshotting where Value == UIViewController, Format == UIImage {
   /// - Parameters:
   ///   - config: A set of device configuration settings.
   ///   - precision: The percentage of pixels that must match.
+  ///   - colorPrecision: The percentage a pixel's color component should match, to be considered a valid pixel.
   ///   - size: A view size override.
   ///   - traits: A trait collection override.
   public static func image(
     on config: ViewImageConfig,
     precision: Float = 1,
+    colorPrecision: Float = 1,
     size: CGSize? = nil,
     traits: UITraitCollection = .init()
     )
     -> Snapshotting {
 
-      return SimplySnapshotting.image(precision: precision, scale: traits.displayScale).asyncPullback { viewController in
+      return SimplySnapshotting.image(
+        precision: precision,
+        colorPrecision: colorPrecision,
+        scale: traits.displayScale
+      ).asyncPullback { viewController in
         snapshotView(
           config: size.map { .init(safeArea: config.safeArea, size: $0, traits: config.traits) } ?? config,
           drawHierarchyInKeyWindow: false,

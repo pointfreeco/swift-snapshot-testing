@@ -12,17 +12,23 @@ extension Snapshotting where Value == UIView, Format == UIImage {
   /// - Parameters:
   ///   - drawHierarchyInKeyWindow: Utilize the simulator's key window in order to render `UIAppearance` and `UIVisualEffect`s. This option requires a host application for your tests and will _not_ work for framework test targets.
   ///   - precision: The percentage of pixels that must match.
+  ///   - colorPrecision: The percentage a pixel's color component should match, to be considered a valid pixel.
   ///   - size: A view size override.
   ///   - traits: A trait collection override.
   public static func image(
     drawHierarchyInKeyWindow: Bool = false,
     precision: Float = 1,
+    colorPrecision: Float = 1,
     size: CGSize? = nil,
     traits: UITraitCollection = .init()
     )
     -> Snapshotting {
 
-      return SimplySnapshotting.image(precision: precision, scale: traits.displayScale).asyncPullback { view in
+      return SimplySnapshotting.image(
+        precision: precision,
+        colorPrecision: colorPrecision,
+        scale: traits.displayScale
+      ).asyncPullback { view in
         snapshotView(
           config: .init(safeArea: .zero, size: size ?? view.frame.size, traits: .init()),
           drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,

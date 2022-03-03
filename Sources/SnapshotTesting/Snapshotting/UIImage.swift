@@ -4,14 +4,15 @@ import XCTest
 
 extension Diffing where Value == UIImage {
   /// A pixel-diffing strategy for UIImage's which requires a 100% match.
-  public static let image = Diffing.image(precision: 1, scale: nil)
+  public static let image = Diffing.image(precision: 1, colorPrecision: 1, scale: nil)
 
   /// A pixel-diffing strategy for UIImage that allows customizing how precise the matching must be.
   ///
   /// - Parameter precision: A value between 0 and 1, where 1 means the images must match 100% of their pixels.
+  /// - Parameter colorPrecision: A value between 0 and 1, where 1 means the pixel is considered invalid if all its color components are not a 100% match.
   /// - Parameter scale: Scale to use when loading the reference image from disk. If `nil` or the `UITraitCollection`s default value of `0.0`, the screens scale is used.
   /// - Returns: A new diffing strategy.
-  public static func image(precision: Float, scale: CGFloat?) -> Diffing {
+  public static func image(precision: Float, colorPrecision: Float = 1, scale: CGFloat?) -> Diffing {
     let imageScale: CGFloat
     if let scale = scale, scale != 0.0 {
       imageScale = scale
@@ -23,7 +24,7 @@ extension Diffing where Value == UIImage {
       toData: { $0.pngData() ?? emptyImage().pngData()! },
       fromData: { UIImage(data: $0, scale: imageScale)! }
     ) { old, new in
-      guard !compare(old, new, precision: precision) else { return nil }
+      guard !compare(old, new, precision: precision, colorPrecision: colorPrecision) else { return nil }
       let difference = SnapshotTesting.diff(old, new)
       let message = new.size == old.size
         ? "Newly-taken snapshot does not match reference."
@@ -56,17 +57,18 @@ extension Diffing where Value == UIImage {
 extension Snapshotting where Value == UIImage, Format == UIImage {
   /// A snapshot strategy for comparing images based on pixel equality.
   public static var image: Snapshotting {
-    return .image(precision: 1, scale: nil)
+    return .image(precision: 1, colorPrecision: 1, scale: nil)
   }
 
   /// A snapshot strategy for comparing images based on pixel equality.
   ///
   /// - Parameter precision: The percentage of pixels that must match.
+  /// - Parameter colorPrecision: The percentage a pixel's color component should match, to be considered a valid pixel.
   /// - Parameter scale: The scale of the reference image stored on disk.
-  public static func image(precision: Float, scale: CGFloat?) -> Snapshotting {
+  public static func image(precision: Float, colorPrecision: Float = 1, scale: CGFloat?) -> Snapshotting {
     return .init(
       pathExtension: "png",
-      diffing: .image(precision: precision, scale: scale)
+      diffing: .image(precision: precision, colorPrecision: colorPrecision, scale: scale)
     )
   }
 }
@@ -76,7 +78,7 @@ let imageContextColorSpace = CGColorSpace(name: CGColorSpace.sRGB)
 let imageContextBitsPerComponent = 8
 let imageContextBytesPerPixel = 4
 
-private func compare(_ old: UIImage, _ new: UIImage, precision: Float) -> Bool {
+private func compare(_ old: UIImage, _ new: UIImage, precision: Float, colorPrecision: Float) -> Bool {
   guard let oldCgImage = old.cgImage else { return false }
   guard let newCgImage = new.cgImage else { return false }
   guard oldCgImage.width != 0 else { return false }
@@ -86,7 +88,8 @@ private func compare(_ old: UIImage, _ new: UIImage, precision: Float) -> Bool {
   guard newCgImage.height != 0 else { return false }
   guard oldCgImage.height == newCgImage.height else { return false }
 
-  let byteCount = imageContextBytesPerPixel * oldCgImage.width * oldCgImage.height
+  let pixelCount = oldCgImage.width * oldCgImage.height
+  let byteCount = imageContextBytesPerPixel * pixelCount
   var oldBytes = [UInt8](repeating: 0, count: byteCount)
   guard let oldContext = context(for: oldCgImage, data: &oldBytes) else { return false }
   guard let oldData = oldContext.data else { return false }
@@ -100,11 +103,40 @@ private func compare(_ old: UIImage, _ new: UIImage, precision: Float) -> Bool {
   guard let newerData = newerContext.data else { return false }
   if memcmp(oldData, newerData, byteCount) == 0 { return true }
   if precision >= 1 { return false }
-  var differentPixelCount = 0
-  let threshold = 1 - precision
-  for byte in 0..<byteCount {
-    if oldBytes[byte] != newerBytes[byte] { differentPixelCount += 1 }
-    if Float(differentPixelCount) / Float(byteCount) > threshold { return false}
+
+  if colorPrecision >= 1 {
+    var differentByteCount = 0
+    let threshold = 1 - precision
+    for byte in 0..<byteCount {
+      if oldBytes[byte] != newerBytes[byte] { differentByteCount += 1 }
+      if Float(differentByteCount) / Float(byteCount) > threshold { return false}
+    }
+  } else {
+    var differentPixelsCount = 0
+    let pixelThreshold = 1 - precision
+    let colorThreshold = 1 - colorPrecision
+
+    for pixel in 0..<pixelCount {
+      let startPixelColor = pixel * imageContextBytesPerPixel
+      let nextPixel = startPixelColor + imageContextBytesPerPixel
+
+      for colorByte in startPixelColor..<nextPixel {
+        let oldColor = oldBytes[colorByte]
+        let newColor = newerBytes[colorByte]
+
+        if oldColor == newColor { continue }
+
+        let maxColor = max(oldColor, newColor)
+        let minColor = min(oldColor, newColor)
+
+        if Float(maxColor - minColor) / Float(UInt8.max) > colorThreshold {
+          differentPixelsCount += 1
+          break
+        }
+      }
+
+      if Float(differentPixelsCount) / Float(pixelCount) > pixelThreshold { return false }
+    }
   }
   return true
 }
