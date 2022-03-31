@@ -35,9 +35,9 @@ extension Snapshotting where Value == CALayer, Format == UIImage {
   /// A snapshot strategy for comparing layers based on pixel equality.
   ///
   /// - Parameter precision: The percentage of pixels that must match.
-  public static func image(precision: Float = 1, traits: UITraitCollection = .init())
+  public static func image(precision: Float = 1, traits: UITraitCollection = .init(), customCompareClosure: Diffing<UIImage>.CompareClosure? = nil)
     -> Snapshotting {
-      return SimplySnapshotting.image(precision: precision, scale: traits.displayScale).pullback { layer in
+      return SimplySnapshotting.image(precision: precision, scale: traits.displayScale, customCompareClosure: customCompareClosure).pullback { layer in
         renderer(bounds: layer.bounds, for: traits).image { ctx in
           layer.setNeedsLayout()
           layer.layoutIfNeeded()

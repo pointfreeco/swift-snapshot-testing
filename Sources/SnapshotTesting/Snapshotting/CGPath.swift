@@ -39,8 +39,8 @@ extension Snapshotting where Value == CGPath, Format == UIImage {
   /// A snapshot strategy for comparing bezier paths based on pixel equality.
   ///
   /// - Parameter precision: The percentage of pixels that must match.
-  public static func image(precision: Float = 1, scale: CGFloat = 1, drawingMode: CGPathDrawingMode = .eoFill) -> Snapshotting {
-    return SimplySnapshotting.image(precision: precision, scale: scale).pullback { path in
+  public static func image(precision: Float = 1, scale: CGFloat = 1, drawingMode: CGPathDrawingMode = .eoFill, customCompareClosure: Diffing<UIImage>.CompareClosure? = nil) -> Snapshotting {
+    return SimplySnapshotting.image(precision: precision, scale: scale, customCompareClosure: customCompareClosure).pullback { path in
       let bounds = path.boundingBoxOfPath
       let format: UIGraphicsImageRendererFormat
       if #available(iOS 11.0, tvOS 11.0, *) {

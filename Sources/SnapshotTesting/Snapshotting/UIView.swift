@@ -18,11 +18,12 @@ extension Snapshotting where Value == UIView, Format == UIImage {
     drawHierarchyInKeyWindow: Bool = false,
     precision: Float = 1,
     size: CGSize? = nil,
-    traits: UITraitCollection = .init()
+    traits: UITraitCollection = .init(),
+    customCompareClosure: Diffing<UIImage>.CompareClosure? = nil
     )
     -> Snapshotting {
 
-      return SimplySnapshotting.image(precision: precision, scale: traits.displayScale).asyncPullback { view in
+      return SimplySnapshotting.image(precision: precision, scale: traits.displayScale, customCompareClosure: customCompareClosure).asyncPullback { view in
         snapshotView(
           config: .init(safeArea: .zero, size: size ?? view.frame.size, traits: .init()),
           drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
