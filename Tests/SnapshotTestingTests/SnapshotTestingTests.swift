@@ -959,6 +959,43 @@ final class SnapshotTestingTests: XCTestCase {
     #endif
   }
 
+  func testUIWindow() {
+    #if os(iOS)
+    let window = UIWindow()
+    window.backgroundColor = .white
+    window.isHidden = false
+    window.frame = CGRect(origin: .zero, size: .init(width: 300, height: 500))
+    let viewController = UIViewController()
+    window.rootViewController = viewController
+    let view = UIButton(type: .contactAdd)
+    view.sizeToFit()
+    viewController.view.addSubview(view)
+
+    assertSnapshot(of: window, as: .image)
+
+    viewController.view.backgroundColor = .blue
+    assertSnapshot(of: window, as: .image)
+    #endif
+  }
+
+  func testUIWindowWithoutRootController() {
+    #if os(iOS)
+    let window = UIWindow()
+    window.backgroundColor = .white
+    window.isHidden = false
+    window.frame = CGRect(origin: .zero, size: .init(width: 300, height: 500))
+
+    let view = UIButton(type: .contactAdd)
+    view.sizeToFit()
+    window.addSubview(view)
+
+    assertSnapshot(of: window, as: .image)
+
+    window.backgroundColor = .blue
+    assertSnapshot(of: window, as: .image)
+    #endif
+  }
+
   func testUIViewControllerLifeCycle() {
     #if os(iOS)
       class ViewController: UIViewController {
