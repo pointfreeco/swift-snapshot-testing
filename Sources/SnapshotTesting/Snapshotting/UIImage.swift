@@ -4,14 +4,15 @@ import XCTest
 
 extension Diffing where Value == UIImage {
   /// A pixel-diffing strategy for UIImage's which requires a 100% match.
-  public static let image = Diffing.image(precision: 1, scale: nil)
+  public static let image = Diffing.image(precision: 1, scale: nil, comparisonStrategy: .equality)
 
   /// A pixel-diffing strategy for UIImage that allows customizing how precise the matching must be.
   ///
   /// - Parameter precision: A value between 0 and 1, where 1 means the images must match 100% of their pixels.
   /// - Parameter scale: Scale to use when loading the reference image from disk. If `nil` or the `UITraitCollection`s default value of `0.0`, the screens scale is used.
+  /// - Parameter comparisonStrategy: A strategy for comparing snapshots with each other.
   /// - Returns: A new diffing strategy.
-  public static func image(precision: Float, scale: CGFloat?) -> Diffing {
+  public static func image(precision: Float, scale: CGFloat?, comparisonStrategy: ComparisonStrategy) -> Diffing {
     let imageScale: CGFloat
     if let scale = scale, scale != 0.0 {
       imageScale = scale
@@ -23,7 +24,7 @@ extension Diffing where Value == UIImage {
       toData: { $0.pngData() ?? emptyImage().pngData()! },
       fromData: { UIImage(data: $0, scale: imageScale)! }
     ) { old, new in
-      guard !compare(old, new, precision: precision) else { return nil }
+      guard !compare(old, new, precision: precision, comparisonStrategy: comparisonStrategy) else { return nil }
       let difference = SnapshotTesting.diff(old, new)
       let message = new.size == old.size
         ? "Newly-taken snapshot does not match reference."
@@ -56,17 +57,18 @@ extension Diffing where Value == UIImage {
 extension Snapshotting where Value == UIImage, Format == UIImage {
   /// A snapshot strategy for comparing images based on pixel equality.
   public static var image: Snapshotting {
-    return .image(precision: 1, scale: nil)
+    return .image(precision: 1, scale: nil, comparisonStrategy: .equality)
   }
 
-  /// A snapshot strategy for comparing images based on pixel equality.
+  /// A snapshot strategy for comparing images based on the selected comparison strategy.
   ///
   /// - Parameter precision: The percentage of pixels that must match.
   /// - Parameter scale: The scale of the reference image stored on disk.
-  public static func image(precision: Float, scale: CGFloat?) -> Snapshotting {
+  /// - Parameter comparisonStrategy: A strategy for comparing snapshots with each other.
+  public static func image(precision: Float, scale: CGFloat?, comparisonStrategy: ComparisonStrategy) -> Snapshotting {
     return .init(
       pathExtension: "png",
-      diffing: .image(precision: precision, scale: scale)
+      diffing: .image(precision: precision, scale: scale, comparisonStrategy: comparisonStrategy)
     )
   }
 }
@@ -76,7 +78,39 @@ let imageContextColorSpace = CGColorSpace(name: CGColorSpace.sRGB)
 let imageContextBitsPerComponent = 8
 let imageContextBytesPerPixel = 4
 
-private func compare(_ old: UIImage, _ new: UIImage, precision: Float) -> Bool {
+/// A comparison strategy for snapshots.
+public enum ComparisonStrategy {
+  /**
+   The difference is calculated as the percentage of bytes that are not equal.
+   
+   let difference = (0..<byteCount).reduce(0) { r, i in r += old[i] != new[i] ? 1 : 0 }
+   */
+  case equality
+  /**
+   The difference is calculated as the sum of normalized differences between the old and new values taken modulo.
+   
+   let difference = (0..<byteCount).reduce(0) { r, i in r += abs(old[i] - new[i]) / 255 }
+   */
+  case subtractionModule
+  public typealias ComparisonClosure = (_ oldByte: UInt8, _ newByte: UInt8) -> Float
+  /**
+   The difference is calculated as the sum of the values returned from the comparison closure performed for each pair of bytes.
+   */
+  case custom(ComparisonClosure)
+  
+  var closure: ComparisonClosure {
+    switch self {
+    case .equality:
+      return { ($0 == $1) ? 0 : 1 }
+    case .subtractionModule:
+      return { abs(Float($0) - Float($1)) / 255 }
+    case .custom(let comparisonClosure):
+      return comparisonClosure
+    }
+  }
+}
+
+private func compare(_ old: UIImage, _ new: UIImage, precision: Float, comparisonStrategy: ComparisonStrategy) -> Bool {
   guard let oldCgImage = old.cgImage else { return false }
   guard let newCgImage = new.cgImage else { return false }
   guard oldCgImage.width != 0 else { return false }
@@ -100,11 +134,11 @@ private func compare(_ old: UIImage, _ new: UIImage, precision: Float) -> Bool {
   guard let newerData = newerContext.data else { return false }
   if memcmp(oldData, newerData, byteCount) == 0 { return true }
   if precision >= 1 { return false }
-  var differentPixelCount = 0
+  var differentByteCount: Float = 0
   let threshold = 1 - precision
   for byte in 0..<byteCount {
-    if oldBytes[byte] != newerBytes[byte] { differentPixelCount += 1 }
-    if Float(differentPixelCount) / Float(byteCount) > threshold { return false}
+    differentByteCount += comparisonStrategy.closure(oldBytes[byte], newerBytes[byte])
+    if differentByteCount / Float(byteCount) > threshold { return false }
   }
   return true
 }

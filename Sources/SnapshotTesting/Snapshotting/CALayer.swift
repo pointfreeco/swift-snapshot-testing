@@ -32,12 +32,13 @@ extension Snapshotting where Value == CALayer, Format == UIImage {
     return .image()
   }
 
-  /// A snapshot strategy for comparing layers based on pixel equality.
+  /// A snapshot strategy for comparing layers based on the selected comparison strategy.
   ///
   /// - Parameter precision: The percentage of pixels that must match.
-  public static func image(precision: Float = 1, traits: UITraitCollection = .init())
+  /// - Parameter comparisonStrategy: A strategy for comparing snapshots with each other.
+  public static func image(precision: Float = 1, traits: UITraitCollection = .init(), comparisonStrategy: ComparisonStrategy = .equality)
     -> Snapshotting {
-      return SimplySnapshotting.image(precision: precision, scale: traits.displayScale).pullback { layer in
+      return SimplySnapshotting.image(precision: precision, scale: traits.displayScale, comparisonStrategy: comparisonStrategy).pullback { layer in
         renderer(bounds: layer.bounds, for: traits).image { ctx in
           layer.setNeedsLayout()
           layer.layoutIfNeeded()
