@@ -43,6 +43,23 @@ final class SnapshotTestingTests: XCTestCase {
     """)
   }
 
+  func testAnyNSObjectSubclassClass() {
+    class User: NSObject { let id = 1, name = "Blobby", bio: String = "Blobbed around the world." }
+    let user = User()
+    assertSnapshot(matching: user, as: .dump)
+    _assertInlineSnapshot(matching: user, as: .dump, with: """
+    - <_TtCFC20SnapshotTestingTests20SnapshotTestingTests28testAnyNSObjectSubclassClassFT_T_L_4User>
+    """)
+
+    assertSnapshot(matching: user, as: .dump(renderChildren: true))
+    _assertInlineSnapshot(matching: user, as: .dump(renderChildren: true), with: """
+    ▿ <_TtCFC20SnapshotTestingTests20SnapshotTestingTests28testAnyNSObjectSubclassClassFT_T_L_4User>
+      - id: 1
+      - name: "Blobby"
+      - bio: "Blobbed around the world."
+    """)
+  }
+
   @available(macOS 10.13, *)
   func testAnyAsJson() throws {
     struct User: Encodable { let id: Int, name: String, bio: String }

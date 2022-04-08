@@ -5,6 +5,12 @@ extension Snapshotting where Format == String {
   public static var dump: Snapshotting {
     return SimplySnapshotting.lines.pullback { snap($0) }
   }
+
+  /// A snapshot strategy for comparing any structure based on a sanitized text dump.
+  /// - Parameter renderChildren: whether to render all children for all types conforming to `AnySnapshotStringConvertible`
+  public static func dump(renderChildren: Bool) -> Snapshotting {
+    SimplySnapshotting.lines.pullback { snap($0, renderChildren: renderChildren) }
+  }
 }
 
 @available(macOS 10.13, *)
@@ -25,7 +31,7 @@ extension Snapshotting where Format == String {
   }
 }
 
-private func snap<T>(_ value: T, name: String? = nil, indent: Int = 0) -> String {
+private func snap<T>(_ value: T, name: String? = nil, indent: Int = 0, renderChildren: Bool = false) -> String {
   let indentation = String(repeating: " ", count: indent)
   let mirror = Mirror(reflecting: value)
   var children = mirror.children
@@ -48,7 +54,7 @@ private func snap<T>(_ value: T, name: String? = nil, indent: Int = 0) -> String
     let subjectType = String(describing: mirror.subjectType)
       .replacingOccurrences(of: " #\\d+", with: "", options: .regularExpression)
     description = count == 0 ? "\(subjectType).none" : "\(subjectType)"
-  case (let value as AnySnapshotStringConvertible, _) where type(of: value).renderChildren:
+  case (let value as AnySnapshotStringConvertible, _) where type(of: value).renderChildren || renderChildren:
     description = value.snapshotDescription
   case (let value as AnySnapshotStringConvertible, _):
     return "\(indentation)- \(name.map { "\($0): " } ?? "")\(value.snapshotDescription)\n"
@@ -67,7 +73,7 @@ private func snap<T>(_ value: T, name: String? = nil, indent: Int = 0) -> String
   }
 
   let lines = ["\(indentation)\(bullet) \(name.map { "\($0): " } ?? "")\(description)\n"]
-    + children.map { snap($1, name: $0, indent: indent + 2) }
+    + children.map { snap($1, name: $0, indent: indent + 2, renderChildren: renderChildren) }
 
   return lines.joined()
 }
