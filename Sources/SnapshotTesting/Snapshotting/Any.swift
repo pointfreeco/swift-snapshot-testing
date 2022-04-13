@@ -34,9 +34,31 @@ extension Snapshotting where Format == String {
 private func snap<T>(_ value: T, name: String? = nil, indent: Int = 0, renderChildren: Bool = false) -> String {
   let indentation = String(repeating: " ", count: indent)
   let mirror = Mirror(reflecting: value)
-  var children = mirror.children
+  var children: Mirror.Children = value is AnySnapshotStringConvertibleIgnoreChildNodes ? Mirror.Children([]) : mirror.children
   let count = children.count
   let bullet = count == 0 ? "-" : "▿"
+
+  if let includedNodesProvider = value as? AnySnapshotStringConvertibleIncludedNodesProvider {
+    let filtered = children.filter { child in
+      guard let label = child.label, let includedNodes = type(of: includedNodesProvider).includedNodes else { return true }
+
+      return includedNodes.contains(label)
+    }
+
+    children = Mirror.Children(filtered)
+  }
+
+  if let excludedNodesProvider = value as? AnySnapshotStringConvertibleExcludedNodesProvider {
+    let excludedNodes = type(of: excludedNodesProvider).excludedNodes
+
+    let filtered = children.filter { child in
+      guard let label = child.label else { return true }
+
+      return !excludedNodes.contains(label)
+    }
+
+    children = Mirror.Children(filtered)
+  }
 
   let description: String
   switch (value, mirror.displayStyle) {
@@ -54,7 +76,7 @@ private func snap<T>(_ value: T, name: String? = nil, indent: Int = 0, renderChi
     let subjectType = String(describing: mirror.subjectType)
       .replacingOccurrences(of: " #\\d+", with: "", options: .regularExpression)
     description = count == 0 ? "\(subjectType).none" : "\(subjectType)"
-  case (let value as AnySnapshotStringConvertible, _) where type(of: value).renderChildren || renderChildren:
+  case (let value as AnySnapshotStringConvertible, _) where (renderChildren || value is AnySnapshotStringConvertibleDumpChildNodes):
     description = value.snapshotDescription
   case (let value as AnySnapshotStringConvertible, _):
     return "\(indentation)- \(name.map { "\($0): " } ?? "")\(value.snapshotDescription)\n"
@@ -91,17 +113,25 @@ private func sort(_ children: Mirror.Children) -> Mirror.Children {
 ///
 /// Types that conform to the `AnySnapshotStringConvertible` protocol can provide their own representation to be used when converting an instance to a `dump`-based snapshot.
 public protocol AnySnapshotStringConvertible {
-  /// Whether or not to dump child nodes (defaults to `false`).
-  static var renderChildren: Bool { get }
-
   /// A textual snapshot dump representation of this instance.
   var snapshotDescription: String { get }
 }
 
-extension AnySnapshotStringConvertible {
-  public static var renderChildren: Bool {
-    return false
-  }
+/// Implement thsi protocol to dump child nodes for the given type
+public protocol AnySnapshotStringConvertibleDumpChildNodes {}
+/// Implement this protocol to ignore dumping child nodes
+public protocol AnySnapshotStringConvertibleIgnoreChildNodes {}
+
+/// Properties to include child nodes
+public protocol AnySnapshotStringConvertibleIncludedNodesProvider {
+  /// Which nodes to include in the dump
+  static var includedNodes: [String]? { get }
+}
+
+/// Properties to exclude child nodes
+public protocol AnySnapshotStringConvertibleExcludedNodesProvider {
+  /// Which nodes to exclude from the dump
+  static var excludedNodes: [String] { get }
 }
 
 extension Character: AnySnapshotStringConvertible {
