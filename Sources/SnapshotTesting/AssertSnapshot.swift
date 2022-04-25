@@ -32,6 +32,7 @@ public func assertSnapshot<Value, Format>(
   as snapshotting: Snapshotting<Value, Format>,
   named name: String? = nil,
   record recording: Bool = false,
+  failOnZero: Bool = false,
   timeout: TimeInterval = 5,
   file: StaticString = #file,
   testName: String = #function,
@@ -43,6 +44,7 @@ public func assertSnapshot<Value, Format>(
     as: snapshotting,
     named: name,
     record: recording,
+    failOnZero: failOnZero,
     timeout: timeout,
     file: file,
     testName: testName,
@@ -165,6 +167,7 @@ public func verifySnapshot<Value, Format>(
   as snapshotting: Snapshotting<Value, Format>,
   named name: String? = nil,
   record recording: Bool = false,
+  failOnZero: Bool = false,
   snapshotDirectory: String? = nil,
   timeout: TimeInterval = 5,
   file: StaticString = #file,
@@ -257,7 +260,7 @@ public func verifySnapshot<Value, Format>(
 
       #if os(iOS) || os(tvOS)
       // If the image generation fails for the diffable part use the reference
-      if let localDiff = diffable as? UIImage, localDiff.size == .zero {
+      if !failOnZero, let localDiff = diffable as? UIImage, localDiff.size == .zero {
         diffable = reference
       }
       #endif
