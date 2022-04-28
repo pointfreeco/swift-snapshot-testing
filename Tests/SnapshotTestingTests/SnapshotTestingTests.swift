@@ -1046,6 +1046,56 @@ final class SnapshotTestingTests: XCTestCase {
     #endif
   }
 
+  func testViewWithZeroHeightOrWidthAndshouldSkipFailureOnZeroSizeFalse() {
+    #if os(iOS) || os(tvOS)
+    let rect = CGRect(x: 0, y: 0, width: 0, height: 0)
+    let view = UIView(frame: rect)
+    view.backgroundColor = .blue
+
+    let result = verifySnapshot(
+      matching: view,
+      as: .image,
+      named: "noWidth.noHeight.shouldSkipFailureOnZeroSize.false",
+      shouldSkipFailureOnZeroSize: false
+    )
+
+    XCTAssertNotNil(result)
+    #endif
+  }
+
+  func testViewWithZeroHeightOrWidthAndshouldSkipFailureOnZeroSizeTrue() {
+    #if os(iOS) || os(tvOS)
+    let rect = CGRect(x: 0, y: 0, width: 0, height: 0)
+    let view = UIView(frame: rect)
+    view.backgroundColor = .blue
+
+    let result = verifySnapshot(
+      matching: view,
+      as: .image,
+      named: "noWidth.noHeight.shouldSkipFailureOnZeroSize.true",
+      shouldSkipFailureOnZeroSize: true
+    )
+
+    XCTAssertNil(result)
+    #endif
+  }
+
+  func testViewWithZeroHeightOrWidthAndshouldSkipFailureOnZeroSizeDefaultTrue() {
+    #if os(iOS) || os(tvOS)
+    let rect = CGRect(x: 0, y: 0, width: 0, height: 0)
+    let view = UIView(frame: rect)
+    view.backgroundColor = .blue
+
+    let result = verifySnapshot(
+      matching: view,
+      as: .image,
+      named: "noWidth.noHeight.shouldSkipFailureOnZeroSize.default.true"
+    )
+
+    XCTAssertNil(result)
+    #endif
+  }
+
   func testEmbeddedWebView() throws {
     #if os(iOS)
     let label = UILabel()
