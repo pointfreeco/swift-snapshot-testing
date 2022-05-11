@@ -173,6 +173,8 @@ public func assertSnapshots<Value, Format>(
 ///   - snapshotDirectory: Optional directory to save snapshots. By default snapshots will be saved
 ///     in a directory with the same name as the test file, and that directory will sit inside a
 ///     directory `__Snapshots__` that sits next to your test file.
+///   - snapshotSubdirectory: The default subdirectory for snapshots in the same directory as the test
+///     file. Defaults to `__Snapshots__` that sits next to your test file. Only used when `snapshotDirectory` is nil.
 ///   - timeout: The amount of time a snapshot must be generated in.
 ///   - file: The file in which failure occurred. Defaults to the file name of the test case in
 ///     which this function was called.
@@ -186,8 +188,9 @@ public func verifySnapshot<Value, Format>(
   as snapshotting: Snapshotting<Value, Format>,
   named name: String? = nil,
   record recording: Bool = false,
-  snapshotDirectory: String? = nil,
-  timeout: TimeInterval = 5,
+  snapshotDirectory: String? = SnapshottingDefaults.snapshotDirectory,
+  snapshotSubdirectory: String = SnapshottingDefaults.snapshotSubdirectory,
+  timeout: TimeInterval = SnapshottingDefaults.timeout,
   file: StaticString = #file,
   testName: String = #function,
   line: UInt = #line
@@ -204,7 +207,7 @@ public func verifySnapshot<Value, Format>(
       snapshotDirectory.map { URL(fileURLWithPath: $0, isDirectory: true) }
       ?? fileUrl
       .deletingLastPathComponent()
-      .appendingPathComponent("__Snapshots__")
+      .appendingPathComponent(snapshotSubdirectory)
       .appendingPathComponent(fileName)
 
     let identifier: String

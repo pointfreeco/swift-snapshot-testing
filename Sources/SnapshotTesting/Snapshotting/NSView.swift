@@ -21,7 +21,7 @@
     ///     human eye.
     ///   - size: A view size override.
     public static func image(
-      precision: Float = 1, perceptualPrecision: Float = 1, size: CGSize? = nil
+      precision: Float = SnapshottingDefaults.precision, perceptualPrecision: Float = SnapshottingDefaults.perceptualPrecision, size: CGSize? = nil
     ) -> Snapshotting {
       return SimplySnapshotting.image(
         precision: precision, perceptualPrecision: perceptualPrecision

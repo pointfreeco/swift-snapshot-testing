@@ -18,7 +18,7 @@
     ///     `UITraitCollection`s default value of `0.0`, the screens scale is used.
     /// - Returns: A new diffing strategy.
     public static func image(
-      precision: Float = 1, perceptualPrecision: Float = 1, scale: CGFloat? = nil
+      precision: Float = SnapshottingDefaults.precision, perceptualPrecision: Float = SnapshottingDefaults.perceptualPrecision, scale: CGFloat? = nil
     ) -> Diffing {
       let imageScale: CGFloat
       if let scale = scale, scale != 0.0 {
@@ -78,7 +78,7 @@
     ///     human eye.
     ///   - scale: The scale of the reference image stored on disk.
     public static func image(
-      precision: Float = 1, perceptualPrecision: Float = 1, scale: CGFloat? = nil
+      precision: Float = SnapshottingDefaults.precision, perceptualPrecision: Float = SnapshottingDefaults.perceptualPrecision, scale: CGFloat? = nil
     ) -> Snapshotting {
       return .init(
         pathExtension: "png",
