@@ -88,10 +88,13 @@ public enum ComparisonStrategy {
   case equality
   /**
    The difference is calculated as the sum of normalized differences between the old and new values taken modulo.
+   Minimum difference threshold can also be specified to ignore all such bytes where it's below this threshold.
    
-   let difference = (0..<byteCount).reduce(0) { r, i in r += abs(old[i] - new[i]) / 255 }
+   let difference = (0..<byteCount).reduce(0) { r, i in r += abs(old[i] - new[i]) < minDifference ? 0 : abs(old[i] - new[i]) / 255 }
    */
-  case subtractionModule
+  case subtractionModule(minDifference: UInt8)
+  public static let subtractionModule = ComparisonStrategy.subtractionModule(minDifference: 0)
+
   public typealias ComparisonClosure = (_ oldByte: UInt8, _ newByte: UInt8) -> Float
   /**
    The difference is calculated as the sum of the values returned from the comparison closure performed for each pair of bytes.
@@ -102,8 +105,13 @@ public enum ComparisonStrategy {
     switch self {
     case .equality:
       return { ($0 == $1) ? 0 : 1 }
-    case .subtractionModule:
-      return { abs(Float($0) - Float($1)) / 255 }
+    case .subtractionModule(let minDifference):
+      return { old, new in
+        guard max(old, new) - min(old, new) < minDifference else {
+          return 0
+        }
+        return abs(Float(old) - Float(new)) / 255
+      }
     case .custom(let comparisonClosure):
       return comparisonClosure
     }
