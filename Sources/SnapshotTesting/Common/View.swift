@@ -731,8 +731,9 @@ func snapshotView(
       view: view,
       viewController: viewController
     )
+    // COFA: commented out to fix issue with LayoutMarginsGuide.
     // NB: Avoid safe area influence.
-    if config.safeArea == .zero { view.frame.origin = .init(x: offscreen, y: offscreen) }
+    // if config.safeArea == .zero { view.frame.origin = .init(x: offscreen, y: offscreen) }
 
     return (view.snapshot ?? Async { callback in
       addImagesForRenderedViews(view).sequence().run { views in
