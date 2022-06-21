@@ -730,11 +730,6 @@ extension View {
       #endif
       return perform()
     }
-    #if (os(iOS) && !targetEnvironment(macCatalyst)) || os(tvOS)
-    if let glkView = self as? GLKView {
-      return Async(value: inWindow { glkView.snapshot })
-    }
-    #endif
     if let scnView = self as? SCNView {
       return Async(value: inWindow { scnView.snapshot() })
     } else if let skView = self as? SKView {
@@ -941,6 +936,10 @@ private func add(traits: UITraitCollection, viewController: UIViewController, to
 
   return {
     rootViewController.beginAppearanceTransition(false, animated: false)
+    viewController.willMove(toParent: nil)
+    viewController.view.removeFromSuperview()
+    viewController.removeFromParent()
+    viewController.didMove(toParent: nil)
     rootViewController.endAppearanceTransition()
     window.rootViewController = nil
   }

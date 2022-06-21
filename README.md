@@ -143,7 +143,10 @@ If you want to use SnapshotTesting in any other project that uses [SwiftPM](http
 
 ```swift
 dependencies: [
-  .package(name: "SnapshotTesting", url: "https://github.com/pointfreeco/swift-snapshot-testing.git", from: "1.9.0"),
+  .package(
+    url: "https://github.com/pointfreeco/swift-snapshot-testing.git",
+    from: "1.9.0"
+  ),
 ]
 ```
 
@@ -151,8 +154,14 @@ Next, add `SnapshotTesting` as a dependency of your test target:
 
 ```swift
 targets: [
-  .target(name: "MyApp", dependencies: [], path: "Sources"),
-  .testTarget(name: "MyAppTests", dependencies: ["MyApp", "SnapshotTesting"])
+  .target(name: "MyApp"),
+  .testTarget(
+    name: "MyAppTests",
+    dependencies: [
+      "MyApp",
+      .product(name: "SnapshotTesting", package: "swift-snapshot-testing"),
+    ]
+  )
 ]
 ```
 
