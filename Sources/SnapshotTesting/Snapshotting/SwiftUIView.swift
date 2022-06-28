@@ -39,6 +39,14 @@ extension Snapshotting where Value: SwiftUI.View, Format == UIImage {
     traits: UITraitCollection = .init()
     )
     -> Snapshotting {
+      #if compiler(>=5.7)
+      if #available(iOS 16, *), drawHierarchyInKeyWindow == false {
+        // Use iOS 16 ImageRenderer strategy if available
+        return .imageRenderer(precision: precision, layout: layout, traits: traits)
+      }
+      #endif
+      // Fall back to UIHostingController based strategy
+
       let config: ViewImageConfig
 
       switch layout {
@@ -81,5 +89,76 @@ extension Snapshotting where Value: SwiftUI.View, Format == UIImage {
       }
   }
 }
+
+#if compiler(>=5.7)
+@available(iOS 16.0, tvOS 16.0, *)
+extension Snapshotting where Value: SwiftUI.View, Format == UIImage {
+  /// A snapshot strategy for comparing SwiftUI Views based on pixel equality using iOS 16 ImageRenderer.
+  ///
+  /// - Parameters:
+  ///   - precision: The percentage of pixels that must match.
+  ///   - size: A view size override.
+  ///   - traits: A trait collection override.
+  static func imageRenderer(
+    precision: Float = 1,
+    layout: SwiftUISnapshotLayout = .sizeThatFits,
+    traits: UITraitCollection = .init()
+    )
+    -> Snapshotting {
+      let config: ViewImageConfig
+
+      switch layout {
+      #if os(iOS) || os(tvOS)
+      case let .device(config: deviceConfig):
+        config = deviceConfig
+      #endif
+      case .sizeThatFits:
+        config = .init(safeArea: .zero, size: nil, traits: traits)
+      case let .fixed(width: width, height: height):
+        let size = CGSize(width: width, height: height)
+        config = .init(safeArea: .zero, size: size, traits: traits)
+      }
+
+      let imageScale: CGFloat
+      if traits.displayScale != 0.0 {
+        imageScale = traits.displayScale
+      } else {
+        imageScale = UIScreen.main.scale
+      }
+
+      return SimplySnapshotting.image(precision: precision, scale: imageScale).asyncPullback { view in
+        return .init { callback in
+          Task { @MainActor in
+            let renderer = ImageRenderer(
+              content: ZStack {
+                // Show white background behind view
+                Color.white.ignoresSafeArea()
+
+                view
+                  .environment(\.horizontalSizeClass, UserInterfaceSizeClass(traits.horizontalSizeClass))
+                  .environment(\.verticalSizeClass, UserInterfaceSizeClass(traits.verticalSizeClass))
+                  .transformEnvironment(\.layoutDirection) { direction in
+                    direction = LayoutDirection(traits.layoutDirection) ?? direction
+                  }
+                  .transformEnvironment(\.dynamicTypeSize) { typeSize in
+                    typeSize = DynamicTypeSize(traits.preferredContentSizeCategory) ?? typeSize
+                  }
+              }
+              .safeAreaInset(edge: .top, spacing: 0) { Spacer().frame(height: config.safeArea.top) }
+              .safeAreaInset(edge: .bottom, spacing: 0) { Spacer().frame(height: config.safeArea.bottom) }
+              .safeAreaInset(edge: .leading, spacing: 0) { Spacer().frame(width: config.safeArea.left) }
+              .safeAreaInset(edge: .trailing, spacing: 0) { Spacer().frame(width: config.safeArea.right) }
+              .frame(width: config.size?.width, height: config.size?.height)
+              .ignoresSafeArea()
+            )
+            renderer.scale = imageScale
+
+            callback(renderer.uiImage ?? UIImage())
+          }
+        }
+      }
+  }
+}
+#endif
 #endif
 #endif
