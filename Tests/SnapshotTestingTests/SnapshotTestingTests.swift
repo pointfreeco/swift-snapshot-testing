@@ -150,6 +150,31 @@ final class SnapshotTestingTests: XCTestCase {
     )
   }
 
+  @available(iOS 13.0, macOS 10.5, tvOS 13.0, *)
+  func testCGColor() {
+    #if os(iOS) || os(tvOS) || os(macOS)
+    let color = CGColor(
+        red: 0.2,
+        green: 0.4,
+        blue: 0.6,
+        alpha: 0.8
+    )
+
+    let osName: String
+    #if os(iOS)
+    osName = "iOS"
+    #elseif os(tvOS)
+    osName = "tvOS"
+    #elseif os(macOS)
+    osName = "macOS"
+    #endif
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(matching: color, as: .color(precision: 1.0), named: osName)
+    }
+    #endif
+  }
+
   func testCGPath() {
     #if os(iOS) || os(tvOS) || os(macOS)
     let path = CGPath.heart
@@ -233,6 +258,30 @@ final class SnapshotTestingTests: XCTestCase {
     }
 
     assertSnapshot(matching: path, as: .elementsDescription, named: "macOS")
+    #endif
+  }
+
+  func testNSColor() {
+    #if os(macOS)
+    let color = CGColor(
+        red: 0.2,
+        green: 0.4,
+        blue: 0.6,
+        alpha: 0.8
+    )
+
+    let osName: String
+    #if os(iOS)
+    osName = "iOS"
+    #elseif os(tvOS)
+    osName = "tvOS"
+    #elseif os(macOS)
+    osName = "macOS"
+    #endif
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(matching: color, as: .color(precision: 1.0), named: osName)
+    }
     #endif
   }
 
@@ -824,6 +873,30 @@ final class SnapshotTestingTests: XCTestCase {
 
     if #available(iOS 11.0, tvOS 11.0, *) {
       assertSnapshot(matching: path, as: .elementsDescription, named: osName)
+    }
+    #endif
+  }
+
+  func testUIColor() {
+    #if os(iOS) || os(tvOS)
+    let color = UIColor(
+        red: 0.2,
+        green: 0.4,
+        blue: 0.6,
+        alpha: 0.8
+    )
+
+    let osName: String
+    #if os(iOS)
+    osName = "iOS"
+    #elseif os(tvOS)
+    osName = "tvOS"
+    #elseif os(macOS)
+    osName = "macOS"
+    #endif
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(matching: color, as: .color(precision: 1.0), named: osName)
     }
     #endif
   }
