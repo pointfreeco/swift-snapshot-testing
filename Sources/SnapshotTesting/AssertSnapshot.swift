@@ -24,6 +24,7 @@ public var record: Bool {
 ///   - name: An optional description of the snapshot.
 ///   - recording: Whether or not to record a new reference.
 ///   - timeout: The amount of time a snapshot must be generated in.
+///   - testFile: The file to associate this failure with, used to generate the snapshot file name. Defaults to the file name of the test case in which this function was called.
 ///   - file: The file in which failure occurred. Defaults to the file name of the test case in which this function was called.
 ///   - testName: The name of the test in which failure occurred. Defaults to the function name of the test case in which this function was called.
 ///   - line: The line number on which failure occurred. Defaults to the line number on which this function was called.
@@ -33,6 +34,7 @@ public func assertSnapshot<Value, Format>(
   named name: String? = nil,
   record recording: Bool = false,
   timeout: TimeInterval = 5,
+  testFile: StaticString = #file,
   file: StaticString = #file,
   testName: String = #function,
   line: UInt = #line
@@ -44,6 +46,7 @@ public func assertSnapshot<Value, Format>(
     named: name,
     record: recording,
     timeout: timeout,
+    testFile: testFile,
     file: file,
     testName: testName,
     line: line
@@ -59,6 +62,7 @@ public func assertSnapshot<Value, Format>(
 ///   - snapshotting: A dictionary of names and strategies for serializing, deserializing, and comparing values.
 ///   - recording: Whether or not to record a new reference.
 ///   - timeout: The amount of time a snapshot must be generated in.
+///   - testFile: The file to associate this failure with, used to generate the snapshot file name. Defaults to the file name of the test case in which this function was called.
 ///   - file: The file in which failure occurred. Defaults to the file name of the test case in which this function was called.
 ///   - testName: The name of the test in which failure occurred. Defaults to the function name of the test case in which this function was called.
 ///   - line: The line number on which failure occurred. Defaults to the line number on which this function was called.
@@ -67,6 +71,7 @@ public func assertSnapshots<Value, Format>(
   as strategies: [String: Snapshotting<Value, Format>],
   record recording: Bool = false,
   timeout: TimeInterval = 5,
+  testFile: StaticString = #file,
   file: StaticString = #file,
   testName: String = #function,
   line: UInt = #line
@@ -79,6 +84,7 @@ public func assertSnapshots<Value, Format>(
       named: name,
       record: recording,
       timeout: timeout,
+      testFile: testFile,
       file: file,
       testName: testName,
       line: line
@@ -93,6 +99,7 @@ public func assertSnapshots<Value, Format>(
 ///   - snapshotting: An array of strategies for serializing, deserializing, and comparing values.
 ///   - recording: Whether or not to record a new reference.
 ///   - timeout: The amount of time a snapshot must be generated in.
+///   - testFile: The file to associate this failure with, used to generate the snapshot file name. Defaults to the file name of the test case in which this function was called.
 ///   - file: The file in which failure occurred. Defaults to the file name of the test case in which this function was called.
 ///   - testName: The name of the test in which failure occurred. Defaults to the function name of the test case in which this function was called.
 ///   - line: The line number on which failure occurred. Defaults to the line number on which this function was called.
@@ -101,6 +108,7 @@ public func assertSnapshots<Value, Format>(
   as strategies: [Snapshotting<Value, Format>],
   record recording: Bool = false,
   timeout: TimeInterval = 5,
+  testFile: StaticString = #file,
   file: StaticString = #file,
   testName: String = #function,
   line: UInt = #line
@@ -112,6 +120,7 @@ public func assertSnapshots<Value, Format>(
       as: strategy,
       record: recording,
       timeout: timeout,
+      testFile: testFile,
       file: file,
       testName: testName,
       line: line
@@ -157,6 +166,7 @@ public func assertSnapshots<Value, Format>(
 ///   - snapshotDirectory: Optional directory to save snapshots. By default snapshots will be saved in a directory with the same name as the test file, and that directory will sit inside a directory `__Snapshots__` that sits next to your test file.
 ///   - timeout: The amount of time a snapshot must be generated in.
 ///   - file: The file in which failure occurred. Defaults to the file name of the test case in which this function was called.
+///   - testFile: The file to associate this failure with, used to generate the snapshot file name. Defaults to the file name of the test case in which this function was called.
 ///   - testName: The name of the test in which failure occurred. Defaults to the function name of the test case in which this function was called.
 ///   - line: The line number on which failure occurred. Defaults to the line number on which this function was called.
 /// - Returns: A failure message or, if the value matches, nil.
@@ -167,6 +177,7 @@ public func verifySnapshot<Value, Format>(
   record recording: Bool = false,
   snapshotDirectory: String? = nil,
   timeout: TimeInterval = 5,
+  testFile: StaticString = #file,
   file: StaticString = #file,
   testName: String = #function,
   line: UInt = #line
@@ -176,7 +187,7 @@ public func verifySnapshot<Value, Format>(
     let recording = recording || isRecording
 
     do {
-      let fileUrl = URL(fileURLWithPath: "\(file)", isDirectory: false)
+      let fileUrl = URL(fileURLWithPath: "\(testFile)", isDirectory: false)
       let fileName = fileUrl.deletingPathExtension().lastPathComponent
 
       let snapshotDirectoryUrl = snapshotDirectory.map { URL(fileURLWithPath: $0, isDirectory: true) }

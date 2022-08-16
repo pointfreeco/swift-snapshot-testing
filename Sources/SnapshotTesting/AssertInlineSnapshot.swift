@@ -16,6 +16,7 @@ import XCTest
 ///   - recording: Whether or not to record a new reference.
 ///   - timeout: The amount of time a snapshot must be generated in.
 ///   - reference: The expected output of snapshotting.
+///   - testFile: The file to associate this failure with, used to generate the snapshot file name. Defaults to the file name of the test case in which this function was called.
 ///   - file: The file in which failure occurred. Defaults to the file name of the test case in which this function was called.
 ///   - line: The line number on which failure occurred. Defaults to the line number on which this function was called.
 public func _assertInlineSnapshot<Value>(
@@ -24,6 +25,7 @@ public func _assertInlineSnapshot<Value>(
   record recording: Bool = false,
   timeout: TimeInterval = 5,
   with reference: String,
+  testFile: StaticString = #file,
   file: StaticString = #file,
   testName: String = #function,
   line: UInt = #line
@@ -35,6 +37,7 @@ public func _assertInlineSnapshot<Value>(
     record: recording,
     timeout: timeout,
     with: reference,
+    testFile: testFile,
     file: file,
     testName: testName,
     line: line
@@ -53,6 +56,7 @@ public func _assertInlineSnapshot<Value>(
 ///   - recording: Whether or not to record a new reference.
 ///   - timeout: The amount of time a snapshot must be generated in.
 ///   - reference: The expected output of snapshotting.
+///   - testFile: The file to associate this failure with, used to generate the snapshot file name. Defaults to the file name of the test case in which this function was called.
 ///   - file: The file in which failure occurred. Defaults to the file name of the test case in which this function was called.
 ///   - testName: The name of the test in which failure occurred. Defaults to the function name of the test case in which this function was called.
 ///   - line: The line number on which failure occurred. Defaults to the line number on which this function was called.
@@ -63,6 +67,7 @@ public func _verifyInlineSnapshot<Value>(
   record recording: Bool = false,
   timeout: TimeInterval = 5,
   with reference: String,
+  testFile: StaticString = #file,
   file: StaticString = #file,
   testName: String = #function,
   line: UInt = #line
@@ -111,7 +116,7 @@ public func _verifyInlineSnapshot<Value>(
 
       // If that diff failed, we either record or fail.
       if recording || trimmedReference.isEmpty {
-        let fileName = "\(file)"
+        let fileName = "\(testFile)"
         let sourceCodeFilePath = URL(fileURLWithPath: fileName, isDirectory: false)
         let sourceCode = try String(contentsOf: sourceCodeFilePath)
         var newRecordings = recordings
