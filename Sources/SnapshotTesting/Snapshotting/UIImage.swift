@@ -1,5 +1,5 @@
 #if os(iOS) || os(tvOS)
-import CoreImage
+import CoreImage.CIFilterBuiltins
 import UIKit
 import XCTest
 
@@ -84,10 +84,8 @@ private let imageContextBytesPerPixel = 4
 private func compare(_ old: UIImage, _ new: UIImage, precision: Float, perceptualPrecision: Float) -> Bool {
   guard let oldCgImage = old.cgImage else { return false }
   guard let newCgImage = new.cgImage else { return false }
-  guard oldCgImage.width != 0 else { return false }
   guard newCgImage.width != 0 else { return false }
   guard oldCgImage.width == newCgImage.width else { return false }
-  guard oldCgImage.height != 0 else { return false }
   guard newCgImage.height != 0 else { return false }
   guard oldCgImage.height == newCgImage.height else { return false }
 
@@ -109,24 +107,48 @@ private func compare(_ old: UIImage, _ new: UIImage, precision: Float, perceptua
   if perceptualPrecision < 1, #available(tvOS 11.0, *) {
     let oldImage = CIImage(cgImage: oldCgImage)
     let newImage = CIImage(cgImage: newerCgImage)
-    guard let filter = CIFilter(name: "CILabDeltaE", parameters: [kCIInputImageKey: oldImage, "inputImage2": newImage]) else { return false }
-    guard let outputImage = filter.outputImage else { return false }
-    var outputPixels = [Float32](repeating: 0, count: pixelCount)
-    CIContext().render(
-      outputImage,
-      toBitmap: &outputPixels,
-      rowBytes: Int(outputImage.extent.width) * MemoryLayout<Float32>.size,
-      bounds: outputImage.extent,
-      format: .Rf,
-      colorSpace: nil
-    )
-    let pixelCountThreshold = Int((1 - precision) * Float(pixelCount))
     let perceptualThreshold = (1 - perceptualPrecision) * 100
-    var differentPixelCount = 0
-    for pixel in outputPixels {
-      if pixel > perceptualThreshold {
-        differentPixelCount += 1
-        if differentPixelCount > pixelCountThreshold { return false }
+    if #available(iOS 14.0, tvOS 14.0, *) {
+      let deltaFilter = CIFilter.labDeltaE()
+      deltaFilter.inputImage = oldImage
+      deltaFilter.image2 = newImage
+      let thresholdFilter = CIFilter.colorThreshold()
+      thresholdFilter.inputImage = deltaFilter.outputImage
+      thresholdFilter.threshold = perceptualThreshold
+      let averageFilter = CIFilter.areaAverage()
+      averageFilter.inputImage = thresholdFilter.outputImage
+      averageFilter.extent = CGRect(x: 0, y: 0, width: oldCgImage.width, height: oldCgImage.height)
+      guard let outputImage = averageFilter.outputImage else { return false }
+      var averagePixel: Float = 0
+      CIContext().render(
+        outputImage,
+        toBitmap: &averagePixel,
+        rowBytes: MemoryLayout<Float>.size,
+        bounds: CGRect(x: 0, y: 0, width: 1, height: 1),
+        format: .Rf,
+        colorSpace: nil
+      )
+      let pixelCountThreshold = 1 - precision
+      if averagePixel > pixelCountThreshold { return false }
+    } else {
+      guard let filter = CIFilter(name: "CILabDeltaE", parameters: [kCIInputImageKey: oldImage, "inputImage2": newImage]) else { return false }
+      guard let outputImage = filter.outputImage else { return false }
+      var outputPixels = [Float32](repeating: 0, count: pixelCount)
+      CIContext().render(
+        outputImage,
+        toBitmap: &outputPixels,
+        rowBytes: Int(outputImage.extent.width) * MemoryLayout<Float32>.size,
+        bounds: outputImage.extent,
+        format: .Rf,
+        colorSpace: nil
+      )
+      let pixelCountThreshold = Int((1 - precision) * Float(pixelCount))
+      var differentPixelCount = 0
+      for pixel in outputPixels {
+        if pixel > perceptualThreshold {
+          differentPixelCount += 1
+          if differentPixelCount > pixelCountThreshold { return false }
+        }
       }
     }
   } else {
