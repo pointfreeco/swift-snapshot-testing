@@ -289,6 +289,24 @@ final class SnapshotTestingTests: XCTestCase {
     #endif
   }
 
+  func testImagePrecision() throws {
+    #if os(iOS) || os(tvOS) || os(macOS)
+    let imageURL = URL(fileURLWithPath: String(#file), isDirectory: false)
+            .deletingLastPathComponent()
+            .appendingPathComponent("__Fixtures__/testImagePrecision.reference.png")
+    #if os(iOS) || os(tvOS)
+    let image = try XCTUnwrap(UIImage(contentsOfFile: imageURL.path))
+    #elseif os(macOS)
+    let image = try XCTUnwrap(NSImage(byReferencing: imageURL))
+    #endif
+
+    assertSnapshot(matching: image, as: .image(precision: 0.995), named: "exact")
+    if #available(iOS 11.0, tvOS 11.0, macOS 10.13, *) {
+      assertSnapshot(matching: image, as: .image(perceptualPrecision: 0.98), named: "perceptual")
+    }
+    #endif
+  }
+
   func testSCNView() {
 //    #if os(iOS) || os(macOS) || os(tvOS)
 //    // NB: CircleCI crashes while trying to instantiate SCNView.
