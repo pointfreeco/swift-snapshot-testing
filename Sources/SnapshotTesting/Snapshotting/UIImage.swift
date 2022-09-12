@@ -104,53 +104,41 @@ private func compare(_ old: UIImage, _ new: UIImage, precision: Float, perceptua
   guard let newerData = newerContext.data else { return false }
   if memcmp(oldData, newerData, byteCount) == 0 { return true }
   if precision >= 1, perceptualPrecision >= 1 { return false }
-  if perceptualPrecision < 1, #available(tvOS 11.0, *) {
-    let oldImage = CIImage(cgImage: oldCgImage)
-    let newImage = CIImage(cgImage: newerCgImage)
-    let perceptualThreshold = (1 - perceptualPrecision) * 100
-    if #available(iOS 14.0, tvOS 14.0, *) {
-      let deltaFilter = CIFilter.labDeltaE()
-      deltaFilter.inputImage = oldImage
-      deltaFilter.image2 = newImage
-      let thresholdFilter = CIFilter.colorThreshold()
-      thresholdFilter.inputImage = deltaFilter.outputImage
-      thresholdFilter.threshold = perceptualThreshold
-      let averageFilter = CIFilter.areaAverage()
-      averageFilter.inputImage = thresholdFilter.outputImage
-      averageFilter.extent = CGRect(x: 0, y: 0, width: oldCgImage.width, height: oldCgImage.height)
-      guard let outputImage = averageFilter.outputImage else { return false }
-      var averagePixel: Float = 0
-      CIContext().render(
-        outputImage,
-        toBitmap: &averagePixel,
-        rowBytes: MemoryLayout<Float>.size,
-        bounds: CGRect(x: 0, y: 0, width: 1, height: 1),
-        format: .Rf,
-        colorSpace: nil
-      )
-      let pixelCountThreshold = 1 - precision
-      if averagePixel > pixelCountThreshold { return false }
-    } else {
-      guard let filter = CIFilter(name: "CILabDeltaE", parameters: [kCIInputImageKey: oldImage, "inputImage2": newImage]) else { return false }
-      guard let outputImage = filter.outputImage else { return false }
-      var outputPixels = [Float32](repeating: 0, count: pixelCount)
-      CIContext().render(
-        outputImage,
-        toBitmap: &outputPixels,
-        rowBytes: Int(outputImage.extent.width) * MemoryLayout<Float32>.size,
-        bounds: outputImage.extent,
-        format: .Rf,
-        colorSpace: nil
-      )
-      let pixelCountThreshold = Int((1 - precision) * Float(pixelCount))
-      var differentPixelCount = 0
-      for pixel in outputPixels {
-        if pixel > perceptualThreshold {
-          differentPixelCount += 1
-          if differentPixelCount > pixelCountThreshold { return false }
-        }
-      }
-    }
+  if perceptualPrecision < 1, #available(iOS 11.0, tvOS 11.0, *) {
+    let deltaFilter = CIFilter(
+      name: "CILabDeltaE",
+      parameters: [
+        kCIInputImageKey: CIImage(cgImage: newCgImage),
+        "inputImage2": CIImage(cgImage: oldCgImage)
+      ]
+    )
+    guard let deltaOutputImage = deltaFilter?.outputImage else { return false }
+    let extent = CGRect(x: 0, y: 0, width: oldCgImage.width, height: oldCgImage.height)
+    let thresholdOutputImage = try? ThresholdImageProcessorKernel.apply(
+      withExtent: extent,
+      inputs: [deltaOutputImage],
+      arguments: [ThresholdImageProcessorKernel.inputThresholdKey: (1 - perceptualPrecision) * 100]
+    )
+    guard let thresholdOutputImage = thresholdOutputImage else { return false }
+    let averageFilter = CIFilter(
+      name: "CIAreaAverage",
+      parameters: [
+        kCIInputImageKey: thresholdOutputImage,
+        kCIInputExtentKey: extent
+      ]
+    )
+    guard let averageOutputImage = averageFilter?.outputImage else { return false }
+    var averagePixel: Float = 0
+    CIContext(options: [.workingColorSpace: NSNull(), .outputColorSpace: NSNull()]).render(
+      averageOutputImage,
+      toBitmap: &averagePixel,
+      rowBytes: MemoryLayout<Float>.size,
+      bounds: CGRect(x: 0, y: 0, width: 1, height: 1),
+      format: .Rf,
+      colorSpace: nil
+    )
+    let pixelCountThreshold = 1 - precision
+    if averagePixel > pixelCountThreshold { return false }
   } else {
     let byteCountThreshold = Int((1 - precision) * Float(byteCount))
     var differentByteCount = 0
@@ -193,5 +181,42 @@ private func diff(_ old: UIImage, _ new: UIImage) -> UIImage {
   let differenceImage = UIGraphicsGetImageFromCurrentImageContext()!
   UIGraphicsEndImageContext()
   return differenceImage
+}
+#endif
+
+#if os(iOS) || os(tvOS) || os(macOS)
+import CoreImage.CIKernel
+import MetalPerformanceShaders
+
+// Copied from https://developer.apple.com/documentation/coreimage/ciimageprocessorkernel
+@available(iOS 10.0, tvOS 10.0, macOS 10.13, *)
+final class ThresholdImageProcessorKernel: CIImageProcessorKernel {
+  static let inputThresholdKey = "thresholdValue"
+  static let device = MTLCreateSystemDefaultDevice()
+
+  override class func process(with inputs: [CIImageProcessorInput]?, arguments: [String: Any]?, output: CIImageProcessorOutput) throws {
+    guard
+      let device = device,
+      let commandBuffer = output.metalCommandBuffer,
+      let input = inputs?.first,
+      let sourceTexture = input.metalTexture,
+      let destinationTexture = output.metalTexture,
+      let thresholdValue = arguments?[inputThresholdKey] as? Float else {
+      return
+    }
+
+    let threshold = MPSImageThresholdBinary(
+      device: device,
+      thresholdValue: thresholdValue,
+      maximumValue: 1.0,
+      linearGrayColorTransform: nil
+    )
+
+    threshold.encode(
+      commandBuffer: commandBuffer,
+      sourceTexture: sourceTexture,
+      destinationTexture: destinationTexture
+    )
+  }
 }
 #endif
