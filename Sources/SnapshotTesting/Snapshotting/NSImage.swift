@@ -1,21 +1,24 @@
 #if os(macOS)
+import CoreImage
 import Cocoa
 import XCTest
 
 extension Diffing where Value == NSImage {
   /// A pixel-diffing strategy for NSImage's which requires a 100% match.
-  public static let image = Diffing.image(precision: 1)
+  public static let image = Diffing.image()
 
   /// A pixel-diffing strategy for NSImage that allows customizing how precise the matching must be.
   ///
-  /// - Parameter precision: A value between 0 and 1, where 1 means the images must match 100% of their pixels.
+  /// - Parameters:
+  ///   - precision: The percentage of pixels that must match.
+  ///   - perceptualPrecision: The percentage a pixel must match the source pixel to be considered a match. [98-99% mimics the precision of the human eye.](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e)
   /// - Returns: A new diffing strategy.
-  public static func image(precision: Float) -> Diffing {
+  public static func image(precision: Float = 1, perceptualPrecision: Float = 1) -> Diffing {
     return .init(
       toData: { NSImagePNGRepresentation($0)! },
       fromData: { NSImage(data: $0)! }
     ) { old, new in
-      guard !compare(old, new, precision: precision) else { return nil }
+      guard !compare(old, new, precision: precision, perceptualPrecision: perceptualPrecision) else { return nil }
       let difference = SnapshotTesting.diff(old, new)
       let message = new.size == old.size
         ? "Newly-taken snapshot does not match reference."
@@ -31,16 +34,18 @@ extension Diffing where Value == NSImage {
 extension Snapshotting where Value == NSImage, Format == NSImage {
   /// A snapshot strategy for comparing images based on pixel equality.
   public static var image: Snapshotting {
-    return .image(precision: 1)
+    return .image()
   }
 
   /// A snapshot strategy for comparing images based on pixel equality.
   ///
-  /// - Parameter precision: The percentage of pixels that must match.
-  public static func image(precision: Float) -> Snapshotting {
+  /// - Parameters:
+  ///   - precision: The percentage of pixels that must match.
+  ///   - perceptualPrecision: The percentage a pixel must match the source pixel to be considered a match. [98-99% mimics the precision of the human eye.](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e)
+  public static func image(precision: Float = 1, perceptualPrecision: Float = 1) -> Snapshotting {
     return .init(
       pathExtension: "png",
-      diffing: .image(precision: precision)
+      diffing: .image(precision: precision, perceptualPrecision: perceptualPrecision)
     )
   }
 }
@@ -52,7 +57,7 @@ private func NSImagePNGRepresentation(_ image: NSImage) -> Data? {
   return rep.representation(using: .png, properties: [:])
 }
 
-private func compare(_ old: NSImage, _ new: NSImage, precision: Float) -> Bool {
+private func compare(_ old: NSImage, _ new: NSImage, precision: Float, perceptualPrecision: Float) -> Bool {
   guard let oldCgImage = old.cgImage(forProposedRect: nil, context: nil, hints: nil) else { return false }
   guard let newCgImage = new.cgImage(forProposedRect: nil, context: nil, hints: nil) else { return false }
   guard oldCgImage.width != 0 else { return false }
@@ -72,19 +77,42 @@ private func compare(_ old: NSImage, _ new: NSImage, precision: Float) -> Bool {
   guard let newerContext = context(for: newerCgImage) else { return false }
   guard let newerData = newerContext.data else { return false }
   if memcmp(oldData, newerData, byteCount) == 0 { return true }
-  if precision >= 1 { return false }
-  let oldRep = NSBitmapImageRep(cgImage: oldCgImage)
-  let newRep = NSBitmapImageRep(cgImage: newerCgImage)
-  var differentPixelCount = 0
-  let pixelCount = oldRep.pixelsWide * oldRep.pixelsHigh
-  let threshold = (1 - precision) * Float(pixelCount)
-  let p1: UnsafeMutablePointer<UInt8> = oldRep.bitmapData!
-  let p2: UnsafeMutablePointer<UInt8> = newRep.bitmapData!
-  for offset in 0 ..< pixelCount * 4 {
-    if p1[offset] != p2[offset] {
+  if precision >= 1, perceptualPrecision >= 1 { return false }
+  if perceptualPrecision < 1, #available(macOS 10.13, *) {
+    let oldImage = CIImage(cgImage: oldCgImage)
+    let newImage = CIImage(cgImage: newerCgImage)
+    let perceptualThreshold = (1 - perceptualPrecision) * 100
+    guard let filter = CIFilter(name: "CILabDeltaE", parameters: [kCIInputImageKey: oldImage, "inputImage2": newImage]) else { return false }
+    guard let outputImage = filter.outputImage else { return false }
+    let pixelCount = oldCgImage.width * oldCgImage.height
+    var outputPixels = [Float](repeating: 0, count: pixelCount)
+    CIContext().render(
+      outputImage,
+      toBitmap: &outputPixels,
+      rowBytes: Int(outputImage.extent.width) * MemoryLayout<Float>.size,
+      bounds: outputImage.extent,
+      format: .Rf,
+      colorSpace: nil
+    )
+    let pixelCountThreshold = Int((1 - precision) * Float(pixelCount))
+    var differentPixelCount = 0
+    for pixel in outputPixels {
+      if pixel > perceptualThreshold {
         differentPixelCount += 1
+        if differentPixelCount > pixelCountThreshold { return false }
+      }
     }
-    if Float(differentPixelCount) > threshold { return false }
+  } else {
+    let oldRep = NSBitmapImageRep(cgImage: oldCgImage).bitmapData!
+    let newRep = NSBitmapImageRep(cgImage: newerCgImage).bitmapData!
+    let byteCountThreshold = Int((1 - precision) * Float(byteCount))
+    var differentByteCount = 0
+    for offset in 0..<byteCount {
+      if oldRep[offset] != newRep[offset] {
+        differentByteCount += 1
+        if differentByteCount > byteCountThreshold { return false }
+      }
+    }
   }
   return true
 }

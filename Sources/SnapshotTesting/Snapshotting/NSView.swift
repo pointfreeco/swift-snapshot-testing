@@ -11,9 +11,10 @@ extension Snapshotting where Value == NSView, Format == NSImage {
   ///
   /// - Parameters:
   ///   - precision: The percentage of pixels that must match.
+  ///   - perceptualPrecision: The percentage a pixel must match the source pixel to be considered a match. [98-99% mimics the precision of the human eye.](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e)
   ///   - size: A view size override.
-  public static func image(precision: Float = 1, size: CGSize? = nil) -> Snapshotting {
-    return SimplySnapshotting.image(precision: precision).asyncPullback { view in
+  public static func image(precision: Float = 1, perceptualPrecision: Float = 1, size: CGSize? = nil) -> Snapshotting {
+    return SimplySnapshotting.image(precision: precision, perceptualPrecision: perceptualPrecision).asyncPullback { view in
       let initialSize = view.frame.size
       if let size = size { view.frame.size = size }
       guard view.frame.width > 0, view.frame.height > 0 else {

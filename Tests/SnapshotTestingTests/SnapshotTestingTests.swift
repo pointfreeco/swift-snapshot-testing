@@ -43,7 +43,7 @@ final class SnapshotTestingTests: XCTestCase {
     """)
   }
 
-  @available(macOS 10.13, *)
+  @available(macOS 10.13, tvOS 11.0, *)
   func testAnyAsJson() throws {
     struct User: Encodable { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
