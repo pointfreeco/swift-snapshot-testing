@@ -131,8 +131,8 @@ extension Snapshotting where Value: SwiftUI.View, Format == UIImage {
           Task { @MainActor in
             let renderer = ImageRenderer(
               content: ZStack {
-                // Show white background behind view
-                Color.white.ignoresSafeArea()
+                // Show default system background color behind view
+                Color(uiColor: UIColor.systemBackground).ignoresSafeArea()
 
                 view
                   .environment(\.horizontalSizeClass, UserInterfaceSizeClass(traits.horizontalSizeClass))
