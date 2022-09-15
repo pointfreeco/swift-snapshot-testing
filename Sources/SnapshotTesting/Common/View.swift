@@ -755,7 +755,11 @@ extension View {
                 callback(Image())
                 return
               }
-              wkWebView.takeSnapshot(with: nil) { image, _ in
+              let configuaration = WKSnapshotConfiguration()
+              if #available(iOS 13, *) {
+                configuaration.afterScreenUpdates = false
+              }
+              wkWebView.takeSnapshot(with: configuaration) { image, _ in
                 callback(image!)
               }
             }
