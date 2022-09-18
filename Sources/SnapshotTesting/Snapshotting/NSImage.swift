@@ -1,5 +1,4 @@
 #if os(macOS)
-import CoreImage.CIFilterBuiltins
 import Cocoa
 import XCTest
 
@@ -18,14 +17,17 @@ extension Diffing where Value == NSImage {
       toData: { NSImagePNGRepresentation($0)! },
       fromData: { NSImage(data: $0)! }
     ) { old, new in
-      guard !compare(old, new, precision: precision, perceptualPrecision: perceptualPrecision) else { return nil }
+      guard let message = compare(old, new, precision: precision, perceptualPrecision: perceptualPrecision) else { return nil }
       let difference = SnapshotTesting.diff(old, new)
-      let message = new.size == old.size
-        ? "Newly-taken snapshot does not match reference."
-        : "Newly-taken snapshot@\(new.size) does not match reference@\(old.size)."
+      let oldAttachment = XCTAttachment(image: old)
+      oldAttachment.name = "reference"
+      let newAttachment = XCTAttachment(image: new)
+      newAttachment.name = "failure"
+      let differenceAttachment = XCTAttachment(image: difference)
+      differenceAttachment.name = "difference"
       return (
         message,
-        [XCTAttachment(image: old), XCTAttachment(image: new), XCTAttachment(image: difference)]
+        [oldAttachment, newAttachment, differenceAttachment]
       )
     }
   }
@@ -57,61 +59,46 @@ private func NSImagePNGRepresentation(_ image: NSImage) -> Data? {
   return rep.representation(using: .png, properties: [:])
 }
 
-private func compare(_ old: NSImage, _ new: NSImage, precision: Float, perceptualPrecision: Float) -> Bool {
-  guard let oldCgImage = old.cgImage(forProposedRect: nil, context: nil, hints: nil) else { return false }
-  guard let newCgImage = new.cgImage(forProposedRect: nil, context: nil, hints: nil) else { return false }
-  guard newCgImage.width != 0 else { return false }
-  guard oldCgImage.width == newCgImage.width else { return false }
-  guard newCgImage.height != 0 else { return false }
-  guard oldCgImage.height == newCgImage.height else { return false }
-  guard let oldContext = context(for: oldCgImage) else { return false }
-  guard let newContext = context(for: newCgImage) else { return false }
-  guard let oldData = oldContext.data else { return false }
-  guard let newData = newContext.data else { return false }
+private func compare(_ old: NSImage, _ new: NSImage, precision: Float, perceptualPrecision: Float) -> String? {
+  guard let oldCgImage = old.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
+    return "Reference image could not be loaded."
+  }
+  guard let newCgImage = new.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
+    return "Newly-taken snapshot could not be loaded."
+  }
+  guard newCgImage.width != 0, newCgImage.height != 0 else {
+    return "Newly-taken snapshot is empty."
+  }
+  guard oldCgImage.width == newCgImage.width, oldCgImage.height == newCgImage.height else {
+    return "Newly-taken snapshot@\(new.size) does not match reference@\(old.size)."
+  }
+  guard let oldContext = context(for: oldCgImage), let oldData = oldContext.data else {
+    return "Reference image's data could not be loaded."
+  }
+  guard let newContext = context(for: newCgImage), let newData = newContext.data else {
+    return "Newly-taken snapshot's data could not be loaded."
+  }
   let byteCount = oldContext.height * oldContext.bytesPerRow
-  if memcmp(oldData, newData, byteCount) == 0 { return true }
-  let newer = NSImage(data: NSImagePNGRepresentation(new)!)!
-  guard let newerCgImage = newer.cgImage(forProposedRect: nil, context: nil, hints: nil) else { return false }
-  guard let newerContext = context(for: newerCgImage) else { return false }
-  guard let newerData = newerContext.data else { return false }
-  if memcmp(oldData, newerData, byteCount) == 0 { return true }
-  if precision >= 1, perceptualPrecision >= 1 { return false }
+  if memcmp(oldData, newData, byteCount) == 0 { return nil }
+  guard
+    let pngData = NSImagePNGRepresentation(new),
+    let newerCgImage = NSImage(data: pngData)?.cgImage(forProposedRect: nil, context: nil, hints: nil),
+    let newerContext = context(for: newerCgImage),
+    let newerData = newerContext.data
+  else {
+    return "Newly-taken snapshot's data could not be loaded."
+  }
+  if memcmp(oldData, newerData, byteCount) == 0 { return nil }
+  if precision >= 1, perceptualPrecision >= 1 {
+    return "Newly-taken snapshot does not match reference."
+  }
   if perceptualPrecision < 1, #available(macOS 10.13, *) {
-    let deltaFilter = CIFilter(
-      name: "CILabDeltaE",
-      parameters: [
-        kCIInputImageKey: CIImage(cgImage: newCgImage),
-        "inputImage2": CIImage(cgImage: oldCgImage)
-      ]
+    return perceptuallyCompare(
+      CIImage(cgImage: oldCgImage),
+      CIImage(cgImage: newCgImage),
+      pixelPrecision: precision,
+      perceptualPrecision: perceptualPrecision
     )
-    guard let deltaOutputImage = deltaFilter?.outputImage else { return false }
-    let extent = CGRect(x: 0, y: 0, width: oldCgImage.width, height: oldCgImage.height)
-    guard 
-      let thresholdOutputImage = try? ThresholdImageProcessorKernel.apply(
-        withExtent: extent,
-        inputs: [deltaOutputImage],
-        arguments: [ThresholdImageProcessorKernel.inputThresholdKey: (1 - perceptualPrecision) * 100]
-      )
-    else { return false }
-    let averageFilter = CIFilter(
-      name: "CIAreaAverage",
-      parameters: [
-        kCIInputImageKey: thresholdOutputImage,
-        kCIInputExtentKey: extent
-      ]
-    )
-    guard let averageOutputImage = averageFilter?.outputImage else { return false }
-    var averagePixel: Float = 0
-    CIContext(options: [.workingColorSpace: NSNull(), .outputColorSpace: NSNull()]).render(
-      averageOutputImage,
-      toBitmap: &averagePixel,
-      rowBytes: MemoryLayout<Float>.size,
-      bounds: CGRect(x: 0, y: 0, width: 1, height: 1),
-      format: .Rf,
-      colorSpace: nil
-    )
-    let pixelCountThreshold = 1 - precision
-    if averagePixel > pixelCountThreshold { return false }
   } else {
     let oldRep = NSBitmapImageRep(cgImage: oldCgImage).bitmapData!
     let newRep = NSBitmapImageRep(cgImage: newerCgImage).bitmapData!
@@ -120,11 +107,14 @@ private func compare(_ old: NSImage, _ new: NSImage, precision: Float, perceptua
     for offset in 0..<byteCount {
       if oldRep[offset] != newRep[offset] {
         differentByteCount += 1
-        if differentByteCount > byteCountThreshold { return false }
       }
     }
+    if differentByteCount > byteCountThreshold {
+      let actualPrecision = 1 - Float(differentByteCount) / Float(byteCount)
+      return "Actual image precision \(actualPrecision) is less than required \(precision)"
+    }
   }
-  return true
+  return nil
 }
 
 private func context(for cgImage: CGImage) -> CGContext? {
