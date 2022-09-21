@@ -58,7 +58,7 @@ jobs:
       - uses: compnerd/gha-setup-swift@main
         with:
           branch: swift-${{ matrix.swift }}-release
-          tag: ${{ matrix.swift }-RELEASE
+          tag: ${{ matrix.swift }}-RELEASE
 
       - name: Set git to use LF
         run: |
