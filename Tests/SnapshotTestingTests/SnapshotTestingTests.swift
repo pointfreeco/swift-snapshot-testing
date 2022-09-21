@@ -1164,9 +1164,9 @@ final class SnapshotTestingTests: XCTestCase {
   }
   #endif
 
+  #if os(iOS)
   @available(iOS 13.0, *)
   func testSwiftUIView_iOS() {
-    #if os(iOS)
     struct MyView: SwiftUI.View {
       var body: some SwiftUI.View {
         HStack {
@@ -1185,12 +1185,12 @@ final class SnapshotTestingTests: XCTestCase {
     assertSnapshot(matching: view, as: .image(layout: .sizeThatFits, traits: .init(userInterfaceStyle: .light)), named: "size-that-fits")
     assertSnapshot(matching: view, as: .image(layout: .fixed(width: 200.0, height: 100.0), traits: .init(userInterfaceStyle: .light)), named: "fixed")
     assertSnapshot(matching: view, as: .image(layout: .device(config: .iPhoneSe), traits: .init(userInterfaceStyle: .light)), named: "device")
-    #endif
   }
+  #endif
 
+  #if os(tvOS)
   @available(tvOS 13.0, *)
   func testSwiftUIView_tvOS() {
-    #if os(tvOS)
     struct MyView: SwiftUI.View {
       var body: some SwiftUI.View {
         HStack {
@@ -1208,8 +1208,8 @@ final class SnapshotTestingTests: XCTestCase {
     assertSnapshot(matching: view, as: .image(layout: .sizeThatFits), named: "size-that-fits")
     assertSnapshot(matching: view, as: .image(layout: .fixed(width: 300.0, height: 100.0)), named: "fixed")
     assertSnapshot(matching: view, as: .image(layout: .device(config: .tv)), named: "device")
-    #endif
   }
+  #endif
 
   @available(*, deprecated)
   func testIsRecordingProxy() {

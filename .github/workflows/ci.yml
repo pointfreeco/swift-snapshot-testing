@@ -13,13 +13,12 @@ jobs:
     strategy:
       matrix:
         xcode:
-          - "11.7"   # Swift 5.2
-          - "12.4"   # Swift 5.3
-          - "12.5.1" # Swift 5.4
-          - "13.0"   # Swift 5.5
+          - "13.2.1"  # Swift 5.5.2
+          - "13.4.1"  # Swift 5.6.1
+          - "14.0"    # Swift 5.7
 
-    name: macOS 11, Xcode ${{ matrix.xcode }}
-    runs-on: macos-11
+    name: macOS 12 (Xcode ${{ matrix.xcode }})
+    runs-on: macos-12
     steps:
       - uses: actions/checkout@v1
       - name: Select Xcode ${{ matrix.xcode }}
@@ -30,32 +29,42 @@ jobs:
   ubuntu:
     strategy:
       matrix:
-        os: ["18.04", "20.04"]
+        swift:
+          - "5.5"
+          - "5.6"
+          - "5.7"
 
-    name: Ubuntu ${{ matrix.os }}
-    runs-on: ubuntu-${{ matrix.os }}
+    name: Ubuntu (Swift ${{ matrix.swift }})
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-      - name: Run tests
-        run: make test-linux
+      - uses: swift-actions/setup-swift@v1
+        with:
+          swift-version: ${{ matrix.swift }}
+      - uses: actions/checkout@v2
+      - run: swift test
 
   windows:
     strategy:
       matrix:
         swift:
-          - "5.4"
           - "5.5"
+          - "5.6"
+          #- "5.7"
 
-    name: Windows 2019, Swift ${{ matrix.swift }}
+    name: Windows (Swift ${{ matrix.swift }})
     runs-on: windows-2019
 
     steps:
+      - uses: compnerd/gha-setup-swift@main
+        with:
+          branch: swift-${{ matrix.swift }}-release
+          tag: ${{ matrix.swift }}-RELEASE
+
       - name: Set git to use LF
         run: |
           git config --global core.autocrlf false
           git config --global core.eol lf
+
       - uses: actions/checkout@v2
-      - uses: MaxDesiatov/swift-windows-action@v1
-        with:
-          shell-action: swift test
-          swift-version: ${{ matrix.swift }}
+      - run: swift build
+      - run: swift test

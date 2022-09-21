@@ -128,12 +128,12 @@ If your data can be represented as an image, text, or data, you can write a snap
 
 ## Installation
 
-### Xcode 11
+### Xcode
 
 > ⚠️ Warning: By default, Xcode will try to add the SnapshotTesting package to your project's main application/framework target. Please ensure that SnapshotTesting is added to a _test_ target instead, as documented in the last step, below.
 
  1. From the **File** menu, navigate through **Swift Packages** and select **Add Package Dependency…**.
- 2. Enter package repository URL: `https://github.com/pointfreeco/swift-snapshot-testing.git`
+ 2. Enter package repository URL: `https://github.com/pointfreeco/swift-snapshot-testing`
  3. Confirm the version and let Xcode resolve the package
  4. On the final dialog, update SnapshotTesting's **Add to Target** column to a test target that will contain snapshot tests (if you have more than one test target, you can later add SnapshotTesting to them by manually linking the library in its build phase)
 
@@ -144,7 +144,7 @@ If you want to use SnapshotTesting in any other project that uses [SwiftPM](http
 ```swift
 dependencies: [
   .package(
-    url: "https://github.com/pointfreeco/swift-snapshot-testing.git",
+    url: "https://github.com/pointfreeco/swift-snapshot-testing",
     from: "1.9.0"
   ),
 ]
@@ -163,33 +163,6 @@ targets: [
     ]
   )
 ]
-```
-
-### Carthage
-
-If you use [Carthage](https://github.com/Carthage/Carthage), you can add the following dependency to your `Cartfile`:
-
-``` ruby
-github "pointfreeco/swift-snapshot-testing" ~> 1.9.0
-```
-
-> ⚠️ Warning: Carthage instructs you to drag frameworks into your Xcode project. Xcode may automatically attempt to link these frameworks to your app target. `SnapshotTesting.framework` is only compatible with test targets, so when you first add it to your project:
->
->  1. Remove `SnapshotTesting.framework` from any non-test target it may have been added to.
->  2. Add `SnapshotTesting.framework` to any applicable test targets.
->  3. Add a **New Copy Build Phase** to any applicable test targets with **Destination** set to "Frameworks", and add `SnapshotTesting.framework` as an item to this phase.
->  4. Do _not_ add `SnapshotTesting.framework` to the "Input Files" or "Output Files" of your app target's Carthage `copy-frameworks` **Run Script Phase**.
->
-> See Carthage's "[Adding frameworks to unit tests or a framework](https://github.com/Carthage/Carthage#adding-frameworks-to-unit-tests-or-a-framework)" documentation for more.
-
-### CocoaPods
-
-If your project uses [CocoaPods](https://cocoapods.org), add the pod to any applicable test targets in your `Podfile`:
-
-```ruby
-target 'MyAppTests' do
-  pod 'SnapshotTesting', '~> 1.9.0'
-end
 ```
 
 ## Features
