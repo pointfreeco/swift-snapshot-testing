@@ -15,20 +15,18 @@ extension Snapshotting where Value == NSView, Format == NSImage {
   ///
   /// - Parameters:
   ///   - precision: The percentage of pixels that must match.
+  ///   - perceptualPrecision: The percentage a pixel must match the source pixel to be considered a match. [98-99% mimics the precision of the human eye.](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e)
   ///   - size: A view size override.
   ///   - appearance: The appearance to use when drawing the view. Pass `nil` to use the view’s existing appearance.
-  ///   - windowForDrawing: The choice of window to use when drawing the view. Pass `.nil` to ignore.
-  ///                       __Precondition__: If set to a none nil value, the view must not already
-  ///                       be attached to an existing window. (We wouldn’t be able to easily restore the view and all its
-  ///                       associated constraints to the original window after moving it to the new window.)
+  ///   - windowForDrawing: The choice of window to use when drawing the view. Pass `nil` to ignore.
   public static func image(
     precision: Float = 1,
+    perceptualPrecision: Float = 1,
     size: CGSize? = nil,
     appearance: NSAppearance? = NSAppearance(named: .aqua),
     windowForDrawing: GenericWindow? = nil
   ) -> Snapshotting {
-    return SimplySnapshotting.image(precision: precision).asyncPullback { view in
-
+    return SimplySnapshotting.image(precision: precision, perceptualPrecision: perceptualPrecision).asyncPullback { view in
       let initialFrame = view.frame
       if let size = size { view.frame.size = size }
       guard view.frame.width > 0, view.frame.height > 0 else {
@@ -43,11 +41,11 @@ extension Snapshotting where Value == NSView, Format == NSImage {
       if let windowForDrawing = windowForDrawing {
         precondition(
           view.window == nil,
-           """
-           If choosing to draw the view using a new window, the view must not already be attached to an existing window. \
-           (We wouldn’t be able to easily restore the view and all its associated constraints to the original window \
-           after moving it to the new window.)
-           """
+          """
+          If choosing to draw the view using a new window, the view must not already be attached to an existing window. \
+          (We wouldn’t be able to easily restore the view and all its associated constraints to the original window \
+          after moving it to the new window.)
+          """
         )
         windowForDrawing.contentView = NSView()
         windowForDrawing.contentView?.addSubview(view)
@@ -69,16 +67,13 @@ extension Snapshotting where Value == NSView, Format == NSImage {
             view.layer = nil
             view.subviews.forEach { subview in
               subview.layer = nil
-
             }
-
             // This is to maintain compatibility with `recursiveDescription` because the current
             // test snapshots expect `.needsLayout = false` and for some apple magic reason
             // `view.needsLayout = false` does not do anything, but this does.
             let bitmapRep2 = view.bitmapImageRepForCachingDisplay(in: view.bounds)!
             view.cacheDisplay(in: view.bounds, to: bitmapRep2)
           }
-
         }
       }
     }

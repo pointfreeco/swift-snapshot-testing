@@ -17,7 +17,7 @@ public struct Snapshotting<Value, Format> {
   /// - Parameters:
   ///   - pathExtension: The path extension applied to references saved to disk.
   ///   - diffing: How to diff and convert the snapshot format to and from data.
-  ///   - snapshot: An asynchronous transform function from a value into a diffable snapshot format.
+  ///   - asyncSnapshot: An asynchronous transform function from a value into a diffable snapshot format.
   ///   - value: A value to be converted.
   public init(
     pathExtension: String?,
@@ -69,7 +69,7 @@ public struct Snapshotting<Value, Format> {
 
   /// Transforms a strategy on `Value`s into a strategy on `NewValue`s through a function `(NewValue) -> Async<Value>`.
   ///
-  /// See the documention of `pullback` for a full description of how pullbacks works. This operation differs from `pullback` in that it allows you to use a transformation `(NewValue) -> Async<Value>`, which is necessary when your transformation needs to perform some asynchronous work.
+  /// See the documentation of `pullback` for a full description of how pullbacks works. This operation differs from `pullback` in that it allows you to use a transformation `(NewValue) -> Async<Value>`, which is necessary when your transformation needs to perform some asynchronous work.
   ///
   /// - Parameters:
   ///   - transform: A transform function from `NewValue` into `Async<Value>`.

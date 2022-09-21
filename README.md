@@ -1,8 +1,8 @@
 # 📸 SnapshotTesting
 
-[![Swift 5.1](https://img.shields.io/badge/swift-5.1-ED523F.svg?style=flat)](https://swift.org/download/)
 [![CI](https://github.com/pointfreeco/swift-snapshot-testing/workflows/CI/badge.svg)](https://actions-badge.atrox.dev/pointfreeco/swift-snapshot-testing/goto)
-[![@pointfreeco](https://img.shields.io/badge/contact-@pointfreeco-5AA9E7.svg?style=flat)](https://twitter.com/pointfreeco)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fpointfreeco%2Fswift-snapshot-testing%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/pointfreeco/swift-snapshot-testing)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fpointfreeco%2Fswift-snapshot-testing%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/pointfreeco/swift-snapshot-testing)
 
 Delightful Swift snapshot testing.
 
@@ -75,7 +75,7 @@ assertSnapshot(matching: vc, as: .image(on: .iPadMini(.portrait)))
 assertSnapshot(matching: vc, as: .recursiveDescription(on: .iPadMini(.portrait)))
 ```
 
-> ⚠️ Warning: Snapshots must be compared using a simulator with the same OS, device gamut, and scale as the simulator that originally took the reference to avoid discrepancies between images.
+> ⚠️ Warning: Snapshots must be compared using the exact same simulator that originally took the reference to avoid discrepancies between images.
 
 Better yet, SnapshotTesting isn't limited to views and view controllers! There are [a number of available snapshot strategies](Documentation/Available-Snapshot-Strategies.md) to choose from.
 
@@ -128,12 +128,12 @@ If your data can be represented as an image, text, or data, you can write a snap
 
 ## Installation
 
-### Xcode 11
+### Xcode
 
 > ⚠️ Warning: By default, Xcode will try to add the SnapshotTesting package to your project's main application/framework target. Please ensure that SnapshotTesting is added to a _test_ target instead, as documented in the last step, below.
 
  1. From the **File** menu, navigate through **Swift Packages** and select **Add Package Dependency…**.
- 2. Enter package repository URL: `https://github.com/pointfreeco/swift-snapshot-testing.git`
+ 2. Enter package repository URL: `https://github.com/pointfreeco/swift-snapshot-testing`
  3. Confirm the version and let Xcode resolve the package
  4. On the final dialog, update SnapshotTesting's **Add to Target** column to a test target that will contain snapshot tests (if you have more than one test target, you can later add SnapshotTesting to them by manually linking the library in its build phase)
 
@@ -144,7 +144,7 @@ If you want to use SnapshotTesting in any other project that uses [SwiftPM](http
 ```swift
 dependencies: [
   .package(
-    url: "https://github.com/pointfreeco/swift-snapshot-testing.git",
+    url: "https://github.com/pointfreeco/swift-snapshot-testing",
     from: "1.9.0"
   ),
 ]
@@ -163,33 +163,6 @@ targets: [
     ]
   )
 ]
-```
-
-### Carthage
-
-If you use [Carthage](https://github.com/Carthage/Carthage), you can add the following dependency to your `Cartfile`:
-
-``` ruby
-github "pointfreeco/swift-snapshot-testing" ~> 1.9.0
-```
-
-> ⚠️ Warning: Carthage instructs you to drag frameworks into your Xcode project. Xcode may automatically attempt to link these frameworks to your app target. `SnapshotTesting.framework` is only compatible with test targets, so when you first add it to your project:
->
->  1. Remove `SnapshotTesting.framework` from any non-test target it may have been added to.
->  2. Add `SnapshotTesting.framework` to any applicable test targets.
->  3. Add a **New Copy Build Phase** to any applicable test targets with **Destination** set to "Frameworks", and add `SnapshotTesting.framework` as an item to this phase.
->  4. Do _not_ add `SnapshotTesting.framework` to the "Input Files" or "Output Files" of your app target's Carthage `copy-frameworks` **Run Script Phase**.
->
-> See Carthage's "[Adding frameworks to unit tests or a framework](https://github.com/Carthage/Carthage#adding-frameworks-to-unit-tests-or-a-framework)" documentation for more.
-
-### CocoaPods
-
-If your project uses [CocoaPods](https://cocoapods.org), add the pod to any applicable test targets in your `Podfile`:
-
-```ruby
-target 'MyAppTests' do
-  pod 'SnapshotTesting', '~> 1.9.0'
-end
 ```
 
 ## Features
@@ -223,6 +196,8 @@ end
 
   - [swift-snapshot-testing-stitch](https://github.com/Sherlouk/swift-snapshot-testing-stitch/) adds the ability to stitch multiple UIView's or UIViewController's together in a single test.
 
+  - [SnapshotTestingHEIC](https://github.com/alexey1312/SnapshotTestingHEIC) adds image support using the HEIC storage format which reduces file sizes in comparison to PNG.
+  
 Have you written your own SnapshotTesting plug-in? [Add it here](https://github.com/pointfreeco/swift-snapshot-testing/edit/master/README.md) and submit a pull request!
   
 ## Related Tools

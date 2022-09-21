@@ -1,24 +1,21 @@
-xcodeproj:
-	PF_DEVELOP=1 swift run xcodegen
-
 test-linux:
 	docker run \
 		--rm \
 		-v "$(PWD):$(PWD)" \
 		-w "$(PWD)" \
-		swift:5.2 \
-		bash -c 'make test-swift'
+		swift:5.7-focal \
+		bash -c 'swift test'
 
 test-macos:
 	set -o pipefail && \
 	xcodebuild test \
-		-scheme SnapshotTesting_macOS \
+		-scheme SnapshotTesting \
 		-destination platform="macOS" \
 
 test-ios:
 	set -o pipefail && \
 	xcodebuild test \
-		-scheme SnapshotTesting_iOS \
+		-scheme SnapshotTesting \
 		-destination platform="iOS Simulator,name=iPhone 11 Pro Max,OS=13.3" \
 
 test-swift:
@@ -27,7 +24,7 @@ test-swift:
 test-tvos:
 	set -o pipefail && \
 	xcodebuild test \
-		-scheme SnapshotTesting_tvOS \
+		-scheme SnapshotTesting \
 		-destination platform="tvOS Simulator,name=Apple TV 4K,OS=13.3" \
 
 test-all: test-linux test-macos test-ios
