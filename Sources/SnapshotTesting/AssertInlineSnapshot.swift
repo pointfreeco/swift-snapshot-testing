@@ -17,6 +17,7 @@ import XCTest
 ///   - timeout: The amount of time a snapshot must be generated in.
 ///   - reference: The expected output of snapshotting.
 ///   - file: The file in which failure occurred. Defaults to the file name of the test case in which this function was called.
+///   - testName: The name of the test in which failure occurred. Defaults to the function name of the test case in which this function was called.
 ///   - line: The line number on which failure occurred. Defaults to the line number on which this function was called.
 public func _assertInlineSnapshot<Value>(
   matching value: @autoclosure () throws -> Value,
