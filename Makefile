@@ -1,12 +1,9 @@
-xcodeproj:
-	PF_DEVELOP=1 swift run xcodegen
-
 test-linux:
 	docker run \
 		--rm \
 		-v "$(PWD):$(PWD)" \
 		-w "$(PWD)" \
-		swift:5.2 \
+		swift:5.5 \
 		bash -c 'make test-swift'
 
 test-macos:
