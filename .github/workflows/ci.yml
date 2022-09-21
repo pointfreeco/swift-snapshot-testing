@@ -66,4 +66,5 @@ jobs:
           git config --global core.eol lf
 
       - uses: actions/checkout@v2
+      - run: swift build
       - run: swift test
