@@ -9,7 +9,7 @@ on:
       - "*"
 
 jobs:
-  build:
+  macos:
     strategy:
       matrix:
         xcode:
