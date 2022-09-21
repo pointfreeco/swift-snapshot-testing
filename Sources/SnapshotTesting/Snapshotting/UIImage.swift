@@ -114,12 +114,13 @@ private func compare(_ old: UIImage, _ new: UIImage, precision: Float, perceptua
     )
     guard let deltaOutputImage = deltaFilter?.outputImage else { return false }
     let extent = CGRect(x: 0, y: 0, width: oldCgImage.width, height: oldCgImage.height)
-    let thresholdOutputImage = try? ThresholdImageProcessorKernel.apply(
-      withExtent: extent,
-      inputs: [deltaOutputImage],
-      arguments: [ThresholdImageProcessorKernel.inputThresholdKey: (1 - perceptualPrecision) * 100]
-    )
-    guard let thresholdOutputImage = thresholdOutputImage else { return false }
+    guard
+      let thresholdOutputImage = try? ThresholdImageProcessorKernel.apply(
+        withExtent: extent,
+        inputs: [deltaOutputImage],
+        arguments: [ThresholdImageProcessorKernel.inputThresholdKey: (1 - perceptualPrecision) * 100]
+      )
+    else { return false }
     let averageFilter = CIFilter(
       name: "CIAreaAverage",
       parameters: [
