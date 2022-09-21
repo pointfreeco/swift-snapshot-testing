@@ -43,7 +43,7 @@ final class SnapshotTestingTests: XCTestCase {
     """)
   }
 
-  @available(macOS 10.13, *)
+  @available(macOS 10.13, tvOS 11.0, *)
   func testAnyAsJson() throws {
     struct User: Encodable { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
@@ -285,6 +285,24 @@ final class SnapshotTestingTests: XCTestCase {
       assertSnapshot(matching: label, as: .image(precision: 0.9), named: platform)
       label.text = "Hello"
       assertSnapshot(matching: label, as: .image(precision: 0.9), named: platform)
+    }
+    #endif
+  }
+
+  func testImagePrecision() throws {
+    #if os(iOS) || os(tvOS) || os(macOS)
+    let imageURL = URL(fileURLWithPath: String(#file), isDirectory: false)
+            .deletingLastPathComponent()
+            .appendingPathComponent("__Fixtures__/testImagePrecision.reference.png")
+    #if os(iOS) || os(tvOS)
+    let image = try XCTUnwrap(UIImage(contentsOfFile: imageURL.path))
+    #elseif os(macOS)
+    let image = try XCTUnwrap(NSImage(byReferencing: imageURL))
+    #endif
+
+    assertSnapshot(matching: image, as: .image(precision: 0.995), named: "exact")
+    if #available(iOS 11.0, tvOS 11.0, macOS 10.13, *) {
+      assertSnapshot(matching: image, as: .image(perceptualPrecision: 0.98), named: "perceptual")
     }
     #endif
   }

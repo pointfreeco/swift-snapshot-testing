@@ -7,7 +7,7 @@ extension Snapshotting where Format == String {
   }
 }
 
-@available(macOS 10.13, watchOS 4.0, *)
+@available(macOS 10.13, watchOS 4.0, tvOS 11.0, *)
 extension Snapshotting where Format == String {
   /// A snapshot strategy for comparing any structure based on their JSON representation.
   public static var json: Snapshotting {
