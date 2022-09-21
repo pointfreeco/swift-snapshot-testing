@@ -14,7 +14,7 @@ extension Snapshotting where Value == SKScene, Format == NSImage {
   ///   - precision: The percentage of pixels that must match.
   ///   - perceptualPrecision: The percentage a pixel must match the source pixel to be considered a match. [98-99% mimics the precision of the human eye.](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e)
   ///   - size: The size of the scene.
-  public static func image(precision: Float = 1, perceptualPrecision: Float = 1, size: CGSize) -> Snapshotting {
+  public static func image(precision: Float = defaultImagePrecision, perceptualPrecision: Float = defaultImagePerceptualPrecision, size: CGSize) -> Snapshotting {
     return .skScene(precision: precision, perceptualPrecision: perceptualPrecision, size: size)
   }
 }
@@ -26,7 +26,7 @@ extension Snapshotting where Value == SKScene, Format == UIImage {
   ///   - precision: The percentage of pixels that must match.
   ///   - perceptualPrecision: The percentage a pixel must match the source pixel to be considered a match. [98-99% mimics the precision of the human eye.](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e)
   ///   - size: The size of the scene.
-  public static func image(precision: Float = 1, perceptualPrecision: Float = 1, size: CGSize) -> Snapshotting {
+  public static func image(precision: Float = defaultImagePrecision, perceptualPrecision: Float = defaultImagePerceptualPrecision, size: CGSize) -> Snapshotting {
     return .skScene(precision: precision, perceptualPrecision: perceptualPrecision, size: size)
   }
 }

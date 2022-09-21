@@ -12,7 +12,7 @@ extension Snapshotting where Value == NSBezierPath, Format == NSImage {
   /// - Parameters:
   ///   - precision: The percentage of pixels that must match.
   ///   - perceptualPrecision: The percentage a pixel must match the source pixel to be considered a match. [98-99% mimics the precision of the human eye.](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e)
-  public static func image(precision: Float = 1, perceptualPrecision: Float = 1) -> Snapshotting {
+  public static func image(precision: Float = defaultImagePrecision, perceptualPrecision: Float = defaultImagePerceptualPrecision) -> Snapshotting {
     return SimplySnapshotting.image(precision: precision, perceptualPrecision: perceptualPrecision).pullback { path in
       // Move path info frame:
       let bounds = path.bounds
