@@ -17,7 +17,7 @@ public struct Snapshotting<Value, Format> {
   /// - Parameters:
   ///   - pathExtension: The path extension applied to references saved to disk.
   ///   - diffing: How to diff and convert the snapshot format to and from data.
-  ///   - snapshot: An asynchronous transform function from a value into a diffable snapshot format.
+  ///   - asyncSnapshot: An asynchronous transform function from a value into a diffable snapshot format.
   ///   - value: A value to be converted.
   public init(
     pathExtension: String?,
