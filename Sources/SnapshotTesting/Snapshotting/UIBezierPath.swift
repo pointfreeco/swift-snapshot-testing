@@ -9,7 +9,9 @@ extension Snapshotting where Value == UIBezierPath, Format == UIImage {
 
   /// A snapshot strategy for comparing bezier paths based on pixel equality.
   ///
-  /// - Parameter precision: The percentage of pixels that must match.
+  /// - Parameters:
+  ///   - precision: The percentage of pixels that must match.
+  ///   - scale: The scale to use when loading the reference image from disk.
   public static func image(precision: Float = 1, scale: CGFloat = 1) -> Snapshotting {
     return SimplySnapshotting.image(precision: precision, scale: scale).pullback { path in
       let bounds = path.bounds
