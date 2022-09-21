@@ -49,7 +49,7 @@ jobs:
         swift:
           - "5.5"
           - "5.6"
-          - "5.7"
+          #- "5.7"
 
     name: Windows (Swift ${{ matrix.swift }})
     runs-on: windows-2019
