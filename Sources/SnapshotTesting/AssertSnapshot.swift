@@ -56,7 +56,7 @@ public func assertSnapshot<Value, Format>(
 ///
 /// - Parameters:
 ///   - value: A value to compare against a reference.
-///   - snapshotting: A dictionary of names and strategies for serializing, deserializing, and comparing values.
+///   - strategies: A dictionary of names and strategies for serializing, deserializing, and comparing values.
 ///   - recording: Whether or not to record a new reference.
 ///   - timeout: The amount of time a snapshot must be generated in.
 ///   - file: The file in which failure occurred. Defaults to the file name of the test case in which this function was called.
@@ -90,7 +90,7 @@ public func assertSnapshots<Value, Format>(
 ///
 /// - Parameters:
 ///   - value: A value to compare against a reference.
-///   - snapshotting: An array of strategies for serializing, deserializing, and comparing values.
+///   - strategies: An array of strategies for serializing, deserializing, and comparing values.
 ///   - recording: Whether or not to record a new reference.
 ///   - timeout: The amount of time a snapshot must be generated in.
 ///   - file: The file in which failure occurred. Defaults to the file name of the test case in which this function was called.
