@@ -52,7 +52,7 @@ jobs:
           - "5.7"
 
     name: Windows (Swift ${{ matrix.swift }})
-    runs-on: windows-latest
+    runs-on: windows-2019
 
     steps:
       - uses: compnerd/gha-setup-swift@main
