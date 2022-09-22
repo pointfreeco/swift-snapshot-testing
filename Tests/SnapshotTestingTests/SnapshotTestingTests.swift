@@ -1199,10 +1199,10 @@ final class SnapshotTestingTests: XCTestCase {
   }
   #endif
 
+  #if os(iOS)
+  #if compiler(>=5.7)
   @available(iOS 16.0, *)
   func testSwiftUIView_ImageRenderer_iOS() {
-    #if os(iOS)
-    #if compiler(>=5.7)
     struct MyView: SwiftUI.View {
       var body: some SwiftUI.View {
         HStack {
@@ -1221,9 +1221,9 @@ final class SnapshotTestingTests: XCTestCase {
     assertSnapshot(matching: view, as: .imageRenderer(layout: .sizeThatFits), named: "size-that-fits")
     assertSnapshot(matching: view, as: .imageRenderer(layout: .fixed(width: 200.0, height: 100.0)), named: "fixed")
     assertSnapshot(matching: view, as: .imageRenderer(layout: .device(config: .iPhoneSe)), named: "device")
-    #endif
-    #endif
   }
+  #endif
+  #endif
 
   #if os(tvOS)
   @available(tvOS 13.0, *)
