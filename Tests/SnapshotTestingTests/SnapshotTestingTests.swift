@@ -250,22 +250,6 @@ final class SnapshotTestingTests: XCTestCase {
     #endif
   }
 
-  func testNSViewCICompatible() {
-    #if os(macOS)
-    let button = NSButton()
-    button.bezelStyle = .rounded
-    button.title = "Push Me"
-    button.sizeToFit()
-    button.appearance = NSAppearance(named: .aqua)
-    button.frame.size = .init(width: 84, height: 32)
-    assertSnapshot(
-      matching: button,
-      as: .image(windowForDrawing: .ci)
-    )
-    assertSnapshot(matching: button, as: .recursiveDescription)
-    #endif
-  }
-  
   func testNSViewWithLayer() {
     #if os(macOS)
     let view = NSView()
@@ -277,22 +261,6 @@ final class SnapshotTestingTests: XCTestCase {
       assertSnapshot(matching: view, as: .image)
       assertSnapshot(matching: view, as: .recursiveDescription)
     }
-    #endif
-  }
-
-  func testNSViewWithLayerCICompatible() {
-    #if os(macOS)
-    let view = NSView()
-    view.frame = CGRect(x: 0.0, y: 0.0, width: 10.0, height: 10.0)
-    view.wantsLayer = true
-    view.layer?.backgroundColor = NSColor.green.cgColor
-    view.layer?.cornerRadius = 5
-    view.appearance = NSAppearance(named: .aqua)
-    assertSnapshot(
-      matching: view,
-      as: .image(windowForDrawing: .ci)
-    )
-    assertSnapshot(matching: view, as: .recursiveDescription)
     #endif
   }
 

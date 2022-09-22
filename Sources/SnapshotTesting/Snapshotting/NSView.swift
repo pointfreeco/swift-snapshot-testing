@@ -71,8 +71,8 @@ extension Snapshotting where Value == NSView, Format == NSImage {
             // This is to maintain compatibility with `recursiveDescription` because the current
             // test snapshots expect `.needsLayout = false` and for some apple magic reason
             // `view.needsLayout = false` does not do anything, but this does.
-            let bitmapRep2 = view.bitmapImageRepForCachingDisplay(in: view.bounds)!
-            view.cacheDisplay(in: view.bounds, to: bitmapRep2)
+            let bitmapRep = view.bitmapImageRepForCachingDisplay(in: view.bounds)!
+            view.cacheDisplay(in: view.bounds, to: bitmapRep)
           }
         }
       }
