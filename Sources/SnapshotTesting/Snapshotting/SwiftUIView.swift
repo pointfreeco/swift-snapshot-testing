@@ -101,7 +101,7 @@ extension Snapshotting where Value: SwiftUI.View, Format == UIImage {
   ///   - scale: The scale at which to render the image. See ``SwiftUI/ImageRenderer/scale``.
   ///   - isOpaque: A Boolean value that indicates whether the alpha channel of the image is fully opaque. See ``SwiftUI/ImageRenderer/isOpaque``.
   ///   - colorMode: The working color space and storage format of the image. See ``SwiftUI/ImageRenderer/colorMode``.
-  static func imageRenderer(
+  public static func imageRenderer(
     precision: Float = 1,
     perceptualPrecision: Float = 1,
     layout: SwiftUISnapshotLayout = .sizeThatFits,
