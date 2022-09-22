@@ -225,7 +225,7 @@ Witness-oriented programming and the design of this library was explored in the 
   - [Episode 41](https://www.pointfree.co/episodes/ep41-a-tour-of-snapshot-testing): A Tour of Snapshot Testing 🆓
 
 <a href="https://www.pointfree.co/episodes/ep41-a-tour-of-snapshot-testing">
-  <img alt="video poster image" src="https://d1hf1soyumxcgv.cloudfront.net/0041-tour-of-snapshot-testing/0041-poster.jpg" width="480">
+  <img alt="video poster image" src="https://d3rccdn33rt8ze.cloudfront.net/episodes/0041.jpeg" width="480">
 </a>
 
 ## License
