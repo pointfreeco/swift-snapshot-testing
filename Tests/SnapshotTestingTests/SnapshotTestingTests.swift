@@ -1200,14 +1200,14 @@ final class SnapshotTestingTests: XCTestCase {
   #endif
 
   @available(iOS 16.0, *)
-  func testSwiftUIViewRenderer_iOS() {
+  func testSwiftUIView_ImageRenderer_iOS() {
     #if os(iOS)
     #if compiler(>=5.7)
     struct MyView: SwiftUI.View {
       var body: some SwiftUI.View {
         HStack {
           Image(systemName: "checkmark.circle.fill")
-            Text("Checked").fixedSize()
+          Text("Checked").fixedSize()
         }
         .padding(5)
         .background(RoundedRectangle(cornerRadius: 5.0).fill(Color.blue))
@@ -1217,10 +1217,10 @@ final class SnapshotTestingTests: XCTestCase {
 
     let view = MyView().background(Color.yellow)
 
-    assertSnapshot(matching: view, as: .imageRenderer(traits: .init(userInterfaceStyle: .light)))
-    assertSnapshot(matching: view, as: .imageRenderer(layout: .sizeThatFits, traits: .init(userInterfaceStyle: .light)), named: "size-that-fits")
-    assertSnapshot(matching: view, as: .imageRenderer(layout: .fixed(width: 200.0, height: 100.0), traits: .init(userInterfaceStyle: .light)), named: "fixed")
-    assertSnapshot(matching: view, as: .imageRenderer(layout: .device(config: .iPhoneSe), traits: .init(userInterfaceStyle: .light)), named: "device")
+    assertSnapshot(matching: view, as: .imageRenderer)
+    assertSnapshot(matching: view, as: .imageRenderer(layout: .sizeThatFits), named: "size-that-fits")
+    assertSnapshot(matching: view, as: .imageRenderer(layout: .fixed(width: 200.0, height: 100.0)), named: "fixed")
+    assertSnapshot(matching: view, as: .imageRenderer(layout: .device(config: .iPhoneSe)), named: "device")
     #endif
     #endif
   }
