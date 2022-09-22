@@ -97,10 +97,10 @@ extension Snapshotting where Value: SwiftUI.View, Format == UIImage {
   ///   - precision: The percentage of pixels that must match.
   ///   - perceptualPrecision: The percentage a pixel must match the source pixel to be considered a match. [98-99% mimics the precision of the human eye.](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e)
   ///   - layout: A view layout override.
-  ///   - proposedSize: The size proposed to the view.  See ``SwiftUI/ImageRenderer/proposedSize``.
-  ///   - scale: The scale at which to render the image.   See ``SwiftUI/ImageRenderer/scale``.
-  ///   - isOpaque: A Boolean value that indicates whether the alpha channel of the image is fully opaque.   See ``SwiftUI/ImageRenderer/isOpaque``.
-  ///   - colorMode: The working color space and storage format of the image.   See ``SwiftUI/ImageRenderer/colorMode``.
+  ///   - proposedSize: The size proposed to the view. See ``SwiftUI/ImageRenderer/proposedSize``.
+  ///   - scale: The scale at which to render the image.  See ``SwiftUI/ImageRenderer/scale``.
+  ///   - isOpaque: A Boolean value that indicates whether the alpha channel of the image is fully opaque.  See ``SwiftUI/ImageRenderer/isOpaque``.
+  ///   - colorMode: The working color space and storage format of the image.  See ``SwiftUI/ImageRenderer/colorMode``.
   static func imageRenderer(
     precision: Float = 1,
     perceptualPrecision: Float = 1,
