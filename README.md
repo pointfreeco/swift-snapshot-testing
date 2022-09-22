@@ -145,7 +145,7 @@ If you want to use SnapshotTesting in any other project that uses [SwiftPM](http
 dependencies: [
   .package(
     url: "https://github.com/pointfreeco/swift-snapshot-testing",
-    from: "1.9.0"
+    from: "1.10.0"
   ),
 ]
 ```
