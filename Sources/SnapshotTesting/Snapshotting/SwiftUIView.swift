@@ -87,8 +87,8 @@ extension Snapshotting where Value: SwiftUI.View, Format == UIImage {
 extension Snapshotting where Value: SwiftUI.View, Format == UIImage {
 
   /// A snapshot strategy for comparing SwiftUI Views based on pixel equality using iOS 16 ImageRenderer.
-  public static var imageRenderer: Snapshotting {
-    return .imageRenderer()
+  public static var imageRender: Snapshotting {
+    return .imageRender()
   }
 
   /// A snapshot strategy for comparing SwiftUI Views based on pixel equality using iOS 16 ImageRenderer.
@@ -101,7 +101,7 @@ extension Snapshotting where Value: SwiftUI.View, Format == UIImage {
   ///   - scale: The scale at which to render the image. See ``SwiftUI/ImageRenderer/scale``.
   ///   - isOpaque: A Boolean value that indicates whether the alpha channel of the image is fully opaque. See ``SwiftUI/ImageRenderer/isOpaque``.
   ///   - colorMode: The working color space and storage format of the image. See ``SwiftUI/ImageRenderer/colorMode``.
-  public static func imageRenderer(
+  public static func imageRender(
     precision: Float = 1,
     perceptualPrecision: Float = 1,
     layout: SwiftUISnapshotLayout = .sizeThatFits,

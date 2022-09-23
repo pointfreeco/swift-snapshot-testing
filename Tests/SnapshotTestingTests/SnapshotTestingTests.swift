@@ -1217,10 +1217,10 @@ final class SnapshotTestingTests: XCTestCase {
 
     let view = MyView().background(Color.yellow)
 
-    assertSnapshot(matching: view, as: .imageRenderer)
-    assertSnapshot(matching: view, as: .imageRenderer(layout: .sizeThatFits), named: "size-that-fits")
-    assertSnapshot(matching: view, as: .imageRenderer(layout: .fixed(width: 200.0, height: 100.0)), named: "fixed")
-    assertSnapshot(matching: view, as: .imageRenderer(layout: .device(config: .iPhoneSe)), named: "device")
+    assertSnapshot(matching: view, as: .imageRender)
+    assertSnapshot(matching: view, as: .imageRender(layout: .sizeThatFits), named: "size-that-fits")
+    assertSnapshot(matching: view, as: .imageRender(layout: .fixed(width: 200.0, height: 100.0)), named: "fixed")
+    assertSnapshot(matching: view, as: .imageRender(layout: .device(config: .iPhoneSe)), named: "device")
   }
   #endif
   #endif
