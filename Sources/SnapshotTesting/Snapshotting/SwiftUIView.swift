@@ -99,15 +99,13 @@ extension Snapshotting where Value: SwiftUI.View, Format == UIImage {
   ///   - layout: A view layout override.
   ///   - proposedSize: The size proposed to the view. See ``SwiftUI/ImageRenderer/proposedSize``.
   ///   - scale: The scale at which to render the image. See ``SwiftUI/ImageRenderer/scale``.
-  ///   - isOpaque: A Boolean value that indicates whether the alpha channel of the image is fully opaque. See ``SwiftUI/ImageRenderer/isOpaque``.
   ///   - colorMode: The working color space and storage format of the image. See ``SwiftUI/ImageRenderer/colorMode``.
   public static func imageRender(
     precision: Float = 1,
     perceptualPrecision: Float = 1,
     layout: SwiftUISnapshotLayout = .sizeThatFits,
-    proposedSize: ProposedViewSize = .unspecified,
+    proposedSize: ProposedViewSize? = nil,
     scale: CGFloat = 1.0,
-    isOpaque: Bool = false,
     colorMode: ColorRenderingMode = .nonLinear
     )
     -> Snapshotting {
@@ -117,9 +115,8 @@ extension Snapshotting where Value: SwiftUI.View, Format == UIImage {
             let renderer = ImageRenderer(
               content: SnapshottingView(layout: layout, content: view)
             )
-            renderer.proposedSize = proposedSize
+            renderer.proposedSize = proposedSize ?? ProposedViewSize(UIScreen.main.bounds.size)
             renderer.scale = scale
-            renderer.isOpaque = isOpaque
             renderer.colorMode = colorMode
 
             callback(renderer.uiImage ?? UIImage())
@@ -135,29 +132,31 @@ private struct SnapshottingView<Content: SwiftUI.View>: SwiftUI.View {
   let content: Content
 
   var body: some SwiftUI.View {
-    switch layout {
-    case let .device(config):
-      ZStack {
-        Color(uiColor: UIColor.systemBackground)
-          .ignoresSafeArea()
+    Group {
+      switch layout {
+      case let .device(config):
+        content
+          // Allow content frame to grow so it is not in direct contact with the safe areas
+          .frame(maxWidth: .infinity, maxHeight: .infinity)
+          // Apply device safe areas
+          .safeAreaInset(edge: .top, spacing: 0) { Spacer().frame(height: config.safeArea.top) }
+          .safeAreaInset(edge: .bottom, spacing: 0) { Spacer().frame(height: config.safeArea.bottom) }
+          .safeAreaInset(edge: .leading, spacing: 0) { Spacer().frame(width: config.safeArea.left) }
+          .safeAreaInset(edge: .trailing, spacing: 0) { Spacer().frame(width: config.safeArea.right) }
+          // Constrain to device screen dimensions
+          .frame(width: config.size?.width, height: config.size?.height)
+          // Apply relevant device traits
+          .modifier(TraitsModifier(traits: config.traits))
 
+      case let .fixed(width, height):
+        content
+          .frame(width: width, height: height)
+
+      case .sizeThatFits:
         content
       }
-      .safeAreaInset(edge: .top, spacing: 0) { Spacer().frame(height: config.safeArea.top) }
-      .safeAreaInset(edge: .bottom, spacing: 0) { Spacer().frame(height: config.safeArea.bottom) }
-      .safeAreaInset(edge: .leading, spacing: 0) { Spacer().frame(width: config.safeArea.left) }
-      .safeAreaInset(edge: .trailing, spacing: 0) { Spacer().frame(width: config.safeArea.right) }
-      .modifier(TraitsModifier(traits: config.traits))
-      .frame(width: config.size?.width, height: config.size?.height)
-
-    case let .fixed(width, height):
-      content
-        .frame(width: width, height: height)
-        .background(Color(uiColor: UIColor.systemBackground))
-
-    case .sizeThatFits:
-      content
     }
+    .background(Color(uiColor: UIColor.systemBackground))
   }
 }
 
