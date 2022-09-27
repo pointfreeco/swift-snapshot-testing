@@ -113,7 +113,7 @@ private func compare(_ old: UIImage, _ new: UIImage, precision: Float, perceptua
   if precision >= 1, perceptualPrecision >= 1 {
     return "Newly-taken snapshot does not match reference."
   }
-  if perceptualPrecision < 1, #available(iOS 11.0, tvOS 11.0, *) {
+  if perceptualPrecision < 1 {
     return perceptuallyCompare(
       CIImage(cgImage: oldCgImage),
       CIImage(cgImage: newCgImage),
@@ -172,7 +172,6 @@ private func diff(_ old: UIImage, _ new: UIImage) -> UIImage {
 import CoreImage.CIKernel
 import MetalPerformanceShaders
 
-@available(iOS 10.0, tvOS 10.0, macOS 10.13, *)
 func perceptuallyCompare(_ old: CIImage, _ new: CIImage, pixelPrecision: Float, perceptualPrecision: Float) -> String? {
   let deltaOutputImage = old.applyingFilter("CILabDeltaE", parameters: ["inputImage2": new])
   let thresholdOutputImage: CIImage
@@ -218,7 +217,6 @@ func perceptuallyCompare(_ old: CIImage, _ new: CIImage, pixelPrecision: Float, 
 }
 
 // Copied from https://developer.apple.com/documentation/coreimage/ciimageprocessorkernel
-@available(iOS 10.0, tvOS 10.0, macOS 10.13, *)
 final class ThresholdImageProcessorKernel: CIImageProcessorKernel {
   static let inputThresholdKey = "thresholdValue"
   static let device = MTLCreateSystemDefaultDevice()

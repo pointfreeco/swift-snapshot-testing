@@ -43,7 +43,6 @@ final class SnapshotTestingTests: XCTestCase {
     """)
   }
 
-  @available(macOS 10.13, tvOS 11.0, *)
   func testAnyAsJson() throws {
     struct User: Encodable { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
@@ -167,9 +166,7 @@ final class SnapshotTestingTests: XCTestCase {
       assertSnapshot(matching: path, as: .image, named: osName)
     }
 
-    if #available(iOS 11.0, OSX 10.13, tvOS 11.0, *) {
-      assertSnapshot(matching: path, as: .elementsDescription, named: osName)
-    }
+    assertSnapshot(matching: path, as: .elementsDescription, named: osName)
     #endif
   }
 
@@ -183,9 +180,7 @@ final class SnapshotTestingTests: XCTestCase {
     struct User: Encodable { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
 
-    if #available(iOS 11.0, macOS 10.13, tvOS 11.0, *) {
-      assertSnapshot(matching: user, as: .json)
-    }
+    assertSnapshot(matching: user, as: .json)
     assertSnapshot(matching: user, as: .plist)
   }
 
@@ -301,9 +296,7 @@ final class SnapshotTestingTests: XCTestCase {
     #endif
 
     assertSnapshot(matching: image, as: .image(precision: 0.995), named: "exact")
-    if #available(iOS 11.0, tvOS 11.0, macOS 10.13, *) {
-      assertSnapshot(matching: image, as: .image(perceptualPrecision: 0.98), named: "perceptual")
-    }
+    assertSnapshot(matching: image, as: .image(perceptualPrecision: 0.98), named: "perceptual")
     #endif
   }
 
@@ -408,7 +401,6 @@ final class SnapshotTestingTests: XCTestCase {
 
   func testTraits() {
     #if os(iOS) || os(tvOS)
-    if #available(iOS 11.0, tvOS 11.0, *) {
       class MyViewController: UIViewController {
         let topLabel = UILabel()
         let leadingLabel = UILabel()
@@ -579,13 +571,11 @@ final class SnapshotTestingTests: XCTestCase {
       assertSnapshot(
         matching: viewController, as: .image(on: .tv4K), named: "tv4k")
       #endif
-    }
     #endif
   }
 
   func testTraitsEmbeddedInTabNavigation() {
     #if os(iOS)
-    if #available(iOS 11.0, *) {
       class MyViewController: UIViewController {
         let topLabel = UILabel()
         let leadingLabel = UILabel()
@@ -695,7 +685,6 @@ final class SnapshotTestingTests: XCTestCase {
         matching: viewController, as: .image(on: .iPadPro11(.portrait)), named: "ipad-pro-11-alternative")
       assertSnapshot(
         matching: viewController, as: .image(on: .iPadPro12_9(.portrait)), named: "ipad-pro-12-9-alternative")
-    }
     #endif
   }
 
@@ -781,19 +770,17 @@ final class SnapshotTestingTests: XCTestCase {
 
   func testTraitsWithView() {
     #if os(iOS)
-    if #available(iOS 11.0, *) {
-      let label = UILabel()
-      label.font = .preferredFont(forTextStyle: .title1)
-      label.adjustsFontForContentSizeCategory = true
-      label.text = "What's the point?"
+    let label = UILabel()
+    label.font = .preferredFont(forTextStyle: .title1)
+    label.adjustsFontForContentSizeCategory = true
+    label.text = "What's the point?"
 
-      allContentSizes.forEach { name, contentSize in
-        assertSnapshot(
-          matching: label,
-          as: .image(traits: .init(preferredContentSizeCategory: contentSize)),
-          named: "label-\(name)"
-        )
-      }
+    allContentSizes.forEach { name, contentSize in
+      assertSnapshot(
+        matching: label,
+        as: .image(traits: .init(preferredContentSizeCategory: contentSize)),
+        named: "label-\(name)"
+      )
     }
     #endif
   }
@@ -840,9 +827,7 @@ final class SnapshotTestingTests: XCTestCase {
       assertSnapshot(matching: path, as: .image, named: osName)
     }
 
-    if #available(iOS 11.0, tvOS 11.0, *) {
-      assertSnapshot(matching: path, as: .elementsDescription, named: osName)
-    }
+    assertSnapshot(matching: path, as: .elementsDescription, named: osName)
     #endif
   }
 
@@ -1176,7 +1161,6 @@ final class SnapshotTestingTests: XCTestCase {
   #endif
 
   #if os(iOS)
-  @available(iOS 13.0, *)
   func testSwiftUIView_iOS() {
     struct MyView: SwiftUI.View {
       var body: some SwiftUI.View {
@@ -1200,7 +1184,6 @@ final class SnapshotTestingTests: XCTestCase {
   #endif
 
   #if os(tvOS)
-  @available(tvOS 13.0, *)
   func testSwiftUIView_tvOS() {
     struct MyView: SwiftUI.View {
       var body: some SwiftUI.View {

@@ -128,10 +128,8 @@ public struct ViewImageConfig {
     return .init(safeArea: safeArea, size: size, traits: .iPhoneXsMax(orientation))
   }
 
-  @available(iOS 11.0, *)
   public static let iPhoneXr = ViewImageConfig.iPhoneXr(.portrait)
 
-  @available(iOS 11.0, *)
   public static func iPhoneXr(_ orientation: Orientation) -> ViewImageConfig {
     let safeArea: UIEdgeInsets
     let size: CGSize
@@ -830,38 +828,26 @@ extension View {
     if let scnView = self as? SCNView {
       return Async(value: inWindow { scnView.snapshot() })
     } else if let skView = self as? SKView {
-      if #available(macOS 10.11, *) {
-        let cgImage = inWindow { skView.texture(from: skView.scene!)!.cgImage() }
-        #if os(macOS)
-        let image = Image(cgImage: cgImage, size: skView.bounds.size)
-        #elseif os(iOS) || os(tvOS)
-        let image = Image(cgImage: cgImage)
-        #endif
-        return Async(value: image)
-      } else {
-        fatalError("Taking SKView snapshots requires macOS 10.11 or greater")
-      }
+      let cgImage = inWindow { skView.texture(from: skView.scene!)!.cgImage() }
+      #if os(macOS)
+      let image = Image(cgImage: cgImage, size: skView.bounds.size)
+      #elseif os(iOS) || os(tvOS)
+      let image = Image(cgImage: cgImage)
+      #endif
+      return Async(value: image)
     }
     #if os(iOS) || os(macOS)
     if let wkWebView = self as? WKWebView {
       return Async<Image> { callback in
         let work = {
-          if #available(iOS 11.0, macOS 10.13, *) {
-            inWindow {
-              guard wkWebView.frame.width != 0, wkWebView.frame.height != 0 else {
-                callback(Image())
-                return
-              }
-              wkWebView.takeSnapshot(with: nil) { image, _ in
-                callback(image!)
-              }
+          inWindow {
+            guard wkWebView.frame.width != 0, wkWebView.frame.height != 0 else {
+              callback(Image())
+              return
             }
-          } else {
-            #if os(iOS)
-            fatalError("Taking WKWebView snapshots requires iOS 11.0 or greater")
-            #elseif os(macOS)
-            fatalError("Taking WKWebView snapshots requires macOS 10.13 or greater")
-            #endif
+            wkWebView.takeSnapshot(with: nil) { image, _ in
+              callback(image!)
+            }
           }
         }
 
@@ -983,13 +969,7 @@ func snapshotView(
 private let offscreen: CGFloat = 10_000
 
 func renderer(bounds: CGRect, for traits: UITraitCollection) -> UIGraphicsImageRenderer {
-  let renderer: UIGraphicsImageRenderer
-  if #available(iOS 11.0, tvOS 11.0, *) {
-    renderer = UIGraphicsImageRenderer(bounds: bounds, format: .init(for: traits))
-  } else {
-    renderer = UIGraphicsImageRenderer(bounds: bounds)
-  }
-  return renderer
+  return UIGraphicsImageRenderer(bounds: bounds, format: .init(for: traits))
 }
 
 private func add(traits: UITraitCollection, viewController: UIViewController, to window: UIWindow) -> () -> Void {
@@ -1043,13 +1023,7 @@ private func add(traits: UITraitCollection, viewController: UIViewController, to
 }
 
 private func getKeyWindow() -> UIWindow? {
-  var window: UIWindow?
-  if #available(iOS 13.0, *) {
-      window = UIApplication.sharedIfAvailable?.windows.first { $0.isKeyWindow }
-  } else {
-      window = UIApplication.sharedIfAvailable?.keyWindow
-  }
-  return window
+  return UIApplication.sharedIfAvailable?.windows.first { $0.isKeyWindow }
 }
 
 private final class Window: UIWindow {
@@ -1080,7 +1054,6 @@ private final class Window: UIWindow {
     fatalError("init(coder:) has not been implemented")
   }
 
-  @available(iOS 11.0, *)
   override var safeAreaInsets: UIEdgeInsets {
     #if os(iOS)
     let removeTopInset = self.config.safeArea == .init(top: 20, left: 0, bottom: 0, right: 0)

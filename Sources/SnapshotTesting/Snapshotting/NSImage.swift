@@ -92,7 +92,7 @@ private func compare(_ old: NSImage, _ new: NSImage, precision: Float, perceptua
   if precision >= 1, perceptualPrecision >= 1 {
     return "Newly-taken snapshot does not match reference."
   }
-  if perceptualPrecision < 1, #available(macOS 10.13, *) {
+  if perceptualPrecision < 1 {
     return perceptuallyCompare(
       CIImage(cgImage: oldCgImage),
       CIImage(cgImage: newCgImage),
