@@ -169,83 +169,67 @@ private func diff(_ old: UIImage, _ new: UIImage) -> UIImage {
 #endif
 
 #if os(iOS) || os(tvOS) || os(macOS)
-import CoreImage.CIKernel
-import MetalPerformanceShaders
+import Accelerate.vImage
+import CoreImage
 
-@available(iOS 10.0, tvOS 10.0, macOS 10.13, *)
 func perceptuallyCompare(_ old: CIImage, _ new: CIImage, pixelPrecision: Float, perceptualPrecision: Float) -> String? {
+  // Calculate the deltaE values. Each pixel is a value between 0-100.
+  // 0 means no difference, 100 means completely opposite.
   let deltaOutputImage = old.applyingFilter("CILabDeltaE", parameters: ["inputImage2": new])
-  let thresholdOutputImage: CIImage
-  do {
-    thresholdOutputImage = try ThresholdImageProcessorKernel.apply(
-      withExtent: new.extent,
-      inputs: [deltaOutputImage],
-      arguments: [ThresholdImageProcessorKernel.inputThresholdKey: (1 - perceptualPrecision) * 100]
-    )
-  } catch {
-    return "Newly-taken snapshot's data could not be loaded. \(error)"
-  }
-  var averagePixel: Float = 0
+  // Setting the working color space and output color space to NSNull disables color management. This is appropriate when the output
+  // of the operations is computational instead of an image intended to be displayed.
   let context = CIContext(options: [.workingColorSpace: NSNull(), .outputColorSpace: NSNull()])
-  context.render(
-    thresholdOutputImage.applyingFilter("CIAreaAverage", parameters: [kCIInputExtentKey: new.extent]),
-    toBitmap: &averagePixel,
-    rowBytes: MemoryLayout<Float>.size,
-    bounds: CGRect(x: 0, y: 0, width: 1, height: 1),
-    format: .Rf,
-    colorSpace: nil
-  )
-  let actualPixelPrecision = 1 - averagePixel
-  guard actualPixelPrecision < pixelPrecision else { return nil }
-  var maximumDeltaE: Float = 0
-  context.render(
-    deltaOutputImage.applyingFilter("CIAreaMaximum", parameters: [kCIInputExtentKey: new.extent]),
-    toBitmap: &maximumDeltaE,
-    rowBytes: MemoryLayout<Float>.size,
-    bounds: CGRect(x: 0, y: 0, width: 1, height: 1),
-    format: .Rf,
-    colorSpace: nil
-  )
-  let actualPerceptualPrecision = 1 - maximumDeltaE / 100
-  if pixelPrecision < 1 {
-    return """
-    Actual image precision \(actualPixelPrecision) is less than required \(pixelPrecision)
-    Actual perceptual precision \(actualPerceptualPrecision) is less than required \(perceptualPrecision)
-    """
-  } else {
-    return "Actual perceptual precision \(actualPerceptualPrecision) is less than required \(perceptualPrecision)"
+  guard let buffer = deltaOutputImage.render(extent: deltaOutputImage.extent, context: context) else {
+    return "Newly-taken snapshot could not be processed."
   }
+  defer { buffer.free() }
+  let deltaThreshold = (1 - perceptualPrecision) * 100
+  var failingPixelCount: Int = 0
+  var maximumDeltaE: Float = 0
+  // rowBytes must be a multiple of 8, so vImage_Buffer pads the end of each row with bytes to meet the multiple of 0 requirement.
+  // We must do 2D iteration of the vImage_Buffer in order to avoid loading the padding garbage bytes at the end of each row.
+  fastForEach(in: 0..<Int(buffer.height)) { line in
+    let lineOffset = buffer.rowBytes * line
+    fastForEach(in: 0..<Int(buffer.width)) { column in
+      let columnOffset = lineOffset + column * MemoryLayout<Float>.size
+      let deltaE = buffer.data.load(fromByteOffset: columnOffset, as: Float.self)
+      if deltaE > deltaThreshold {
+        failingPixelCount += 1
+      }
+      maximumDeltaE = max(maximumDeltaE, deltaE)
+    }
+  }
+  let failingPixelPercent = Float(failingPixelCount) / Float(deltaOutputImage.extent.width * deltaOutputImage.extent.height)
+  let actualPixelPrecision = 1 - failingPixelPercent
+  guard actualPixelPrecision < pixelPrecision else { return nil }
+  // The actual perceptual precision is the perceptual precision of the pixel with the highest DeltaE.
+  // DeltaE is in a 0-100 scale, so we need to divide by 100 to transform it to a percentage.
+  let minimumPerceptualPrecision = 1 - maximumDeltaE / 100
+  return """
+  Actual image precision \(actualPixelPrecision) is less than required \(pixelPrecision)
+  Minimum perceptual precision \(minimumPerceptualPrecision) is less than required \(perceptualPrecision)
+  """
 }
 
-// Copied from https://developer.apple.com/documentation/coreimage/ciimageprocessorkernel
-@available(iOS 10.0, tvOS 10.0, macOS 10.13, *)
-final class ThresholdImageProcessorKernel: CIImageProcessorKernel {
-  static let inputThresholdKey = "thresholdValue"
-  static let device = MTLCreateSystemDefaultDevice()
-
-  override class func process(with inputs: [CIImageProcessorInput]?, arguments: [String: Any]?, output: CIImageProcessorOutput) throws {
+extension CIImage {
+  func render(extent: CGRect, context: CIContext, format: CIFormat = CIFormat.Rh) -> vImage_Buffer? {
+    // Some hardware configurations (virtualized CPU renderers) do not support 32-bit float output formats,
+    // so use a compatible 16-bit float format and convert the output value to 32-bit floats.
+    guard var buffer16 = try? vImage_Buffer(width: Int(extent.width), height: Int(extent.height), bitsPerPixel: 16) else { return nil }
+    defer { buffer16.free() }
+    context.render(
+      self,
+      toBitmap: buffer16.data,
+      rowBytes: buffer16.rowBytes,
+      bounds: extent,
+      format: format,
+      colorSpace: nil
+    )
     guard
-      let device = device,
-      let commandBuffer = output.metalCommandBuffer,
-      let input = inputs?.first,
-      let sourceTexture = input.metalTexture,
-      let destinationTexture = output.metalTexture,
-      let thresholdValue = arguments?[inputThresholdKey] as? Float else {
-      return
-    }
-
-    let threshold = MPSImageThresholdBinary(
-      device: device,
-      thresholdValue: thresholdValue,
-      maximumValue: 1.0,
-      linearGrayColorTransform: nil
-    )
-
-    threshold.encode(
-      commandBuffer: commandBuffer,
-      sourceTexture: sourceTexture,
-      destinationTexture: destinationTexture
-    )
+      var buffer32 = try? vImage_Buffer(width: Int(buffer16.width), height: Int(buffer16.height), bitsPerPixel: 32),
+      vImageConvert_Planar16FtoPlanarF(&buffer16, &buffer32, 0) == kvImageNoError
+    else { return nil }
+    return buffer32
   }
 }
 #endif
