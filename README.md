@@ -187,9 +187,9 @@ targets: [
   - [swift-snapshot-testing-nimble](https://github.com/Killectro/swift-snapshot-testing-nimble) adds [Nimble](https://github.com/Quick/Nimble) matchers for SnapshotTesting.
 
   - [swift-html](https://github.com/pointfreeco/swift-html) is a Swift DSL for type-safe, extensible, and transformable HTML documents and includes an `HtmlSnapshotTesting` module to snapshot test its HTML documents.
-  
+
   - [GRDBSnapshotTesting](https://github.com/SebastianOsinski/GRDBSnapshotTesting) adds snapshot strategy for testing SQLite database migrations made with [GRDB](https://github.com/groue/GRDB.swift).
-  
+
   - [AccessibilitySnapshot](https://github.com/cashapp/AccessibilitySnapshot) adds easy regression testing for iOS accessibility.
 
   - [AccessibilitySnapshotColorBlindness](https://github.com/Sherlouk/AccessibilitySnapshotColorBlindness) adds snapshot strategies for color blindness simulation on iOS views, view controllers and images.
@@ -197,9 +197,11 @@ targets: [
   - [swift-snapshot-testing-stitch](https://github.com/Sherlouk/swift-snapshot-testing-stitch/) adds the ability to stitch multiple UIView's or UIViewController's together in a single test.
 
   - [SnapshotTestingHEIC](https://github.com/alexey1312/SnapshotTestingHEIC) adds image support using the HEIC storage format which reduces file sizes in comparison to PNG.
-  
+  - [SnapshotTestingDump](https://github.com/tahirmt/swift-snapshot-testing-dump) Adds support to use [swift-custom-dump](https://github.com/pointfreeco/swift-custom-dump/) by using `customDump` strategy for `Any`
+  - [Nimble-SnapshotTesting](https://github.com/tahirmt/Nimble-SnapshotTesting) adds [Nimble](https://github.com/Quick/Nimble) matchers for SnapshotTesting to be used by Swift Package Manager.
+
 Have you written your own SnapshotTesting plug-in? [Add it here](https://github.com/pointfreeco/swift-snapshot-testing/edit/master/README.md) and submit a pull request!
-  
+
 ## Related Tools
 
   - [`iOSSnapshotTestCase`](https://github.com/uber/ios-snapshot-test-case/) helped introduce screen shot testing to a broad audience in the iOS community. Experience with it inspired the creation of this library.
