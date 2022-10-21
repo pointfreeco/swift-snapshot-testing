@@ -123,7 +123,7 @@ private func compare(_ old: UIImage, _ new: UIImage, precision: Float, perceptua
   } else {
     let byteCountThreshold = Int((1 - precision) * Float(byteCount))
     var differentByteCount = 0
-    for offset in 0..<byteCount {
+    fastForEach(in: 0..<byteCount) { offset in
       if oldBytes[offset] != newerBytes[offset] {
         differentByteCount += 1
       }
@@ -249,3 +249,13 @@ final class ThresholdImageProcessorKernel: CIImageProcessorKernel {
   }
 }
 #endif
+
+/// When the compiler doesn't have optimizations enabled, like in test targets, a `while` loop is significantly faster than a `for` loop
+/// for iterating through the elements of a memory buffer. Details can be found in [SR-6983](https://github.com/apple/swift/issues/49531#issuecomment-1108286654)
+func fastForEach(in range: Range<Int>, _ body: (Int) -> Void) {
+  var index = range.lowerBound
+  while index < range.upperBound {
+    body(index)
+    index += 1
+  }
+}
