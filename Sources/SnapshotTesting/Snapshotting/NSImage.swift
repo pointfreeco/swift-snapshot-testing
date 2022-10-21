@@ -104,7 +104,7 @@ private func compare(_ old: NSImage, _ new: NSImage, precision: Float, perceptua
     let newRep = NSBitmapImageRep(cgImage: newerCgImage).bitmapData!
     let byteCountThreshold = Int((1 - precision) * Float(byteCount))
     var differentByteCount = 0
-    for offset in 0..<byteCount {
+    fastForEach(in: 0..<byteCount) { offset in
       if oldRep[offset] != newRep[offset] {
         differentByteCount += 1
       }
