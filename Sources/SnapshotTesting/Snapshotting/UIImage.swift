@@ -94,7 +94,10 @@ private func compare(_ old: UIImage, _ new: UIImage, precision: Float, perceptua
   let pixelCount = oldCgImage.width * oldCgImage.height
   let byteCount = imageContextBytesPerPixel * pixelCount
   var oldBytes = [UInt8](repeating: 0, count: byteCount)
-  guard let oldData = context(for: oldCgImage, data: &oldBytes)?.data else {
+  guard
+    let oldContext = context(for: oldCgImage, data: &oldBytes),
+    let oldData = oldContext.data
+  else {
     return "Reference image's data could not be loaded."
   }
   if let newContext = context(for: newCgImage), let newData = newContext.data {
@@ -115,8 +118,8 @@ private func compare(_ old: UIImage, _ new: UIImage, precision: Float, perceptua
   }
   if perceptualPrecision < 1, #available(iOS 11.0, tvOS 11.0, *) {
     return perceptuallyCompare(
-      CIImage(cgImage: oldCgImage),
-      CIImage(cgImage: newCgImage),
+      CIImage(cgImage: oldContext.makeImage() ?? oldCgImage),
+      CIImage(cgImage: newerContext.makeImage() ?? newerCgImage),
       pixelPrecision: precision,
       perceptualPrecision: perceptualPrecision
     )

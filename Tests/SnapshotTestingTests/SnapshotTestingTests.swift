@@ -20,6 +20,10 @@ import XCTest
 @testable import SnapshotTesting
 
 final class SnapshotTestingTests: XCTestCase {
+  private let fixturesURL = URL(fileURLWithPath: #file, isDirectory: false)
+    .deletingLastPathComponent()
+    .appendingPathComponent("__Fixtures__", isDirectory: true)
+
   override func setUp() {
     super.setUp()
     diffTool = "ksdiff"
@@ -291,9 +295,9 @@ final class SnapshotTestingTests: XCTestCase {
 
   func testImagePrecision() throws {
     #if os(iOS) || os(tvOS) || os(macOS)
-    let imageURL = URL(fileURLWithPath: String(#file), isDirectory: false)
-            .deletingLastPathComponent()
-            .appendingPathComponent("__Fixtures__/testImagePrecision.reference.png")
+    let imageURL = fixturesURL
+            .appendingPathComponent(sanitizePathComponent(#function), isDirectory: false)
+            .appendingPathExtension("reference.png")
     #if os(iOS) || os(tvOS)
     let image = try XCTUnwrap(UIImage(contentsOfFile: imageURL.path))
     #elseif os(macOS)
@@ -301,9 +305,30 @@ final class SnapshotTestingTests: XCTestCase {
     #endif
 
     assertSnapshot(matching: image, as: .image(precision: 0.995), named: "exact")
-    if #available(iOS 11.0, tvOS 11.0, macOS 10.13, *) {
-      assertSnapshot(matching: image, as: .image(perceptualPrecision: 0.98), named: "perceptual")
-    }
+    assertSnapshot(matching: image, as: .image(perceptualPrecision: 0.98), named: "perceptual")
+    #endif
+  }
+
+  func testImageColorSpaceConversion() throws {
+    #if os(iOS) || os(tvOS) || os(macOS)
+    let fileName = URL(fileURLWithPath: #file, isDirectory: false).deletingPathExtension().lastPathComponent
+    let baseImageURL = URL(fileURLWithPath: #file, isDirectory: false)
+      .deletingLastPathComponent()
+      .appendingPathComponent("__Snapshots__", isDirectory: true)
+      .appendingPathComponent(fileName, isDirectory: true)
+      .appendingPathComponent(sanitizePathComponent(#function), isDirectory: false)
+    let p3ImageURL = baseImageURL.appendingPathExtension("p3.png")
+    let sRGBImageURL = baseImageURL.appendingPathExtension("srgb.png")
+    #if os(iOS) || os(tvOS)
+    let p3Image = try XCTUnwrap(UIImage(contentsOfFile: p3ImageURL.path))
+    let sRGBImage = try XCTUnwrap(UIImage(contentsOfFile: sRGBImageURL.path))
+    #elseif os(macOS)
+    let p3Image = try XCTUnwrap(NSImage(byReferencing: p3ImageURL))
+    let sRGBImage = try XCTUnwrap(NSImage(byReferencing: sRGBImageURL))
+    #endif
+
+    assertSnapshot(matching: p3Image, as: .image(perceptualPrecision: 0.99), named: "srgb")
+    assertSnapshot(matching: sRGBImage, as: .image(perceptualPrecision: 0.99), named: "p3")
     #endif
   }
 
@@ -319,9 +344,7 @@ final class SnapshotTestingTests: XCTestCase {
 //      sphereNode.position = SCNVector3Zero
 //      scene.rootNode.addChildNode(sphereNode)
 //
-//      sphereGeometry.firstMaterial?.diffuse.contents = URL(fileURLWithPath: String(#file), isDirectory: false)
-//        .deletingLastPathComponent()
-//        .appendingPathComponent("__Fixtures__/earth.png")
+//      sphereGeometry.firstMaterial?.diffuse.contents = fixturesURL.appendingPathComponent("earth.png", isDirectory: false)
 //
 //      let cameraNode = SCNNode()
 //      cameraNode.camera = SCNCamera()
@@ -1029,9 +1052,7 @@ final class SnapshotTestingTests: XCTestCase {
 
   func testWebView() throws {
     #if os(iOS) || os(macOS)
-    let fixtureUrl = URL(fileURLWithPath: String(#file), isDirectory: false)
-      .deletingLastPathComponent()
-      .appendingPathComponent("__Fixtures__/pointfree.html")
+    let fixtureUrl = fixturesURL.appendingPathComponent("pointfree.html", isDirectory: false)
     let html = try String(contentsOf: fixtureUrl)
     let webView = WKWebView()
     webView.loadHTMLString(html, baseURL: nil)
@@ -1080,9 +1101,7 @@ final class SnapshotTestingTests: XCTestCase {
     let label = UILabel()
     label.text = "Hello, Blob!"
 
-    let fixtureUrl = URL(fileURLWithPath: String(#file), isDirectory: false)
-      .deletingLastPathComponent()
-      .appendingPathComponent("__Fixtures__/pointfree.html")
+    let fixtureUrl = fixturesURL.appendingPathComponent("pointfree.html", isDirectory: false)
     let html = try String(contentsOf: fixtureUrl)
     let webView = WKWebView()
     webView.loadHTMLString(html, baseURL: nil)
@@ -1112,9 +1131,7 @@ final class SnapshotTestingTests: XCTestCase {
     let webView = WKWebView()
     webView.navigationDelegate = manipulatingWKWebViewNavigationDelegate
 
-    let fixtureUrl = URL(fileURLWithPath: String(#file), isDirectory: false)
-      .deletingLastPathComponent()
-      .appendingPathComponent("__Fixtures__/pointfree.html")
+    let fixtureUrl = fixturesURL.appendingPathComponent("pointfree.html", isDirectory: false)
     let html = try String(contentsOf: fixtureUrl)
     webView.loadHTMLString(html, baseURL: nil)
     if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
@@ -1159,9 +1176,7 @@ final class SnapshotTestingTests: XCTestCase {
     let webView = WKWebView()
     webView.navigationDelegate = cancellingWKWebViewNavigationDelegate
 
-    let fixtureUrl = URL(fileURLWithPath: String(#file), isDirectory: false)
-      .deletingLastPathComponent()
-      .appendingPathComponent("__Fixtures__/pointfree.html")
+    let fixtureUrl = fixturesURL.appendingPathComponent("pointfree.html", isDirectory: false)
     let html = try String(contentsOf: fixtureUrl)
     webView.loadHTMLString(html, baseURL: nil)
     if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
