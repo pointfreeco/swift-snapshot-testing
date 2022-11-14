@@ -249,7 +249,7 @@ public func verifySnapshot<Value, Format>(
           ? """
             Record mode is on. Turn record mode off and re-run "\(testName)" to test against the newly-recorded snapshot.
 
-            open "\(snapshotFileUrl.path)"
+            open "\(snapshotFileUrl.absoluteString)"
 
             Recorded snapshot: …
             """
@@ -302,9 +302,9 @@ public func verifySnapshot<Value, Format>(
         .map { "\($0) \"\(snapshotFileUrl.path)\" \"\(failedSnapshotFileUrl.path)\"" }
         ?? """
         @\(minus)
-        "\(snapshotFileUrl.path)"
+        "\(snapshotFileUrl.absoluteString)"
         @\(plus)
-        "\(failedSnapshotFileUrl.path)"
+        "\(failedSnapshotFileUrl.absoluteString)"
 
         To configure output for a custom diff tool, like Kaleidoscope:
 
