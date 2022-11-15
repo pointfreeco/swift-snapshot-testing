@@ -110,21 +110,21 @@ extension Snapshotting where Value: SwiftUI.View, Format == UIImage {
   ///   - perceptualPrecision: The percentage a pixel must match the source pixel to be considered a match. [98-99% mimics the precision of the human eye.](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e)
   ///   - layout: A view layout override.
   ///   - proposedSize: The size proposed to the view. See ``SwiftUI/ImageRenderer/proposedSize``.
-  ///   - scale: The scale at which to render the image. See ``SwiftUI/ImageRenderer/scale``.
-  ///   - colorMode: The working color space and storage format of the image. See ``SwiftUI/ImageRenderer/colorMode``.
+  ///   - traits: A trait collection override.
   public static func imageRender(
     precision: Float = 1,
     perceptualPrecision: Float = 1,
     layout: SwiftUISnapshotLayout = .sizeThatFits,
     proposedSize: ProposedViewSize? = nil,
-    scale: CGFloat = 1.0
+    traits: UITraitCollection = .init()
     )
     -> Snapshotting {
+      let scale = traits.displayScale != 0.0 ? traits.displayScale : 1
       return SimplySnapshotting.image(precision: precision, perceptualPrecision: perceptualPrecision, scale: scale).asyncPullback { view in
         return .init { callback in
           Task { @MainActor in
             let renderer = ImageRenderer(
-              content: SnapshottingView(layout: layout, content: view)
+              content: SnapshottingView(layout: layout, traits: traits, content: view)
             )
             renderer.proposedSize = proposedSize ?? ProposedViewSize(UIScreen.main.bounds.size)
             renderer.scale = scale
@@ -139,6 +139,7 @@ extension Snapshotting where Value: SwiftUI.View, Format == UIImage {
 @available(iOS 16.0, tvOS 16.0, *)
 private struct SnapshottingView<Content: SwiftUI.View>: SwiftUI.View {
   let layout: SwiftUISnapshotLayout
+  let traits: UITraitCollection
   let content: Content
 
   var body: some SwiftUI.View {
@@ -167,6 +168,7 @@ private struct SnapshottingView<Content: SwiftUI.View>: SwiftUI.View {
       }
     }
     .background(Color(uiColor: UIColor.systemBackground))
+    .modifier(TraitsModifier(traits: traits))
   }
 }
 
@@ -183,6 +185,9 @@ private struct TraitsModifier: ViewModifier {
       }
       .transformEnvironment(\.dynamicTypeSize) { typeSize in
         typeSize = DynamicTypeSize(traits.preferredContentSizeCategory) ?? typeSize
+      }
+      .transformEnvironment(\.colorScheme) { colorScheme in
+        colorScheme = ColorScheme(traits.userInterfaceStyle) ?? colorScheme
       }
   }
 }
