@@ -1221,6 +1221,7 @@ final class SnapshotTestingTests: XCTestCase {
     assertSnapshot(matching: view, as: .imageRender(layout: .sizeThatFits), named: "size-that-fits")
     assertSnapshot(matching: view, as: .imageRender(layout: .fixed(width: 200.0, height: 100.0)), named: "fixed")
     assertSnapshot(matching: view, as: .imageRender(layout: .device(config: .iPhoneSe)), named: "device")
+    assertSnapshot(matching: view, as: .imageRender(layout: .device(config: .iPhoneSe), traits: .init(userInterfaceStyle: .dark)), named: "dark mode")
   }
 
   @available(iOS 16.0, *)
