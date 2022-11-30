@@ -244,13 +244,35 @@ public struct ViewImageConfig {
   public static let iPhone14 = ViewImageConfig.iPhone14(.portrait)
 
   public static func iPhone14(_ orientation: Orientation) -> ViewImageConfig {
-      .iPhone13(orientation)
+    let safeArea: UIEdgeInsets
+    let size: CGSize
+    switch orientation {
+    case .landscape:
+      safeArea = .init(top: 0, left: 47, bottom: 21, right: 47)
+      size = .init(width: 844, height: 390)
+    case .portrait:
+      safeArea = .init(top: 47, left: 0, bottom: 34, right: 0)
+      size = .init(width: 390, height: 844)
+    }
+
+    return .init(safeArea: safeArea, size: size, traits: UITraitCollection.iPhone14(orientation))
   }
 
   public static let iPhone14Plus = ViewImageConfig.iPhone14Plus(.portrait)
 
   public static func iPhone14Plus(_ orientation: Orientation) -> ViewImageConfig {
-      .iPhone13ProMax(orientation)
+    let safeArea: UIEdgeInsets
+    let size: CGSize
+    switch orientation {
+    case .landscape:
+      safeArea = .init(top: 0, left: 47, bottom: 21, right: 47)
+      size = .init(width: 926, height: 428)
+    case .portrait:
+      safeArea = .init(top: 47, left: 0, bottom: 34, right: 0)
+      size = .init(width: 428, height: 926)
+    }
+
+    return .init(safeArea: safeArea, size: size, traits: .iPhone14Plus(orientation))
   }
 
    public static let iPhone14Pro = ViewImageConfig.iPhone14Pro(.portrait)
@@ -267,7 +289,7 @@ public struct ViewImageConfig {
            size = .init(width: 393, height: 852)
        }
 
-       return .init(safeArea: safeArea, size: size, traits: .iPhone13ProMax(orientation))
+       return .init(safeArea: safeArea, size: size, traits: .iPhone14Pro(orientation))
    }
 
    public static let iPhone14ProMax = ViewImageConfig.iPhone14ProMax(.portrait)
@@ -284,7 +306,7 @@ public struct ViewImageConfig {
            size = .init(width: 430, height: 932)
        }
 
-       return .init(safeArea: safeArea, size: size, traits: .iPhone13ProMax(orientation))
+       return .init(safeArea: safeArea, size: size, traits: .iPhone14ProMax(orientation))
   }
 
   public static let iPadMini = ViewImageConfig.iPadMini(.landscape)
