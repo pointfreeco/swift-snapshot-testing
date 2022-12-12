@@ -18,7 +18,11 @@ let package = Package(
     .target(name: "SnapshotTesting"),
     .testTarget(
       name: "SnapshotTestingTests",
-      dependencies: ["SnapshotTesting"]
+      dependencies: ["SnapshotTesting"],
+      exclude: [
+        "__Snapshots__",
+        "__Fixtures__"
+      ]
     )
   ]
 )
