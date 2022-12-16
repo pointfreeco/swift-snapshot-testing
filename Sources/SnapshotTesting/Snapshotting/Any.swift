@@ -3,7 +3,12 @@ import Foundation
 extension Snapshotting where Format == String {
   /// A snapshot strategy for comparing any structure based on a sanitized text dump.
   public static var dump: Snapshotting {
-    return SimplySnapshotting.lines.pullback { snap($0) }
+    return dumpWith({ $0 })
+  }
+	
+  /// A snapshot strategy for comparing any structure based on a sanitized text dump. Allows to further transform the generated string
+  public static func dumpWith(_ transform: @escaping (String) -> String) -> Snapshotting {
+    return SimplySnapshotting.lines.pullback { snap($0, transform: transform) }
   }
 }
 
@@ -25,7 +30,7 @@ extension Snapshotting where Format == String {
   }
 }
 
-private func snap<T>(_ value: T, name: String? = nil, indent: Int = 0) -> String {
+private func snap<T>(_ value: T, transform: @escaping (String) -> String = { $0 }, name: String? = nil, indent: Int = 0) -> String {
   let indentation = String(repeating: " ", count: indent)
   let mirror = Mirror(reflecting: value)
   var children = mirror.children
@@ -69,7 +74,7 @@ private func snap<T>(_ value: T, name: String? = nil, indent: Int = 0) -> String
   let lines = ["\(indentation)\(bullet) \(name.map { "\($0): " } ?? "")\(description)\n"]
     + children.map { snap($1, name: $0, indent: indent + 2) }
 
-  return lines.joined()
+  return transform(lines.joined())
 }
 
 private func sort(_ children: Mirror.Children) -> Mirror.Children {

@@ -42,6 +42,18 @@ final class SnapshotTestingTests: XCTestCase {
       - name: "Blobby"
     """)
   }
+	
+  func testAnyTransform() {
+    struct User { let id: Int, name: String, bio: String }
+    let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
+    assertSnapshot(matching: user, as: .dumpWith { $0.replacingOccurrences(of: "Blobby", with: "****") })
+    _assertInlineSnapshot(matching: user, as: .dump, with: """
+     ▿ User
+       - bio: "Blobbed around the world."
+       - id: 1
+       - name: "****"
+     """)
+	}
 
   @available(macOS 10.13, tvOS 11.0, *)
   func testAnyAsJson() throws {
