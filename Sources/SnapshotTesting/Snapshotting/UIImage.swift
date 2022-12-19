@@ -25,7 +25,7 @@ extension Diffing where Value == UIImage {
       toData: { $0.pngData() ?? emptyImage().pngData()! },
       fromData: { UIImage(data: $0, scale: imageScale)! }
     ) { old, new in
-      let old = UIImage(cgImage: old.cgImage, scale: old.imageScale, orientation: new.imageOrientation)
+      let old = UIImage(cgImage: old.cgImage!, scale: old.scale, orientation: new.imageOrientation)
       guard let message = compare(old, new, precision: precision, perceptualPrecision: perceptualPrecision) else { return nil }
       let difference = SnapshotTesting.diff(old, new)
       let oldAttachment = XCTAttachment(image: old)
