@@ -10,24 +10,7 @@ public struct Snapshotting<Value, Format> {
   public var diffing: Diffing<Format>
 
   /// How a value is transformed into a diffable snapshot format.
-  public var snapshot: (Value) -> Async<Format>
-
-  /// Creates a snapshot strategy.
-  ///
-  /// - Parameters:
-  ///   - pathExtension: The path extension applied to references saved to disk.
-  ///   - diffing: How to diff and convert the snapshot format to and from data.
-  ///   - asyncSnapshot: An asynchronous transform function from a value into a diffable snapshot format.
-  ///   - value: A value to be converted.
-  public init(
-    pathExtension: String?,
-    diffing: Diffing<Format>,
-    asyncSnapshot: @escaping (_ value: Value) -> Async<Format>
-    ) {
-    self.pathExtension = pathExtension
-    self.diffing = diffing
-    self.snapshot = asyncSnapshot
-  }
+  public var snapshot: (Value) async -> Format
 
   /// Creates a snapshot strategy.
   ///
@@ -39,11 +22,34 @@ public struct Snapshotting<Value, Format> {
   public init(
     pathExtension: String?,
     diffing: Diffing<Format>,
-    snapshot: @escaping (_ value: Value) -> Format
+    snapshot: @escaping (_ value: Value) async -> Format
+  ) {
+    self.pathExtension = pathExtension
+    self.diffing = diffing
+    self.snapshot = snapshot
+  }
+
+  /// Creates a snapshot strategy.
+  ///
+  /// - Parameters:
+  ///   - pathExtension: The path extension applied to references saved to disk.
+  ///   - diffing: How to diff and convert the snapshot format to and from data.
+  ///   - asyncSnapshot: An asynchronous transform function from a value into a diffable snapshot format.
+  ///   - value: A value to be converted.
+  @available(*, deprecated)
+  public init(
+    pathExtension: String?,
+    diffing: Diffing<Format>,
+    asyncSnapshot: @escaping (_ value: Value) -> Async<Format>
   ) {
     self.init(pathExtension: pathExtension, diffing: diffing) {
-      Async(value: snapshot($0))
+      await asyncSnapshot($0).run()
     }
+  }
+
+  @available(*, deprecated)
+  public func snapshot(_ value: Value) -> Async<Format> {
+    .init(run: { await self.snapshot(value) })
   }
 
   /// Transforms a strategy on `Value`s into a strategy on `NewValue`s through a function `(NewValue) -> Value`.
@@ -63,8 +69,15 @@ public struct Snapshotting<Value, Format> {
   /// - Parameters:
   ///   - transform: A transform function from `NewValue` into `Value`.
   ///   - otherValue: A value to be transformed.
-  public func pullback<NewValue>(_ transform: @escaping (_ otherValue: NewValue) -> Value) -> Snapshotting<NewValue, Format> {
-    return self.asyncPullback { newValue in Async(value: transform(newValue)) }
+  public func pullback<NewValue>(
+    _ transform: @escaping (_ otherValue: NewValue) async -> Value
+  ) -> Snapshotting<NewValue, Format> {
+    .init(
+      pathExtension: self.pathExtension,
+      diffing: self.diffing
+    ) { newValue in
+      await self.snapshot(transform(newValue))
+    }
   }
 
   /// Transforms a strategy on `Value`s into a strategy on `NewValue`s through a function `(NewValue) -> Async<Value>`.
@@ -74,21 +87,13 @@ public struct Snapshotting<Value, Format> {
   /// - Parameters:
   ///   - transform: A transform function from `NewValue` into `Async<Value>`.
   ///   - otherValue: A value to be transformed.
-  public func asyncPullback<NewValue>(_ transform: @escaping (_ otherValue: NewValue) -> Async<Value>)
-    -> Snapshotting<NewValue, Format> {
-
-      return Snapshotting<NewValue, Format>(
-        pathExtension: self.pathExtension,
-        diffing: self.diffing
-      ) { newValue in
-        return .init { callback in
-          transform(newValue).run { value in
-            self.snapshot(value).run { snapshot in
-              callback(snapshot)
-            }
-          }
-        }
-      }
+  @available(*, deprecated)
+  public func asyncPullback<NewValue>(
+    _ transform: @escaping (_ otherValue: NewValue) -> Async<Value>
+  ) -> Snapshotting<NewValue, Format> {
+    self.pullback { newValue in
+      await transform(newValue).run()
+    }
   }
 }
 

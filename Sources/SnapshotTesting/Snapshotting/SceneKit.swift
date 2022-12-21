@@ -34,7 +34,7 @@ extension Snapshotting where Value == SCNScene, Format == UIImage {
 
 fileprivate extension Snapshotting where Value == SCNScene, Format == Image {
   static func scnScene(precision: Float, perceptualPrecision: Float, size: CGSize) -> Snapshotting {
-    return Snapshotting<View, Image>.image(precision: precision, perceptualPrecision: perceptualPrecision).pullback { scene in
+    return Snapshotting<View, Image>.image(precision: precision, perceptualPrecision: perceptualPrecision).pullback { @MainActor scene in
       let view = SCNView(frame: .init(x: 0, y: 0, width: size.width, height: size.height))
       view.scene = scene
       return view

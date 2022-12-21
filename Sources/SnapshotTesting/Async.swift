@@ -9,6 +9,7 @@
 ///         callback(image!)
 ///       }
 ///     }
+@available(*, deprecated)
 public struct Async<Value> {
   private let _run: () async -> Value
 
