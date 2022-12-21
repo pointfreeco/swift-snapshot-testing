@@ -364,7 +364,7 @@ extension DispatchQueue {
   private static let key = DispatchSpecificKey<UInt8>()
   private static let value: UInt8 = 0
 
-  static func mainSync<R>(execute block: () -> R) -> R {
+  fileprivate static func mainSync<R>(execute block: () -> R) -> R {
     main.setSpecific(key: key, value: value)
     if getSpecific(key: key) == value {
       return block()
