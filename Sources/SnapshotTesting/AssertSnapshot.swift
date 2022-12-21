@@ -190,7 +190,7 @@ public func verifySnapshot<Value, Format>(
       if let name = name {
         identifier = sanitizePathComponent(name)
       } else {
-        let counter = counterQueue.sync { () -> Int in
+        let counter = DispatchQueue.mainSync { () -> Int in
           let key = snapshotDirectoryUrl.appendingPathComponent(testName)
           counterMap[key, default: 0] += 1
           return counterMap[key]!
@@ -332,9 +332,7 @@ public func verifySnapshot<Value, Format>(
 
 // MARK: - Private
 
-private let counterQueue = DispatchQueue(label: "co.pointfree.SnapshotTesting.counter")
 private var counterMap: [URL: Int] = [:]
-private let counterLock = NSRecursiveLock()
 
 func sanitizePathComponent(_ string: String) -> String {
   return string
@@ -347,7 +345,7 @@ private class CleanCounterBetweenTestCases: NSObject, XCTestObservation {
   private static var registered = false
 
   static func registerIfNeeded() {
-    counterLock.withLock {
+    DispatchQueue.mainSync {
       if !registered {
         registered = true
         XCTestObservationCenter.shared.addTestObserver(CleanCounterBetweenTestCases())
@@ -356,8 +354,22 @@ private class CleanCounterBetweenTestCases: NSObject, XCTestObservation {
   }
 
   func testCaseDidFinish(_ testCase: XCTestCase) {
-    counterLock.withLock {
+    DispatchQueue.mainSync {
       counterMap = [:]
+    }
+  }
+}
+
+extension DispatchQueue {
+  private static let key = DispatchSpecificKey<UInt8>()
+  private static let value: UInt8 = 0
+
+  static func mainSync<R>(execute block: () -> R) -> R {
+    main.setSpecific(key: key, value: value)
+    if getSpecific(key: key) == value {
+      return block()
+    } else {
+      return main.sync(execute: block)
     }
   }
 }
