@@ -37,48 +37,50 @@ extension Snapshotting where Value: SwiftUI.View, Format == UIImage {
     perceptualPrecision: Float = 1,
     layout: SwiftUISnapshotLayout = .sizeThatFits,
     traits: UITraitCollection = .init()
+  ) -> Snapshotting {
+    let config: ViewImageConfig
+
+    switch layout {
+#if os(iOS) || os(tvOS)
+    case let .device(config: deviceConfig):
+      config = deviceConfig
+#endif
+    case .sizeThatFits:
+      config = .init(safeArea: .zero, size: nil, traits: traits)
+    case let .fixed(width: width, height: height):
+      let size = CGSize(width: width, height: height)
+      config = .init(safeArea: .zero, size: size, traits: traits)
+    }
+
+    return SimplySnapshotting.image(
+      precision: precision,
+      perceptualPrecision: perceptualPrecision,
+      scale: traits.displayScale
     )
-    -> Snapshotting {
-      let config: ViewImageConfig
+    .pullback { @MainActor view in
+      var config = config
 
-      switch layout {
-      #if os(iOS) || os(tvOS)
-      case let .device(config: deviceConfig):
-        config = deviceConfig
-      #endif
-      case .sizeThatFits:
-        config = .init(safeArea: .zero, size: nil, traits: traits)
-      case let .fixed(width: width, height: height):
-        let size = CGSize(width: width, height: height)
-        config = .init(safeArea: .zero, size: size, traits: traits)
+      let controller: UIViewController
+
+      if config.size != nil {
+        controller = UIHostingController(rootView: view)
+      } else {
+        let hostingController = UIHostingController.init(rootView: view)
+
+        let maxSize = CGSize(width: 0.0, height: 0.0)
+        config.size = hostingController.sizeThatFits(in: maxSize)
+
+        controller = hostingController
       }
 
-      return SimplySnapshotting.image(precision: precision, perceptualPrecision: perceptualPrecision, scale: traits.displayScale).asyncPullback { view in
-        var config = config
-
-        let controller: UIViewController
-
-        if config.size != nil {
-          controller = UIHostingController.init(
-            rootView: view
-          )
-        } else {
-          let hostingController = UIHostingController.init(rootView: view)
-
-          let maxSize = CGSize(width: 0.0, height: 0.0)
-          config.size = hostingController.sizeThatFits(in: maxSize)
-
-          controller = hostingController
-        }
-
-        return snapshotView(
-          config: config,
-          drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
-          traits: traits,
-          view: controller.view,
-          viewController: controller
-        )
-      }
+      return await snapshotView(
+        config: config,
+        drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+        traits: traits,
+        view: controller.view,
+        viewController: controller
+      )
+    }
   }
 }
 #endif

@@ -6,16 +6,12 @@ extension Snapshotting where Value: CaseIterable, Format == String  {
   /// Returns: A snapshot strategy on functions (Value) -> A that feeds every possible input into the
   ///          function and records the output into a CSV file.
   public static func `func`<A>(into witness: Snapshotting<A, Format>) -> Snapshotting<(Value) -> A, Format> {
-    var snapshotting = Snapshotting<String, String>.lines.asyncPullback { (f: (Value) -> A) in
-      Value.allCases.map { input in
-        witness.snapshot(f(input))
-          .map { (input, $0) }
-        }
-        .sequence()
-        .map { rows in
-          rows.map { "\"\($0)\",\"\($1)\"" }
-            .joined(separator: "\n")
+    var snapshotting = Snapshotting<String, String>.lines.pullback { (f: (Value) -> A) in
+      var output = ""
+      for input in Value.allCases {
+        await output.append(#""\#(input)","\#(witness.snapshot(f(input)))"\n"#)
       }
+      return output
     }
 
     snapshotting.pathExtension = "csv"

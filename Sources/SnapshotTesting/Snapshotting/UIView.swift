@@ -21,18 +21,22 @@ extension Snapshotting where Value == UIView, Format == UIImage {
     perceptualPrecision: Float = 1,
     size: CGSize? = nil,
     traits: UITraitCollection = .init()
-    )
-    -> Snapshotting {
+  ) -> Snapshotting {
 
-      return SimplySnapshotting.image(precision: precision, perceptualPrecision: perceptualPrecision, scale: traits.displayScale).asyncPullback { view in
-        snapshotView(
-          config: .init(safeArea: .zero, size: size ?? view.frame.size, traits: .init()),
-          drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
-          traits: traits,
-          view: view,
-          viewController: .init()
-        )
-      }
+    SimplySnapshotting.image(
+      precision: precision,
+      perceptualPrecision: perceptualPrecision,
+      scale: traits.displayScale
+    )
+    .pullback { @MainActor view in
+      await snapshotView(
+        config: .init(safeArea: .zero, size: size ?? view.frame.size, traits: .init()),
+        drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+        traits: traits,
+        view: view,
+        viewController: .init()
+      )
+    }
   }
 }
 
@@ -48,7 +52,7 @@ extension Snapshotting where Value == UIView, Format == String {
     traits: UITraitCollection = .init()
     )
     -> Snapshotting<UIView, String> {
-      return SimplySnapshotting.lines.pullback { view in
+      return SimplySnapshotting.lines.pullback { @MainActor view in
         let dispose = prepareView(
           config: .init(safeArea: .zero, size: size ?? view.frame.size, traits: traits),
           drawHierarchyInKeyWindow: false,

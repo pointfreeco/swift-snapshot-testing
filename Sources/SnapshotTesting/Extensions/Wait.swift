@@ -10,18 +10,12 @@ extension Snapshotting {
     for duration: TimeInterval,
     on strategy: Snapshotting
   ) -> Snapshotting {
-    return Snapshotting(
+    Snapshotting(
       pathExtension: strategy.pathExtension,
-      diffing: strategy.diffing,
-      asyncSnapshot: { value in
-        Async { callback in
-          let expectation = XCTestExpectation(description: "Wait")
-          DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
-            expectation.fulfill()
-          }
-          _ = XCTWaiter.wait(for: [expectation], timeout: duration + 1)
-          strategy.snapshot(value).run(callback)
-        }
-    })
+      diffing: strategy.diffing
+    ) { value in
+      try? await Task.sleep(nanoseconds: UInt64(duration * 1_000_000_000))
+      return await strategy.snapshot(value)
+    }
   }
 }

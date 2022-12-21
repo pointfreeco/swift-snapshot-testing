@@ -21,18 +21,24 @@ extension Snapshotting where Value == UIViewController, Format == UIImage {
     perceptualPrecision: Float = 1,
     size: CGSize? = nil,
     traits: UITraitCollection = .init()
-    )
-    -> Snapshotting {
+  ) -> Snapshotting {
 
-      return SimplySnapshotting.image(precision: precision, perceptualPrecision: perceptualPrecision, scale: traits.displayScale).asyncPullback { viewController in
-        snapshotView(
-          config: size.map { .init(safeArea: config.safeArea, size: $0, traits: config.traits) } ?? config,
-          drawHierarchyInKeyWindow: false,
-          traits: traits,
-          view: viewController.view,
-          viewController: viewController
-        )
-      }
+    SimplySnapshotting.image(
+      precision: precision,
+      perceptualPrecision: perceptualPrecision,
+      scale: traits.displayScale
+    )
+    .pullback { @MainActor viewController in
+      await snapshotView(
+        config: size
+          .map { .init(safeArea: config.safeArea, size: $0, traits: config.traits) }
+        ?? config,
+        drawHierarchyInKeyWindow: false,
+        traits: traits,
+        view: viewController.view,
+        viewController: viewController
+      )
+    }
   }
 
   /// A snapshot strategy for comparing view controller views based on pixel equality.
@@ -49,25 +55,29 @@ extension Snapshotting where Value == UIViewController, Format == UIImage {
     perceptualPrecision: Float = 1,
     size: CGSize? = nil,
     traits: UITraitCollection = .init()
-    )
-    -> Snapshotting {
+  )
+  -> Snapshotting {
 
-      return SimplySnapshotting.image(precision: precision, perceptualPrecision: perceptualPrecision, scale: traits.displayScale).asyncPullback { viewController in
-        snapshotView(
-          config: .init(safeArea: .zero, size: size, traits: traits),
-          drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
-          traits: traits,
-          view: viewController.view,
-          viewController: viewController
-        )
-      }
+    SimplySnapshotting.image(
+      precision: precision,
+      perceptualPrecision: perceptualPrecision,
+      scale: traits.displayScale
+    ).pullback { @MainActor viewController in
+      await snapshotView(
+        config: .init(safeArea: .zero, size: size, traits: traits),
+        drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+        traits: traits,
+        view: viewController.view,
+        viewController: viewController
+      )
+    }
   }
 }
 
 extension Snapshotting where Value == UIViewController, Format == String {
   /// A snapshot strategy for comparing view controllers based on their embedded controller hierarchy.
   public static var hierarchy: Snapshotting {
-    return Snapshotting<String, String>.lines.pullback { viewController in
+    Snapshotting<String, String>.lines.pullback { @MainActor viewController in
       let dispose = prepareView(
         config: .init(),
         drawHierarchyInKeyWindow: false,
@@ -84,7 +94,7 @@ extension Snapshotting where Value == UIViewController, Format == String {
 
   /// A snapshot strategy for comparing view controller views based on a recursive description of their properties and hierarchies.
   public static var recursiveDescription: Snapshotting {
-    return Snapshotting.recursiveDescription()
+    Snapshotting.recursiveDescription()
   }
 
   /// A snapshot strategy for comparing view controller views based on a recursive description of their properties and hierarchies.
@@ -97,22 +107,21 @@ extension Snapshotting where Value == UIViewController, Format == String {
     on config: ViewImageConfig = .init(),
     size: CGSize? = nil,
     traits: UITraitCollection = .init()
-    )
-    -> Snapshotting<UIViewController, String> {
-      return SimplySnapshotting.lines.pullback { viewController in
-        let dispose = prepareView(
-          config: .init(safeArea: config.safeArea, size: size ?? config.size, traits: config.traits),
-          drawHierarchyInKeyWindow: false,
-          traits: traits,
-          view: viewController.view,
-          viewController: viewController
-        )
-        defer { dispose() }
-        return purgePointers(
-          viewController.view.perform(Selector(("recursiveDescription"))).retain().takeUnretainedValue()
-            as! String
-        )
-      }
+  ) -> Snapshotting<UIViewController, String> {
+    SimplySnapshotting.lines.pullback { @MainActor viewController in
+      let dispose = prepareView(
+        config: .init(safeArea: config.safeArea, size: size ?? config.size, traits: config.traits),
+        drawHierarchyInKeyWindow: false,
+        traits: traits,
+        view: viewController.view,
+        viewController: viewController
+      )
+      defer { dispose() }
+      return purgePointers(
+        viewController.view.perform(Selector(("recursiveDescription"))).retain().takeUnretainedValue()
+        as! String
+      )
+    }
   }
 }
 #endif
