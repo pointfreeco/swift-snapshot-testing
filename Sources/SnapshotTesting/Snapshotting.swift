@@ -40,7 +40,7 @@ public struct Snapshotting<Value, Format> {
     pathExtension: String?,
     diffing: Diffing<Format>,
     snapshot: @escaping (_ value: Value) -> Format
-    ) {
+  ) {
     self.init(pathExtension: pathExtension, diffing: diffing) {
       Async(value: snapshot($0))
     }
