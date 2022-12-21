@@ -334,6 +334,7 @@ public func verifySnapshot<Value, Format>(
 
 private let counterQueue = DispatchQueue(label: "co.pointfree.SnapshotTesting.counter")
 private var counterMap: [URL: Int] = [:]
+private let counterLock = NSRecursiveLock()
 
 func sanitizePathComponent(_ string: String) -> String {
   return string
@@ -343,21 +344,20 @@ func sanitizePathComponent(_ string: String) -> String {
 
 // We need to clean counter between tests executions in order to support test-iterations.
 private class CleanCounterBetweenTestCases: NSObject, XCTestObservation {
-    private static var registered = false
-    private static var registerQueue = DispatchQueue(label: "co.pointfree.SnapshotTesting.testObserver")
+  private static var registered = false
 
-    static func registerIfNeeded() {
-      registerQueue.sync {
-        if !registered {
-          registered = true
-          XCTestObservationCenter.shared.addTestObserver(CleanCounterBetweenTestCases())
-        }
+  static func registerIfNeeded() {
+    counterLock.withLock {
+      if !registered {
+        registered = true
+        XCTestObservationCenter.shared.addTestObserver(CleanCounterBetweenTestCases())
       }
     }
+  }
 
-    func testCaseDidFinish(_ testCase: XCTestCase) {
-      counterQueue.sync {
-        counterMap = [:]
-      }
+  func testCaseDidFinish(_ testCase: XCTestCase) {
+    counterLock.withLock {
+      counterMap = [:]
     }
+  }
 }
