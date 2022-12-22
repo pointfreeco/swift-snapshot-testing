@@ -28,9 +28,9 @@ public func _assertInlineSnapshot<Value>(
   file: StaticString = #file,
   testName: String = #function,
   line: UInt = #line
-  ) {
+  ) async {
 
-  let failure = _verifyInlineSnapshot(
+  let failure = await _verifyInlineSnapshot(
     matching: try value(),
     as: snapshotting,
     record: recording,
@@ -67,42 +67,15 @@ public func _verifyInlineSnapshot<Value>(
   file: StaticString = #file,
   testName: String = #function,
   line: UInt = #line
-  )
+  ) async
   -> String? {
 
     let recording = recording || isRecording
 
     do {
-      let tookSnapshot = XCTestExpectation(description: "Took snapshot")
-      var optionalDiffable: String?
-      snapshotting.snapshot(try value()).run { b in
-        optionalDiffable = b
-        tookSnapshot.fulfill()
-      }
-      let result = XCTWaiter.wait(for: [tookSnapshot], timeout: timeout)
-      switch result {
-      case .completed:
-        break
-      case .timedOut:
-        return """
-          Exceeded timeout of \(timeout) seconds waiting for snapshot.
-
-          This can happen when an asynchronously rendered view (like a web view) has not loaded. \
-          Ensure that every subview of the view hierarchy has loaded to avoid timeouts, or, if a \
-          timeout is unavoidable, consider setting the "timeout" parameter of "assertSnapshot" to \
-          a higher value.
-          """
-      case .incorrectOrder, .invertedFulfillment, .interrupted:
-        return "Couldn't snapshot value"
-      @unknown default:
-        return "Couldn't snapshot value"
-      }
-
       let trimmingChars = CharacterSet.whitespacesAndNewlines.union(CharacterSet(charactersIn: "\u{FEFF}"))
-      guard let diffable = optionalDiffable?.trimmingCharacters(in: trimmingChars) else {
-        return "Couldn't snapshot value"
-      }
-
+      let diffable: String = await snapshotting.snapshot(try value())
+        .trimmingCharacters(in: trimmingChars)
       let trimmedReference = reference.trimmingCharacters(in: .whitespacesAndNewlines)
 
       // Always perform diff, and return early on success!

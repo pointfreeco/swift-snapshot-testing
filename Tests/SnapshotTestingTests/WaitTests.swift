@@ -2,16 +2,19 @@ import XCTest
 @testable import SnapshotTesting
 
 class WaitTests: XCTestCase {
-  func testWait() {
+  class UnsafeDelay: @unchecked Sendable {
     var value = "Hello"
-    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-      value = "Goodbye"
+  }
+  func testWait() async {
+    let delay = UnsafeDelay()
+    Task {
+      delay.value = "Goodbye"
     }
 
     let strategy = Snapshotting.lines.pullback { (_: Void) in
-      value
+      delay.value
     }
 
-    assertSnapshot(matching: (), as: .wait(for: 1.5, on: strategy))
+    await assertSnapshot(matching: (), as: .wait(for: 1.5, on: strategy))
   }
 }

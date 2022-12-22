@@ -36,9 +36,9 @@ public func assertSnapshot<Value, Format>(
   file: StaticString = #file,
   testName: String = #function,
   line: UInt = #line
-  ) {
+  ) async {
 
-  let failure = verifySnapshot(
+  let failure = await verifySnapshot(
     matching: try value(),
     as: snapshotting,
     named: name,
@@ -70,20 +70,20 @@ public func assertSnapshots<Value, Format>(
   file: StaticString = #file,
   testName: String = #function,
   line: UInt = #line
-  ) {
+  ) async {
 
-  try? strategies.forEach { name, strategy in
-    assertSnapshot(
-      matching: try value(),
-      as: strategy,
-      named: name,
-      record: recording,
-      timeout: timeout,
-      file: file,
-      testName: testName,
-      line: line
-    )
-  }
+    for (name, strategy) in strategies {
+      await assertSnapshot(
+        matching: try value(),
+        as: strategy,
+        named: name,
+        record: recording,
+        timeout: timeout,
+        file: file,
+        testName: testName,
+        line: line
+      )
+    }
 }
 
 /// Asserts that a given value matches references on disk.
@@ -104,10 +104,10 @@ public func assertSnapshots<Value, Format>(
   file: StaticString = #file,
   testName: String = #function,
   line: UInt = #line
-  ) {
+  ) async {
 
-  try? strategies.forEach { strategy in
-    assertSnapshot(
+  for strategy in strategies {
+    await assertSnapshot(
       matching: try value(),
       as: strategy,
       record: recording,
@@ -170,7 +170,7 @@ public func verifySnapshot<Value, Format>(
   file: StaticString = #file,
   testName: String = #function,
   line: UInt = #line
-  )
+  ) async
   -> String? {
 
     CleanCounterBetweenTestCases.registerIfNeeded()
@@ -205,35 +205,8 @@ public func verifySnapshot<Value, Format>(
       let fileManager = FileManager.default
       try fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
 
-      let tookSnapshot = XCTestExpectation(description: "Took snapshot")
-      var optionalDiffable: Format?
-      snapshotting.snapshot(try value()).run { b in
-        optionalDiffable = b
-        tookSnapshot.fulfill()
-      }
-      let result = XCTWaiter.wait(for: [tookSnapshot], timeout: timeout)
-      switch result {
-      case .completed:
-        break
-      case .timedOut:
-        return """
-          Exceeded timeout of \(timeout) seconds waiting for snapshot.
+      var diffable = try await snapshotting.snapshot(value())
 
-          This can happen when an asynchronously rendered view (like a web view) has not loaded. \
-          Ensure that every subview of the view hierarchy has loaded to avoid timeouts, or, if a \
-          timeout is unavoidable, consider setting the "timeout" parameter of "assertSnapshot" to \
-          a higher value.
-          """
-      case .incorrectOrder, .invertedFulfillment, .interrupted:
-        return "Couldn't snapshot value"
-      @unknown default:
-        return "Couldn't snapshot value"
-      }
-
-      guard var diffable = optionalDiffable else {
-        return "Couldn't snapshot value"
-      }
-      
       guard !recording, fileManager.fileExists(atPath: snapshotFileUrl.path) else {
         try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)
         #if !os(Linux) && !os(Windows)
@@ -289,9 +262,11 @@ public func verifySnapshot<Value, Format>(
       if !attachments.isEmpty {
         #if !os(Linux) && !os(Windows)
         if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
-          XCTContext.runActivity(named: "Attached Failure Diff") { activity in
-            attachments.forEach {
-              activity.add($0)
+          DispatchQueue.mainSync {
+            XCTContext.runActivity(named: "Attached Failure Diff") { activity in
+              attachments.forEach {
+                activity.add($0)
+              }
             }
           }
         }
