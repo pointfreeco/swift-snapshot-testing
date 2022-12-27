@@ -212,9 +212,11 @@ public func verifySnapshot<Value, Format>(
         try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)
         #if !os(Linux) && !os(Windows)
         if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
-          XCTContext.runActivity(named: "Attached Recorded Snapshot") { activity in
-            let attachment = XCTAttachment(contentsOfFile: snapshotFileUrl)
-            activity.add(attachment)
+          DispatchQueue.mainSync {
+            XCTContext.runActivity(named: "Attached Recorded Snapshot") { activity in
+              let attachment = XCTAttachment(contentsOfFile: snapshotFileUrl)
+              activity.add(attachment)
+            }
           }
         }
         #endif
@@ -340,7 +342,7 @@ extension DispatchQueue {
   private static let key = DispatchSpecificKey<UInt8>()
   private static let value: UInt8 = 0
 
-  fileprivate static func mainSync<R>(execute block: () -> R) -> R {
+  static func mainSync<R>(execute block: () -> R) -> R {
     main.setSpecific(key: key, value: value)
     if getSpecific(key: key) == value {
       return block()
