@@ -20,7 +20,7 @@ import XCTest
 ///   - testName: The name of the test in which failure occurred. Defaults to the function name of the test case in which this function was called.
 ///   - line: The line number on which failure occurred. Defaults to the line number on which this function was called.
 public func _assertInlineSnapshot<Value>(
-  matching value: @autoclosure () throws -> Value,
+  matching value: @autoclosure () async throws -> Value,
   as snapshotting: Snapshotting<Value, String>,
   record recording: Bool = false,
   timeout: TimeInterval = 5,
@@ -31,7 +31,7 @@ public func _assertInlineSnapshot<Value>(
   ) async {
 
   let failure = await _verifyInlineSnapshot(
-    matching: try value(),
+    matching: try await value(),
     as: snapshotting,
     record: recording,
     timeout: timeout,
@@ -60,7 +60,7 @@ public func _assertInlineSnapshot<Value>(
 /// - Returns: A failure message or, if the value matches, nil.
 @MainActor
 public func _verifyInlineSnapshot<Value>(
-  matching value: @autoclosure () throws -> Value,
+  matching value: @autoclosure () async throws -> Value,
   as snapshotting: Snapshotting<Value, String>,
   record recording: Bool = false,
   timeout: TimeInterval = 5,
