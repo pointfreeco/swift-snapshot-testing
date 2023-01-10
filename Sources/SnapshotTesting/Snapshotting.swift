@@ -70,7 +70,7 @@ public struct Snapshotting<Value, Format> {
   ///   - transform: A transform function from `NewValue` into `Value`.
   ///   - otherValue: A value to be transformed.
   public func pullback<NewValue>(
-    _ transform: @escaping (_ otherValue: NewValue) async -> Value
+    _ transform: @escaping (_ otherValue: NewValue) async throws -> Value
   ) -> Snapshotting<NewValue, Format> {
     .init(
       pathExtension: self.pathExtension,
