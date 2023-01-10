@@ -19,6 +19,7 @@ import XCTest
 
 @testable import SnapshotTesting
 
+@MainActor
 final class SnapshotTestingTests: XCTestCase {
   override func setUp() {
     super.setUp()
@@ -1118,6 +1119,7 @@ final class SnapshotTestingTests: XCTestCase {
   }
 
   #if os(iOS) || os(macOS)
+  @MainActor
   final class ManipulatingWKWebViewNavigationDelegate: NSObject, WKNavigationDelegate {
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
       webView.evaluateJavaScript("document.body.children[0].classList.remove(\"hero\")") // Change layout
