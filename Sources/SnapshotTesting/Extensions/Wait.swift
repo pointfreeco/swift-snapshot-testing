@@ -15,7 +15,7 @@ extension Snapshotting {
       diffing: strategy.diffing
     ) { value in
       try? await Task.sleep(nanoseconds: UInt64(duration * 1_000_000_000))
-      return await strategy.snapshot(value)
+      return try await strategy.snapshot(value)
     }
   }
 }

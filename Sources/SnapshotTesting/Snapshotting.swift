@@ -10,7 +10,7 @@ public struct Snapshotting<Value, Format> {
   public var diffing: Diffing<Format>
 
   /// How a value is transformed into a diffable snapshot format.
-  public var snapshot: (Value) async -> Format
+  public var snapshot: (@escaping () async throws -> Value) async throws -> Format
 
   /// Creates a snapshot strategy.
   ///
@@ -22,7 +22,7 @@ public struct Snapshotting<Value, Format> {
   public init(
     pathExtension: String?,
     diffing: Diffing<Format>,
-    snapshot: @escaping (_ value: Value) async -> Format
+    snapshot: @escaping (_ value: @escaping () async throws -> Value) async throws -> Format
   ) {
     self.pathExtension = pathExtension
     self.diffing = diffing
@@ -40,17 +40,17 @@ public struct Snapshotting<Value, Format> {
   public init(
     pathExtension: String?,
     diffing: Diffing<Format>,
-    asyncSnapshot: @escaping (_ value: Value) -> Async<Format>
+    asyncSnapshot: @escaping (_ value: @escaping () async throws -> Value) -> Async<Format>
   ) {
     self.init(pathExtension: pathExtension, diffing: diffing) {
       await asyncSnapshot($0).run()
     }
   }
 
-  @available(*, deprecated)
-  public func snapshot(_ value: Value) -> Async<Format> {
-    .init(run: { await self.snapshot(value) })
-  }
+//  @available(*, deprecated)
+//  public func snapshot(_ value: @autoclosure @escaping () throws -> Value) -> Async<Format> {
+//    .init(run: { try await self.snapshot { try value() } })
+//  }
 
   /// Transforms a strategy on `Value`s into a strategy on `NewValue`s through a function `(NewValue) -> Value`.
   ///
@@ -75,8 +75,8 @@ public struct Snapshotting<Value, Format> {
     .init(
       pathExtension: self.pathExtension,
       diffing: self.diffing
-    ) { newValue in
-      await self.snapshot(transform(newValue))
+    ) { (newValue: @escaping () async throws -> NewValue) in
+      try await self.snapshot { try await transform(newValue()) }
     }
   }
 
@@ -105,7 +105,7 @@ extension Snapshotting where Value == Format {
     self.init(
       pathExtension: pathExtension,
       diffing: diffing,
-      snapshot: { $0 }
+      snapshot: { try await $0() }
     )
   }
 }

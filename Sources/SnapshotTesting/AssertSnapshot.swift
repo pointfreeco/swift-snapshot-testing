@@ -28,7 +28,7 @@ public var record: Bool {
 ///   - testName: The name of the test in which failure occurred. Defaults to the function name of the test case in which this function was called.
 ///   - line: The line number on which failure occurred. Defaults to the line number on which this function was called.
 public func assertSnapshot<Value, Format>(
-  matching value: @autoclosure () async throws -> Value,
+  matching value: @autoclosure @escaping () async throws -> Value,
   as snapshotting: Snapshotting<Value, Format>,
   named name: String? = nil,
   record recording: Bool = false,
@@ -63,7 +63,7 @@ public func assertSnapshot<Value, Format>(
 ///   - testName: The name of the test in which failure occurred. Defaults to the function name of the test case in which this function was called.
 ///   - line: The line number on which failure occurred. Defaults to the line number on which this function was called.
 public func assertSnapshots<Value, Format>(
-  matching value: @autoclosure () async throws -> Value,
+  matching value: @autoclosure @escaping () async throws -> Value,
   as strategies: [String: Snapshotting<Value, Format>],
   record recording: Bool = false,
   timeout: TimeInterval = 5,
@@ -97,7 +97,7 @@ public func assertSnapshots<Value, Format>(
 ///   - testName: The name of the test in which failure occurred. Defaults to the function name of the test case in which this function was called.
 ///   - line: The line number on which failure occurred. Defaults to the line number on which this function was called.
 public func assertSnapshots<Value, Format>(
-  matching value: @autoclosure () async throws -> Value,
+  matching value: @autoclosure @escaping () async throws -> Value,
   as strategies: [Snapshotting<Value, Format>],
   record recording: Bool = false,
   timeout: TimeInterval = 5,
@@ -162,7 +162,7 @@ public func assertSnapshots<Value, Format>(
 /// - Returns: A failure message or, if the value matches, nil.
 @MainActor
 public func verifySnapshot<Value, Format>(
-  matching value: @autoclosure () async throws -> Value,
+  matching value: @autoclosure @escaping () async throws -> Value,
   as snapshotting: Snapshotting<Value, Format>,
   named name: String? = nil,
   record recording: Bool = false,
@@ -206,7 +206,7 @@ public func verifySnapshot<Value, Format>(
       let fileManager = FileManager.default
       try fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
 
-      var diffable = try await snapshotting.snapshot(value())
+      var diffable = try await snapshotting.snapshot { try await value() }
 
       guard !recording, fileManager.fileExists(atPath: snapshotFileUrl.path) else {
         try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)

@@ -20,7 +20,7 @@ import XCTest
 ///   - testName: The name of the test in which failure occurred. Defaults to the function name of the test case in which this function was called.
 ///   - line: The line number on which failure occurred. Defaults to the line number on which this function was called.
 public func _assertInlineSnapshot<Value>(
-  matching value: @autoclosure () async throws -> Value,
+  matching value: @autoclosure @escaping () async throws -> Value,
   as snapshotting: Snapshotting<Value, String>,
   record recording: Bool = false,
   timeout: TimeInterval = 5,
@@ -60,7 +60,7 @@ public func _assertInlineSnapshot<Value>(
 /// - Returns: A failure message or, if the value matches, nil.
 @MainActor
 public func _verifyInlineSnapshot<Value>(
-  matching value: @autoclosure () async throws -> Value,
+  matching value: @autoclosure @escaping () async throws -> Value,
   as snapshotting: Snapshotting<Value, String>,
   record recording: Bool = false,
   timeout: TimeInterval = 5,
@@ -75,7 +75,7 @@ public func _verifyInlineSnapshot<Value>(
 
     do {
       let trimmingChars = CharacterSet.whitespacesAndNewlines.union(CharacterSet(charactersIn: "\u{FEFF}"))
-      let diffable: String = await snapshotting.snapshot(try value())
+      let diffable: String = try await snapshotting.snapshot { try await value() }
         .trimmingCharacters(in: trimmingChars)
       let trimmedReference = reference.trimmingCharacters(in: .whitespacesAndNewlines)
 
