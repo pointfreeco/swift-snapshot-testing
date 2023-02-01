@@ -11,6 +11,9 @@ public struct Diffing<Value> {
 
   /// Compares two values. If the values do not match, returns a failure message and artifacts describing the failure.
   public var diff: (Value, Value) -> (String, [XCTAttachment])?
+    
+  /// Compares two values. If the values are different the diff value is returned, nil otherwise.
+  public var rawDiff: ((Value, Value) -> (Value?))?
 
   /// Creates a new `Diffing` on `Value`.
   ///

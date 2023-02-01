@@ -204,6 +204,13 @@ public func verifySnapshot<Value, Format>(
         .appendingPathExtension(snapshotting.pathExtension ?? "")
       let fileManager = FileManager.default
       try fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
+        
+      let failureDataDirectoryUrl = snapshotDirectoryUrl.appendingPathComponent("failures")
+            .appendingPathComponent(testName)
+        
+      if fileManager.fileExists(atPath: failureDataDirectoryUrl.path) {
+        try fileManager.removeItem(at: failureDataDirectoryUrl)
+      }
 
       let tookSnapshot = XCTestExpectation(description: "Took snapshot")
       var optionalDiffable: Format?
@@ -297,7 +304,17 @@ public func verifySnapshot<Value, Format>(
         }
         #endif
       }
+        
+      // store failure data (reference, snapshotted and diff values) as files.
+      if let rawDiff = snapshotting.diffing.rawDiff?(reference, diffable) {
+        var failureData = SnapshotsAssertFailureData(reference: reference, snapshotted: diffable, diff: rawDiff)
+          failureData.convertToData = snapshotting.diffing.toData
+          
+          try fileManager.createDirectory(at: failureDataDirectoryUrl, withIntermediateDirectories: true)
 
+          try failureData.store(snapshotsDir: failureDataDirectoryUrl)
+      }
+        
       let diffMessage = diffTool
         .map { "\($0) \"\(snapshotFileUrl.path)\" \"\(failedSnapshotFileUrl.path)\"" }
         ?? """
@@ -359,5 +376,26 @@ private class CleanCounterBetweenTestCases: NSObject, XCTestObservation {
       counterQueue.sync {
         counterMap = [:]
       }
+    }
+}
+
+
+private struct SnapshotsAssertFailureData<Format> {
+    let reference: Format
+    let snapshotted: Format
+    let diff: Format
+    
+    var convertToData: ((Format) -> Data?)?
+        
+    init(reference: Format, snapshotted: Format, diff: Format) {
+        self.reference = reference
+        self.snapshotted = snapshotted
+        self.diff = diff
+    }
+    
+    func store(snapshotsDir: URL) throws {
+        try convertToData?(reference)?.write(to: snapshotsDir.appendingPathComponent("reference.png"))
+        try convertToData?(snapshotted)?.write(to: snapshotsDir.appendingPathComponent("snapshotted.png"))
+        try convertToData?(diff)?.write(to: snapshotsDir.appendingPathComponent("diff.png"))
     }
 }

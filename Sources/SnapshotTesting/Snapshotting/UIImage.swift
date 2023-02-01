@@ -21,7 +21,7 @@ extension Diffing where Value == UIImage {
       imageScale = UIScreen.main.scale
     }
 
-    return Diffing(
+    var diffing = Diffing(
       toData: { $0.pngData() ?? emptyImage().pngData()! },
       fromData: { UIImage(data: $0, scale: imageScale)! }
     ) { old, new in
@@ -39,6 +39,10 @@ extension Diffing where Value == UIImage {
         [oldAttachment, newAttachment, differenceAttachment]
       )
     }
+      
+      diffing.rawDiff = SnapshotTesting.diff
+      
+      return diffing
   }
   
   
