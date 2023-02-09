@@ -198,6 +198,8 @@ targets: [
   - [swift-snapshot-testing-stitch](https://github.com/Sherlouk/swift-snapshot-testing-stitch/) adds the ability to stitch multiple UIView's or UIViewController's together in a single test.
 
   - [SnapshotTestingHEIC](https://github.com/alexey1312/SnapshotTestingHEIC) adds image support using the HEIC storage format which reduces file sizes in comparison to PNG.
+
+  - [PreviewSnapshots](https://github.com/doordash-oss/swiftui-preview-snapshots) share `View` configurations between SwiftUI Previews and snapshot tests and generate several snapshots with a single test assertion.
   
 Have you written your own SnapshotTesting plug-in? [Add it here](https://github.com/pointfreeco/swift-snapshot-testing/edit/master/README.md) and submit a pull request!
   
