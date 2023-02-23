@@ -28,23 +28,6 @@ class MyViewControllerTests: XCTestCase {
   }
 }
 ```
-Using SwiftUI? use `UIHostingController`.
-``` swift
-import SnapshotTesting
-import SwiftUI
-import XCTest
-@testable import MyTestProject
-
-class MyViewTests: XCTestCase {
-    func myViewTest() throws {
-        let myView = MyView()
-        let view: UIView = UIHostingController(rootView: MyView).view
-
-        assertSnapshot(matching: view, as: .image)
-    }
-}
-```
-
 
 When an assertion first runs, a snapshot is automatically recorded to disk and the test will fail, printing out the file path of any newly-recorded reference.
 
