@@ -18,6 +18,7 @@ Once [installed](#installation), _no additional configuration is required_. You 
 ``` swift
 import SnapshotTesting
 import XCTest
+@testable import MyTestProject
 
 class MyViewControllerTests: XCTestCase {
   func testMyViewController() {
@@ -27,6 +28,23 @@ class MyViewControllerTests: XCTestCase {
   }
 }
 ```
+Using SwiftUI? use `UIHostingController`.
+``` swift
+import SnapshotTesting
+import SwiftUI
+import XCTest
+@testable import MyTestProject
+
+class MyViewTests: XCTestCase {
+    func myViewTest() throws {
+        let myView = MyView()
+        let view: UIView = UIHostingController(rootView: MyView).view
+
+        assertSnapshot(matching: view, as: .image)
+    }
+}
+```
+
 
 When an assertion first runs, a snapshot is automatically recorded to disk and the test will fail, printing out the file path of any newly-recorded reference.
 
@@ -136,7 +154,10 @@ If your data can be represented as an image, text, or data, you can write a snap
  1. From the **File** menu, navigate through **Swift Packages** and select **Add Package Dependency…**.
  2. Enter package repository URL: `https://github.com/pointfreeco/swift-snapshot-testing`
  3. Confirm the version and let Xcode resolve the package
- 4. On the final dialog, update SnapshotTesting's **Add to Target** column to a test target that will contain snapshot tests (if you have more than one test target, you can later add SnapshotTesting to them by manually linking the library in its build phase)
+ 4. Go to your projectsettings -> select your target testproject -> navigate to "Build phases" -> "Link Binary With Libraries" -> Add SnapshotTesting
+ ![image](https://user-images.githubusercontent.com/30670162/220935001-d82624d1-e687-4cc2-9398-24dc07ccf0fa.png)
+ (if you have more than one test target, you can later add SnapshotTesting to them by manually linking the library in its build phase)
+ 
 
 ### Swift Package Manager
 
