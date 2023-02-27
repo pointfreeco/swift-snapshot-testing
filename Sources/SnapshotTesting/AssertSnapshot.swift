@@ -133,7 +133,7 @@ public enum SnapshotDirectory {
   /// This style may be configured via an ENV variable, for example to find snapshots
   /// in an available directory for Xcode Cloud.
   ///
-  ///   SNAPSHOTTESTING_PACKAGES_PATH=/Volumes/workspace/respository/ci_scripts/snapshots
+  ///   SNAPSHOTTESTING_PACKAGE_PATH=/Volumes/workspace/respository/ci_scripts/snapshots
   ///
   /// For example:
   ///
@@ -150,11 +150,11 @@ public enum SnapshotDirectory {
   /// This style may be configured via an ENV variable, for example to find snapshots
   /// in an available directory for Xcode Cloud.
   ///
-  ///   SNAPSHOTTESTING_PACKAGES_PATH=/Volumes/workspace/respository/ci_scripts/snapshots
+  ///   SNAPSHOTTESTING_PATH=/Volumes/workspace/respository/ci_scripts/snapshots
   ///
   /// For example:
   ///
-  ///   /Volumes/workspace/respository/ci_scripts/snapshots/MyTests/snapshot1.json
+  ///   /Volumes/workspace/respository/ci_scripts/snapshots/snapshot1.json
   case path(String)
 
   /// Standard directory to save snapshots.
@@ -163,8 +163,8 @@ public enum SnapshotDirectory {
   ///
   ///  `.snapshotsForFile`
   ///
-  ///   /MyProject/MyTests.swift
-  ///   /MyProject/__Snapshots__/MyTests/snapshot.1.json
+  ///   /MyPackage/Tests/MyTests.swift
+  ///   /MyPackage/Tests/__Snapshots__/MyTests/snapshot.1.json
   case snapshotsForFile
 }
 
