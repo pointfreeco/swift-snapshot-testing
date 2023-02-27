@@ -119,6 +119,118 @@ public func assertSnapshots<Value, Format>(
   }
 }
 
+/// A set of options for how to save snapshots for each test.
+public enum SnapshotDirectory {
+  /// Standard directory to save snapshots.
+  ///
+  /// By default snapshots will be saved in a directory with the same name as the test file, and that directory will sit inside a directory `__Snapshots__` that sits next to your test file.
+  ///
+  ///  `.snapshotsForFile`
+  ///
+  ///   /MyProject/MyTests.swift
+  ///   /MyProject/__Snapshots__/MyTests/snapshot.1.json
+  case snapshotsForFile
+
+  /// Alternate directory to save snapshots.
+  ///
+  ///  `.path("/MyProject/configured/path")`
+  ///
+  ///   /MyProject/MyTests.swift
+  ///   /MyProject/configured/path/snapshot.1.json
+  ///
+  /// This style may be configured via an ENV variable, for example to find snapshots
+  /// in an available directory for Xcode Cloud.
+  ///
+  ///   SNAPSHOTTESTING_PACKAGES_PATH=/Volumes/workspace/respository/ci_scripts/snapshots
+  ///
+  /// For example:
+  ///
+  ///   /Volumes/workspace/respository/ci_scripts/snapshots/MyTests/snapshot1.json
+  case path(String)
+
+  /// Alternate directory to save snapshots for a Swift Package.
+  ///
+  /// Snapshots will be saved in the specified directory, appending the name of the package, and the name of the test.
+  ///
+  ///  `.packageNameAtPath("/AllSnapshots")`
+  ///
+  ///   /MyPackage/Tests/MyTests.swift
+  ///   /AllSnapshots/MyPackage/MyTests/snapshot.1.json
+  ///
+  /// This style may be configured via an ENV variable, for example to find snapshots
+  /// in an available directory for Xcode Cloud.
+  ///
+  ///   SNAPSHOTTESTING_PACKAGES_PATH=/Volumes/workspace/respository/ci_scripts/snapshots
+  ///
+  /// For example:
+  ///
+  ///   /Volumes/workspace/respository/ci_scripts/snapshots/MyPackage/MyTests/snapshot1.json
+  case packageNameAtPath(String)
+}
+
+extension SnapshotDirectory {
+  func makeURL(fileUrl: URL, fileName: String) -> URL? {
+    switch self {
+    case .snapshotsForFile:
+      return fileUrl
+        .deletingLastPathComponent()
+        .appendingPathComponent("__Snapshots__")
+        .appendingPathComponent(fileName)
+    case let .path(path):
+      return URL(fileURLWithPath: path, isDirectory: true)
+    case let .packageNameAtPath(path):
+      guard
+        let components = URL(string: path)?.pathComponents,
+        let testsIndex = components.lastIndex(of: "Tests"),
+        let packageName = components.endIndex > testsIndex + 1 ? components[testsIndex + 1] : nil
+      else { return nil }
+      return URL(fileURLWithPath: path, isDirectory: true)
+        .appendingPathComponent(packageName)
+        .appendingPathComponent(fileName)
+    }
+  }
+  init(path: String?) {
+    if let path {
+      self = .path(path)
+      return
+    }
+    if let path = ProcessInfo.processInfo.environment["SNAPSHOTTESTING_PATH"] {
+      self = .path(path)
+      return
+    }
+    if let path = ProcessInfo.processInfo.environment["SNAPSHOTTESTING_PACKAGES_PATH"] {
+      self = .packageNameAtPath(path)
+      return
+    }
+    self = .snapshotsForFile
+  }
+}
+
+public func verifySnapshot<Value, Format>(
+  matching value: @autoclosure () throws -> Value,
+  as snapshotting: Snapshotting<Value, Format>,
+  named name: String? = nil,
+  record recording: Bool = false,
+  snapshotDirectory path: String? = nil,
+  timeout: TimeInterval = 5,
+  file: StaticString = #file,
+  testName: String = #function,
+  line: UInt = #line
+)
+-> String? {
+  return verifySnapshot(
+    matching: try value(),
+    as: snapshotting,
+    named: name,
+    record: recording,
+    snapshotDirectory: SnapshotDirectory(path: path),
+    timeout: timeout,
+    file: file,
+    testName: testName,
+    line: line
+  )
+}
+
 /// Verifies that a given value matches a reference on disk.
 ///
 /// Third party snapshot assert helpers can be built on top of this function. Simply invoke `verifySnapshot` with your own arguments, and then invoke `XCTFail` with the string returned if it is non-`nil`. For example, if you want the snapshot directory to be determined by an environment variable, you can create your own assert helper like so:
@@ -140,7 +252,7 @@ public func assertSnapshots<Value, Format>(
 ///           as: snapshotting,
 ///           named: name,
 ///           record: recording,
-///           snapshotDirectory: snapshotDirectory,
+///           snapshotDirectory: .path(snapshotDirectory),
 ///           timeout: timeout,
 ///           file: file,
 ///           testName: testName
@@ -154,7 +266,7 @@ public func assertSnapshots<Value, Format>(
 ///   - snapshotting: A strategy for serializing, deserializing, and comparing values.
 ///   - name: An optional description of the snapshot.
 ///   - recording: Whether or not to record a new reference.
-///   - snapshotDirectory: Optional directory to save snapshots. By default snapshots will be saved in a directory with the same name as the test file, and that directory will sit inside a directory `__Snapshots__` that sits next to your test file.
+///   - snapshotDirectory: Determines where to save snapshots. By default snapshots will be saved in a directory with the same name as the test file, and that directory will sit inside a directory `__Snapshots__` that sits next to your test file.
 ///   - timeout: The amount of time a snapshot must be generated in.
 ///   - file: The file in which failure occurred. Defaults to the file name of the test case in which this function was called.
 ///   - testName: The name of the test in which failure occurred. Defaults to the function name of the test case in which this function was called.
@@ -165,7 +277,7 @@ public func verifySnapshot<Value, Format>(
   as snapshotting: Snapshotting<Value, Format>,
   named name: String? = nil,
   record recording: Bool = false,
-  snapshotDirectory: String? = nil,
+  snapshotDirectory: SnapshotDirectory,
   timeout: TimeInterval = 5,
   file: StaticString = #file,
   testName: String = #function,
@@ -180,11 +292,11 @@ public func verifySnapshot<Value, Format>(
       let fileUrl = URL(fileURLWithPath: "\(file)", isDirectory: false)
       let fileName = fileUrl.deletingPathExtension().lastPathComponent
 
-      let snapshotDirectoryUrl = snapshotDirectory.map { URL(fileURLWithPath: $0, isDirectory: true) }
-        ?? fileUrl
-          .deletingLastPathComponent()
-          .appendingPathComponent("__Snapshots__")
-          .appendingPathComponent(fileName)
+      guard
+        let snapshotDirectoryUrl = snapshotDirectory.makeURL(fileUrl: fileUrl, fileName: fileName)
+      else {
+        return "Failed to create snapshotDirectoryUrl"
+      }
 
       let identifier: String
       if let name = name {
