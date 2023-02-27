@@ -121,17 +121,26 @@ public func assertSnapshots<Value, Format>(
 
 /// A set of options for how to save snapshots for each test.
 public enum SnapshotDirectory {
-  /// Standard directory to save snapshots.
+  /// Alternate directory to save snapshots for a Swift Package.
   ///
-  /// By default snapshots will be saved in a directory with the same name as the test file, and that directory will sit inside a directory `__Snapshots__` that sits next to your test file.
+  /// Snapshots will be saved in the specified directory, appending the name of the package, and the name of the test.
   ///
-  ///  `.snapshotsForFile`
+  ///  `.packageSnapshotsAtPath("/AllSnapshots")`
   ///
-  ///   /MyProject/MyTests.swift
-  ///   /MyProject/__Snapshots__/MyTests/snapshot.1.json
-  case snapshotsForFile
+  ///   /MyPackage/Tests/MyTests.swift
+  ///   /AllSnapshots/MyPackage/MyTests/snapshot.1.json
+  ///
+  /// This style may be configured via an ENV variable, for example to find snapshots
+  /// in an available directory for Xcode Cloud.
+  ///
+  ///   SNAPSHOTTESTING_PACKAGES_PATH=/Volumes/workspace/respository/ci_scripts/snapshots
+  ///
+  /// For example:
+  ///
+  ///   /Volumes/workspace/respository/ci_scripts/snapshots/MyPackage/MyTests/snapshot1.json
+  case packageSnapshotsAtPath(String)
 
-  /// Alternate directory to save snapshots.
+  /// Alternate directory to save snapshots, with no special handling.
   ///
   ///  `.path("/MyProject/configured/path")`
   ///
@@ -148,44 +157,39 @@ public enum SnapshotDirectory {
   ///   /Volumes/workspace/respository/ci_scripts/snapshots/MyTests/snapshot1.json
   case path(String)
 
-  /// Alternate directory to save snapshots for a Swift Package.
+  /// Standard directory to save snapshots.
   ///
-  /// Snapshots will be saved in the specified directory, appending the name of the package, and the name of the test.
+  /// By default snapshots will be saved in a directory with the same name as the test file, and that directory will sit inside a directory `__Snapshots__` that sits next to your test file.
   ///
-  ///  `.packageNameAtPath("/AllSnapshots")`
+  ///  `.snapshotsForFile`
   ///
-  ///   /MyPackage/Tests/MyTests.swift
-  ///   /AllSnapshots/MyPackage/MyTests/snapshot.1.json
-  ///
-  /// This style may be configured via an ENV variable, for example to find snapshots
-  /// in an available directory for Xcode Cloud.
-  ///
-  ///   SNAPSHOTTESTING_PACKAGES_PATH=/Volumes/workspace/respository/ci_scripts/snapshots
-  ///
-  /// For example:
-  ///
-  ///   /Volumes/workspace/respository/ci_scripts/snapshots/MyPackage/MyTests/snapshot1.json
-  case packageNameAtPath(String)
+  ///   /MyProject/MyTests.swift
+  ///   /MyProject/__Snapshots__/MyTests/snapshot.1.json
+  case snapshotsForFile
 }
 
 extension SnapshotDirectory {
   func makeURL(fileUrl: URL, fileName: String) -> URL? {
     switch self {
+    case let .packageSnapshotsAtPath(path):
+      let fileComponents = fileUrl
+        .deletingLastPathComponent()
+        .pathComponents
+      guard
+        let testsIndex = fileComponents.lastIndex(of: "Tests"),
+        fileComponents.endIndex > testsIndex + 1
+      else { return nil }
+      var base = URL(fileURLWithPath: path, isDirectory: true)
+      for index in (testsIndex + 1)..<fileComponents.endIndex {
+        base = base.appendingPathComponent(fileComponents[index])
+      }
+      return base.appendingPathComponent(fileName)
+    case let .path(path):
+      return URL(fileURLWithPath: path, isDirectory: true)
     case .snapshotsForFile:
       return fileUrl
         .deletingLastPathComponent()
         .appendingPathComponent("__Snapshots__")
-        .appendingPathComponent(fileName)
-    case let .path(path):
-      return URL(fileURLWithPath: path, isDirectory: true)
-    case let .packageNameAtPath(path):
-      guard
-        let components = URL(string: path)?.pathComponents,
-        let testsIndex = components.lastIndex(of: "Tests"),
-        let packageName = components.endIndex > testsIndex + 1 ? components[testsIndex + 1] : nil
-      else { return nil }
-      return URL(fileURLWithPath: path, isDirectory: true)
-        .appendingPathComponent(packageName)
         .appendingPathComponent(fileName)
     }
   }
@@ -198,8 +202,8 @@ extension SnapshotDirectory {
       self = .path(path)
       return
     }
-    if let path = ProcessInfo.processInfo.environment["SNAPSHOTTESTING_PACKAGES_PATH"] {
-      self = .packageNameAtPath(path)
+    if let path = ProcessInfo.processInfo.environment["SNAPSHOTTESTING_PACKAGE_PATH"] {
+      self = .packageSnapshotsAtPath(path)
       return
     }
     self = .snapshotsForFile
