@@ -908,6 +908,7 @@ extension UIApplication {
 func prepareView(
   config: ViewImageConfig,
   drawHierarchyInKeyWindow: Bool,
+  computeScrollSize: Bool,
   traits: UITraitCollection,
   view: UIView,
   viewController: UIViewController
@@ -934,6 +935,15 @@ func prepareView(
   }
   let dispose = add(traits: traits, viewController: viewController, to: window)
 
+  if #available(iOS 15.0, *) {
+      if computeScrollSize, let scrollView = viewController.contentScrollView(for: .top) {
+          var size = scrollView.contentSize
+          size.width += scrollView.contentInset.left + scrollView.contentInset.right
+          size.height += scrollView.contentInset.top + scrollView.contentInset.bottom
+          viewController.view.frame.size = size
+      }
+  }
+
   if size.width == 0 || size.height == 0 {
     // Try to call sizeToFit() if the view still has invalid size
     view.sizeToFit()
@@ -947,6 +957,7 @@ func prepareView(
 func snapshotView(
   config: ViewImageConfig,
   drawHierarchyInKeyWindow: Bool,
+  computeScrollSize: Bool,
   traits: UITraitCollection,
   view: UIView,
   viewController: UIViewController
@@ -956,6 +967,7 @@ func snapshotView(
     let dispose = prepareView(
       config: config,
       drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+      computeScrollSize: computeScrollSize,
       traits: traits,
       view: view,
       viewController: viewController

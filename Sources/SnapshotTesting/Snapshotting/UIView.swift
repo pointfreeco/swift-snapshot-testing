@@ -17,6 +17,7 @@ extension Snapshotting where Value == UIView, Format == UIImage {
   ///   - traits: A trait collection override.
   public static func image(
     drawHierarchyInKeyWindow: Bool = false,
+    computeScrollSize: Bool = false,
     precision: Float = 1,
     perceptualPrecision: Float = 1,
     size: CGSize? = nil,
@@ -28,6 +29,7 @@ extension Snapshotting where Value == UIView, Format == UIImage {
         snapshotView(
           config: .init(safeArea: .zero, size: size ?? view.frame.size, traits: .init()),
           drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+          computeScrollSize: computeScrollSize,
           traits: traits,
           view: view,
           viewController: .init()
@@ -45,6 +47,7 @@ extension Snapshotting where Value == UIView, Format == String {
   /// A snapshot strategy for comparing views based on a recursive description of their properties and hierarchies.
   public static func recursiveDescription(
     size: CGSize? = nil,
+    computeScrollSize: Bool = false,
     traits: UITraitCollection = .init()
     )
     -> Snapshotting<UIView, String> {
@@ -52,6 +55,7 @@ extension Snapshotting where Value == UIView, Format == String {
         let dispose = prepareView(
           config: .init(safeArea: .zero, size: size ?? view.frame.size, traits: traits),
           drawHierarchyInKeyWindow: false,
+          computeScrollSize: computeScrollSize,
           traits: .init(),
           view: view,
           viewController: .init()
