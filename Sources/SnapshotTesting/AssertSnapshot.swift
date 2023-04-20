@@ -8,6 +8,12 @@ public var diffTool: String? = nil
 /// Whether or not to record all new references.
 public var isRecording = false
 
+/// If assert failure will save artifacts in here, you can use it to uplaod artifacts when running CI.
+public var artifactsUrl: URL = {
+    let path = ProcessInfo.processInfo.environment["SNAPSHOT_ARTIFACTS"] ?? NSTemporaryDirectory()
+    return URL(fileURLWithPath: path , isDirectory: true)
+}()
+
 /// Whether or not to record all new references.
 /// Due to a name clash in Xcode 12, this has been renamed to `isRecording`.
 @available(*, deprecated, renamed: "isRecording")
@@ -278,9 +284,6 @@ public func verifySnapshot<Value, Format>(
         return nil
       }
 
-      let artifactsUrl = URL(
-        fileURLWithPath: ProcessInfo.processInfo.environment["SNAPSHOT_ARTIFACTS"] ?? NSTemporaryDirectory(), isDirectory: true
-      )
       let artifactsSubUrl = artifactsUrl.appendingPathComponent(fileName)
       try fileManager.createDirectory(at: artifactsSubUrl, withIntermediateDirectories: true)
       let failedSnapshotFileUrl = artifactsSubUrl.appendingPathComponent(snapshotFileUrl.lastPathComponent)
