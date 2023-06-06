@@ -1,5 +1,7 @@
 #if os(macOS)
+import AppKit
 import Cocoa
+import QuartzCore
 
 extension Snapshotting where Value == CALayer, Format == NSImage {
   /// A snapshot strategy for comparing layers based on pixel equality.
