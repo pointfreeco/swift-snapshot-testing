@@ -1133,7 +1133,7 @@ final class SnapshotTestingTests: XCTestCase {
     let webView = WKWebView()
     webView.navigationDelegate = manipulatingWKWebViewNavigationDelegate
 
-    webView.load(URLRequest(url: URL(string: "https://www.pointfree.co")!))
+    webView.load(URLRequest(url: URL(string: "http://pointfree.co/.well-known/apple-developer-merchantid-domain-association")!))
     if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
       assertSnapshot(
         matching: webView,
