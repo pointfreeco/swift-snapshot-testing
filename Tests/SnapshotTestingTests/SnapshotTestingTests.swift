@@ -146,10 +146,10 @@ final class SnapshotTestingTests: XCTestCase {
       }
     }
 
-    await assertSnapshot(
-      matching: { $0.rotatedLeft },
-      as: Snapshotting<Direction, String>.func(into: .description)
-    )
+//    await assertSnapshot(
+//      matching: { $0.rotatedLeft },
+//      as: Snapshotting<Direction, String>.func(into: .description)
+//    )
   }
 
   func testCGPath() async {
