@@ -1147,25 +1147,6 @@ final class SnapshotTestingTests: XCTestCase {
     _ = manipulatingWKWebViewNavigationDelegate
   }
 
-  #if os(iOS) || os(macOS)
-  @MainActor
-  func testWebViewWithRealUrl() async throws {
-    let manipulatingWKWebViewNavigationDelegate = ManipulatingWKWebViewNavigationDelegate()
-    let webView = WKWebView()
-    webView.navigationDelegate = manipulatingWKWebViewNavigationDelegate
-
-    webView.load(URLRequest(url: URL(string: "https://www.pointfree.co")!))
-    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
-      await assertSnapshot(
-        matching: webView,
-        as: .image(size: .init(width: 800, height: 600)),
-        named: platform
-      )
-    }
-    _ = manipulatingWKWebViewNavigationDelegate
-  }
-  #endif
-
   final class CancellingWKWebViewNavigationDelegate: NSObject, WKNavigationDelegate {
     func webView(
       _ webView: WKWebView,

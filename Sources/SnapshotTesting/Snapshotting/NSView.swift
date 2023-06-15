@@ -1,4 +1,5 @@
 #if os(macOS)
+import AppKit
 import Cocoa
 
 extension Snapshotting where Value == NSView, Format == NSImage {
