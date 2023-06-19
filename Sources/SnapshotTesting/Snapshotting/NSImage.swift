@@ -12,7 +12,7 @@ extension Diffing where Value == NSImage {
   ///   - precision: The percentage of pixels that must match.
   ///   - perceptualPrecision: The percentage a pixel must match the source pixel to be considered a match. [98-99% mimics the precision of the human eye.](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e)
   /// - Returns: A new diffing strategy.
-  public static func image(precision: Float = 1, perceptualPrecision: Float = 1) -> Diffing {
+  public static func image(precision: Float = defaultImagePrecision, perceptualPrecision: Float = defaultImagePerceptualPrecision) -> Diffing {
     return .init(
       toData: { NSImagePNGRepresentation($0)! },
       fromData: { NSImage(data: $0)! }
@@ -44,7 +44,7 @@ extension Snapshotting where Value == NSImage, Format == NSImage {
   /// - Parameters:
   ///   - precision: The percentage of pixels that must match.
   ///   - perceptualPrecision: The percentage a pixel must match the source pixel to be considered a match. [98-99% mimics the precision of the human eye.](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e)
-  public static func image(precision: Float = 1, perceptualPrecision: Float = 1) -> Snapshotting {
+  public static func image(precision: Float = defaultImagePrecision, perceptualPrecision: Float = defaultImagePerceptualPrecision) -> Snapshotting {
     return .init(
       pathExtension: "png",
       diffing: .image(precision: precision, perceptualPrecision: perceptualPrecision)

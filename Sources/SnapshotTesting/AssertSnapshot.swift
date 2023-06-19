@@ -16,6 +16,30 @@ public var record: Bool {
   set { isRecording = newValue }
 }
 
+/// The default precision used in image snapshot comparisons.
+///
+/// Represents a percentage of pixels in the snapshot that must match the reference image.
+///
+/// - Precondition: Value is a percentage that should be within the range `0...1`.
+public var defaultImagePrecision: Float = 1
+
+/// The default perceptual precision used in image snapshot comparisons.
+///
+/// Represents how perceptually similar pixels must be to consider them matching.
+/// The value is the inverse of a [Delta E](http://zschuessler.github.io/DeltaE/learn#toc-defining-delta-e).
+///
+/// | Value | Description                                                       |
+/// | ----: | :---------------------------------------------------------------- |
+/// |  100% | Images must be _exactly_ equal                                    |
+/// | ≥ 99% | Allows differences imperceptible by human eyes                    |
+/// | ≥ 98% | Allows differences possibly perceptible through close observation |
+/// | ≥ 90% | Allows differences perceptible at a glance                        |
+/// | ≥ 50% | Allows differences when more similar than not                     |
+/// |  ≥ 0% | Allows any differences                                            |
+///
+/// - Precondition: Value is a percentage that should be within the range `0...1`.
+public var defaultImagePerceptualPrecision: Float = 1
+
 /// Asserts that a given value matches a reference on disk.
 ///
 /// - Parameters:

@@ -14,7 +14,7 @@ extension Snapshotting where Value == CGPath, Format == NSImage {
   /// - Parameters:
   ///   - precision: The percentage of pixels that must match.
   ///   - perceptualPrecision: The percentage a pixel must match the source pixel to be considered a match. [98-99% mimics the precision of the human eye.](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e)
-  public static func image(precision: Float = 1, perceptualPrecision: Float = 1, drawingMode: CGPathDrawingMode = .eoFill) -> Snapshotting {
+  public static func image(precision: Float = defaultImagePrecision, perceptualPrecision: Float = defaultImagePerceptualPrecision, drawingMode: CGPathDrawingMode = .eoFill) -> Snapshotting {
     return SimplySnapshotting.image(precision: precision, perceptualPrecision: perceptualPrecision).pullback { path in
       let bounds = path.boundingBoxOfPath
       var transform = CGAffineTransform(translationX: -bounds.origin.x, y: -bounds.origin.y)
@@ -45,7 +45,7 @@ extension Snapshotting where Value == CGPath, Format == UIImage {
   /// - Parameters:
   ///   - precision: The percentage of pixels that must match.
   ///   - perceptualPrecision: The percentage a pixel must match the source pixel to be considered a match. [98-99% mimics the precision of the human eye.](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e)
-  public static func image(precision: Float = 1, perceptualPrecision: Float = 1, scale: CGFloat = 1, drawingMode: CGPathDrawingMode = .eoFill) -> Snapshotting {
+  public static func image(precision: Float = defaultImagePrecision, perceptualPrecision: Float = defaultImagePerceptualPrecision, scale: CGFloat = 1, drawingMode: CGPathDrawingMode = .eoFill) -> Snapshotting {
     return SimplySnapshotting.image(precision: precision, perceptualPrecision: perceptualPrecision, scale: scale).pullback { path in
       let bounds = path.boundingBoxOfPath
       let format: UIGraphicsImageRendererFormat
