@@ -5,6 +5,9 @@ import XCTest
 ///     diffTool = "ksdiff"
 public var diffTool: String? = nil
 
+/// Whether or not to automatically record snapshots when an existing file is not found.
+public var recordMissingSnapshots = true
+
 /// Whether or not to record all new references.
 public var isRecording = false
 
@@ -233,8 +236,15 @@ public func verifySnapshot<Value, Format>(
       guard var diffable = optionalDiffable else {
         return "Couldn't snapshot value"
       }
-      
+
       guard !recording, fileManager.fileExists(atPath: snapshotFileUrl.path) else {
+        if !recording && !recordMissingSnapshots {
+          return """
+                 No reference was found on disk, and `recordMissingSnapshots` is false.
+                 Did not record snapshot.
+                 """
+        }
+
         try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)
         #if !os(Linux) && !os(Windows)
         if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
