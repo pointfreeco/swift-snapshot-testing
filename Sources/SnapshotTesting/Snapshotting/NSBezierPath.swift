@@ -1,4 +1,5 @@
 #if os(macOS)
+import AppKit
 import Cocoa
 
 extension Snapshotting where Value == NSBezierPath, Format == NSImage {
@@ -30,6 +31,7 @@ extension Snapshotting where Value == NSBezierPath, Format == NSImage {
 
 extension Snapshotting where Value == NSBezierPath, Format == String {
   /// A snapshot strategy for comparing bezier paths based on pixel equality.
+  @available(macOS 11.0, *)
   @available(iOS 11.0, *)
   public static var elementsDescription: Snapshotting {
     return .elementsDescription(numberFormatter: defaultNumberFormatter)
@@ -38,6 +40,7 @@ extension Snapshotting where Value == NSBezierPath, Format == String {
   /// A snapshot strategy for comparing bezier paths based on pixel equality.
   ///
   /// - Parameter numberFormatter: The number formatter used for formatting points.
+  @available(macOS 11.0, *)
   @available(iOS 11.0, *)
   public static func elementsDescription(numberFormatter: NumberFormatter) -> Snapshotting {
     let namesByType: [NSBezierPath.ElementType: String] = [
