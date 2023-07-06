@@ -821,9 +821,6 @@ assertSnapshot(
   matching: vc,
   as: .image(traits: .init(horizontalSizeClass: .compact))
 )
-
-// Match reference as-is.
-assertSnapshot(matching: vc, as: .image)
 ```
 
 **See also**: [`UIView`](#uiview).
