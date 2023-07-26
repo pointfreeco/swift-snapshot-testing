@@ -34,11 +34,13 @@ extension Snapshotting where Value == SKScene, Format == UIImage {
 
 fileprivate extension Snapshotting where Value == SKScene, Format == Image {
   static func skScene(precision: Float, perceptualPrecision: Float, size: CGSize) -> Snapshotting {
-    return Snapshotting<View, Image>.image(precision: precision, perceptualPrecision: perceptualPrecision).pullback { scene in
-      let view = SKView(frame: .init(x: 0, y: 0, width: size.width, height: size.height))
-      view.presentScene(scene)
-      return view
-    }
+    return Snapshotting<View, Image>
+      .image(precision: precision, perceptualPrecision: perceptualPrecision)
+      .pullback { @MainActor scene in
+        let view = SKView(frame: .init(x: 0, y: 0, width: size.width, height: size.height))
+        view.presentScene(scene)
+        return view
+      }
   }
 }
 #endif
