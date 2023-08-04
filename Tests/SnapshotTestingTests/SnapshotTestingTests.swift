@@ -854,6 +854,35 @@ final class SnapshotTestingTests: XCTestCase {
     #endif
   }
 
+  func testUIViewControllerPreserveDirectionalLayoutMargins() {
+    #if os(iOS)
+      class ViewController: UIViewController {
+
+          let blueView: UIView = {
+              let view = UIView()
+              view.backgroundColor = .blue
+              view.translatesAutoresizingMaskIntoConstraints = false
+              return view
+          }()
+
+          override func viewDidLoad() {
+              super.viewDidLoad()
+              view.backgroundColor = .white
+              view.addSubview(blueView)
+              NSLayoutConstraint.activate([
+                  blueView.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
+                  blueView.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+                  blueView.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+                  blueView.bottomAnchor.constraint(equalTo: view.layoutMarginsGuide.bottomAnchor)
+              ])
+          }
+      }
+      let device: ViewImageConfig = .iPhone8(.landscape)
+      let vc = ViewController()
+      assertSnapshot(matching: vc, as: .image(on: device))
+    #endif
+  }
+
   func testUIViewControllerLifeCycle() {
     #if os(iOS)
     class ViewController: UIViewController {

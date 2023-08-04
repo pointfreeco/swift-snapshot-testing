@@ -960,8 +960,11 @@ func snapshotView(
       view: view,
       viewController: viewController
     )
+
     // NB: Avoid safe area influence.
+    let directionalLayoutMargins = view.directionalLayoutMargins
     if config.safeArea == .zero { view.frame.origin = .init(x: offscreen, y: offscreen) }
+    view.directionalLayoutMargins = directionalLayoutMargins
 
     return (view.snapshot ?? Async { callback in
       addImagesForRenderedViews(view).sequence().run { views in
