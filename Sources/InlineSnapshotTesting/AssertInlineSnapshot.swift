@@ -1,4 +1,5 @@
 import Foundation
+import SnapshotTesting
 import SwiftParser
 import SwiftSyntax
 import SwiftSyntaxBuilder
@@ -8,11 +9,11 @@ public func assertInlineSnapshot<Value>(
   of value: @autoclosure () throws -> Value,
   as snapshotting: Snapshotting<Value, String>,
   timeout: TimeInterval = 5,
+  matches expected: (() -> String)? = nil,
   file: StaticString = #filePath,
   function: StaticString = #function,
   line: UInt = #line,
-  column: UInt = #column,
-  matches expected: (() -> String)? = nil
+  column: UInt = #column
 ) {
   XCTCurrentTestCase?.addTeardownBlock {
     writeInlineSnapshots()
@@ -128,10 +129,12 @@ private func writeInlineSnapshots() {
     )
     let updatedSource = snapshotRewriter.visit(sourceFile).description
     do {
-      try updatedSource.write(toFile: filePath, atomically: true, encoding: .utf8)
+      if source != updatedSource {
+        try updatedSource.write(toFile: filePath, atomically: true, encoding: .utf8)
+      }
       snapshotRewriter.report()
     } catch {
-      XCTFail()
+      XCTFail("Threw error: \(error)")
     }
   }
 }
@@ -165,12 +168,14 @@ private class SnapshotRewriter: SyntaxRewriter {
   override func visit(_ functionCallExpr: FunctionCallExprSyntax) -> ExprSyntax {
     guard
       let snapshot = snapshots.first,
-      // functionCallExpr.calledExpression.as(IdentifierExprSyntax.self)?.identifier.text
-      //   == "assertInlineSnapshot",
       (functionCallExpr.position..<functionCallExpr.endPosition).contains(
         self.sourceLocationConverter.position(
           ofLine: Int(snapshot.line), column: Int(snapshot.column)
         )
+      ),
+      isRecording && snapshot.expected != snapshot.actual || (
+        !functionCallExpr.argumentList.contains(where: { $0.label == "matches" })
+          && functionCallExpr.trailingClosure == nil
       )
     else {
       return ExprSyntax(functionCallExpr)
@@ -199,7 +204,12 @@ private class SnapshotRewriter: SyntaxRewriter {
       .with(\.argumentList, argumentList)
       .with(
         \.rightParen,
-        (functionCallExpr.rightParen ?? .rightParenToken()).with(\.trailingTrivia, .space)
+        (functionCallExpr.rightParen ?? .rightParenToken()).with(
+          \.trailingTrivia,
+          functionCallExpr.rightParen?.trailingTrivia.isEmpty == true
+            ? .space
+           : functionCallExpr.rightParen?.trailingTrivia ?? .space
+        )
       )
       .with(
         \.trailingClosure,
@@ -272,7 +282,7 @@ private class SnapshotRewriter: SyntaxRewriter {
         """
         \(failure)
 
-        Re-run "\(snapshot.function)" to test against the newly-recorded value.
+        Re-run "\(snapshot.function)" to test against the newly-recorded snapshot.
         """,
         file: self.file.path,
         line: line

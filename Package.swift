@@ -1,4 +1,5 @@
 // swift-tools-version:5.5
+
 import PackageDescription
 
 let package = Package(
@@ -13,6 +14,14 @@ let package = Package(
       name: "SnapshotTesting",
       targets: ["SnapshotTesting"]
     ),
+    .library(
+      name: "InlineSnapshotTesting",
+      targets: ["InlineSnapshotTesting"]
+    ),
+    .library(
+      name: "MacroSnapshotTesting",
+      targets: ["MacroSnapshotTesting"]
+    ),
   ],
   dependencies: [
     .package(
@@ -22,21 +31,34 @@ let package = Package(
   ],
   targets: [
     .target(
-      name: "SnapshotTesting",
+      name: "SnapshotTesting"
+    ),
+    .target(
+      name: "InlineSnapshotTesting",
       dependencies: [
-        .product(name: "SwiftBasicFormat", package: "swift-syntax"),
+        "SnapshotTesting",
         .product(name: "SwiftParser", package: "swift-syntax"),
         .product(name: "SwiftSyntax", package: "swift-syntax"),
         .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
       ]
     ),
+    .target(
+      name: "MacroSnapshotTesting",
+      dependencies: [
+        "InlineSnapshotTesting",
+        .product(name: "SwiftSyntaxMacrosTestSupport", package: "swift-syntax"),
+      ]
+    ),
     .testTarget(
       name: "SnapshotTestingTests",
-      dependencies: ["SnapshotTesting"],
+      dependencies: [
+        "InlineSnapshotTesting",
+        "SnapshotTesting",
+      ],
       exclude: [
         "__Fixtures__",
         "__Snapshots__",
       ]
-    )
+    ),
   ]
 )
