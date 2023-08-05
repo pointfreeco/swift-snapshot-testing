@@ -27,11 +27,25 @@ public func assertInlineSnapshot<Value>(
     switch XCTWaiter.wait(for: [expectation], timeout: timeout) {
     case .completed:
       break
-    case .incorrectOrder, .interrupted, .invertedFulfillment, .timedOut:
-      XCTFail()
+    case .timedOut:
+      XCTFail(
+        """
+        Exceeded timeout of \(timeout) seconds waiting for snapshot.
+
+        This can happen when an asynchronously rendered view (like a web view) has not loaded. \
+        Ensure that every subview of the view hierarchy has loaded to avoid timeouts, or, if a \
+        timeout is unavoidable, consider setting the "timeout" parameter of "assertSnapshot" to \
+        a higher value.
+        """,
+        file: file,
+        line: line
+      )
+      return
+    case .incorrectOrder, .interrupted, .invertedFulfillment:
+      XCTFail("Couldn't snapshot value", file: file, line: line)
       return
     @unknown default:
-      XCTFail()
+      XCTFail("Couldn't snapshot value", file: file, line: line)
       return
     }
     guard !isRecording, let expected = expected?()
@@ -59,7 +73,7 @@ public func assertInlineSnapshot<Value>(
       )
     }
   } catch {
-    XCTFail("TODO: Show error message")
+    XCTFail("Threw error: \(error)", file: file, line: line)
   }
 }
 
