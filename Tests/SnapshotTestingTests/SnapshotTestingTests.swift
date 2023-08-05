@@ -23,12 +23,86 @@ final class SnapshotTestingTests: XCTestCase {
   override func setUp() {
     super.setUp()
     diffTool = "ksdiff"
-//    isRecording = true
+    // isRecording = true
   }
 
   override func tearDown() {
     isRecording = false
     super.tearDown()
+  }
+
+  func testInlineSnapshots() {
+    assertInlineSnapshot(of: ["Hello", "World"], as: .dump) {
+      """
+      ▿ 2 elements
+        - "Hello"
+        - "World"
+
+      """
+    }
+
+    assertInlineSnapshot(of: "Hello\"\"\"#, world", as: .lines) {
+      ##"""
+      Hello"""#, world
+      """##
+    }
+
+    assertInlineSnapshot(of: ["Hello", "World"], as: .dump) {
+      """
+      ▿ 2 elements
+        - "Hello"
+        - "World"
+
+      """
+    }
+  }
+
+  func testCustomInlineSnapshots() {
+    func assertCustomInlineSnapshot<Value>(
+      of value: @autoclosure () throws -> Value,
+      as snapshotting: Snapshotting<Value, String>,
+      timeout: TimeInterval = 5,
+      file: StaticString = #filePath,
+      function: StaticString = #function,
+      line: UInt = #line,
+      column: UInt = #column,
+      matches expected: (() -> String)? = nil
+    ) {
+      assertInlineSnapshot(
+        of: try value(),
+        as: snapshotting,
+        timeout: timeout,
+        file: file,
+        function: function,
+        line: line,
+        column: column,
+        matches: expected
+      )
+    }
+
+    assertCustomInlineSnapshot(of: ["Hello", "World"], as: .dump) {
+      """
+      ▿ 2 elements
+        - "Hello"
+        - "World"
+
+      """
+    }
+
+    assertCustomInlineSnapshot(of: "Hello\"\"\"#, world", as: .lines) {
+      ##"""
+      Hello"""#, world
+      """##
+    }
+
+    assertCustomInlineSnapshot(of: ["Hello", "World"], as: .dump) {
+      """
+      ▿ 2 elements
+        - "Hello"
+        - "World"
+
+      """
+    }
   }
 
   func testAny() {

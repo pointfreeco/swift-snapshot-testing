@@ -12,7 +12,7 @@ public func assertInlineSnapshot<Value>(
   function: StaticString = #function,
   line: UInt = #line,
   column: UInt = #column,
-  matches expected: String? = nil
+  matches expected: (() -> String)? = nil
 ) {
   XCTCurrentTestCase?.addTeardownBlock {
     writeInlineSnapshots()
@@ -34,11 +34,11 @@ public func assertInlineSnapshot<Value>(
       XCTFail()
       return
     }
-    guard !isRecording, let expected = expected
+    guard !isRecording, let expected = expected?()
     else {
       inlineSnapshotState[File(path: file), default: []].append(
         InlineSnapshot(
-          expected: expected,
+          expected: expected?(),
           actual: actual,
           function: "\(function)",
           line: line,
@@ -85,7 +85,8 @@ private var XCTCurrentTestCase: XCTestCase? {
   guard
     let observers = XCTestObservationCenter.shared.perform(Selector(("observers")))?
       .takeUnretainedValue() as? [AnyObject],
-    let observer = observers
+    let observer =
+      observers
       .first(where: { NSStringFromClass(type(of: $0)) == "XCTestMisuseObserver" }),
     let currentTestCase = observer.perform(Selector(("currentTestCase")))?
       .takeUnretainedValue() as? XCTestCase
@@ -136,8 +137,7 @@ private class SnapshotRewriter: SyntaxRewriter {
     sourceLocationConverter: SourceLocationConverter
   ) {
     self.file = file
-    // TODO: Better line to render this on?
-    self.line = snapshots.last?.line
+    self.line = snapshots.first?.line
     self.indent = String(
       sourceLocationConverter.sourceLines
         .first(where: { $0.first?.isWhitespace == true && $0 != "\n" })?
@@ -151,8 +151,8 @@ private class SnapshotRewriter: SyntaxRewriter {
   override func visit(_ functionCallExpr: FunctionCallExprSyntax) -> ExprSyntax {
     guard
       let snapshot = snapshots.first,
-      functionCallExpr.calledExpression.as(IdentifierExprSyntax.self)?.identifier.text
-        == "assertInlineSnapshot",
+      // functionCallExpr.calledExpression.as(IdentifierExprSyntax.self)?.identifier.text
+      //   == "assertInlineSnapshot",
       (functionCallExpr.position..<functionCallExpr.endPosition).contains(
         self.sourceLocationConverter.position(
           ofLine: Int(snapshot.line), column: Int(snapshot.column)
@@ -163,72 +163,56 @@ private class SnapshotRewriter: SyntaxRewriter {
     }
     self.snapshots.removeFirst()
     var argumentList = functionCallExpr.argumentList
-    let isMultiline = snapshot.actual.contains("\n")
-    let trailingComma =
-      functionCallExpr.argumentList.leadingTrivia.isEmpty
-      ? argumentList.first?.trailingComma
-      : .commaToken()
     if let index = argumentList.firstIndex(where: { $0.label?.text == "matches" }) {
       argumentList = argumentList.removing(
         childAt: argumentList.distance(from: argumentList.startIndex, to: index)
       )
+      argumentList = argumentList.replacing(
+        childAt: argumentList.count - 1,
+        with: argumentList[argumentList.index(before: argumentList.endIndex)]
+          .with(\.trailingComma, nil)
+      )
     }
-    argumentList = argumentList.replacing(
-      childAt: argumentList.count - 1,
-      with: argumentList[argumentList.index(before: argumentList.endIndex)]
-        .with(\.trailingComma, trailingComma)
-    )
-    let functionLeadingTrivia = String(
+    let leadingTrivia = String(
       functionCallExpr.leadingTrivia.description.split(separator: "\n").last ?? ""
     )
-    let argumentLeadingTrivia = String(
-      functionCallExpr.argumentList.leadingTrivia.description.split(separator: "\n").last
-        ?? ""
-    )
-    let leadingTrivia =
-      functionCallExpr.argumentList.leadingTrivia.isEmpty
-      ? functionLeadingTrivia
-      : argumentLeadingTrivia
     let delimiter = String(
-      repeating: "#", count: snapshot.actual.hashCount(isMultiline: isMultiline)
+      repeating: "#", count: snapshot.actual.hashCount(isMultiline: true)
     )
     let leadingIndent = leadingTrivia + self.indent
     let updatedFunctionCallExpr =
       functionCallExpr
       .with(\.argumentList, argumentList)
-      .addArgument(
-        TupleExprElementSyntax(
-          leadingTrivia: functionCallExpr.argumentList.leadingTrivia,
-          label: "matches",
-          colon: .colonToken(trailingTrivia: .space),
-          expression: ExprSyntax(
+      .with(
+        \.rightParen,
+        (functionCallExpr.rightParen ?? .rightParenToken()).with(\.trailingTrivia, .space)
+      )
+      .with(
+        \.trailingClosure,
+        ClosureExprSyntax(
+          leftBrace: .leftBraceToken(trailingTrivia: .newline),
+          statements: CodeBlockItemListSyntax {
             StringLiteralExprSyntax(
+              leadingTrivia: .init(stringLiteral: leadingIndent),
               openDelimiter: .rawStringDelimiter(delimiter),
-              openQuote: isMultiline
-                ? .multilineStringQuoteToken(trailingTrivia: .newline)
-                : .stringQuoteToken(),
+              openQuote: .multilineStringQuoteToken(trailingTrivia: .newline),
               segments: [
                 .stringSegment(
                   StringSegmentSyntax(
-                    content: .stringSegment(
-                      isMultiline
-                        ? snapshot.actual.indenting(with: leadingIndent)
-                        : snapshot.actual
-                    )
+                    content: .stringSegment(snapshot.actual.indenting(with: leadingIndent))
                   )
                 )
               ],
-              closeQuote: isMultiline
-                ? .multilineStringQuoteToken(
-                  leadingTrivia: .newline + .init(stringLiteral: leadingIndent))
-                : .stringQuoteToken(),
+              closeQuote: .multilineStringQuoteToken(
+                leadingTrivia: .newline + .init(stringLiteral: leadingIndent)
+              ),
               closeDelimiter: .rawStringDelimiter(delimiter)
             )
-          ),
-          trailingComma: nil,
-          trailingTrivia: nil
-        )
-      )
+          },
+          rightBrace: .rightBraceToken(
+            leadingTrivia: .newline + .init(stringLiteral: leadingTrivia)
+          )
+        ))
     defer {
       let lineCount = functionCallExpr.description
         .split(separator: "\n", omittingEmptySubsequences: false)
@@ -265,8 +249,7 @@ private class SnapshotRewriter: SyntaxRewriter {
     }
     for (snapshot, line) in self.newRecordings {
       var failure = "Automatically recorded a new snapshot."
-      if
-        let expected = snapshot.expected,
+      if let expected = snapshot.expected,
         let difference = Diffing.lines.diff(expected, snapshot.actual)?.0
       {
         failure += " Difference: …\n\n\(difference.indenting(by: 2))"
