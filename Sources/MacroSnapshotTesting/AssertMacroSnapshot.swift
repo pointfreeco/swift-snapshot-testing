@@ -18,6 +18,10 @@ public func assertMacroSnapshot(
   assertInlineSnapshot(
     of: try originalSource(),
     as: .macroExpansion(macros),
+    syntaxDescriptor: InlineSnapshotSyntaxDescriptor(
+      trailingClosureLabel: "expandsTo",
+      trailingClosureOffset: 1
+    ),
     matches: expandedSource,
     file: file,
     function: function,
