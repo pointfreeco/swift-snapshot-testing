@@ -127,7 +127,6 @@ public func _verifyInlineSnapshot<Value>(
           )
         ).sourceCode
 
-        print("???")
         try modifiedSource
           .data(using: String.Encoding.utf8)?
           .write(to: sourceCodeFilePath)
