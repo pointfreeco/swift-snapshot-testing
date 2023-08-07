@@ -8,17 +8,17 @@ import SwiftSyntaxMacrosTestSupport
 
 public func assertMacroSnapshot(
   _ macros: [String: Macro.Type],
-  of source: () throws -> String,
-  expandsTo expected: (() -> String)? = nil,
+  of originalSource: () throws -> String,
+  expandsTo expandedSource: (() -> String)? = nil,
   file: StaticString = #filePath,
   function: StaticString = #function,
   line: UInt = #line,
   column: UInt = #column
 ) {
   assertInlineSnapshot(
-    of: try source(),
+    of: try originalSource(),
     as: .macroExpansion(macros),
-    matches: expected,
+    matches: expandedSource,
     file: file,
     function: function,
     line: line,
