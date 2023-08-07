@@ -1,4 +1,5 @@
 import InlineSnapshotTesting
+// import SwiftBasicFormat
 import SwiftParser
 import SwiftSyntax
 import SwiftSyntaxMacroExpansion
@@ -8,7 +9,7 @@ import SwiftSyntaxMacrosTestSupport
 public func assertMacroSnapshot(
   _ macros: [String: Macro.Type],
   of value: () throws -> String,
-  matches expected: (() -> String)? = nil,
+  expandsTo expected: (() -> String)? = nil,
   file: StaticString = #filePath,
   function: StaticString = #function,
   line: UInt = #line,
@@ -43,6 +44,7 @@ extension Snapshotting where Value == String, Format == String {
         macros: macros,
         in: context
       )
+      // .formatted(using: BasicFormat(indentationWidth: indentationWidth))
       return expandedSourceFile.description.trimmingTrailingWhitespace()
     }
   }

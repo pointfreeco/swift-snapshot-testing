@@ -5,10 +5,21 @@ import SwiftSyntax
 import SwiftSyntaxBuilder
 import XCTest
 
+public struct InlineSnapshotSyntaxDescriptor: Hashable {
+  public var trailingClosureLabel: String
+  public var trailingClosureOffset: Int
+
+  public init(trailingClosureLabel: String = "matches", trailingClosureOffset: Int = 0) {
+    self.trailingClosureLabel = trailingClosureLabel
+    self.trailingClosureOffset = trailingClosureOffset
+  }
+}
+
 public func assertInlineSnapshot<Value>(
   of value: @autoclosure () throws -> Value,
   as snapshotting: Snapshotting<Value, String>,
   timeout: TimeInterval = 5,
+  syntaxDescriptor: InlineSnapshotSyntaxDescriptor = .init(),
   matches expected: (() -> String)? = nil,
   file: StaticString = #filePath,
   function: StaticString = #function,
@@ -55,6 +66,7 @@ public func assertInlineSnapshot<Value>(
         InlineSnapshot(
           expected: expected?(),
           actual: actual,
+          syntaxDescriptor: syntaxDescriptor,
           function: "\(function)",
           line: line,
           column: column
@@ -91,6 +103,7 @@ private struct File: Hashable {
 private struct InlineSnapshot: Hashable {
   var expected: String?
   var actual: String
+  var syntaxDescriptor: InlineSnapshotSyntaxDescriptor
   var function: String
   var line: UInt
   var column: UInt
@@ -173,25 +186,12 @@ private class SnapshotRewriter: SyntaxRewriter {
           ofLine: Int(snapshot.line), column: Int(snapshot.column)
         )
       ),
-      isRecording && snapshot.expected != snapshot.actual || (
-        !functionCallExpr.argumentList.contains(where: { $0.label == "matches" })
-          && functionCallExpr.trailingClosure == nil
-      )
+      snapshot.expected != snapshot.actual
     else {
       return ExprSyntax(functionCallExpr)
     }
     self.snapshots.removeFirst()
-    var argumentList = functionCallExpr.argumentList
-    if let index = argumentList.firstIndex(where: { $0.label?.text == "matches" }) {
-      argumentList = argumentList.removing(
-        childAt: argumentList.distance(from: argumentList.startIndex, to: index)
-      )
-      argumentList = argumentList.replacing(
-        childAt: argumentList.count - 1,
-        with: argumentList[argumentList.index(before: argumentList.endIndex)]
-          .with(\.trailingComma, nil)
-      )
-    }
+
     let leadingTrivia = String(
       functionCallExpr.leadingTrivia.description.split(separator: "\n").last ?? ""
     )
@@ -199,44 +199,95 @@ private class SnapshotRewriter: SyntaxRewriter {
       repeating: "#", count: snapshot.actual.hashCount(isMultiline: true)
     )
     let leadingIndent = leadingTrivia + self.indent
-    let updatedFunctionCallExpr =
-      functionCallExpr
-      .with(\.argumentList, argumentList)
-      .with(
-        \.rightParen,
-        (functionCallExpr.rightParen ?? .rightParenToken()).with(
-          \.trailingTrivia,
-          functionCallExpr.rightParen?.trailingTrivia.isEmpty == true
-            ? .space
-           : functionCallExpr.rightParen?.trailingTrivia ?? .space
-        )
-      )
-      .with(
-        \.trailingClosure,
-        ClosureExprSyntax(
-          leftBrace: .leftBraceToken(trailingTrivia: .newline),
-          statements: CodeBlockItemListSyntax {
-            StringLiteralExprSyntax(
-              leadingTrivia: .init(stringLiteral: leadingIndent),
-              openDelimiter: .rawStringDelimiter(delimiter),
-              openQuote: .multilineStringQuoteToken(trailingTrivia: .newline),
-              segments: [
-                .stringSegment(
-                  StringSegmentSyntax(
-                    content: .stringSegment(snapshot.actual.indenting(with: leadingIndent))
-                  )
-                )
-              ],
-              closeQuote: .multilineStringQuoteToken(
-                leadingTrivia: .newline + .init(stringLiteral: leadingIndent)
-              ),
-              closeDelimiter: .rawStringDelimiter(delimiter)
+    let snapshotClosure = ClosureExprSyntax(
+      leftBrace: .leftBraceToken(trailingTrivia: .newline),
+      statements: CodeBlockItemListSyntax {
+        StringLiteralExprSyntax(
+          leadingTrivia: .init(stringLiteral: leadingIndent),
+          openDelimiter: .rawStringDelimiter(delimiter),
+          openQuote: .multilineStringQuoteToken(trailingTrivia: .newline),
+          segments: [
+            .stringSegment(
+              StringSegmentSyntax(
+                content: .stringSegment(snapshot.actual.indenting(with: leadingIndent))
+              )
             )
-          },
-          rightBrace: .rightBraceToken(
-            leadingTrivia: .newline + .init(stringLiteral: leadingTrivia)
+          ],
+          closeQuote: .multilineStringQuoteToken(
+            leadingTrivia: .newline + .init(stringLiteral: leadingIndent)
+          ),
+          closeDelimiter: .rawStringDelimiter(delimiter)
+        )
+      },
+      rightBrace: .rightBraceToken(
+        leadingTrivia: .newline + .init(stringLiteral: leadingTrivia)
+      )
+    )
+
+    var argumentList = functionCallExpr.argumentList
+
+    let firstTrailingClosureOffset = argumentList
+      .enumerated()
+      .reversed()
+      .prefix(while: { $0.element.expression.is(ClosureExprSyntax.self) })
+      .last?
+      .offset
+      ?? argumentList.count
+
+    let trailingClosureOffset = firstTrailingClosureOffset
+      + snapshot.syntaxDescriptor.trailingClosureOffset
+
+    let updatedFunctionCallExpr: FunctionCallExprSyntax
+    let centeredTrailingClosureOffset = trailingClosureOffset - argumentList.count
+    
+    switch centeredTrailingClosureOffset {
+    case ..<0:
+      let argument = argumentList[
+        argumentList.index(argumentList.startIndex, offsetBy: trailingClosureOffset)
+      ]
+      // TODO: Validate argument label and argument syntax?
+      argumentList = argumentList.replacing(
+        childAt: trailingClosureOffset,
+        with: argument.with(\.expression, ExprSyntax(snapshotClosure))
+      )
+      updatedFunctionCallExpr = functionCallExpr.with(\.argumentList, argumentList)
+
+    case 0:
+      updatedFunctionCallExpr = functionCallExpr.with(
+        \.trailingClosure,
+        snapshotClosure.with(\.leadingTrivia, snapshotClosure.leadingTrivia + .space)
+      )
+
+    case 1...:
+      var additionalTrailingClosures = functionCallExpr.additionalTrailingClosures ?? []
+      if !additionalTrailingClosures.isEmpty, let index = additionalTrailingClosures.index(
+        additionalTrailingClosures.startIndex,
+        offsetBy: centeredTrailingClosureOffset - 1,
+        limitedBy: additionalTrailingClosures.endIndex
+      ) {
+        let child = additionalTrailingClosures[index]
+        additionalTrailingClosures = additionalTrailingClosures.replacing(
+          childAt: centeredTrailingClosureOffset - 1,
+          with: child.with(\.closure, snapshotClosure)
+        )
+      } else if centeredTrailingClosureOffset == 1 {
+        additionalTrailingClosures = additionalTrailingClosures.appending(
+          MultipleTrailingClosureElementSyntax(
+            leadingTrivia: .space,
+            label: TokenSyntax(stringLiteral: snapshot.syntaxDescriptor.trailingClosureLabel),
+            closure: snapshotClosure.with(\.leadingTrivia, snapshotClosure.leadingTrivia + .space)
           )
-        ))
+        )
+      } else {
+        fatalError("TODO")
+      }
+      updatedFunctionCallExpr = functionCallExpr
+        .with(\.additionalTrailingClosures, additionalTrailingClosures)
+
+    default:
+      fatalError("TODO")
+    }
+
     defer {
       let lineCount = functionCallExpr.description
         .split(separator: "\n", omittingEmptySubsequences: false)
@@ -245,16 +296,6 @@ private class SnapshotRewriter: SyntaxRewriter {
         .split(separator: "\n", omittingEmptySubsequences: false)
         .count
       self.offset += updatedLineCount - lineCount
-    }
-    if snapshot.expected != snapshot.actual {
-      let line = UInt(
-        functionCallExpr.calledExpression.startLocation(
-          converter: self.sourceLocationConverter,
-          afterLeadingTrivia: true
-        )
-        .line + self.offset
-      )
-      self.newRecordings.append((snapshot: snapshot, line: line))
     }
     return ExprSyntax(updatedFunctionCallExpr)
   }
@@ -308,7 +349,7 @@ extension String {
   fileprivate func hashCount(isMultiline: Bool) -> Int {
     let (quote, offset) = isMultiline ? ("\"\"\"", 2) : ("\"", 0)
     var substring = self[...]
-    var hashCount = 0
+    var hashCount = self.contains(#"\"#) ? 1 : 0
     let pattern = "(\(quote)[#]*)"
     while let range = substring.range(of: pattern, options: .regularExpression) {
       let count = substring.distance(from: range.lowerBound, to: range.upperBound) - offset

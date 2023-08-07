@@ -34,14 +34,14 @@ final class SnapshotTestingTests: XCTestCase {
   }
 
   func testInlineSnapshots() {
-    assertInlineSnapshot(of: ["Hello", "World"], as: .dump) {
+    assertInlineSnapshot(of: ["Hello", "World"], as: .dump, matches: {
       """
       ▿ 2 elements
         - "Hello"
         - "World"
 
       """
-    }
+    })
 
     assertInlineSnapshot(of: "Hello\"\"\"#, world", as: .lines) {
       ##"""
@@ -60,20 +60,21 @@ final class SnapshotTestingTests: XCTestCase {
   }
 
   func testCustomInlineSnapshots() {
-    func assertCustomInlineSnapshot<Value>(
-      of value: @autoclosure () throws -> Value,
-      as snapshotting: Snapshotting<Value, String>,
-      timeout: TimeInterval = 5,
-      matches expected: (() -> String)? = nil,
+    func assertCustomInlineSnapshot(
+      of value: () -> String,
+      is expected: (() -> String)? = nil,
       file: StaticString = #filePath,
       function: StaticString = #function,
       line: UInt = #line,
       column: UInt = #column
     ) {
       assertInlineSnapshot(
-        of: try value(),
-        as: snapshotting,
-        timeout: timeout,
+        of: value(),
+        as: .dump,
+        syntaxDescriptor: InlineSnapshotSyntaxDescriptor(
+          trailingClosureLabel: "is",
+          trailingClosureOffset: 1
+        ),
         matches: expected,
         file: file,
         function: function,
@@ -82,29 +83,47 @@ final class SnapshotTestingTests: XCTestCase {
       )
     }
 
-    assertCustomInlineSnapshot(of: ["Hellos", "World"], as: .dump) {
+    assertCustomInlineSnapshot {
       """
-      ▿ 2 elements
-        - "Hellos"
-        - "World"
+      "Hello"
+      "World"
+      """
+    } is: {
+      #"""
+      - "\"Hello\"\n\"World\""
+
+      """#
+    }
+
+    assertCustomInlineSnapshot { "Hello" } is: {
+      """
+      - "Hello"
 
       """
     }
 
-    assertCustomInlineSnapshot(of: "Hellos\"\"\"#, world", as: .lines) {
-      ##"""
-      Hellos"""#, world
-      """##
-    }
-
-    assertCustomInlineSnapshot(of: ["Hello", "World"], as: .dump) {
+    assertCustomInlineSnapshot(of: { "Hello" }) {
       """
-      ▿ 2 elements
-        - "Hello"
-        - "World"
+      - "Hello"
 
       """
     }
+
+    assertCustomInlineSnapshot(
+      of: { "Hello" }
+    ) {
+      """
+      - "Hello"
+
+      """
+    }
+
+    assertCustomInlineSnapshot(of: { "Hello" }, is: {
+      """
+      - "Hello"
+
+      """
+    })
   }
 
   func testAny() {
