@@ -46,6 +46,9 @@ let package = Package(
       name: "MacroSnapshotTesting",
       dependencies: [
         "InlineSnapshotTesting",
+        .product(name: "SwiftBasicFormat", package: "swift-syntax"),
+        .product(name: "SwiftSyntaxMacroExpansion", package: "swift-syntax"),
+        .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
         .product(name: "SwiftSyntaxMacrosTestSupport", package: "swift-syntax"),
       ]
     ),
