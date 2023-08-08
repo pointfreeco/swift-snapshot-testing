@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "51DE17C6-8983-4674-9EAB-D8A67C0BB957",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : false
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "InlineSnapshotTestingTests",
+        "name" : "InlineSnapshotTestingTests"
+      }
+    }
+  ],
+  "version" : 1
+}

@@ -1,5 +1,4 @@
 import Foundation
-import InlineSnapshotTesting
 import XCTest
 
 @testable import SnapshotTesting
@@ -31,99 +30,6 @@ final class SnapshotTestingTests: XCTestCase {
   override func tearDown() {
     isRecording = false
     super.tearDown()
-  }
-
-  func testInlineSnapshots() {
-    assertInlineSnapshot(of: ["Hello", "World"], as: .dump, matches: {
-      """
-      ▿ 2 elements
-        - "Hello"
-        - "World"
-
-      """
-    })
-
-    assertInlineSnapshot(of: "Hello\"\"\"#, world", as: .lines) {
-      ##"""
-      Hello"""#, world
-      """##
-    }
-
-    assertInlineSnapshot(of: ["Hello", "World"], as: .dump) {
-      """
-      ▿ 2 elements
-        - "Hello"
-        - "World"
-
-      """
-    }
-  }
-
-  func testCustomInlineSnapshots() {
-    func assertCustomInlineSnapshot(
-      of value: () -> String,
-      is expected: (() -> String)? = nil,
-      file: StaticString = #filePath,
-      function: StaticString = #function,
-      line: UInt = #line,
-      column: UInt = #column
-    ) {
-      assertInlineSnapshot(
-        of: value(),
-        as: .dump,
-        syntaxDescriptor: InlineSnapshotSyntaxDescriptor(
-          trailingClosureLabel: "is",
-          trailingClosureOffset: 1
-        ),
-        matches: expected,
-        file: file,
-        function: function,
-        line: line,
-        column: column
-      )
-    }
-
-    assertCustomInlineSnapshot {
-      """
-      "Hello"
-      "World"
-      """
-    } is: {
-      #"""
-      - "\"Hello\"\n\"World\""
-
-      """#
-    }
-
-    assertCustomInlineSnapshot { "Hello" } is: {
-      """
-      - "Hello"
-
-      """
-    }
-
-    assertCustomInlineSnapshot(of: { "Hello" }) {
-      """
-      - "Hello"
-
-      """
-    }
-
-    assertCustomInlineSnapshot(
-      of: { "Hello" }
-    ) {
-      """
-      - "Hello"
-
-      """
-    }
-
-    assertCustomInlineSnapshot(of: { "Hello" }, is: {
-      """
-      - "Hello"
-
-      """
-    })
   }
 
   func testAny() {

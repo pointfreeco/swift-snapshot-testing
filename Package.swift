@@ -53,9 +53,14 @@ let package = Package(
       ]
     ),
     .testTarget(
-      name: "SnapshotTestingTests",
+      name: "InlineSnapshotTestingTests",
       dependencies: [
         "InlineSnapshotTesting",
+      ]
+    ),
+    .testTarget(
+      name: "SnapshotTestingTests",
+      dependencies: [
         "SnapshotTesting",
       ],
       exclude: [
