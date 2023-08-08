@@ -134,7 +134,7 @@ private func writeInlineSnapshots() {
       return
     }
     let sourceFile = Parser.parse(source: source)
-    let sourceLocationConverter = SourceLocationConverter(file: filePath, source: source)
+    let sourceLocationConverter = SourceLocationConverter(fileName: filePath, tree: sourceFile)
     let snapshotRewriter = SnapshotRewriter(
       file: file,
       snapshots: snapshots.sorted(by: { $0.line < $1.line }),
@@ -204,8 +204,8 @@ private class SnapshotRewriter: SyntaxRewriter {
       statements: CodeBlockItemListSyntax {
         StringLiteralExprSyntax(
           leadingTrivia: .init(stringLiteral: leadingIndent),
-          openDelimiter: .rawStringDelimiter(delimiter),
-          openQuote: .multilineStringQuoteToken(trailingTrivia: .newline),
+          openingPounds: .rawStringPoundDelimiter(delimiter),
+          openingQuote: .multilineStringQuoteToken(trailingTrivia: .newline),
           segments: [
             .stringSegment(
               StringSegmentSyntax(
@@ -213,10 +213,10 @@ private class SnapshotRewriter: SyntaxRewriter {
               )
             )
           ],
-          closeQuote: .multilineStringQuoteToken(
+          closingQuote: .multilineStringQuoteToken(
             leadingTrivia: .newline + .init(stringLiteral: leadingIndent)
           ),
-          closeDelimiter: .rawStringDelimiter(delimiter)
+          closingPounds: .rawStringPoundDelimiter(delimiter)
         )
       },
       rightBrace: .rightBraceToken(
@@ -224,33 +224,28 @@ private class SnapshotRewriter: SyntaxRewriter {
       )
     )
 
-    var argumentList = functionCallExpr.argumentList
+    var arguments = functionCallExpr.arguments
 
-    let firstTrailingClosureOffset = argumentList
+    let firstTrailingClosureOffset = arguments
       .enumerated()
       .reversed()
       .prefix(while: { $0.element.expression.is(ClosureExprSyntax.self) })
       .last?
       .offset
-      ?? argumentList.count
+      ?? arguments.count
 
     let trailingClosureOffset = firstTrailingClosureOffset
       + snapshot.syntaxDescriptor.trailingClosureOffset
 
     let updatedFunctionCallExpr: FunctionCallExprSyntax
-    let centeredTrailingClosureOffset = trailingClosureOffset - argumentList.count
+    let centeredTrailingClosureOffset = trailingClosureOffset - arguments.count
     
     switch centeredTrailingClosureOffset {
     case ..<0:
-      let argument = argumentList[
-        argumentList.index(argumentList.startIndex, offsetBy: trailingClosureOffset)
-      ]
+      let index = arguments.index(arguments.startIndex, offsetBy: trailingClosureOffset)
       // TODO: Validate argument label and argument syntax?
-      argumentList = argumentList.replacing(
-        childAt: trailingClosureOffset,
-        with: argument.with(\.expression, ExprSyntax(snapshotClosure))
-      )
-      updatedFunctionCallExpr = functionCallExpr.with(\.argumentList, argumentList)
+      arguments[index].expression = ExprSyntax(snapshotClosure)
+      updatedFunctionCallExpr = functionCallExpr.with(\.arguments, arguments)
 
     case 0:
       if isRecording || functionCallExpr.trailingClosure == nil {
@@ -273,16 +268,12 @@ private class SnapshotRewriter: SyntaxRewriter {
         )
       {
         if isRecording {
-          let child = additionalTrailingClosures[index]
-          additionalTrailingClosures = additionalTrailingClosures.replacing(
-            childAt: centeredTrailingClosureOffset - 1,
-            with: child.with(\.closure, snapshotClosure)
-          )
+          additionalTrailingClosures[index].closure = snapshotClosure
         } else {
           return ExprSyntax(functionCallExpr)
         }
       } else if centeredTrailingClosureOffset == 1 {
-        additionalTrailingClosures = additionalTrailingClosures.appending(
+        additionalTrailingClosures.append(
           MultipleTrailingClosureElementSyntax(
             leadingTrivia: .space,
             label: TokenSyntax(stringLiteral: snapshot.syntaxDescriptor.trailingClosureLabel),

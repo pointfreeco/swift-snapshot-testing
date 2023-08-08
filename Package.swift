@@ -26,7 +26,7 @@ let package = Package(
   dependencies: [
     .package(
       url: "https://github.com/apple/swift-syntax.git",
-      from: "509.0.0-swift-DEVELOPMENT-SNAPSHOT-2023-07-10-a"
+      from: "509.0.0-swift-DEVELOPMENT-SNAPSHOT-2023-08-07-a"
     ),
   ],
   targets: [
@@ -46,7 +46,6 @@ let package = Package(
       name: "MacroSnapshotTesting",
       dependencies: [
         "InlineSnapshotTesting",
-        .product(name: "SwiftBasicFormat", package: "swift-syntax"),
         .product(name: "SwiftDiagnostics", package: "swift-syntax"),
         .product(name: "SwiftParserDiagnostics", package: "swift-syntax"),
         .product(name: "SwiftSyntaxMacroExpansion", package: "swift-syntax"),

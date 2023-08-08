@@ -1,5 +1,4 @@
 import InlineSnapshotTesting
-import SwiftBasicFormat
 import SwiftDiagnostics
 import SwiftParser
 import SwiftParserDiagnostics
@@ -51,9 +50,9 @@ extension Snapshotting where Value == String, Format == String {
       )
       let expandedSourceFile = origSourceFile.expand(
         macros: macros,
-        in: context
+        in: context,
+        indentationWidth: indentationWidth
       )
-      .formatted(using: BasicFormat(indentationWidth: indentationWidth))
       let converter = SourceLocationConverter(fileName: "-", tree: expandedSourceFile)
       let lines = converter.location(for: expandedSourceFile.endPosition).line
       let diagnostics = ParseDiagnosticsGenerator.diagnostics(for: expandedSourceFile)
@@ -73,6 +72,9 @@ extension Snapshotting where Value == String, Format == String {
             contextSize: lines
           )
           .description
+          .replacingOccurrences(
+            of: "\n +│ ( *(?:╰|├)─) error: ", with: "\n$1 🛑 ", options: .regularExpression
+          )
           .replacingOccurrences(of: #"(^|\n) *\d* +│ "#, with: "$1", options: .regularExpression)
           .trimmingCharacters(in: .newlines)
       }
