@@ -37,7 +37,7 @@ extension Snapshotting where Value == String, Format == String {
     _ macros: [String: Macro.Type],
     testModuleName: String = "TestModule",
     testFileName: String = "Test.swift",
-    indentationWidth: Trivia = .spaces(2),
+    indentationWidth: Trivia? = nil,
     file: StaticString = #filePath,
     line: UInt = #line
   ) -> Self {
@@ -47,6 +47,14 @@ extension Snapshotting where Value == String, Format == String {
         sourceFiles: [
           origSourceFile: .init(moduleName: testModuleName, fullFilePath: testFileName)
         ]
+      )
+      let indentationWidth = indentationWidth ?? Trivia(
+        stringLiteral: String(
+          SourceLocationConverter(fileName: "-", tree: origSourceFile).sourceLines
+            .first(where: { $0.first?.isWhitespace == true && $0 != "\n" })?
+            .prefix(while: { $0.isWhitespace })
+            ?? "    "
+        )
       )
       let expandedSourceFile = origSourceFile.expand(
         macros: macros,
