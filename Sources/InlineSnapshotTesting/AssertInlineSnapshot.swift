@@ -308,6 +308,16 @@ private class SnapshotRewriter: SyntaxRewriter {
         .count
       self.offset += updatedLineCount - lineCount
     }
+    if snapshot.expected != snapshot.actual {
+      let line = UInt(
+        functionCallExpr.calledExpression.startLocation(
+          converter: self.sourceLocationConverter,
+          afterLeadingTrivia: true
+        )
+        .line + self.offset
+      )
+      self.newRecordings.append((snapshot: snapshot, line: line))
+    }
     return ExprSyntax(updatedFunctionCallExpr)
   }
 
