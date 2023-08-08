@@ -253,23 +253,34 @@ private class SnapshotRewriter: SyntaxRewriter {
       updatedFunctionCallExpr = functionCallExpr.with(\.argumentList, argumentList)
 
     case 0:
-      updatedFunctionCallExpr = functionCallExpr.with(
-        \.trailingClosure,
-        snapshotClosure.with(\.leadingTrivia, snapshotClosure.leadingTrivia + .space)
-      )
+      if isRecording || functionCallExpr.trailingClosure == nil {
+        updatedFunctionCallExpr = functionCallExpr.with(
+          \.trailingClosure,
+          snapshotClosure.with(\.leadingTrivia, snapshotClosure.leadingTrivia + .space)
+        )
+      } else {
+        fatalError("TODO")
+      }
 
     case 1...:
       var additionalTrailingClosures = functionCallExpr.additionalTrailingClosures ?? []
-      if !additionalTrailingClosures.isEmpty, let index = additionalTrailingClosures.index(
-        additionalTrailingClosures.startIndex,
-        offsetBy: centeredTrailingClosureOffset - 1,
-        limitedBy: additionalTrailingClosures.endIndex
-      ) {
-        let child = additionalTrailingClosures[index]
-        additionalTrailingClosures = additionalTrailingClosures.replacing(
-          childAt: centeredTrailingClosureOffset - 1,
-          with: child.with(\.closure, snapshotClosure)
+      if
+        !additionalTrailingClosures.isEmpty,
+        let index = additionalTrailingClosures.index(
+          additionalTrailingClosures.startIndex,
+          offsetBy: centeredTrailingClosureOffset - 1,
+          limitedBy: additionalTrailingClosures.endIndex
         )
+      {
+        if isRecording {
+          let child = additionalTrailingClosures[index]
+          additionalTrailingClosures = additionalTrailingClosures.replacing(
+            childAt: centeredTrailingClosureOffset - 1,
+            with: child.with(\.closure, snapshotClosure)
+          )
+        } else {
+          return ExprSyntax(functionCallExpr)
+        }
       } else if centeredTrailingClosureOffset == 1 {
         additionalTrailingClosures = additionalTrailingClosures.appending(
           MultipleTrailingClosureElementSyntax(
@@ -303,10 +314,17 @@ private class SnapshotRewriter: SyntaxRewriter {
   func report() {
     guard !self.newRecordings.isEmpty else {
       XCTFail(
-        """
-        Record mode is on. Turn record mode off and run tests again to assert against recorded \
-        snapshots.
-        """,
+        isRecording
+          ?
+          """
+          Record mode is on. Turn record mode off and run tests again to assert against recorded \
+          snapshots.
+          """
+          :
+          """
+          Could not assert against inline snapshot. Please file an issue with the author of this \
+          helper.
+          """,
         file: self.file.path,
         line: self.line ?? 1
       )

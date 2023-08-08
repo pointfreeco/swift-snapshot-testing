@@ -1,10 +1,13 @@
 import InlineSnapshotTesting
 import SwiftBasicFormat
+import SwiftDiagnostics
 import SwiftParser
+import SwiftParserDiagnostics
 import SwiftSyntax
 import SwiftSyntaxMacroExpansion
 import SwiftSyntaxMacros
 import SwiftSyntaxMacrosTestSupport
+import XCTest
 
 public func assertMacroSnapshot(
   _ macros: [String: Macro.Type],
@@ -17,7 +20,7 @@ public func assertMacroSnapshot(
 ) {
   assertInlineSnapshot(
     of: try originalSource(),
-    as: .macroExpansion(macros),
+    as: .macroExpansion(macros, file: file, line: line),
     syntaxDescriptor: InlineSnapshotSyntaxDescriptor(
       trailingClosureLabel: "expandsTo",
       trailingClosureOffset: 1
@@ -35,11 +38,13 @@ extension Snapshotting where Value == String, Format == String {
     _ macros: [String: Macro.Type],
     testModuleName: String = "TestModule",
     testFileName: String = "Test.swift",
-    indentationWidth: Trivia = .spaces(2)
+    indentationWidth: Trivia = .spaces(2),
+    file: StaticString = #filePath,
+    line: UInt = #line
   ) -> Self {
     Snapshotting<String, String>.lines.pullback { input in
       let origSourceFile = Parser.parse(source: input)
-      let context =  SwiftSyntaxMacroExpansion.BasicMacroExpansionContext(
+      let context = SwiftSyntaxMacroExpansion.BasicMacroExpansionContext(
         sourceFiles: [
           origSourceFile: .init(moduleName: testModuleName, fullFilePath: testFileName)
         ]
@@ -49,7 +54,31 @@ extension Snapshotting where Value == String, Format == String {
         in: context
       )
       .formatted(using: BasicFormat(indentationWidth: indentationWidth))
-      return expandedSourceFile.description.trimmingTrailingWhitespace()
+      let converter = SourceLocationConverter(fileName: "-", tree: expandedSourceFile)
+      let lines = converter.location(for: expandedSourceFile.endPosition).line
+      let diagnostics = ParseDiagnosticsGenerator.diagnostics(for: expandedSourceFile)
+        + context.diagnostics
+      if !diagnostics.isEmpty {
+        let s = DiagnosticsFormatter
+          .annotatedSource(
+            tree: expandedSourceFile,
+            diags: diagnostics,
+            contextSize: lines
+          )
+          .description
+        return DiagnosticsFormatter
+          .annotatedSource(
+            tree: expandedSourceFile,
+            diags: diagnostics,
+            contextSize: lines
+          )
+          .description
+          .replacingOccurrences(of: #"(^|\n) *\d* +│ "#, with: "$1", options: .regularExpression)
+          .trimmingCharacters(in: .newlines)
+      }
+      return expandedSourceFile
+        .description
+        .trimmingCharacters(in: .newlines)
     }
   }
 }
