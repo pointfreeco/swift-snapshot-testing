@@ -11,7 +11,7 @@ import XCTest
 public func assertMacroSnapshot(
   _ macros: [String: Macro.Type],
   of originalSource: () throws -> String,
-  expandsTo expandedSource: (() -> String)? = nil,
+  matches expandedOrDiagnosedSource: (() -> String)? = nil,
   file: StaticString = #filePath,
   function: StaticString = #function,
   line: UInt = #line,
@@ -21,10 +21,10 @@ public func assertMacroSnapshot(
     of: try originalSource(),
     as: .macroExpansion(macros, file: file, line: line),
     syntaxDescriptor: InlineSnapshotSyntaxDescriptor(
-      trailingClosureLabel: "expandsTo",
+      trailingClosureLabel: "matches",
       trailingClosureOffset: 1
     ),
-    matches: expandedSource,
+    matches: expandedOrDiagnosedSource,
     file: file,
     function: function,
     line: line,
