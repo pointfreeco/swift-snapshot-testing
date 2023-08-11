@@ -43,6 +43,8 @@ extension Snapshotting where Value == String, Format == String {
   ) -> Self {
     Snapshotting<String, String>.lines.pullback { input in
       let origSourceFile = Parser.parse(source: input)
+      let origDiagnostics = ParseDiagnosticsGenerator.diagnostics(for: origSourceFile)
+
       let context = SwiftSyntaxMacroExpansion.BasicMacroExpansionContext(
         sourceFiles: [
           origSourceFile: .init(moduleName: testModuleName, fullFilePath: testFileName)
@@ -61,34 +63,41 @@ extension Snapshotting where Value == String, Format == String {
         in: context,
         indentationWidth: indentationWidth
       )
-      let converter = SourceLocationConverter(fileName: "-", tree: expandedSourceFile)
-      let lines = converter.location(for: expandedSourceFile.endPosition).line
-      let diagnostics = ParseDiagnosticsGenerator.diagnostics(for: expandedSourceFile)
-        + context.diagnostics
-      if !diagnostics.isEmpty {
-        let s = DiagnosticsFormatter
-          .annotatedSource(
-            tree: expandedSourceFile,
-            diags: diagnostics,
-            contextSize: lines
-          )
-          .description
-        return DiagnosticsFormatter
-          .annotatedSource(
-            tree: expandedSourceFile,
-            diags: diagnostics,
-            contextSize: lines
-          )
-          .description
-          .replacingOccurrences(
-            of: "\n +│ ( *(?:╰|├)─) error: ", with: "\n$1 🛑 ", options: .regularExpression
-          )
-          .replacingOccurrences(of: #"(^|\n) *\d* +│ "#, with: "$1", options: .regularExpression)
-          .trimmingCharacters(in: .newlines)
+
+      guard
+        origDiagnostics.isEmpty,
+        context.diagnostics.isEmpty
+      else {
+        return diagnostics(
+          diags: origDiagnostics + context.diagnostics,
+          tree: origSourceFile
+        )
+      }
+
+      let diags = ParseDiagnosticsGenerator.diagnostics(for: expandedSourceFile)
+      guard diags.isEmpty
+      else {
+        return diagnostics(diags: diags, tree: expandedSourceFile)
       }
       return expandedSourceFile
         .description
         .trimmingCharacters(in: .newlines)
     }
   }
+}
+
+private func diagnostics(
+  diags: [Diagnostic],
+  tree: some SyntaxProtocol
+) -> String {
+  let converter = SourceLocationConverter(fileName: "-", tree: tree)
+  let lineCount = converter.location(for: tree.endPosition).line
+  return DiagnosticsFormatter
+    .annotatedSource(tree: tree, diags: diags, contextSize: lineCount)
+    .description
+    .replacingOccurrences(
+      of: "\n +│ ( *(?:╰|├)─) error: ", with: "\n$1 🛑 ", options: .regularExpression
+    )
+    .replacingOccurrences(of: #"(^|\n) *\d* +│ "#, with: "$1", options: .regularExpression)
+    .trimmingCharacters(in: .newlines)
 }
