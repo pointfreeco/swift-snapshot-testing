@@ -66,6 +66,7 @@ public func assertInlineSnapshot<Value>(
         InlineSnapshot(
           expected: expected?(),
           actual: actual,
+          wasRecording: isRecording,
           syntaxDescriptor: syntaxDescriptor,
           function: "\(function)",
           line: line,
@@ -103,6 +104,7 @@ private struct File: Hashable {
 private struct InlineSnapshot: Hashable {
   var expected: String?
   var actual: String
+  var wasRecording: Bool
   var syntaxDescriptor: InlineSnapshotSyntaxDescriptor
   var function: String
   var line: UInt
@@ -156,6 +158,7 @@ private class SnapshotRewriter: SyntaxRewriter {
   let file: File
   let indent: String
   let line: UInt?
+  let wasRecording: Bool
   var newRecordings: [(snapshot: InlineSnapshot, line: UInt)] = []
   var offset = 0
   var snapshots: [InlineSnapshot]
@@ -168,6 +171,7 @@ private class SnapshotRewriter: SyntaxRewriter {
   ) {
     self.file = file
     self.line = snapshots.first?.line
+    self.wasRecording = snapshots.first?.wasRecording ?? isRecording
     self.indent = String(
       sourceLocationConverter.sourceLines
         .first(where: { $0.first?.isWhitespace == true && $0 != "\n" })?
@@ -248,7 +252,7 @@ private class SnapshotRewriter: SyntaxRewriter {
       updatedFunctionCallExpr = functionCallExpr.with(\.arguments, arguments)
 
     case 0:
-      if isRecording || functionCallExpr.trailingClosure == nil {
+      if snapshot.wasRecording || functionCallExpr.trailingClosure == nil {
         updatedFunctionCallExpr = functionCallExpr.with(
           \.trailingClosure,
           snapshotClosure.with(\.leadingTrivia, snapshotClosure.leadingTrivia + .space)
@@ -267,7 +271,7 @@ private class SnapshotRewriter: SyntaxRewriter {
           limitedBy: additionalTrailingClosures.endIndex
         )
       {
-        if isRecording {
+        if snapshot.wasRecording {
           additionalTrailingClosures[index].closure = snapshotClosure
         } else {
           return ExprSyntax(functionCallExpr)
@@ -315,7 +319,7 @@ private class SnapshotRewriter: SyntaxRewriter {
   func report() {
     guard !self.newRecordings.isEmpty else {
       XCTFail(
-        isRecording
+        self.wasRecording
           ?
           """
           Record mode is on. Turn record mode off and run tests again to assert against recorded \
