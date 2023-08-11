@@ -8,8 +8,37 @@ import SwiftSyntaxMacros
 import SwiftSyntaxMacrosTestSupport
 import XCTest
 
+public enum MacroSnapshot {
+  @TaskLocal public static var isRecording = false
+  @TaskLocal public static var macros: [String: Macro.Type] = [:]
+
+  public static func withConfiguration<R>(
+    isRecording: Bool = MacroSnapshot.isRecording,
+    macros: [String: Macro.Type] = MacroSnapshot.macros,
+    operation: () throws -> R
+  ) rethrows {
+    try Self.$isRecording.withValue(isRecording) {
+      try Self.$macros.withValue(macros) {
+        try operation()
+      }
+    }
+  }
+
+  public static func withConfiguration<R>(
+    isRecording: Bool = MacroSnapshot.isRecording,
+    macros: [String: Macro.Type] = MacroSnapshot.macros,
+    operation: () async throws -> R
+  ) async rethrows {
+    try await Self.$isRecording.withValue(isRecording) {
+      try await Self.$macros.withValue(macros) {
+        try await operation()
+      }
+    }
+  }
+}
+
 public func assertMacroSnapshot(
-  _ macros: [String: Macro.Type],
+  _ macros: [String: Macro.Type] = MacroSnapshot.macros,
   of originalSource: () throws -> String,
   matches expandedOrDiagnosedSource: (() -> String)? = nil,
   file: StaticString = #filePath,
@@ -17,6 +46,9 @@ public func assertMacroSnapshot(
   line: UInt = #line,
   column: UInt = #column
 ) {
+  let wasRecording = isRecording
+  isRecording = MacroSnapshot.isRecording
+  defer { isRecording = wasRecording }
   assertInlineSnapshot(
     of: try originalSource(),
     as: .macroExpansion(macros, file: file, line: line),
@@ -34,7 +66,7 @@ public func assertMacroSnapshot(
 
 extension Snapshotting where Value == String, Format == String {
   public static func macroExpansion(
-    _ macros: [String: Macro.Type],
+    _ macros: [String: Macro.Type] = MacroSnapshot.macros,
     testModuleName: String = "TestModule",
     testFileName: String = "Test.swift",
     indentationWidth: Trivia? = nil,
