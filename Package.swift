@@ -18,10 +18,6 @@ let package = Package(
       name: "InlineSnapshotTesting",
       targets: ["InlineSnapshotTesting"]
     ),
-    .library(
-      name: "MacroSnapshotTesting",
-      targets: ["MacroSnapshotTesting"]
-    ),
   ],
   dependencies: [
     .package(
@@ -40,17 +36,6 @@ let package = Package(
         .product(name: "SwiftParser", package: "swift-syntax"),
         .product(name: "SwiftSyntax", package: "swift-syntax"),
         .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
-      ]
-    ),
-    .target(
-      name: "MacroSnapshotTesting",
-      dependencies: [
-        "InlineSnapshotTesting",
-        .product(name: "SwiftDiagnostics", package: "swift-syntax"),
-        .product(name: "SwiftParserDiagnostics", package: "swift-syntax"),
-        .product(name: "SwiftSyntaxMacroExpansion", package: "swift-syntax"),
-        .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
-        .product(name: "SwiftSyntaxMacrosTestSupport", package: "swift-syntax"),
       ]
     ),
     .testTarget(
