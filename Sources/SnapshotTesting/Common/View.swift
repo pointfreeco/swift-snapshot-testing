@@ -949,7 +949,8 @@ func snapshotView(
   drawHierarchyInKeyWindow: Bool,
   traits: UITraitCollection,
   view: UIView,
-  viewController: UIViewController
+  viewController: UIViewController,
+  delay: Double? = nil
   )
   -> Async<UIImage> {
     let initialFrame = view.frame
@@ -964,7 +965,7 @@ func snapshotView(
     if config.safeArea == .zero { view.frame.origin = .init(x: offscreen, y: offscreen) }
 
     return (view.snapshot ?? Async { callback in
-      addImagesForRenderedViews(view).sequence().run { views in
+      addImagesForRenderedViews(view).sequence().delay(by: delay).run { views in
         callback(
           renderer(bounds: view.bounds, for: traits).image { ctx in
             if drawHierarchyInKeyWindow {
