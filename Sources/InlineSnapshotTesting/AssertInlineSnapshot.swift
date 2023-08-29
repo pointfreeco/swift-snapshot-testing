@@ -18,6 +18,7 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
 public func assertInlineSnapshot<Value>(
   of value: @autoclosure () throws -> Value,
   as snapshotting: Snapshotting<Value, String>,
+  message: @autoclosure () -> String = "",
   timeout: TimeInterval = 5,
   syntaxDescriptor: InlineSnapshotSyntaxDescriptor = .init(),
   matches expected: (() -> String)? = nil,
@@ -26,6 +27,7 @@ public func assertInlineSnapshot<Value>(
   line: UInt = #line,
   column: UInt = #column
 ) {
+  XCTAssertEqual(1, 1)
   XCTCurrentTestCase?.addTeardownBlock {
     writeInlineSnapshots()
   }
@@ -77,9 +79,10 @@ public func assertInlineSnapshot<Value>(
       return
     }
     if let difference = snapshotting.diffing.diff(actual, expected)?.0 {
+      let message = message()
       XCTFail(
         """
-        Snapshot did not match. Difference: …
+        \(message.isEmpty ? "Snapshot did not match. Difference: …" : message)
 
         \(difference.indenting(by: 2))
         """,
