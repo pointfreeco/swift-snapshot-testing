@@ -66,6 +66,7 @@ public func assertInlineSnapshot<Value>(
         InlineSnapshot(
           expected: expected?(),
           actual: actual,
+          diffing: snapshotting.diffing,
           wasRecording: isRecording,
           syntaxDescriptor: syntaxDescriptor,
           function: "\(function)",
@@ -104,11 +105,32 @@ private struct File: Hashable {
 private struct InlineSnapshot: Hashable {
   var expected: String?
   var actual: String
+  var diffing: Diffing<String>
   var wasRecording: Bool
   var syntaxDescriptor: InlineSnapshotSyntaxDescriptor
   var function: String
   var line: UInt
   var column: UInt
+
+  static func == (lhs: Self, rhs: Self) -> Bool {
+    lhs.expected == rhs.expected
+      && lhs.actual == rhs.actual
+      && lhs.wasRecording == rhs.wasRecording
+      && lhs.syntaxDescriptor == rhs.syntaxDescriptor
+      && lhs.function == rhs.function
+      && lhs.line == rhs.line
+      && lhs.column == rhs.column
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine(self.expected)
+    hasher.combine(self.actual)
+    hasher.combine(self.wasRecording)
+    hasher.combine(self.syntaxDescriptor)
+    hasher.combine(self.function)
+    hasher.combine(self.line)
+    hasher.combine(self.column)
+  }
 }
 
 private var XCTCurrentTestCase: XCTestCase? {
@@ -338,7 +360,7 @@ private class SnapshotRewriter: SyntaxRewriter {
     for (snapshot, line) in self.newRecordings {
       var failure = "Automatically recorded a new snapshot."
       if let expected = snapshot.expected,
-        let difference = Diffing.lines.diff(expected, snapshot.actual)?.0
+         let difference = snapshot.diffing.diff(expected, snapshot.actual)?.0
       {
         failure += " Difference: …\n\n\(difference.indenting(by: 2))"
       }

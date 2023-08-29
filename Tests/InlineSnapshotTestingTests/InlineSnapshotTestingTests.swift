@@ -19,7 +19,7 @@ final class SnapshotTestingTests: XCTestCase {
     assertInlineSnapshot(of: ["Hello", "World"], as: .dump) {
       """
       ▿ 2 elements
-        - "Hello"
+        - "Hellos"
         - "World"
 
       """
