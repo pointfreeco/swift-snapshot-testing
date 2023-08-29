@@ -76,7 +76,7 @@ public func assertInlineSnapshot<Value>(
       )
       return
     }
-    if let difference = Diffing.lines.diff(actual, expected)?.0 {
+    if let difference = snapshotting.diffing.diff(actual, expected)?.0 {
       XCTFail(
         """
         Snapshot did not match. Difference: …
