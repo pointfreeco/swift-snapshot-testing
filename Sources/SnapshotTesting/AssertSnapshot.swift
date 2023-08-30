@@ -24,11 +24,14 @@ public var record: Bool {
 ///   - name: An optional description of the snapshot.
 ///   - recording: Whether or not to record a new reference.
 ///   - timeout: The amount of time a snapshot must be generated in.
-///   - file: The file in which failure occurred. Defaults to the file name of the test case in which this function was called.
-///   - testName: The name of the test in which failure occurred. Defaults to the function name of the test case in which this function was called.
-///   - line: The line number on which failure occurred. Defaults to the line number on which this function was called.
+///   - file: The file in which failure occurred. Defaults to the file name of the test case in
+///     which this function was called.
+///   - testName: The name of the test in which failure occurred. Defaults to the function name of
+///     the test case in which this function was called.
+///   - line: The line number on which failure occurred. Defaults to the line number on which this
+///     function was called.
 public func assertSnapshot<Value, Format>(
-  matching value: @autoclosure () throws -> Value,
+  of value: @autoclosure () throws -> Value,
   as snapshotting: Snapshotting<Value, Format>,
   named name: String? = nil,
   record recording: Bool = false,
@@ -36,10 +39,9 @@ public func assertSnapshot<Value, Format>(
   file: StaticString = #file,
   testName: String = #function,
   line: UInt = #line
-  ) {
-
+) {
   let failure = verifySnapshot(
-    matching: try value(),
+    of: try value(),
     as: snapshotting,
     named: name,
     record: recording,
@@ -63,18 +65,17 @@ public func assertSnapshot<Value, Format>(
 ///   - testName: The name of the test in which failure occurred. Defaults to the function name of the test case in which this function was called.
 ///   - line: The line number on which failure occurred. Defaults to the line number on which this function was called.
 public func assertSnapshots<Value, Format>(
-  matching value: @autoclosure () throws -> Value,
+  of value: @autoclosure () throws -> Value,
   as strategies: [String: Snapshotting<Value, Format>],
   record recording: Bool = false,
   timeout: TimeInterval = 5,
   file: StaticString = #file,
   testName: String = #function,
   line: UInt = #line
-  ) {
-
+) {
   try? strategies.forEach { name, strategy in
     assertSnapshot(
-      matching: try value(),
+      of: try value(),
       as: strategy,
       named: name,
       record: recording,
@@ -97,18 +98,17 @@ public func assertSnapshots<Value, Format>(
 ///   - testName: The name of the test in which failure occurred. Defaults to the function name of the test case in which this function was called.
 ///   - line: The line number on which failure occurred. Defaults to the line number on which this function was called.
 public func assertSnapshots<Value, Format>(
-  matching value: @autoclosure () throws -> Value,
+  of value: @autoclosure () throws -> Value,
   as strategies: [Snapshotting<Value, Format>],
   record recording: Bool = false,
   timeout: TimeInterval = 5,
   file: StaticString = #file,
   testName: String = #function,
   line: UInt = #line
-  ) {
-
+) {
   try? strategies.forEach { strategy in
     assertSnapshot(
-      matching: try value(),
+      of: try value(),
       as: strategy,
       record: recording,
       timeout: timeout,
@@ -124,7 +124,7 @@ public func assertSnapshots<Value, Format>(
 /// Third party snapshot assert helpers can be built on top of this function. Simply invoke `verifySnapshot` with your own arguments, and then invoke `XCTFail` with the string returned if it is non-`nil`. For example, if you want the snapshot directory to be determined by an environment variable, you can create your own assert helper like so:
 ///
 ///     public func myAssertSnapshot<Value, Format>(
-///       matching value: @autoclosure () throws -> Value,
+///       of value: @autoclosure () throws -> Value,
 ///       as snapshotting: Snapshotting<Value, Format>,
 ///       named name: String? = nil,
 ///       record recording: Bool = false,
@@ -136,7 +136,7 @@ public func assertSnapshots<Value, Format>(
 ///
 ///         let snapshotDirectory = ProcessInfo.processInfo.environment["SNAPSHOT_REFERENCE_DIR"]! + "/" + #file
 ///         let failure = verifySnapshot(
-///           matching: value,
+///           of: value,
 ///           as: snapshotting,
 ///           named: name,
 ///           record: recording,
@@ -154,14 +154,19 @@ public func assertSnapshots<Value, Format>(
 ///   - snapshotting: A strategy for serializing, deserializing, and comparing values.
 ///   - name: An optional description of the snapshot.
 ///   - recording: Whether or not to record a new reference.
-///   - snapshotDirectory: Optional directory to save snapshots. By default snapshots will be saved in a directory with the same name as the test file, and that directory will sit inside a directory `__Snapshots__` that sits next to your test file.
+///   - snapshotDirectory: Optional directory to save snapshots. By default snapshots will be saved
+///     in a directory with the same name as the test file, and that directory will sit inside a
+///     directory `__Snapshots__` that sits next to your test file.
 ///   - timeout: The amount of time a snapshot must be generated in.
-///   - file: The file in which failure occurred. Defaults to the file name of the test case in which this function was called.
-///   - testName: The name of the test in which failure occurred. Defaults to the function name of the test case in which this function was called.
-///   - line: The line number on which failure occurred. Defaults to the line number on which this function was called.
+///   - file: The file in which failure occurred. Defaults to the file name of the test case in
+///     which this function was called.
+///   - testName: The name of the test in which failure occurred. Defaults to the function name of
+///     the test case in which this function was called.
+///   - line: The line number on which failure occurred. Defaults to the line number on which this
+///     function was called.
 /// - Returns: A failure message or, if the value matches, nil.
 public func verifySnapshot<Value, Format>(
-  matching value: @autoclosure () throws -> Value,
+  of value: @autoclosure () throws -> Value,
   as snapshotting: Snapshotting<Value, Format>,
   named name: String? = nil,
   record recording: Bool = false,
@@ -170,8 +175,7 @@ public func verifySnapshot<Value, Format>(
   file: StaticString = #file,
   testName: String = #function,
   line: UInt = #line
-  )
-  -> String? {
+) -> String? {
 
     CleanCounterBetweenTestCases.registerIfNeeded()
     let recording = recording || isRecording
