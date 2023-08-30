@@ -1013,7 +1013,7 @@ final class SnapshotTestingTests: XCTestCase {
     post.httpBody = Data("""
                          {"pricing": {"lane": "individual","billing": "monthly"}}
                          """.utf8)
-    _assertInlineSnapshot(of: post, as: .raw(pretty: true), with: """
+    _assertInlineSnapshot(matching: post, as: .raw(pretty: true), with: """
     POST https://www.pointfree.co/subscribe
     Accept: application/json
     Cookie: pf_session={"user_id":"0"}
