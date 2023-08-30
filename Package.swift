@@ -4,9 +4,9 @@ import PackageDescription
 let package = Package(
   name: "swift-snapshot-testing",
   platforms: [
-    .iOS(.v13),
-    .macOS(.v10_15),
-    .tvOS(.v13)
+    .iOS(.v11),
+    .macOS(.v10_10),
+    .tvOS(.v10),
   ],
   products: [
     .library(
@@ -18,7 +18,11 @@ let package = Package(
     .target(name: "SnapshotTesting"),
     .testTarget(
       name: "SnapshotTestingTests",
-      dependencies: ["SnapshotTesting"]
+      dependencies: ["SnapshotTesting"],
+      exclude: [
+        "__Snapshots__",
+        "__Fixtures__"
+      ]
     )
   ]
 )
