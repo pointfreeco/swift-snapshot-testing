@@ -20,8 +20,8 @@ let package = Package(
       name: "SnapshotTestingTests",
       dependencies: ["SnapshotTesting"],
       exclude: [
-        "__Snapshots__",
-        "__Fixtures__"
+        "__Fixtures__",
+        "__Snapshots__"
       ]
     )
   ]
