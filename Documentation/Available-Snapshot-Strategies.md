@@ -66,7 +66,7 @@ A snapshot strategy that captures a value's textual description from `String`'s 
 #### Example:
 
 ``` swift
-assertSnapshot(matching: user, as: .description)
+assertSnapshot(of: user, as: .description)
 ```
 
 Records:
@@ -90,7 +90,7 @@ You can hook into how an instance of a type is rendered in this strategy by conf
 #### Example:
 
 ``` swift
-assertSnapshot(matching: user, as: .dump)
+assertSnapshot(of: user, as: .dump)
 ```
 
 Records:
@@ -124,10 +124,10 @@ A snapshot strategy for comparing layers based on pixel equality.
 
 ``` swift
 // Match reference perfectly.
-assertSnapshot(matching: layer, as: .image)
+assertSnapshot(of: layer, as: .image)
 
 // Allow for a 1% pixel difference.
-assertSnapshot(matching: layer, as: .image(precision: 0.99))
+assertSnapshot(of: layer, as: .image(precision: 0.99))
 ```
 
 ## CaseIterable
@@ -160,7 +160,7 @@ enum Direction: String, CaseIterable {
 }
 
 assertSnapshot(
-  matching: { $0.rotatedLeft },
+  of: { $0.rotatedLeft },
   as: Snapshotting<Direction, String>.func(into: .description)
 )
 ```
@@ -194,10 +194,10 @@ A snapshot strategy for comparing paths based on pixel equality.
 
 ``` swift
 // Match reference perfectly.
-assertSnapshot(matching: path, as: .image)
+assertSnapshot(of: path, as: .image)
 
 // Allow for a 1% pixel difference.
-assertSnapshot(matching: path, as: .image(precision: 0.99))
+assertSnapshot(of: path, as: .image(precision: 0.99))
 ```
 
 ### `.elementsDescription`
@@ -216,10 +216,10 @@ A snapshot strategy for comparing paths based on a description of their elements
 
 ``` swift
 // Match reference perfectly.
-assertSnapshot(matching: path, as: .elementsDescription)
+assertSnapshot(of: path, as: .elementsDescription)
 
 // Match reference as formatted by formatter.
-assertSnapshot(matching: path, as: .elementsDescription(numberFormatter: NumberFormatter()))
+assertSnapshot(of: path, as: .elementsDescription(numberFormatter: NumberFormatter()))
 ```
 
 ## Data
@@ -233,7 +233,7 @@ A snapshot strategy for comparing bare binary data.
 #### Example:
 
 ``` swift
-assertSnapshot(matching: data, as: .data)
+assertSnapshot(of: data, as: .data)
 ```
 
 ## Encodable
@@ -253,7 +253,7 @@ A snapshot strategy for comparing encodable structures based on their JSON repre
 #### Example:
 
 ``` swift
-assertSnapshot(matching: user, as: .json)
+assertSnapshot(of: user, as: .json)
 ```
 
 Records:
@@ -279,7 +279,7 @@ A snapshot strategy for comparing encodable structures based on their property l
 #### Example:
 
 ``` swift
-assertSnapshot(matching: user, as: .plist)
+assertSnapshot(of: user, as: .plist)
 ```
 
 Records:
@@ -319,10 +319,10 @@ A snapshot strategy for comparing paths based on pixel equality.
 
 ``` swift
 // Match reference perfectly.
-assertSnapshot(matching: path, as: .image)
+assertSnapshot(of: path, as: .image)
 
 // Allow for a 1% pixel difference.
-assertSnapshot(matching: path, as: .image(precision: 0.99))
+assertSnapshot(of: path, as: .image(precision: 0.99))
 ```
 
 ### `.elementsDescription`
@@ -341,10 +341,10 @@ A snapshot strategy for comparing paths based on a description of their elements
 
 ``` swift
 // Match reference perfectly.
-assertSnapshot(matching: path, as: .elementsDescription)
+assertSnapshot(of: path, as: .elementsDescription)
 
 // Match reference as formatted by formatter.
-assertSnapshot(matching: path, as: .elementsDescription(numberFormatter: NumberFormatter()))
+assertSnapshot(of: path, as: .elementsDescription(numberFormatter: NumberFormatter()))
 ```
 
 ## NSImage
@@ -367,10 +367,10 @@ A snapshot strategy for comparing images based on pixel equality.
 
 ``` swift
 // Match reference as-is.
-assertSnapshot(matching: image, as: .image)
+assertSnapshot(of: image, as: .image)
 
 // Allow for a 1% pixel difference.
-assertSnapshot(matching: image, as: .image(precision: 0.99))
+assertSnapshot(of: image, as: .image(precision: 0.99))
 ```
 
 ## NSView
@@ -401,14 +401,14 @@ A snapshot strategy for comparing layers based on pixel equality.
 
 ``` swift
 // Match reference as-is.
-assertSnapshot(matching: view, as: .image)
+assertSnapshot(of: view, as: .image)
 
 // Allow for a 1% pixel difference.
-assertSnapshot(matching: view, as: .image(precision: 0.99))
+assertSnapshot(of: view, as: .image(precision: 0.99))
 
 // Render at a certain size.
 assertSnapshot(
-  matching: view,
+  of: view,
   as: .image(size: .init(width: 44, height: 44))
 )
 ```
@@ -422,7 +422,7 @@ A snapshot strategy for comparing views based on a recursive description of thei
 #### Example
 
 ``` swift
-assertSnapshot(matching: view, as: .recursiveDescription)
+assertSnapshot(of: view, as: .recursiveDescription)
 ```
 
 Records:
@@ -458,14 +458,14 @@ A snapshot strategy for comparing layers based on pixel equality.
 
 ``` swift
 // Match reference as-is.
-assertSnapshot(matching: vc, as: .image)
+assertSnapshot(of: vc, as: .image)
 
 // Allow for a 1% pixel difference.
-assertSnapshot(matching: vc, as: .image(precision: 0.99))
+assertSnapshot(of: vc, as: .image(precision: 0.99))
 
 // Render at a certain size.
 assertSnapshot(
-  matching: vc,
+  of: vc,
   as: .image(size: .init(width: 640, height: 480))
 )
 ```
@@ -481,7 +481,7 @@ A snapshot strategy for comparing view controller views based on a recursive des
 #### Example
 
 ``` swift
-assertSnapshot(matching: vc, as: .recursiveDescription)
+assertSnapshot(of: vc, as: .recursiveDescription)
 ```
 
 Records:
@@ -515,7 +515,7 @@ A snapshot strategy for comparing SceneKit scenes based on pixel equality.
 
 ``` swift
 assertSnapshot(
-  matching: scene,
+  of: scene,
   as: .image(size: .init(width: 640, height: 480))
 )
 ```
@@ -544,7 +544,7 @@ A snapshot strategy for comparing SpriteKit scenes based on pixel equality.
 
 ``` swift
 assertSnapshot(
-  matching: scene,
+  of: scene,
   as: .image(size: .init(width: 640, height: 480))
 )
 ```
@@ -564,7 +564,7 @@ A snapshot strategy for comparing strings based on equality.
 #### Example:
 
 ``` swift
-assertSnapshot(matching: htmlString, as: .lines)
+assertSnapshot(of: htmlString, as: .lines)
 ```
 
 ## UIBezierPath
@@ -587,10 +587,10 @@ A snapshot strategy for comparing paths based on pixel equality.
 
 ``` swift
 // Match reference perfectly.
-assertSnapshot(matching: path, as: .image)
+assertSnapshot(of: path, as: .image)
 
 // Allow for a 1% pixel difference.
-assertSnapshot(matching: path, as: .image(precision: 0.99))
+assertSnapshot(of: path, as: .image(precision: 0.99))
 ```
 
 ### `.elementsDescription`
@@ -609,10 +609,10 @@ A snapshot strategy for comparing paths based on a description of their elements
 
 ``` swift
 // Match reference perfectly.
-assertSnapshot(matching: path, as: .elementsDescription)
+assertSnapshot(of: path, as: .elementsDescription)
 
 // Match reference as formatted by formatter.
-assertSnapshot(matching: path, as: .elementsDescription(numberFormatter: NumberFormatter()))
+assertSnapshot(of: path, as: .elementsDescription(numberFormatter: NumberFormatter()))
 ```
 
 ## UIImage
@@ -635,10 +635,10 @@ A snapshot strategy for comparing images based on pixel equality.
 
 ``` swift
 // Match reference as-is.
-assertSnapshot(matching: image, as: .image)
+assertSnapshot(of: image, as: .image)
 
 // Allow for a 1% pixel difference.
-assertSnapshot(matching: image, as: .image(precision: 0.99))
+assertSnapshot(of: image, as: .image(precision: 0.99))
 ```
 
 ## UIView
@@ -677,20 +677,20 @@ A snapshot strategy for comparing layers based on pixel equality.
 
 ``` swift
 // Match reference as-is.
-assertSnapshot(matching: view, as: .image)
+assertSnapshot(of: view, as: .image)
 
 // Allow for a 1% pixel difference.
-assertSnapshot(matching: view, as: .image(precision: 0.99))
+assertSnapshot(of: view, as: .image(precision: 0.99))
 
 // Render at a certain size.
 assertSnapshot(
-  matching: view,
+  of: view,
   as: .image(size: .init(width: 44, height: 44))
 )
 
 // Render with a horizontally-compact size class.
 assertSnapshot(
-  matching: view,
+  of: view,
   as: .image(traits: .init(horizontalSizeClass: .regular))
 )
 ```
@@ -715,13 +715,13 @@ A snapshot strategy for comparing views based on a recursive description of thei
 
 ``` swift
 // Layout on the current device.
-assertSnapshot(matching: view, as: .recursiveDescription)
+assertSnapshot(of: view, as: .recursiveDescription)
 
 // Layout with a certain size.
-assertSnapshot(matching: view, as: .recursiveDescription(size: .init(width: 22, height: 22)))
+assertSnapshot(of: view, as: .recursiveDescription(size: .init(width: 22, height: 22)))
 
 // Layout with a certain trait collection.
-assertSnapshot(matching: view, as: .recursiveDescription(traits: .init(horizontalSizeClass: .regular)))
+assertSnapshot(of: view, as: .recursiveDescription(traits: .init(horizontalSizeClass: .regular)))
 ```
 
 Records:
@@ -744,7 +744,7 @@ A snapshot strategy for comparing view controllers based on their embedded contr
 #### Example
 
 ``` swift
-assertSnapshot(matching: vc, as: .hierarchy)
+assertSnapshot(of: vc, as: .hierarchy)
 ```
 
 Records:
@@ -802,28 +802,28 @@ A snapshot strategy for comparing layers based on pixel equality.
 
 ``` swift
 // Match reference as-is.
-assertSnapshot(matching: vc, as: .image)
+assertSnapshot(of: vc, as: .image)
 
 // Allow for a 1% pixel difference.
-assertSnapshot(matching: vc, as: .image(precision: 0.99))
+assertSnapshot(of: vc, as: .image(precision: 0.99))
 
 // Render as if on a certain device.
-assertSnapshot(matching: vc, as: .image(on: .iPhoneX(.portrait)))
+assertSnapshot(of: vc, as: .image(on: .iPhoneX(.portrait)))
 
 // Render at a certain size.
 assertSnapshot(
-  matching: vc,
+  of: vc,
   as: .image(size: .init(width: 375, height: 667))
 )
 
 // Render with a horizontally-compact size class.
 assertSnapshot(
-  matching: vc,
+  of: vc,
   as: .image(traits: .init(horizontalSizeClass: .compact))
 )
 
 // Match reference as-is.
-assertSnapshot(matching: vc, as: .image)
+assertSnapshot(of: vc, as: .image)
 ```
 
 **See also**: [`UIView`](#uiview).
@@ -852,10 +852,10 @@ A snapshot strategy for comparing view controller views based on a recursive des
 
 ``` swift
 // Layout on the current device.
-assertSnapshot(matching: vc, as: .recursiveDescription)
+assertSnapshot(of: vc, as: .recursiveDescription)
 
 // Layout as if on a certain device.
-assertSnapshot(matching: vc, as: .recursiveDescription(on: .iPhoneSe(.portrait)))
+assertSnapshot(of: vc, as: .recursiveDescription(on: .iPhoneSe(.portrait)))
 ```
 
 Records:
@@ -878,7 +878,7 @@ A snapshot strategy for comparing requests based on a cURL representation.
 #### Example:
 
 ``` swift
-assertSnapshot(matching: request, as: .curl)
+assertSnapshot(of: request, as: .curl)
 ```
 
 Records:
@@ -900,7 +900,7 @@ A snapshot strategy for comparing requests based on raw equality.
 #### Example:
 
 ``` swift
-assertSnapshot(matching: request, as: .raw)
+assertSnapshot(of: request, as: .raw)
 ```
 
 Records:

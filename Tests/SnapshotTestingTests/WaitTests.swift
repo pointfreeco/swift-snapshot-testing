@@ -12,6 +12,6 @@ class WaitTests: XCTestCase {
       value
     }
 
-    assertSnapshot(matching: (), as: .wait(for: 1.5, on: strategy))
+    assertSnapshot(of: (), as: .wait(for: 1.5, on: strategy))
   }
 }
