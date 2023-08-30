@@ -200,6 +200,8 @@ targets: [
   - [SnapshotTestingHEIC](https://github.com/alexey1312/SnapshotTestingHEIC) adds image support using the HEIC storage format which reduces file sizes in comparison to PNG.
 
   - [PreviewSnapshots](https://github.com/doordash-oss/swiftui-preview-snapshots) share `View` configurations between SwiftUI Previews and snapshot tests and generate several snapshots with a single test assertion.
+
+  - [Prefire](https://github.com/BarredEwe/Prefire) generating Snapshot Tests via [Swift Package Plugins](https://github.com/apple/swift-package-manager/blob/main/Documentation/Plugins.md) using SwiftUI `Preview`
   
 Have you written your own SnapshotTesting plug-in? [Add it here](https://github.com/pointfreeco/swift-snapshot-testing/edit/master/README.md) and submit a pull request!
   
