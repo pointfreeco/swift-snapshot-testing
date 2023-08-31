@@ -953,6 +953,53 @@ final class SnapshotTestingTests: XCTestCase {
     #endif
   }
 
+  func testContentScrollSize() {
+    #if os(iOS)
+    let viewController = UIViewController()
+    viewController.view.backgroundColor = .green
+
+    let scrollView = UIScrollView()
+    scrollView.translatesAutoresizingMaskIntoConstraints = false
+    scrollView.backgroundColor = .red
+    viewController.view.addSubview(scrollView)
+    if #available(iOS 15.0, *) {
+      viewController.setContentScrollView(scrollView)
+    }
+
+    let labels = (0...100).map {
+      let label = UILabel()
+      label.text = "Label #\($0)"
+      label.backgroundColor = .blue
+      return label
+    }
+
+    let stackView = UIStackView(arrangedSubviews: labels)
+    stackView.backgroundColor = .green
+    stackView.axis = .vertical
+    stackView.alignment = .center
+    stackView.spacing = 16
+    stackView.layoutMargins = .init(top: 16, left: 0, bottom: 16, right: 0)
+    stackView.isLayoutMarginsRelativeArrangement = true
+    stackView.translatesAutoresizingMaskIntoConstraints = false
+    scrollView.addSubview(stackView)
+
+    NSLayoutConstraint.activate([
+      scrollView.leadingAnchor.constraint(equalTo: viewController.view.leadingAnchor),
+      scrollView.topAnchor.constraint(equalTo: viewController.view.topAnchor),
+      scrollView.trailingAnchor.constraint(equalTo: viewController.view.trailingAnchor),
+      scrollView.bottomAnchor.constraint(equalTo: viewController.view.bottomAnchor),
+
+      stackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 8),
+      stackView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 8),
+      stackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: -8),
+      stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: -8),
+      stackView.widthAnchor.constraint(equalTo: scrollView.widthAnchor, constant: -16)
+    ])
+
+    assertSnapshot(matching: viewController, as: .image(computeScrollSize: true))
+    #endif
+  }
+
   func testViewControllerHierarchy() {
     #if os(iOS)
     let page = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal)

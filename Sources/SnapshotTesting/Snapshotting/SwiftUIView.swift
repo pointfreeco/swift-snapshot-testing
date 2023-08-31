@@ -33,6 +33,7 @@ extension Snapshotting where Value: SwiftUI.View, Format == UIImage {
   ///   - traits: A trait collection override.
   public static func image(
     drawHierarchyInKeyWindow: Bool = false,
+    computeScrollSize: Bool = false,
     precision: Float = 1,
     perceptualPrecision: Float = 1,
     layout: SwiftUISnapshotLayout = .sizeThatFits,
@@ -74,6 +75,7 @@ extension Snapshotting where Value: SwiftUI.View, Format == UIImage {
         return snapshotView(
           config: config,
           drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+          computeScrollSize: computeScrollSize,
           traits: traits,
           view: controller.view,
           viewController: controller
