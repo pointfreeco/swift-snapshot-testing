@@ -853,6 +853,23 @@ final class SnapshotTestingTests: XCTestCase {
     assertSnapshot(of: view, as: .recursiveDescription)
     #endif
   }
+  
+  func testSystemLayoutFittingWithView() {
+    #if os(iOS)
+    let label = UILabel()
+    label.text = "What's the point?"
+    label.numberOfLines = .zero
+
+    assertSnapshot(
+      matching: label,
+      as: .image(
+        targetSize: CGSize(width: 50, height: UIView.layoutFittingExpandedSize.height),
+        horizontalFittingPriority: .required,
+        verticalFittingPriority: .fittingSizeLevel
+      )
+    )
+    #endif
+  }
 
   func testUIViewControllerLifeCycle() {
     #if os(iOS)
