@@ -904,10 +904,10 @@ final class SnapshotTestingTests: XCTestCase {
     let viewDidAppearExpectation = expectation(description: "viewDidAppear")
     let viewWillDisappearExpectation = expectation(description: "viewWillDisappear")
     let viewDidDisappearExpectation = expectation(description: "viewDidDisappear")
-    viewWillAppearExpectation.expectedFulfillmentCount = 4
-    viewDidAppearExpectation.expectedFulfillmentCount = 4
-    viewWillDisappearExpectation.expectedFulfillmentCount = 4
-    viewDidDisappearExpectation.expectedFulfillmentCount = 4
+    viewWillAppearExpectation.expectedFulfillmentCount = 2
+    viewDidAppearExpectation.expectedFulfillmentCount = 2
+    viewWillDisappearExpectation.expectedFulfillmentCount = 2
+    viewDidDisappearExpectation.expectedFulfillmentCount = 2
 
     let viewController = ViewController(
       viewDidLoadExpectation: viewDidLoadExpectation,
