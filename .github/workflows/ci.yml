@@ -20,11 +20,20 @@ jobs:
     name: macOS 12 (Xcode ${{ matrix.xcode }})
     runs-on: macos-12
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Select Xcode ${{ matrix.xcode }}
         run: sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode }}.app
       - name: Run tests
         run: make test-swift
+        env:
+          SNAPSHOT_ARTIFACTS: "./.temp/artifacts"
+
+      - name: Archive failing snapshots
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: failing-snapshots
+          path: .temp/artifacts
 
   ubuntu:
     strategy:

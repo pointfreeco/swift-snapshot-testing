@@ -242,13 +242,14 @@ final class SnapshotTestingTests: XCTestCase {
     button.bezelStyle = .rounded
     button.title = "Push Me"
     button.sizeToFit()
+    button.appearance = NSAppearance(named: .aqua)
     if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
       assertSnapshot(of: button, as: .image)
       assertSnapshot(of: button, as: .recursiveDescription)
     }
     #endif
   }
-  
+
   func testNSViewWithLayer() {
     #if os(macOS)
     let view = NSView()
