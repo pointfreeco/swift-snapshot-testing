@@ -174,6 +174,10 @@ import MetalPerformanceShaders
 
 @available(iOS 10.0, tvOS 10.0, macOS 10.13, *)
 func perceptuallyCompare(_ old: CIImage, _ new: CIImage, pixelPrecision: Float, perceptualPrecision: Float) -> String? {
+  guard nil != MTLCreateSystemDefaultDevice() else {
+    return "Failed to compare snapshots. Metal is required for perceptuallyCompare, but not available on this machine."
+  } 
+
   let deltaOutputImage = old.applyingFilter("CILabDeltaE", parameters: ["inputImage2": new])
   let thresholdOutputImage: CIImage
   do {
