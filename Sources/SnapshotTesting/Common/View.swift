@@ -944,7 +944,7 @@ func prepareView(
   return dispose
 }
 
-func snapshotView(
+public func snapshotView(
   config: ViewImageConfig,
   drawHierarchyInKeyWindow: Bool,
   traits: UITraitCollection,
