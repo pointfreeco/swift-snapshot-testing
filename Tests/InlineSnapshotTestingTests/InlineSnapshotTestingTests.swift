@@ -3,15 +3,15 @@ import InlineSnapshotTesting
 import SnapshotTesting
 import XCTest
 
-final class SnapshotTestingTests: XCTestCase {
+final class InlineSnapshotTestingTests: XCTestCase {
   override func setUp() {
     super.setUp()
     diffTool = "ksdiff"
-    //isRecording = true
+    // SnapshotTesting.isRecording = true
   }
 
   override func tearDown() {
-    isRecording = false
+    SnapshotTesting.isRecording = false
     super.tearDown()
   }
 
@@ -19,7 +19,18 @@ final class SnapshotTestingTests: XCTestCase {
     assertInlineSnapshot(of: ["Hello", "World"], as: .dump) {
       """
       ▿ 2 elements
-        - "Hellos"
+        - "Hello"
+        - "World"
+
+      """
+    }
+  }
+
+  func testInlineSnapshot2() {
+    assertInlineSnapshot(of: ["Hello", "World"], as: .dump) {
+      """
+      ▿ 2 elements
+        - "Hello"
         - "World"
 
       """
@@ -51,7 +62,7 @@ final class SnapshotTestingTests: XCTestCase {
     } is: {
       """
       - "Hello"
-      
+
       """
     }
   }
@@ -65,7 +76,7 @@ final class SnapshotTestingTests: XCTestCase {
     } is: {
       #"""
       - "\"Hello\"\n\"World\""
-      
+
       """#
     }
   }
@@ -74,7 +85,7 @@ final class SnapshotTestingTests: XCTestCase {
     assertCustomInlineSnapshot(of: { "Hello" }) {
       """
       - "Hello"
-      
+
       """
     }
   }
@@ -85,7 +96,7 @@ final class SnapshotTestingTests: XCTestCase {
     ) {
       """
       - "Hello"
-      
+
       """
     }
   }
@@ -98,7 +109,89 @@ final class SnapshotTestingTests: XCTestCase {
         - "Hello"
 
         """
-      })
+      }
+    )
+  }
+
+  func testMultipleInlineSnapshots() {
+    func assertResponse(
+      of url: () -> String,
+      head: (() -> String)? = nil,
+      body: (() -> String)? = nil,
+      file: StaticString = #filePath,
+      function: StaticString = #function,
+      line: UInt = #line,
+      column: UInt = #column
+    ) {
+      assertInlineSnapshot(
+        of: """
+          HTTP/1.1 200 OK
+          Content-Type: text/html; charset=utf-8
+          """,
+        as: .lines,
+        message: "Head did not match",
+        syntaxDescriptor: InlineSnapshotSyntaxDescriptor(
+          trailingClosureLabel: "head",
+          trailingClosureOffset: 1
+        ),
+        matches: head,
+        file: file,
+        function: function,
+        line: line,
+        column: column
+      )
+      assertInlineSnapshot(
+        of: """
+          <!doctype html>
+          <html lang="en">
+          <head>
+            <meta charset="utf-8">
+            <title>Point-Free</title>
+            <link rel="stylesheet" href="style.css">
+          </head>
+          <body>
+            <p>What's the point?</p>
+          </body>
+          </html>
+          """,
+        as: .lines,
+        message: "Body did not match",
+        syntaxDescriptor: InlineSnapshotSyntaxDescriptor(
+          trailingClosureLabel: "body",
+          trailingClosureOffset: 2
+        ),
+        matches: body,
+        file: file,
+        function: function,
+        line: line,
+        column: column
+      )
+    }
+
+    assertResponse {
+      """
+      https://www.pointfree.co/
+      """
+    } head: {
+      """
+      HTTP/1.1 200 OK
+      Content-Type: text/html; charset=utf-8
+      """
+    } body: {
+      """
+      <!doctype html>
+      <html lang="en">
+      <head>
+        <meta charset="utf-8">
+        <title>Point-Free</title>
+        <link rel="stylesheet" href="style.css">
+      </head>
+      <body>
+        <p>What's the point?</p>
+      </body>
+      </html>
+      """
+    }
   }
 }
 
