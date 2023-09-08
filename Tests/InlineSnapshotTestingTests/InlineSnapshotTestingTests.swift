@@ -6,7 +6,7 @@ import XCTest
 final class InlineSnapshotTestingTests: XCTestCase {
   override func setUp() {
     super.setUp()
-    diffTool = "ksdiff"
+    SnapshotTesting.diffTool = "ksdiff"
     // SnapshotTesting.isRecording = true
   }
 
@@ -16,17 +16,6 @@ final class InlineSnapshotTestingTests: XCTestCase {
   }
 
   func testInlineSnapshot() {
-    assertInlineSnapshot(of: ["Hello", "World"], as: .dump) {
-      """
-      ▿ 2 elements
-        - "Hello"
-        - "World"
-
-      """
-    }
-  }
-
-  func testInlineSnapshot2() {
     assertInlineSnapshot(of: ["Hello", "World"], as: .dump) {
       """
       ▿ 2 elements
@@ -82,12 +71,7 @@ final class InlineSnapshotTestingTests: XCTestCase {
   }
 
   func testCustomInlineSnapshot_SingleTrailingClosure() {
-    assertCustomInlineSnapshot(of: { "Hello" }) {
-      """
-      - "Hello"
-
-      """
-    }
+    assertCustomInlineSnapshot(of: { "Hello" })
   }
 
   func testCustomInlineSnapshot_MultilineSingleTrailingClosure() {
@@ -172,26 +156,7 @@ final class InlineSnapshotTestingTests: XCTestCase {
       """
       https://www.pointfree.co/
       """
-    } head: {
-      """
-      HTTP/1.1 200 OK
-      Content-Type: text/html; charset=utf-8
-      """
-    } body: {
-      """
-      <!doctype html>
-      <html lang="en">
-      <head>
-        <meta charset="utf-8">
-        <title>Point-Free</title>
-        <link rel="stylesheet" href="style.css">
-      </head>
-      <body>
-        <p>What's the point?</p>
-      </body>
-      </html>
-      """
-    }
+    } 
   }
 }
 

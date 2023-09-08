@@ -40,15 +40,7 @@ public func assertInlineSnapshot<Value>(
   line: UInt = #line,
   column: UInt = #column
 ) {
-  defer {
-    if let XCTCurrentTestCase = XCTCurrentTestCase {
-      XCTCurrentTestCase.addTeardownBlock {
-        writeInlineSnapshots()
-      }
-    } else {
-      writeInlineSnapshots()
-    }
-  }
+  let _: Void = installTestObserver
   do {
     var actual: String!
     let expectation = XCTestExpectation()
@@ -81,11 +73,25 @@ public func assertInlineSnapshot<Value>(
     }
     guard !isRecording, let expected = expected?()
     else {
+      var failure = "Automatically recorded a new snapshot."
+      if let expected = expected?(),
+        let difference = snapshotting.diffing.diff(expected, actual)?.0
+      {
+        failure += " Difference: …\n\n\(difference.indenting(by: 2))"
+      }
+      XCTFail(
+        """
+        \(failure)
+
+        Re-run "\(function)" to test against the newly-recorded snapshot.
+        """,
+        file: file,
+        line: line
+      )
       inlineSnapshotState[File(path: file), default: []].append(
         InlineSnapshot(
           expected: expected?(),
           actual: actual,
-          diffing: snapshotting.diffing,
           wasRecording: isRecording,
           syntaxDescriptor: syntaxDescriptor,
           function: "\(function)",
@@ -171,6 +177,15 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
   }
 }
 
+private let installTestObserver: Void = {
+  final class InlineSnapshotObserver: NSObject, XCTestObservation {
+    func testBundleDidFinish(_ testBundle: Bundle) {
+      writeInlineSnapshots()
+    }
+  }
+  XCTestObservationCenter.shared.addTestObserver(InlineSnapshotObserver())
+}()
+
 private struct File: Hashable {
   let path: StaticString
   static func == (lhs: Self, rhs: Self) -> Bool {
@@ -184,32 +199,11 @@ private struct File: Hashable {
 private struct InlineSnapshot: Hashable {
   var expected: String?
   var actual: String
-  var diffing: Diffing<String>
   var wasRecording: Bool
   var syntaxDescriptor: InlineSnapshotSyntaxDescriptor
   var function: String
   var line: UInt
   var column: UInt
-
-  static func == (lhs: Self, rhs: Self) -> Bool {
-    lhs.expected == rhs.expected
-      && lhs.actual == rhs.actual
-      && lhs.wasRecording == rhs.wasRecording
-      && lhs.syntaxDescriptor == rhs.syntaxDescriptor
-      && lhs.function == rhs.function
-      && lhs.line == rhs.line
-      && lhs.column == rhs.column
-  }
-
-  func hash(into hasher: inout Hasher) {
-    hasher.combine(self.expected)
-    hasher.combine(self.actual)
-    hasher.combine(self.wasRecording)
-    hasher.combine(self.syntaxDescriptor)
-    hasher.combine(self.function)
-    hasher.combine(self.line)
-    hasher.combine(self.column)
-  }
 }
 
 private var XCTCurrentTestCase: XCTestCase? {
@@ -234,15 +228,14 @@ private func writeInlineSnapshots() {
     let line = snapshots.first?.line ?? 1
     guard let source = try? String(contentsOfFile: filePath)
     else {
-      XCTFail("Couldn't load snapshot from disk", file: file.path, line: line)
-      return
+      fatalError("Couldn't load snapshot from disk", file: file.path, line: line)
     }
     let sourceFile = Parser.parse(source: source)
     let sourceLocationConverter = SourceLocationConverter(fileName: filePath, tree: sourceFile)
     let snapshotRewriter = SnapshotRewriter(
       file: file,
       snapshots: snapshots.sorted {
-        $0.line > $1.line
+        $0.line < $1.line
           && $0.syntaxDescriptor.trailingClosureOffset < $1.syntaxDescriptor.trailingClosureOffset
       },
       sourceLocationConverter: sourceLocationConverter
@@ -252,9 +245,8 @@ private func writeInlineSnapshots() {
       if source != updatedSource {
         try updatedSource.write(toFile: filePath, atomically: true, encoding: .utf8)
       }
-      snapshotRewriter.report()
     } catch {
-      XCTFail("Threw error: \(error)", file: file.path, line: line)
+      fatalError("Threw error: \(error)", file: file.path, line: line)
     }
   }
 }
@@ -264,7 +256,6 @@ private final class SnapshotRewriter: SyntaxRewriter {
   var function: String?
   let indent: String
   let line: UInt?
-  var offset = 0
   var newRecordings: [(snapshot: InlineSnapshot, line: UInt)] = []
   var snapshots: [InlineSnapshot]
   let sourceLocationConverter: SourceLocationConverter
@@ -289,22 +280,26 @@ private final class SnapshotRewriter: SyntaxRewriter {
   }
 
   override func visit(_ functionCallExpr: FunctionCallExprSyntax) -> ExprSyntax {
-    var functionCallExpr = functionCallExpr
-    while let snapshot = snapshots.first,
+    let snapshots = snapshots.prefix { snapshot in
       (functionCallExpr.position..<functionCallExpr.endPosition).contains(
         self.sourceLocationConverter.position(
           ofLine: Int(snapshot.line), column: Int(snapshot.column)
         )
-      ),
-      snapshot.expected != snapshot.actual
-    {
-      self.snapshots.removeFirst()
+      )
+    }
 
-      let originalFunctionCallExpr = functionCallExpr
+    guard !snapshots.isEmpty
+    else { return ExprSyntax(functionCallExpr) }
+
+    defer { self.snapshots.removeFirst(snapshots.count) }
+
+    var functionCallExpr = functionCallExpr
+    for snapshot in snapshots {
+      guard snapshot.expected != snapshot.actual else { continue }
+
       self.function =
         self.function
         ?? functionCallExpr.calledExpression.as(DeclReferenceExprSyntax.self)?.baseName.text
-      var line: Int?
 
       let leadingTrivia = String(
         functionCallExpr.leadingTrivia.description.split(separator: "\n").last ?? ""
@@ -358,13 +353,11 @@ private final class SnapshotRewriter: SyntaxRewriter {
       case ..<0:
         let index = arguments.index(arguments.startIndex, offsetBy: trailingClosureOffset)
         functionCallExpr.arguments[index].expression = ExprSyntax(snapshotClosure)
-        line = functionCallExpr.lineOffset(of: { $0.arguments[index].expression })
 
       case 0:
         if snapshot.wasRecording || functionCallExpr.trailingClosure == nil {
           functionCallExpr.rightParen?.trailingTrivia = .space
           functionCallExpr.trailingClosure = snapshotClosure
-          line = functionCallExpr.lineOffset(of: { $0.trailingClosure })
         } else {
           fatalError()
         }
@@ -394,8 +387,6 @@ private final class SnapshotRewriter: SyntaxRewriter {
           {
             if snapshot.wasRecording {
               functionCallExpr.additionalTrailingClosures[index].closure = snapshotClosure
-            } else {
-              return ExprSyntax(functionCallExpr)
             }
           } else {
             functionCallExpr.additionalTrailingClosures.insert(
@@ -403,7 +394,6 @@ private final class SnapshotRewriter: SyntaxRewriter {
               at: index
             )
           }
-          line = functionCallExpr.lineOffset(of: { $0.additionalTrailingClosures[index].label })
         } else if centeredTrailingClosureOffset >= 1 {
           if let index = functionCallExpr.additionalTrailingClosures.index(
             functionCallExpr.additionalTrailingClosures.endIndex,
@@ -415,7 +405,6 @@ private final class SnapshotRewriter: SyntaxRewriter {
             functionCallExpr.trailingClosure?.trailingTrivia = .space
           }
           functionCallExpr.additionalTrailingClosures.append(newElement)
-          line = functionCallExpr.lineOffset(of: { $0.additionalTrailingClosures.last?.label })
         } else {
           fatalError()
         }
@@ -423,75 +412,8 @@ private final class SnapshotRewriter: SyntaxRewriter {
       default:
         fatalError()
       }
-
-      defer {
-        let lineCount = originalFunctionCallExpr.description
-          .split(separator: "\n", omittingEmptySubsequences: false)
-          .count
-        let updatedLineCount = functionCallExpr.description
-          .split(separator: "\n", omittingEmptySubsequences: false)
-          .count
-        self.offset += updatedLineCount - lineCount
-      }
-      if snapshot.expected != snapshot.actual {
-        self.newRecordings.append(
-          (snapshot: snapshot, line: snapshot.line + UInt(line ?? 0))
-        )
-      }
     }
     return ExprSyntax(functionCallExpr)
-  }
-
-  func report() {
-    guard !self.newRecordings.isEmpty else {
-      XCTFail(
-        self.wasRecording
-          ? """
-          Record mode is on. Turn record mode off and run tests again to assert against recorded \
-          snapshots.
-          """
-          : """
-          Could not assert against inline snapshot. Please file an issue with the author of \
-          \(self.function.map { "\"\($0)\"" } ?? "this helper").
-          """,
-        file: self.file.path,
-        line: self.line ?? 1
-      )
-      return
-    }
-    for (snapshot, line) in self.newRecordings {
-      var failure = "Automatically recorded a new snapshot."
-      if let expected = snapshot.expected,
-        let difference = snapshot.diffing.diff(expected, snapshot.actual)?.0
-      {
-        failure += " Difference: …\n\n\(difference.indenting(by: 2))"
-      }
-      XCTFail(
-        """
-        \(failure)
-
-        Re-run "\(snapshot.function)" to test against the newly-recorded snapshot.
-        """,
-        file: self.file.path,
-        line: line
-      )
-    }
-  }
-}
-
-private extension SyntaxProtocol {
-  func lineOffset(of child: (Self) -> (some SyntaxProtocol)?) -> Int? {
-    guard let child = child(self) else { return nil }
-
-    let trimmed = self.trimmed
-    return trimmed.syntaxTextBytes[
-      ..<(child.positionAfterSkippingLeadingTrivia.utf8Offset - trimmed.position.utf8Offset)
-    ]
-    .reduce(into: 0) { lines, byte in
-      if byte == UTF8.CodeUnit(ascii: "\n") {
-        lines += 1
-      }
-    }
   }
 }
 
