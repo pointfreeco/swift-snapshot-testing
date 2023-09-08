@@ -182,6 +182,40 @@ final class InlineSnapshotTestingTests: XCTestCase {
       """
     }
   }
+
+  func testAsyncThrowing() async throws {
+    func assertAsyncThrowingInlineSnapshot(
+      of value: () -> String,
+      is expected: (() -> String)? = nil,
+      file: StaticString = #filePath,
+      function: StaticString = #function,
+      line: UInt = #line,
+      column: UInt = #column
+    ) async throws {
+      assertInlineSnapshot(
+        of: value(),
+        as: .dump,
+        syntaxDescriptor: InlineSnapshotSyntaxDescriptor(
+          trailingClosureLabel: "is",
+          trailingClosureOffset: 1
+        ),
+        matches: expected,
+        file: file,
+        function: function,
+        line: line,
+        column: column
+      )
+    }
+
+    try await assertAsyncThrowingInlineSnapshot {
+      "Hello"
+    } is: {
+      """
+      - "Hello"
+
+      """
+    }
+  }
 }
 
 private func assertCustomInlineSnapshot(

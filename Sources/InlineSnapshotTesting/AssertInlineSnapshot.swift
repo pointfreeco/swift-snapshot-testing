@@ -165,7 +165,7 @@ extension DispatchQueue {
   private static let value: UInt8 = 0
 
   static func mainSync<R>(execute block: () -> R) -> R {
-    main.setSpecific(key: key, value: value)
+    Self.main.setSpecific(key: key, value: value)
     if getSpecific(key: key) == value {
       return block()
     } else {
@@ -291,7 +291,8 @@ private final class SnapshotRewriter: SyntaxRewriter {
         ?? functionCallExpr.calledExpression.as(DeclReferenceExprSyntax.self)?.baseName.text
 
       let leadingTrivia = String(
-        functionCallExpr.leadingTrivia.description.split(separator: "\n").last ?? ""
+        self.sourceLocationConverter.sourceLines[Int(snapshot.line) - 1]
+          .prefix(while: { $0 == " " || $0 == "\t" })
       )
       let delimiter = String(
         repeating: "#", count: snapshot.actual.hashCount(isMultiline: true)
