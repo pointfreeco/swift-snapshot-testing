@@ -1,4 +1,5 @@
-// swift-tools-version:5.5
+// swift-tools-version:5.9
+
 import PackageDescription
 
 let package = Package(
@@ -7,22 +8,52 @@ let package = Package(
     .iOS(.v13),
     .macOS(.v10_15),
     .tvOS(.v13),
+    .watchOS(.v6),
   ],
   products: [
     .library(
       name: "SnapshotTesting",
       targets: ["SnapshotTesting"]
     ),
+    .library(
+      name: "InlineSnapshotTesting",
+      targets: ["InlineSnapshotTesting"]
+    ),
+  ],
+  dependencies: [
+    .package(
+      url: "https://github.com/apple/swift-syntax.git",
+      from: "509.0.0-swift-DEVELOPMENT-SNAPSHOT-2023-09-05-a"
+    )
   ],
   targets: [
-    .target(name: "SnapshotTesting"),
+    .target(
+      name: "SnapshotTesting"
+    ),
+    .target(
+      name: "InlineSnapshotTesting",
+      dependencies: [
+        "SnapshotTesting",
+        .product(name: "SwiftParser", package: "swift-syntax"),
+        .product(name: "SwiftSyntax", package: "swift-syntax"),
+        .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
+      ]
+    ),
+    .testTarget(
+      name: "InlineSnapshotTestingTests",
+      dependencies: [
+        "InlineSnapshotTesting"
+      ]
+    ),
     .testTarget(
       name: "SnapshotTestingTests",
-      dependencies: ["SnapshotTesting"],
+      dependencies: [
+        "SnapshotTesting"
+      ],
       exclude: [
         "__Fixtures__",
-        "__Snapshots__"
+        "__Snapshots__",
       ]
-    )
+    ),
   ]
 )

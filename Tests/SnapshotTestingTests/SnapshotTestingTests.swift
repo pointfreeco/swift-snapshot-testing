@@ -36,12 +36,6 @@ final class SnapshotTestingTests: XCTestCase {
     struct User { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
     await assertSnapshot(of: user, as: .dump)
-    await _assertInlineSnapshot(matching: user, as: .dump, with: """
-    ▿ User
-      - bio: "Blobbed around the world."
-      - id: 1
-      - name: "Blobby"
-    """)
   }
 
   @available(macOS 10.13, tvOS 11.0, *)
@@ -63,28 +57,6 @@ final class SnapshotTestingTests: XCTestCase {
     await assertSnapshot(of: "Hello, world!", as: .dump, named: "string")
     await assertSnapshot(of: "Hello, world!".dropLast(8), as: .dump, named: "substring")
     await assertSnapshot(of: URL(string: "https://www.pointfree.co")!, as: .dump, named: "url")
-    // Inline
-    await _assertInlineSnapshot(matching: "a" as Character, as: .dump, with: """
-    - "a"
-    """)
-    await _assertInlineSnapshot(matching: Data("Hello, world!".utf8), as: .dump, with: """
-    - 13 bytes
-    """)
-    await _assertInlineSnapshot(matching: Date(timeIntervalSinceReferenceDate: 0), as: .dump, with: """
-    - 2001-01-01T00:00:00Z
-    """)
-    await _assertInlineSnapshot(matching: NSObject(), as: .dump, with: """
-    - <NSObject>
-    """)
-    await _assertInlineSnapshot(matching: "Hello, world!", as: .dump, with: """
-    - "Hello, world!"
-    """)
-    await _assertInlineSnapshot(matching: "Hello, world!".dropLast(8), as: .dump, with: """
-    - "Hello"
-    """)
-    await _assertInlineSnapshot(matching: URL(string: "https://www.pointfree.co")!, as: .dump, with: """
-    - https://www.pointfree.co
-    """)
   }
 
   @MainActor
@@ -113,24 +85,6 @@ final class SnapshotTestingTests: XCTestCase {
       set: [.init(name: "Brandon"), .init(name: "Stephen")]
     )
     await assertSnapshot(of: set, as: .dump)
-    await _assertInlineSnapshot(matching: set, as: .dump, with: """
-    ▿ DictionarySetContainer
-      ▿ dict: 3 key/value pairs
-        ▿ (2 elements)
-          - key: "a"
-          - value: 1
-        ▿ (2 elements)
-          - key: "b"
-          - value: 2
-        ▿ (2 elements)
-          - key: "c"
-          - value: 3
-      ▿ set: 2 members
-        ▿ Person
-          - name: "Brandon"
-        ▿ Person
-          - name: "Stephen"
-    """)
   }
 
   func testCaseIterable() async {
@@ -1026,18 +980,6 @@ final class SnapshotTestingTests: XCTestCase {
     post.httpBody = Data("""
                          {"pricing": {"lane": "individual","billing": "monthly"}}
                          """.utf8)
-    await _assertInlineSnapshot(matching: post, as: .raw(pretty: true), with: """
-    POST https://www.pointfree.co/subscribe
-    Accept: application/json
-    Cookie: pf_session={"user_id":"0"}
-    
-    {
-      "pricing" : {
-        "billing" : "monthly",
-        "lane" : "individual"
-      }
-    }
-    """)
   }
 
   @MainActor
