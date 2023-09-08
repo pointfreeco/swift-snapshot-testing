@@ -319,7 +319,8 @@ private final class SnapshotRewriter: SyntaxRewriter {
         ?? functionCallExpr.calledExpression.as(DeclReferenceExprSyntax.self)?.baseName.text
 
       let leadingTrivia = String(
-        functionCallExpr.leadingTrivia.description.split(separator: "\n").last ?? ""
+        self.sourceLocationConverter.sourceLines[Int(snapshot.line) - 1]
+          .prefix(while: { $0 == " " || $0 == "\t" })
       )
       let delimiter = String(
         repeating: "#", count: snapshot.actual.hashCount(isMultiline: true)
