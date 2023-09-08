@@ -235,8 +235,9 @@ private func writeInlineSnapshots() {
     let snapshotRewriter = SnapshotRewriter(
       file: file,
       snapshots: snapshots.sorted {
-        $0.line < $1.line
-          && $0.syntaxDescriptor.trailingClosureOffset < $1.syntaxDescriptor.trailingClosureOffset
+        $0.line != $1.line
+          ? $0.line < $1.line
+          : $0.syntaxDescriptor.trailingClosureOffset < $1.syntaxDescriptor.trailingClosureOffset
       },
       sourceLocationConverter: sourceLocationConverter
     )
@@ -280,7 +281,7 @@ private final class SnapshotRewriter: SyntaxRewriter {
   }
 
   override func visit(_ functionCallExpr: FunctionCallExprSyntax) -> ExprSyntax {
-    let snapshots = snapshots.prefix { snapshot in
+    let snapshots = self.snapshots.prefix { snapshot in
       (functionCallExpr.position..<functionCallExpr.endPosition).contains(
         self.sourceLocationConverter.position(
           ofLine: Int(snapshot.line), column: Int(snapshot.column)
