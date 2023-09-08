@@ -183,8 +183,24 @@ private let installTestObserver: Void = {
       writeInlineSnapshots()
     }
   }
-  XCTestObservationCenter.shared.addTestObserver(InlineSnapshotObserver())
+  DispatchQueue.mainSync {
+    XCTestObservationCenter.shared.addTestObserver(InlineSnapshotObserver())
+  }
 }()
+
+extension DispatchQueue {
+  private static let key = DispatchSpecificKey<UInt8>()
+  private static let value: UInt8 = 0
+
+  static func mainSync<R>(execute block: () -> R) -> R {
+    Self.main.setSpecific(key: key, value: value)
+    if getSpecific(key: key) == value {
+      return block()
+    } else {
+      return main.sync(execute: block)
+    }
+  }
+}
 
 private struct File: Hashable {
   let path: StaticString
