@@ -71,7 +71,12 @@ final class InlineSnapshotTestingTests: XCTestCase {
   }
 
   func testCustomInlineSnapshot_SingleTrailingClosure() {
-    assertCustomInlineSnapshot(of: { "Hello" })
+    assertCustomInlineSnapshot(of: { "Hello" }) {
+      """
+      - "Hello"
+
+      """
+    }
   }
 
   func testCustomInlineSnapshot_MultilineSingleTrailingClosure() {
@@ -156,7 +161,26 @@ final class InlineSnapshotTestingTests: XCTestCase {
       """
       https://www.pointfree.co/
       """
-    } 
+    } head: {
+      """
+      HTTP/1.1 200 OK
+      Content-Type: text/html; charset=utf-8
+      """
+    } body: {
+      """
+      <!doctype html>
+      <html lang="en">
+      <head>
+        <meta charset="utf-8">
+        <title>Point-Free</title>
+        <link rel="stylesheet" href="style.css">
+      </head>
+      <body>
+        <p>What's the point?</p>
+      </body>
+      </html>
+      """
+    }
   }
 }
 
