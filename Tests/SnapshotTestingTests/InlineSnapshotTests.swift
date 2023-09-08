@@ -505,7 +505,7 @@ func assertSnapshot(source: String, diffable: String, record: Bool = false, file
     }
   }
   """########
-  await assertSnapshot(matching: decoratedCode, as: .swift, record: record, file: file, testName: testName, line: line)
+  await assertSnapshot(of: decoratedCode, as: .swift, record: record, file: file, testName: testName, line: line)
 }
 
 func assertSnapshot(source: String, diffable: String, diffable2: String, record: Bool = false, file: StaticString = #file, testName: String = #function, line: UInt = #line) async {
@@ -529,7 +529,7 @@ func assertSnapshot(source: String, diffable: String, diffable2: String, record:
      }
   }
   """########
-  await assertSnapshot(matching: decoratedCode, as: .swift, record: record, file: file, testName: testName, line: line)
+  await assertSnapshot(of: decoratedCode, as: .swift, record: record, file: file, testName: testName, line: line)
 }
 
 extension Snapshotting where Value == String, Format == String {
