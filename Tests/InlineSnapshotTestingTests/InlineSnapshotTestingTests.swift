@@ -216,6 +216,21 @@ final class InlineSnapshotTestingTests: XCTestCase {
       """
     }
   }
+
+  func testNestedInClosureFunction() {
+    func withDependencies(operation: () -> Void) {
+      operation()
+    }
+
+    withDependencies {
+      assertInlineSnapshot(of: "Hello", as: .dump) {
+        """
+        - "Hello"
+
+        """
+      }
+    }
+  }
 }
 
 private func assertCustomInlineSnapshot(
