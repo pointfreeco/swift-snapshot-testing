@@ -26,8 +26,8 @@ import XCTest
 ///     method where you call this function.
 ///   - line: The line where the assertion occurs. The default is the line number where you call
 ///     this function.
-///   - column: The column where the assertion occurs. The default is the line number where you call
-///     this function.
+///   - column: The column where the assertion occurs. The default is the line column you call this
+///     function.
 public func assertInlineSnapshot<Value>(
   of value: @autoclosure () throws -> Value,
   as snapshotting: Snapshotting<Value, String>,
@@ -102,30 +102,16 @@ public func assertInlineSnapshot<Value>(
       return
     }
     if let difference = snapshotting.diffing.diff(actual, expected)?.0 {
-      let filePath = "\(file)"
-      var trailingClosureLine: Int?
-      // TODO: Cache parsed source
-      if let source = try? String(contentsOfFile: filePath) {
-        let sourceFile = Parser.parse(source: source)
-        let sourceLocationConverter = SourceLocationConverter(fileName: filePath, tree: sourceFile)
-        let visitor = SnapshotVisitor(
-          functionCallLine: Int(line),
-          functionCallColumn: Int(column),
-          sourceLocationConverter: sourceLocationConverter,
-          syntaxDescriptor: syntaxDescriptor
-        )
-        visitor.walk(sourceFile)
-        trailingClosureLine = visitor.trailingClosureLine
-      }
       let message = message()
-      XCTFail(
+      syntaxDescriptor.fail(
         """
         \(message.isEmpty ? "Snapshot did not match. Difference: …" : message)
 
         \(difference.indenting(by: 2))
         """,
         file: file,
-        line: trailingClosureLine.map(UInt.init) ?? line
+        line: line,
+        column: column
       )
     }
   } catch {
@@ -175,6 +161,44 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
   public init(trailingClosureLabel: String = "matches", trailingClosureOffset: Int = 0) {
     self.trailingClosureLabel = trailingClosureLabel
     self.trailingClosureOffset = trailingClosureOffset
+  }
+
+  /// Generates a test failure immediately and unconditionally at the described trailing closure.
+  ///
+  /// This method will attempt to locate the line of the trailing closure described by this type and
+  /// call `XCTFail` with it. If the trailing closure cannot be located, the failure will be
+  /// associated with the given line, instead.
+  ///
+  /// - Parameters:
+  ///   - message: An optional description of the assertion, for inclusion in test results.
+  ///   - file: The file where the assertion occurs. The default is the filename of the test case
+  ///     where you call `assertInlineSnapshot`.
+  ///   - line: The line where the assertion occurs. The default is the line number where you call
+  ///     `assertInlineSnapshot`.
+  ///   - column: The column where the assertion occurs. The default is the column where you call
+  ///     `assertInlineSnapshot`.
+  public func fail(
+    _ message: @autoclosure () -> String = "",
+    file: StaticString,
+    line: UInt,
+    column: UInt
+  ) {
+    var trailingClosureLine: Int?
+    if let testSource = try? testSource(file: File(path: file)) {
+      let visitor = SnapshotVisitor(
+        functionCallLine: Int(line),
+        functionCallColumn: Int(column),
+        sourceLocationConverter: testSource.sourceLocationConverter,
+        syntaxDescriptor: self
+      )
+      visitor.walk(testSource.sourceFile)
+      trailingClosureLine = visitor.trailingClosureLine
+    }
+    XCTFail(
+      message(),
+      file: file,
+      line: trailingClosureLine.map(UInt.init) ?? line
+    )
   }
 }
 
@@ -238,17 +262,40 @@ private var XCTCurrentTestCase: XCTestCase? {
 
 private var inlineSnapshotState: [File: [InlineSnapshot]] = [:]
 
+private struct TestSource {
+  let source: String
+  let sourceFile: SourceFileSyntax
+  let sourceLocationConverter: SourceLocationConverter
+}
+
+private func testSource(file: File) throws -> TestSource {
+  guard let testSource = testSourceCache[file]
+  else {
+    let filePath = "\(file.path)"
+    let source = try String(contentsOfFile: filePath)
+    let sourceFile = Parser.parse(source: source)
+    let sourceLocationConverter = SourceLocationConverter(fileName: filePath, tree: sourceFile)
+    let testSource = TestSource(
+      source: source,
+      sourceFile: sourceFile,
+      sourceLocationConverter: sourceLocationConverter
+    )
+    testSourceCache[file] = testSource
+    return testSource
+  }
+  return testSource
+}
+
+private var testSourceCache: [File: TestSource] = [:]
+
 private func writeInlineSnapshots() {
   defer { inlineSnapshotState.removeAll() }
   for (file, snapshots) in inlineSnapshotState {
-    let filePath = "\(file.path)"
     let line = snapshots.first?.line ?? 1
-    guard let source = try? String(contentsOfFile: filePath)
+    guard let testSource = try? testSource(file: file)
     else {
       fatalError("Couldn't load snapshot from disk", file: file.path, line: line)
     }
-    let sourceFile = Parser.parse(source: source)
-    let sourceLocationConverter = SourceLocationConverter(fileName: filePath, tree: sourceFile)
     let snapshotRewriter = SnapshotRewriter(
       file: file,
       snapshots: snapshots.sorted {
@@ -256,12 +303,12 @@ private func writeInlineSnapshots() {
           ? $0.line < $1.line
           : $0.syntaxDescriptor.trailingClosureOffset < $1.syntaxDescriptor.trailingClosureOffset
       },
-      sourceLocationConverter: sourceLocationConverter
+      sourceLocationConverter: testSource.sourceLocationConverter
     )
-    let updatedSource = snapshotRewriter.visit(sourceFile).description
+    let updatedSource = snapshotRewriter.visit(testSource.sourceFile).description
     do {
-      if source != updatedSource {
-        try updatedSource.write(toFile: filePath, atomically: true, encoding: .utf8)
+      if testSource.source != updatedSource {
+        try updatedSource.write(toFile: "\(file.path)", atomically: true, encoding: .utf8)
       }
     } catch {
       fatalError("Threw error: \(error)", file: file.path, line: line)
