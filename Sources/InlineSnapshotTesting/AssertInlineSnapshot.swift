@@ -104,6 +104,7 @@ public func assertInlineSnapshot<Value>(
     if let difference = snapshotting.diffing.diff(actual, expected)?.0 {
       let filePath = "\(file)"
       var trailingClosureLine: Int?
+      // TODO: Cache parsed source
       if let source = try? String(contentsOfFile: filePath) {
         let sourceFile = Parser.parse(source: source)
         let sourceLocationConverter = SourceLocationConverter(fileName: filePath, tree: sourceFile)
