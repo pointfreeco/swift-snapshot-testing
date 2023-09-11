@@ -269,18 +269,18 @@ public func verifySnapshot<Value, Format>(
 
       return recording
         ? """
-        Record mode is on. Turn record mode off and re-run "\(testName)" to test against the newly-recorded snapshot.
+        Record mode is on. Automatically recorded snapshot: …
 
         open "\(snapshotFileUrl.absoluteString)"
 
-        Recorded snapshot: …
+        Turn record mode off and re-run "\(testName)" to assert against the newly-recorded snapshot
         """
         : """
         No reference was found on disk. Automatically recorded snapshot: …
 
         open "\(snapshotFileUrl.absoluteString)"
 
-        Re-run "\(testName)" to test against the newly-recorded snapshot.
+        Re-run "\(testName)" to assert against the newly-recorded snapshot.
         """
     }
 
