@@ -73,7 +73,7 @@ public func assertInlineSnapshot<Value>(
     }
     guard !isRecording, let expected = expected?()
     else {
-      var failure = "Automatically recorded a new snapshot."
+      var failure = "\"\(function)\" automatically recorded a new snapshot."
       if let expected = expected?(),
         let difference = snapshotting.diffing.diff(expected, actual)?.0
       {
@@ -83,7 +83,7 @@ public func assertInlineSnapshot<Value>(
         """
         \(failure)
 
-        Re-run "\(function)" to test against the newly-recorded snapshot.
+        Re-run "\(function)" to assert against the newly-recorded snapshot.
         """,
         file: file,
         line: line

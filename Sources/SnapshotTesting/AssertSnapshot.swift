@@ -278,7 +278,7 @@ public func verifySnapshot<Value, Format>(
         : """
         No reference was found on disk. Automatically recorded snapshot: …
 
-        open "\(snapshotFileUrl.path)"
+        open "\(snapshotFileUrl.absoluteString)"
 
         Re-run "\(testName)" to test against the newly-recorded snapshot.
         """
