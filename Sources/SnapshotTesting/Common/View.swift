@@ -1032,6 +1032,9 @@ private func add(traits: UITraitCollection, viewController: UIViewController, to
   viewController.view.layoutIfNeeded()
 
   return {
+    let originalFirstResponder = findFirstResponderRecursively(in: window)
+    defer { originalFirstResponder?.becomeFirstResponder() }
+
     rootViewController.beginAppearanceTransition(false, animated: false)
     viewController.willMove(toParent: nil)
     viewController.view.removeFromSuperview()
@@ -1040,6 +1043,18 @@ private func add(traits: UITraitCollection, viewController: UIViewController, to
     rootViewController.endAppearanceTransition()
     window.rootViewController = nil
   }
+}
+
+private func findFirstResponderRecursively(in view: UIView) -> UIView? {
+    for subView in view.subviews {
+        if subView.isFirstResponder {
+            return subView
+        }
+        if let recursiveSubView = findFirstResponderRecursively(in: subView) {
+            return recursiveSubView
+        }
+    }
+    return nil
 }
 
 private func getKeyWindow() -> UIWindow? {
