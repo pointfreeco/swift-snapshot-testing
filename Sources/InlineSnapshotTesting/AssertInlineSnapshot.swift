@@ -249,19 +249,6 @@ private struct InlineSnapshot: Hashable {
   var column: UInt
 }
 
-private var XCTCurrentTestCase: XCTestCase? {
-  guard
-    let observers = XCTestObservationCenter.shared.perform(Selector(("observers")))?
-      .takeUnretainedValue() as? [AnyObject],
-    let observer =
-      observers
-      .first(where: { NSStringFromClass(type(of: $0)) == "XCTestMisuseObserver" }),
-    let currentTestCase = observer.perform(Selector(("currentTestCase")))?
-      .takeUnretainedValue() as? XCTestCase
-  else { return nil }
-  return currentTestCase
-}
-
 private var inlineSnapshotState: [File: [InlineSnapshot]] = [:]
 
 private struct TestSource {
