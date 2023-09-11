@@ -202,6 +202,8 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
   }
 }
 
+// MARK: - Private
+
 private let installTestObserver: Void = {
   final class InlineSnapshotObserver: NSObject, XCTestObservation {
     func testBundleDidFinish(_ testBundle: Bundle) {
@@ -217,7 +219,7 @@ extension DispatchQueue {
   private static let key = DispatchSpecificKey<UInt8>()
   private static let value: UInt8 = 0
 
-  static func mainSync<R>(execute block: () -> R) -> R {
+  fileprivate static func mainSync<R>(execute block: () -> R) -> R {
     Self.main.setSpecific(key: key, value: value)
     if getSpecific(key: key) == value {
       return block()
@@ -245,19 +247,6 @@ private struct InlineSnapshot: Hashable {
   var function: String
   var line: UInt
   var column: UInt
-}
-
-private var XCTCurrentTestCase: XCTestCase? {
-  guard
-    let observers = XCTestObservationCenter.shared.perform(Selector(("observers")))?
-      .takeUnretainedValue() as? [AnyObject],
-    let observer =
-      observers
-      .first(where: { NSStringFromClass(type(of: $0)) == "XCTestMisuseObserver" }),
-    let currentTestCase = observer.perform(Selector(("currentTestCase")))?
-      .takeUnretainedValue() as? XCTestCase
-  else { return nil }
-  return currentTestCase
 }
 
 private var inlineSnapshotState: [File: [InlineSnapshot]] = [:]
@@ -502,12 +491,11 @@ private final class SnapshotVisitor: SyntaxVisitor {
   }
 
   override func visit(_ functionCallExpr: FunctionCallExprSyntax) -> SyntaxVisitorContinueKind {
+    let location = functionCallExpr.calledExpression
+      .endLocation(converter: self.sourceLocationConverter, afterTrailingTrivia: true)
     guard
-      (functionCallExpr.position..<functionCallExpr.endPosition).contains(
-        self.sourceLocationConverter.position(
-          ofLine: Int(self.functionCallLine), column: Int(self.functionCallColumn)
-        )
-      )
+      Int(self.functionCallLine) == location.line,
+      Int(self.functionCallColumn) == location.column
     else { return .visitChildren }
 
     let arguments = functionCallExpr.arguments
