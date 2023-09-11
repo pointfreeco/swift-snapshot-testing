@@ -15,8 +15,8 @@ jobs:
         xcode:
           - "14.3.1"
 
-    name: macOS 12 (Xcode ${{ matrix.xcode }})
-    runs-on: macos-12
+    name: macOS 13 (Xcode ${{ matrix.xcode }})
+    runs-on: macos-13
     steps:
       - uses: actions/checkout@v3
       - name: Select Xcode ${{ matrix.xcode }}
