@@ -12,7 +12,10 @@
     /// - Parameters:
     ///   - config: A set of device configuration settings.
     ///   - precision: The percentage of pixels that must match.
-    ///   - perceptualPrecision: The percentage a pixel must match the source pixel to be considered a match. [98-99% mimics the precision of the human eye.](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e)
+    ///   - perceptualPrecision: The percentage a pixel must match the source pixel to be considered a
+    ///     match. 98-99% mimics
+    ///     [the precision](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e) of the
+    ///     human eye.
     ///   - size: A view size override.
     ///   - traits: A trait collection override.
     public static func image(
@@ -45,9 +48,14 @@
     /// A snapshot strategy for comparing view controller views based on pixel equality.
     ///
     /// - Parameters:
-    ///   - drawHierarchyInKeyWindow: Utilize the simulator's key window in order to render `UIAppearance` and `UIVisualEffect`s. This option requires a host application for your tests and will _not_ work for framework test targets.
+    ///   - drawHierarchyInKeyWindow: Utilize the simulator's key window in order to render
+    ///     `UIAppearance` and `UIVisualEffect`s. This option requires a host application for your
+    ///     tests and will _not_ work for framework test targets.
     ///   - precision: The percentage of pixels that must match.
-    ///   - perceptualPrecision: The percentage a pixel must match the source pixel to be considered a match. [98-99% mimics the precision of the human eye.](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e)
+    ///   - perceptualPrecision: The percentage a pixel must match the source pixel to be considered a
+    ///     match. 98-99% mimics
+    ///     [the precision](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e) of the
+    ///     human eye.
     ///   - size: A view size override.
     ///   - traits: A trait collection override.
     public static func image(
@@ -77,7 +85,29 @@
   }
 
   extension Snapshotting where Value == UIViewController, Format == String {
-    /// A snapshot strategy for comparing view controllers based on their embedded controller hierarchy.
+    /// A snapshot strategy for comparing view controllers based on their embedded controller
+    /// hierarchy.
+    ///
+    /// ``` swift
+    /// assertSnapshot(of: vc, as: .hierarchy)
+    /// ```
+    ///
+    /// Records:
+    ///
+    /// ```
+    /// <UITabBarController>, state: appeared, view: <UILayoutContainerView>
+    ///    | <UINavigationController>, state: appeared, view: <UILayoutContainerView>
+    ///    |    | <UIPageViewController>, state: appeared, view: <_UIPageViewControllerContentView>
+    ///    |    |    | <UIViewController>, state: appeared, view: <UIView>
+    ///    | <UINavigationController>, state: disappeared, view: <UILayoutContainerView> not in the window
+    ///    |    | <UIViewController>, state: disappeared, view: (view not loaded)
+    ///    | <UINavigationController>, state: disappeared, view: <UILayoutContainerView> not in the window
+    ///    |    | <UIViewController>, state: disappeared, view: (view not loaded)
+    ///    | <UINavigationController>, state: disappeared, view: <UILayoutContainerView> not in the window
+    ///    |    | <UIViewController>, state: disappeared, view: (view not loaded)
+    ///    | <UINavigationController>, state: disappeared, view: <UILayoutContainerView> not in the window
+    ///    |    | <UIViewController>, state: disappeared, view: (view not loaded)
+    /// ```
     public static var hierarchy: Snapshotting {
       Snapshotting<String, String>.lines.pullback { @MainActor viewController in
         let dispose = prepareView(
@@ -95,12 +125,14 @@
       }
     }
 
-    /// A snapshot strategy for comparing view controller views based on a recursive description of their properties and hierarchies.
+    /// A snapshot strategy for comparing view controller views based on a recursive description of
+    /// their properties and hierarchies.
     public static var recursiveDescription: Snapshotting {
       Snapshotting.recursiveDescription()
     }
 
-    /// A snapshot strategy for comparing view controller views based on a recursive description of their properties and hierarchies.
+    /// A snapshot strategy for comparing view controller views based on a recursive description of
+    /// their properties and hierarchies.
     ///
     /// - Parameters:
     ///   - config: A set of device configuration settings.

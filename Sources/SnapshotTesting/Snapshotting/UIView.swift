@@ -10,9 +10,14 @@
     /// A snapshot strategy for comparing views based on pixel equality.
     ///
     /// - Parameters:
-    ///   - drawHierarchyInKeyWindow: Utilize the simulator's key window in order to render `UIAppearance` and `UIVisualEffect`s. This option requires a host application for your tests and will _not_ work for framework test targets.
+    ///   - drawHierarchyInKeyWindow: Utilize the simulator's key window in order to render
+    ///     `UIAppearance` and `UIVisualEffect`s. This option requires a host application for your
+    ///     tests and will _not_ work for framework test targets.
     ///   - precision: The percentage of pixels that must match.
-    ///   - perceptualPrecision: The percentage a pixel must match the source pixel to be considered a match. [98-99% mimics the precision of the human eye.](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e)
+    ///   - perceptualPrecision: The percentage a pixel must match the source pixel to be considered a
+    ///     match. 98-99% mimics
+    ///     [the precision](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e) of the
+    ///     human eye.
     ///   - size: A view size override.
     ///   - traits: A trait collection override.
     public static func image(
@@ -41,12 +46,32 @@
   }
 
   extension Snapshotting where Value == UIView, Format == String {
-    /// A snapshot strategy for comparing views based on a recursive description of their properties and hierarchies.
+    /// A snapshot strategy for comparing views based on a recursive description of their properties
+    /// and hierarchies.
+    ///
+    /// ``` swift
+    /// s// Layout on the current device.
+    /// assertSnapshot(of: view, as: .recursiveDescription)
+    ///
+    /// // Layout with a certain size.
+    /// assertSnapshot(of: view, as: .recursiveDescription(size: .init(width: 22, height: 22)))
+    ///
+    /// // Layout with a certain trait collection.
+    /// assertSnapshot(of: view, as: .recursiveDescription(traits: .init(horizontalSizeClass: .regular)))
+    /// ```
+    ///
+    /// Records:
+    ///
+    /// ```
+    /// <UIButton; frame = (0 0; 22 22); opaque = NO; layer = <CALayer>>
+    ///    | <UIImageView; frame = (0 0; 22 22); clipsToBounds = YES; opaque = NO; userInteractionEnabled = NO; layer = <CALayer>>
+    /// ```
     public static var recursiveDescription: Snapshotting {
       return Snapshotting.recursiveDescription()
     }
 
-    /// A snapshot strategy for comparing views based on a recursive description of their properties and hierarchies.
+    /// A snapshot strategy for comparing views based on a recursive description of their properties
+    /// and hierarchies.
     public static func recursiveDescription(
       size: CGSize? = nil,
       traits: UITraitCollection = .init()

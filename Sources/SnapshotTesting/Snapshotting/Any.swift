@@ -1,7 +1,46 @@
 import Foundation
 
 extension Snapshotting where Format == String {
+  /// A snapshot strategy that captures a value's textual description from `String`'s
+  /// `init(describing:)` initializer.
+  ///
+  /// ``` swift
+  /// assertSnapshot(of: user, as: .description)
+  /// ```
+  ///
+  /// Records:
+  ///
+  /// ```
+  /// User(bio: "Blobbed around the world.", id: 1, name: "Blobby")
+  /// ```
+  public static var description: Snapshotting {
+    return SimplySnapshotting.lines.pullback(String.init(describing:))
+  }
+}
+
+extension Snapshotting where Format == String {
   /// A snapshot strategy for comparing any structure based on a sanitized text dump.
+  ///
+  /// The reference format looks a lot like the output of Swift's built-in `dump` function, though
+  /// it does its best to make output deterministic by stripping out pointer memory addresses and
+  /// sorting non-deterministic data, like dictionaries and sets.
+  ///
+  /// You can hook into how an instance of a type is rendered in this strategy by conforming to the
+  /// ``AnySnapshotStringConvertible`` protocol and defining the
+  /// ``AnySnapshotStringConvertible/snapshotDescription` property.
+  ///
+  /// ```swift
+  /// assertSnapshot(of: user, as: .dump)
+  /// ```
+  ///
+  /// Records:
+  ///
+  /// ```
+  /// ▿ User
+  ///   - bio: "Blobbed around the world."
+  ///   - id: 1
+  ///   - name: "Blobby"
+  /// ```
   public static var dump: Snapshotting {
     return SimplySnapshotting.lines.pullback { snap($0) }
   }
@@ -86,7 +125,8 @@ private func sort(_ children: Mirror.Children) -> Mirror.Children {
 
 /// A type with a customized snapshot dump representation.
 ///
-/// Types that conform to the `AnySnapshotStringConvertible` protocol can provide their own representation to be used when converting an instance to a `dump`-based snapshot.
+/// Types that conform to the `AnySnapshotStringConvertible` protocol can provide their own
+/// representation to be used when converting an instance to a `dump`-based snapshot.
 public protocol AnySnapshotStringConvertible {
   /// Whether or not to dump child nodes (defaults to `false`).
   static var renderChildren: Bool { get }

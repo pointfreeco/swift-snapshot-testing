@@ -186,14 +186,14 @@ final class InlineSnapshotTestingTests: XCTestCase {
 
   func testAsyncThrowing() async throws {
     func assertAsyncThrowingInlineSnapshot(
-      of value: () -> String,
+      of value: @escaping () -> String,
       is expected: (() -> String)? = nil,
       file: StaticString = #filePath,
       function: StaticString = #function,
       line: UInt = #line,
       column: UInt = #column
     ) async throws {
-      assertInlineSnapshot(
+      await assertInlineSnapshot(
         of: value(),
         as: .dump,
         syntaxDescriptor: InlineSnapshotSyntaxDescriptor(
@@ -218,13 +218,13 @@ final class InlineSnapshotTestingTests: XCTestCase {
     }
   }
 
-  func testNestedInClosureFunction() {
-    func withDependencies(operation: () -> Void) {
-      operation()
+  func testNestedInClosureFunction() async {
+    func withDependencies(operation: () async -> Void) async {
+      await operation()
     }
 
-    withDependencies {
-      assertInlineSnapshot(of: "Hello", as: .dump) {
+    await withDependencies {
+      await assertInlineSnapshot(of: "Hello", as: .dump) {
         """
         - "Hello"
 

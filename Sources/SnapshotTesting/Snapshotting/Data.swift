@@ -2,6 +2,7 @@ import Foundation
 import XCTest
 
 extension Snapshotting where Value == Data, Format == Data {
+  /// A snapshot strategy for comparing bare binary data.
   public static var data: Snapshotting {
     return .init(
       pathExtension: nil,

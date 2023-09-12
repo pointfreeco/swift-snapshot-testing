@@ -10,7 +10,10 @@
     ///
     /// - Parameters:
     ///   - precision: The percentage of pixels that must match.
-    ///   - perceptualPrecision: The percentage a pixel must match the source pixel to be considered a match. [98-99% mimics the precision of the human eye.](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e)
+    ///   - perceptualPrecision: The percentage a pixel must match the source pixel to be considered a
+    ///     match. 98-99% mimics
+    ///     [the precision](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e) of the
+    ///     human eye.
     /// - Returns: A new diffing strategy.
     public static func image(precision: Float = 1, perceptualPrecision: Float = 1) -> Diffing {
       return .init(
@@ -46,7 +49,10 @@
     ///
     /// - Parameters:
     ///   - precision: The percentage of pixels that must match.
-    ///   - perceptualPrecision: The percentage a pixel must match the source pixel to be considered a match. [98-99% mimics the precision of the human eye.](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e)
+    ///   - perceptualPrecision: The percentage a pixel must match the source pixel to be considered a
+    ///     match. 98-99% mimics
+    ///     [the precision](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e) of the
+    ///     human eye.
     public static func image(precision: Float = 1, perceptualPrecision: Float = 1) -> Snapshotting {
       return .init(
         pathExtension: "png",

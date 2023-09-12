@@ -10,9 +10,20 @@
 
     /// A snapshot strategy for comparing bezier paths based on pixel equality.
     ///
+    ///``` swift
+    /// // Match reference perfectly.
+    /// assertSnapshot(of: path, as: .image)
+    ///
+    /// // Allow for a 1% pixel difference.
+    /// assertSnapshot(of: path, as: .image(precision: 0.99))
+    /// ```
+    ///
     /// - Parameters:
     ///   - precision: The percentage of pixels that must match.
-    ///   - perceptualPrecision: The percentage a pixel must match the source pixel to be considered a match. [98-99% mimics the precision of the human eye.](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e)
+    ///   - perceptualPrecision: The percentage a pixel must match the source pixel to be considered a
+    ///     match. 98-99% mimics
+    ///     [the precision](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e) of the
+    ///     human eye.
     public static func image(precision: Float = 1, perceptualPrecision: Float = 1) -> Snapshotting {
       return SimplySnapshotting.image(
         precision: precision, perceptualPrecision: perceptualPrecision

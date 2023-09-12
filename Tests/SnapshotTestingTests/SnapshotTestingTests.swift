@@ -25,7 +25,7 @@ final class SnapshotTestingTests: XCTestCase {
   override func setUp() {
     super.setUp()
     diffTool = "ksdiff"
-    //    isRecording = true
+    // isRecording = true
   }
 
   override func tearDown() {
@@ -266,59 +266,59 @@ final class SnapshotTestingTests: XCTestCase {
   }
 
   func testSCNView() {
-    //    #if os(iOS) || os(macOS) || os(tvOS)
-    //    // NB: CircleCI crashes while trying to instantiate SCNView.
-    //    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
-    //      let scene = SCNScene()
+    // #if os(iOS) || os(macOS) || os(tvOS)
+    // // NB: CircleCI crashes while trying to instantiate SCNView.
+    // if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+    //   let scene = SCNScene()
     //
-    //      let sphereGeometry = SCNSphere(radius: 3)
-    //      sphereGeometry.segmentCount = 200
-    //      let sphereNode = SCNNode(geometry: sphereGeometry)
-    //      sphereNode.position = SCNVector3Zero
-    //      scene.rootNode.addChildNode(sphereNode)
+    //   let sphereGeometry = SCNSphere(radius: 3)
+    //   sphereGeometry.segmentCount = 200
+    //   let sphereNode = SCNNode(geometry: sphereGeometry)
+    //   sphereNode.position = SCNVector3Zero
+    //   scene.rootNode.addChildNode(sphereNode)
     //
-    //      sphereGeometry.firstMaterial?.diffuse.contents = URL(fileURLWithPath: String(#file), isDirectory: false)
-    //        .deletingLastPathComponent()
-    //        .appendingPathComponent("__Fixtures__/earth.png")
+    //   sphereGeometry.firstMaterial?.diffuse.contents = URL(fileURLWithPath: String(#file), isDirectory: false)
+    //     .deletingLastPathComponent()
+    //     .appendingPathComponent("__Fixtures__/earth.png")
     //
-    //      let cameraNode = SCNNode()
-    //      cameraNode.camera = SCNCamera()
-    //      cameraNode.position = SCNVector3Make(0, 0, 8)
-    //      scene.rootNode.addChildNode(cameraNode)
+    //   let cameraNode = SCNNode()
+    //   cameraNode.camera = SCNCamera()
+    //   cameraNode.position = SCNVector3Make(0, 0, 8)
+    //   scene.rootNode.addChildNode(cameraNode)
     //
-    //      let omniLight = SCNLight()
-    //      omniLight.type = .omni
-    //      let omniLightNode = SCNNode()
-    //      omniLightNode.light = omniLight
-    //      omniLightNode.position = SCNVector3Make(10, 10, 10)
-    //      scene.rootNode.addChildNode(omniLightNode)
+    //   let omniLight = SCNLight()
+    //   omniLight.type = .omni
+    //   let omniLightNode = SCNNode()
+    //   omniLightNode.light = omniLight
+    //   omniLightNode.position = SCNVector3Make(10, 10, 10)
+    //   scene.rootNode.addChildNode(omniLightNode)
     //
-    //      assertSnapshot(
-    //        of: scene,
-    //        as: .image(size: .init(width: 500, height: 500)),
-    //        named: platform
-    //      )
-    //    }
-    //    #endif
+    //   assertSnapshot(
+    //     of: scene,
+    //     as: .image(size: .init(width: 500, height: 500)),
+    //     named: platform
+    //   )
+    // }
+    // #endif
   }
 
   func testSKView() {
-    //    #if os(iOS) || os(macOS) || os(tvOS)
-    //    // NB: CircleCI crashes while trying to instantiate SKView.
-    //    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
-    //      let scene = SKScene(size: .init(width: 50, height: 50))
-    //      let node = SKShapeNode(circleOfRadius: 15)
-    //      node.fillColor = .red
-    //      node.position = .init(x: 25, y: 25)
-    //      scene.addChild(node)
+    // #if os(iOS) || os(macOS) || os(tvOS)
+    // // NB: CircleCI crashes while trying to instantiate SKView.
+    // if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+    //   let scene = SKScene(size: .init(width: 50, height: 50))
+    //   let node = SKShapeNode(circleOfRadius: 15)
+    //   node.fillColor = .red
+    //   node.position = .init(x: 25, y: 25)
+    //   scene.addChild(node)
     //
-    //      assertSnapshot(
-    //        of: scene,
-    //        as: .image(size: .init(width: 50, height: 50)),
-    //        named: platform
-    //      )
-    //    }
-    //    #endif
+    //   assertSnapshot(
+    //     of: scene,
+    //     as: .image(size: .init(width: 50, height: 50)),
+    //     named: platform
+    //   )
+    // }
+    // #endif
   }
 
   @MainActor
@@ -833,8 +833,8 @@ final class SnapshotTestingTests: XCTestCase {
 
         lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
 
-        override func viewDidLoad() {
-          super.viewDidLoad()
+          override func viewDidLoad() {
+            super.viewDidLoad()
 
           view.backgroundColor = .white
           view.addSubview(collectionView)

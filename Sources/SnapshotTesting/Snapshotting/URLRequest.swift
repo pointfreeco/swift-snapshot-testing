@@ -6,6 +6,19 @@ import Foundation
 
 extension Snapshotting where Value == URLRequest, Format == String {
   /// A snapshot strategy for comparing requests based on raw equality.
+  ///
+  /// ``` swift
+  /// assertSnapshot(of: request, as: .raw)
+  /// ```
+  ///
+  /// Records:
+  ///
+  /// ```
+  /// POST http://localhost:8080/account
+  /// Cookie: pf_session={"userId":"1"}
+  ///
+  /// email=blob%40pointfree.co&name=Blob
+  /// ```
   public static let raw = Snapshotting.raw(pretty: false)
 
   /// A snapshot strategy for comparing requests based on raw equality.
@@ -47,6 +60,20 @@ extension Snapshotting where Value == URLRequest, Format == String {
   }
 
   /// A snapshot strategy for comparing requests based on a cURL representation.
+  ///
+  // ``` swift
+  // assertSnapshot(of: request, as: .curl)
+  // ```
+  //
+  // Records:
+  //
+  // ```
+  // curl \
+  //   --request POST \
+  //   --header "Accept: text/html" \
+  //   --data 'pricing[billing]=monthly&pricing[lane]=individual' \
+  //   "https://www.pointfree.co/subscribe"
+  // ```
   public static let curl = SimplySnapshotting.lines.pullback { (request: URLRequest) in
 
     var components = ["curl"]

@@ -45,7 +45,16 @@ public func assertInlineSnapshot<Value>(
     let actual = try await snapshotting.snapshot { try await value() }
     guard !isRecording, let expected = expected?()
     else {
-      var failure = "Automatically recorded a new snapshot."
+      var failure: String
+      if syntaxDescriptor.trailingClosureLabel
+        == InlineSnapshotSyntaxDescriptor.defaultTrailingClosureLabel
+      {
+        failure = "Automatically recorded a new snapshot."
+      } else {
+        failure = """
+          Automatically recorded a new snapshot for "\(syntaxDescriptor.trailingClosureLabel)".
+          """
+      }
       if let expected = expected?(),
         let difference = snapshotting.diffing.diff(expected, actual)?.0
       {
@@ -55,7 +64,7 @@ public func assertInlineSnapshot<Value>(
         """
         \(failure)
 
-        Re-run "\(function)" to test against the newly-recorded snapshot.
+        Re-run "\(function)" to assert against the newly-recorded snapshot.
         """,
         file: file,
         line: line
@@ -98,6 +107,9 @@ public func assertInlineSnapshot<Value>(
 /// ``assertInlineSnapshot(of:as:message:timeout:syntaxDescriptor:matches:file:function:line:column:)``
 /// under the hood.
 public struct InlineSnapshotSyntaxDescriptor: Hashable {
+  /// The default label describing an inline snapshot.
+  public static let defaultTrailingClosureLabel = "matches"
+
   /// The label of the trailing closure that returns the inline snapshot.
   public var trailingClosureLabel: String
 
@@ -131,7 +143,10 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
   ///   - trailingClosureLabel: The label of the trailing closure that returns the inline snapshot.
   ///   - trailingClosureOffset: The offset of the trailing closure that returns the inline
   ///     snapshot, relative to the first trailing closure.
-  public init(trailingClosureLabel: String = "matches", trailingClosureOffset: Int = 0) {
+  public init(
+    trailingClosureLabel: String = Self.defaultTrailingClosureLabel,
+    trailingClosureOffset: Int = 0
+  ) {
     self.trailingClosureLabel = trailingClosureLabel
     self.trailingClosureOffset = trailingClosureOffset
   }

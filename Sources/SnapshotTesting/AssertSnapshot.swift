@@ -1,14 +1,18 @@
 import XCTest
 
-/// Enhances failure messages with a command line diff tool expression that can be copied and pasted into a terminal.
+/// Enhances failure messages with a command line diff tool expression that can be copied and pasted
+/// into a terminal.
 ///
-///     diffTool = "ksdiff"
+/// ```swift
+/// diffTool = "ksdiff"
+/// ```
 public var diffTool: String? = nil
 
 /// Whether or not to record all new references.
 public var isRecording = false
 
 /// Whether or not to record all new references.
+///
 /// Due to a name clash in Xcode 12, this has been renamed to `isRecording`.
 @available(*, deprecated, renamed: "isRecording")
 public var record: Bool {
@@ -58,12 +62,16 @@ public func assertSnapshot<Value, Format>(
 ///
 /// - Parameters:
 ///   - value: A value to compare against a reference.
-///   - strategies: A dictionary of names and strategies for serializing, deserializing, and comparing values.
+///   - strategies: A dictionary of names and strategies for serializing, deserializing, and
+///     comparing values.
 ///   - recording: Whether or not to record a new reference.
 ///   - timeout: The amount of time a snapshot must be generated in.
-///   - file: The file in which failure occurred. Defaults to the file name of the test case in which this function was called.
-///   - testName: The name of the test in which failure occurred. Defaults to the function name of the test case in which this function was called.
-///   - line: The line number on which failure occurred. Defaults to the line number on which this function was called.
+///   - file: The file in which failure occurred. Defaults to the file name of the test case in
+///     which this function was called.
+///   - testName: The name of the test in which failure occurred. Defaults to the function name of
+///     the test case in which this function was called.
+///   - line: The line number on which failure occurred. Defaults to the line number on which this
+///     function was called.
 public func assertSnapshots<Value, Format>(
   of value: @autoclosure @escaping () async throws -> Value,
   as strategies: [String: Snapshotting<Value, Format>],
@@ -94,9 +102,12 @@ public func assertSnapshots<Value, Format>(
 ///   - strategies: An array of strategies for serializing, deserializing, and comparing values.
 ///   - recording: Whether or not to record a new reference.
 ///   - timeout: The amount of time a snapshot must be generated in.
-///   - file: The file in which failure occurred. Defaults to the file name of the test case in which this function was called.
-///   - testName: The name of the test in which failure occurred. Defaults to the function name of the test case in which this function was called.
-///   - line: The line number on which failure occurred. Defaults to the line number on which this function was called.
+///   - file: The file in which failure occurred. Defaults to the file name of the test case in
+///     which this function was called.
+///   - testName: The name of the test in which failure occurred. Defaults to the function name of
+///     the test case in which this function was called.
+///   - line: The line number on which failure occurred. Defaults to the line number on which this
+///     function was called.
 public func assertSnapshots<Value, Format>(
   of value: @autoclosure @escaping () async throws -> Value,
   as strategies: [Snapshotting<Value, Format>],
@@ -121,33 +132,38 @@ public func assertSnapshots<Value, Format>(
 
 /// Verifies that a given value matches a reference on disk.
 ///
-/// Third party snapshot assert helpers can be built on top of this function. Simply invoke `verifySnapshot` with your own arguments, and then invoke `XCTFail` with the string returned if it is non-`nil`. For example, if you want the snapshot directory to be determined by an environment variable, you can create your own assert helper like so:
+/// Third party snapshot assert helpers can be built on top of this function. Simply invoke
+/// `verifySnapshot` with your own arguments, and then invoke `XCTFail` with the string returned if
+/// it is non-`nil`. For example, if you want the snapshot directory to be determined by an
+/// environment variable, you can create your own assert helper like so:
 ///
-///     public func myAssertSnapshot<Value, Format>(
-///       of value: @autoclosure () throws -> Value,
-///       as snapshotting: Snapshotting<Value, Format>,
-///       named name: String? = nil,
-///       record recording: Bool = false,
-///       timeout: TimeInterval = 5,
-///       file: StaticString = #file,
-///       testName: String = #function,
-///       line: UInt = #line
-///       ) {
+/// ```swift
+/// public func myAssertSnapshot<Value, Format>(
+///   of value: @autoclosure () throws -> Value,
+///   as snapshotting: Snapshotting<Value, Format>,
+///   named name: String? = nil,
+///   record recording: Bool = false,
+///   timeout: TimeInterval = 5,
+///   file: StaticString = #file,
+///   testName: String = #function,
+///   line: UInt = #line
+///   ) {
 ///
-///         let snapshotDirectory = ProcessInfo.processInfo.environment["SNAPSHOT_REFERENCE_DIR"]! + "/" + #file
-///         let failure = verifySnapshot(
-///           of: value,
-///           as: snapshotting,
-///           named: name,
-///           record: recording,
-///           snapshotDirectory: snapshotDirectory,
-///           timeout: timeout,
-///           file: file,
-///           testName: testName
-///         )
-///         guard let message = failure else { return }
-///         XCTFail(message, file: file, line: line)
-///     }
+///     let snapshotDirectory = ProcessInfo.processInfo.environment["SNAPSHOT_REFERENCE_DIR"]! + "/" + #file
+///     let failure = verifySnapshot(
+///       of: value,
+///       as: snapshotting,
+///       named: name,
+///       record: recording,
+///       snapshotDirectory: snapshotDirectory,
+///       timeout: timeout,
+///       file: file,
+///       testName: testName
+///     )
+///     guard let message = failure else { return }
+///     XCTFail(message, file: file, line: line)
+/// }
+/// ```
 ///
 /// - Parameters:
 ///   - value: A value to compare against a reference.

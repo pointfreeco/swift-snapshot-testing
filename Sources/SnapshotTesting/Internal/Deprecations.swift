@@ -399,3 +399,6 @@ public func verifySnapshot<Value, Format>(
     line: line
   )
 }
+
+@available(*, deprecated, renamed: "XCTestCase")
+public typealias SnapshotTestCase = XCTestCase
