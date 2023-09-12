@@ -92,7 +92,7 @@ public func assertInlineSnapshot<Value>(
         """
         \(failure)
 
-        Re-run "\(function)" to test against the newly-recorded snapshot.
+        Re-run "\(function)" to assert against the newly-recorded snapshot.
         """,
         file: file,
         line: line
