@@ -7,7 +7,7 @@ import XCTest
   *,
   deprecated,
   message: """
-    Use 'assertInlineSnapshot(of:)' from swift-snapshot-testing's 'InlineSnapshotTesting' module, instead.
+    Use 'assertInlineSnapshot(of:)' from the 'InlineSnapshotTesting' module, instead.
     """
 )
 public func _assertInlineSnapshot<Value>(
@@ -39,7 +39,7 @@ public func _assertInlineSnapshot<Value>(
   *,
   deprecated,
   message: """
-    Use 'assertInlineSnapshot(of:)' from swift-snapshot-testing's 'InlineSnapshotTesting' module, instead.
+    Use 'assertInlineSnapshot(of:)' from the 'InlineSnapshotTesting' module, instead.
     """
 )
 @MainActor

@@ -4,15 +4,14 @@ import SnapshotTesting
 import XCTest
 
 final class InlineSnapshotTestingTests: XCTestCase {
-  override func setUp() {
-    super.setUp()
+  override func invokeTest() {
     SnapshotTesting.diffTool = "ksdiff"
     // SnapshotTesting.isRecording = true
-  }
-
-  override func tearDown() {
-    SnapshotTesting.isRecording = false
-    super.tearDown()
+    defer {
+      SnapshotTesting.diffTool = nil
+      SnapshotTesting.isRecording = false
+    }
+    super.invokeTest()
   }
 
   func testInlineSnapshot() async {
