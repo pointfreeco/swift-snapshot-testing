@@ -26,14 +26,16 @@ final class InlineSnapshotTestingTests: XCTestCase {
   }
 
   func testInlineSnapshot_NamedTrailingClosure() async {
-    await assertInlineSnapshot(of: ["Hello", "World"], as: .dump, matches: {
-      """
-      ▿ 2 elements
-        - "Hello"
-        - "World"
+    await assertInlineSnapshot(
+      of: ["Hello", "World"], as: .dump,
+      matches: {
+        """
+        ▿ 2 elements
+          - "Hello"
+          - "World"
 
-      """
-    })
+        """
+      })
   }
 
   func testInlineSnapshot_Escaping() async {

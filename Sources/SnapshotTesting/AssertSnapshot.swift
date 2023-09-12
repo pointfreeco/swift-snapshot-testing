@@ -178,43 +178,45 @@ public func verifySnapshot<Value, Format>(
   line: UInt = #line
 ) async -> String? {
 
-    CleanCounterBetweenTestCases.registerIfNeeded()
-    let recording = recording || isRecording
+  CleanCounterBetweenTestCases.registerIfNeeded()
+  let recording = recording || isRecording
 
-    do {
-      let fileUrl = URL(fileURLWithPath: "\(file)", isDirectory: false)
-      let fileName = fileUrl.deletingPathExtension().lastPathComponent
+  do {
+    let fileUrl = URL(fileURLWithPath: "\(file)", isDirectory: false)
+    let fileName = fileUrl.deletingPathExtension().lastPathComponent
 
-      let snapshotDirectoryUrl = snapshotDirectory.map { URL(fileURLWithPath: $0, isDirectory: true) }
-        ?? fileUrl
-          .deletingLastPathComponent()
-          .appendingPathComponent("__Snapshots__")
-          .appendingPathComponent(fileName)
+    let snapshotDirectoryUrl =
+      snapshotDirectory.map { URL(fileURLWithPath: $0, isDirectory: true) }
+      ?? fileUrl
+      .deletingLastPathComponent()
+      .appendingPathComponent("__Snapshots__")
+      .appendingPathComponent(fileName)
 
-      let identifier: String
-      if let name = name {
-        identifier = sanitizePathComponent(name)
-      } else {
-        let counter = DispatchQueue.mainSync { () -> Int in
-          let key = snapshotDirectoryUrl.appendingPathComponent(testName)
-          counterMap[key, default: 0] += 1
-          return counterMap[key]!
-        }
-        identifier = String(counter)
+    let identifier: String
+    if let name = name {
+      identifier = sanitizePathComponent(name)
+    } else {
+      let counter = DispatchQueue.mainSync { () -> Int in
+        let key = snapshotDirectoryUrl.appendingPathComponent(testName)
+        counterMap[key, default: 0] += 1
+        return counterMap[key]!
       }
+      identifier = String(counter)
+    }
 
-      let testName = sanitizePathComponent(testName)
-      let snapshotFileUrl = snapshotDirectoryUrl
-        .appendingPathComponent("\(testName).\(identifier)")
-        .appendingPathExtension(snapshotting.pathExtension ?? "")
-      let fileManager = FileManager.default
-      try fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
+    let testName = sanitizePathComponent(testName)
+    let snapshotFileUrl =
+      snapshotDirectoryUrl
+      .appendingPathComponent("\(testName).\(identifier)")
+      .appendingPathExtension(snapshotting.pathExtension ?? "")
+    let fileManager = FileManager.default
+    try fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
 
-      var diffable = try await snapshotting.snapshot { try await value() }
+    var diffable = try await snapshotting.snapshot { try await value() }
 
-      guard !recording, fileManager.fileExists(atPath: snapshotFileUrl.path) else {
-        try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)
-        #if !os(Linux) && !os(Windows)
+    guard !recording, fileManager.fileExists(atPath: snapshotFileUrl.path) else {
+      try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)
+      #if !os(Linux) && !os(Windows)
         if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
           DispatchQueue.mainSync {
             XCTContext.runActivity(named: "Attached Recorded Snapshot") { activity in
@@ -223,51 +225,54 @@ public func verifySnapshot<Value, Format>(
             }
           }
         }
-        #endif
-
-        return recording
-          ? """
-            Record mode is on. Turn record mode off and re-run "\(testName)" to test against the newly-recorded snapshot.
-
-            open "\(snapshotFileUrl.absoluteString)"
-
-            Recorded snapshot: …
-            """
-          : """
-            No reference was found on disk. Automatically recorded snapshot: …
-
-            open "\(snapshotFileUrl.path)"
-
-            Re-run "\(testName)" to test against the newly-recorded snapshot.
-            """
-      }
-
-      let data = try Data(contentsOf: snapshotFileUrl)
-      let reference = snapshotting.diffing.fromData(data)
-
-      #if os(iOS) || os(tvOS)
-      // If the image generation fails for the diffable part and the reference was empty, use the reference
-      if let localDiff = diffable as? UIImage,
-         let refImage = reference as? UIImage,
-         localDiff.size == .zero && refImage.size == .zero {
-        diffable = reference
-      }
       #endif
 
-      guard let (failure, attachments) = snapshotting.diffing.diff(reference, diffable) else {
-        return nil
+      return recording
+        ? """
+        Record mode is on. Turn record mode off and re-run "\(testName)" to test against the newly-recorded snapshot.
+
+        open "\(snapshotFileUrl.absoluteString)"
+
+        Recorded snapshot: …
+        """
+        : """
+        No reference was found on disk. Automatically recorded snapshot: …
+
+        open "\(snapshotFileUrl.path)"
+
+        Re-run "\(testName)" to test against the newly-recorded snapshot.
+        """
+    }
+
+    let data = try Data(contentsOf: snapshotFileUrl)
+    let reference = snapshotting.diffing.fromData(data)
+
+    #if os(iOS) || os(tvOS)
+      // If the image generation fails for the diffable part and the reference was empty, use the reference
+      if let localDiff = diffable as? UIImage,
+        let refImage = reference as? UIImage,
+        localDiff.size == .zero && refImage.size == .zero
+      {
+        diffable = reference
       }
+    #endif
 
-      let artifactsUrl = URL(
-        fileURLWithPath: ProcessInfo.processInfo.environment["SNAPSHOT_ARTIFACTS"] ?? NSTemporaryDirectory(), isDirectory: true
-      )
-      let artifactsSubUrl = artifactsUrl.appendingPathComponent(fileName)
-      try fileManager.createDirectory(at: artifactsSubUrl, withIntermediateDirectories: true)
-      let failedSnapshotFileUrl = artifactsSubUrl.appendingPathComponent(snapshotFileUrl.lastPathComponent)
-      try snapshotting.diffing.toData(diffable).write(to: failedSnapshotFileUrl)
+    guard let (failure, attachments) = snapshotting.diffing.diff(reference, diffable) else {
+      return nil
+    }
 
-      if !attachments.isEmpty {
-        #if !os(Linux) && !os(Windows)
+    let artifactsUrl = URL(
+      fileURLWithPath: ProcessInfo.processInfo.environment["SNAPSHOT_ARTIFACTS"]
+        ?? NSTemporaryDirectory(), isDirectory: true
+    )
+    let artifactsSubUrl = artifactsUrl.appendingPathComponent(fileName)
+    try fileManager.createDirectory(at: artifactsSubUrl, withIntermediateDirectories: true)
+    let failedSnapshotFileUrl = artifactsSubUrl.appendingPathComponent(
+      snapshotFileUrl.lastPathComponent)
+    try snapshotting.diffing.toData(diffable).write(to: failedSnapshotFileUrl)
+
+    if !attachments.isEmpty {
+      #if !os(Linux) && !os(Windows)
         if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
           DispatchQueue.mainSync {
             XCTContext.runActivity(named: "Attached Failure Diff") { activity in
@@ -277,39 +282,40 @@ public func verifySnapshot<Value, Format>(
             }
           }
         }
-        #endif
-      }
+      #endif
+    }
 
-      let diffMessage = diffTool
-        .map { "\($0) \"\(snapshotFileUrl.path)\" \"\(failedSnapshotFileUrl.path)\"" }
-        ?? """
-        @\(minus)
-        "\(snapshotFileUrl.absoluteString)"
-        @\(plus)
-        "\(failedSnapshotFileUrl.absoluteString)"
+    let diffMessage =
+      diffTool
+      .map { "\($0) \"\(snapshotFileUrl.path)\" \"\(failedSnapshotFileUrl.path)\"" }
+      ?? """
+      @\(minus)
+      "\(snapshotFileUrl.absoluteString)"
+      @\(plus)
+      "\(failedSnapshotFileUrl.absoluteString)"
 
-        To configure output for a custom diff tool, like Kaleidoscope:
+      To configure output for a custom diff tool, like Kaleidoscope:
 
-            SnapshotTesting.diffTool = "ksdiff"
-        """
+          SnapshotTesting.diffTool = "ksdiff"
+      """
 
-      let failureMessage: String
-      if let name = name {
-        failureMessage = "Snapshot \"\(name)\" does not match reference."
-      } else {
-        failureMessage = "Snapshot does not match reference."
-      }
+    let failureMessage: String
+    if let name = name {
+      failureMessage = "Snapshot \"\(name)\" does not match reference."
+    } else {
+      failureMessage = "Snapshot does not match reference."
+    }
 
-      return """
+    return """
       \(failureMessage)
 
       \(diffMessage)
 
       \(failure.trimmingCharacters(in: .whitespacesAndNewlines))
       """
-    } catch {
-      return error.localizedDescription
-    }
+  } catch {
+    return error.localizedDescription
+  }
 }
 
 // MARK: - Private
@@ -317,7 +323,8 @@ public func verifySnapshot<Value, Format>(
 private var counterMap: [URL: Int] = [:]
 
 func sanitizePathComponent(_ string: String) -> String {
-  return string
+  return
+    string
     .replacingOccurrences(of: "\\W+", with: "-", options: .regularExpression)
     .replacingOccurrences(of: "^-|-$", with: "", options: .regularExpression)
 }

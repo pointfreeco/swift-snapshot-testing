@@ -47,7 +47,7 @@ public func assertInlineSnapshot<Value>(
     else {
       var failure = "Automatically recorded a new snapshot."
       if let expected = expected?(),
-         let difference = snapshotting.diffing.diff(expected, actual)?.0
+        let difference = snapshotting.diffing.diff(expected, actual)?.0
       {
         failure += " Difference: …\n\n\(difference.indenting(by: 2))"
       }
@@ -78,14 +78,14 @@ public func assertInlineSnapshot<Value>(
 
     let message = message()
     syntaxDescriptor.fail(
-        """
-        \(message.isEmpty ? "Snapshot did not match. Difference: …" : message)
+      """
+      \(message.isEmpty ? "Snapshot did not match. Difference: …" : message)
 
-        \(difference.indenting(by: 2))
-        """,
-        file: file,
-        line: line,
-        column: column
+      \(difference.indenting(by: 2))
+      """,
+      file: file,
+      line: line,
+      column: column
     )
   } catch {
     XCTFail("Threw error: \(error)", file: file, line: line)

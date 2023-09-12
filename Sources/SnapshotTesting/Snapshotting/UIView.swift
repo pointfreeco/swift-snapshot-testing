@@ -1,57 +1,58 @@
 #if os(iOS) || os(tvOS)
-import UIKit
+  import UIKit
 
-extension Snapshotting where Value == UIView, Format == UIImage {
-  /// A snapshot strategy for comparing views based on pixel equality.
-  public static var image: Snapshotting {
-    return .image()
-  }
+  extension Snapshotting where Value == UIView, Format == UIImage {
+    /// A snapshot strategy for comparing views based on pixel equality.
+    public static var image: Snapshotting {
+      return .image()
+    }
 
-  /// A snapshot strategy for comparing views based on pixel equality.
-  ///
-  /// - Parameters:
-  ///   - drawHierarchyInKeyWindow: Utilize the simulator's key window in order to render `UIAppearance` and `UIVisualEffect`s. This option requires a host application for your tests and will _not_ work for framework test targets.
-  ///   - precision: The percentage of pixels that must match.
-  ///   - perceptualPrecision: The percentage a pixel must match the source pixel to be considered a match. [98-99% mimics the precision of the human eye.](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e)
-  ///   - size: A view size override.
-  ///   - traits: A trait collection override.
-  public static func image(
-    drawHierarchyInKeyWindow: Bool = false,
-    precision: Float = 1,
-    perceptualPrecision: Float = 1,
-    size: CGSize? = nil,
-    traits: UITraitCollection = .init()
-  ) -> Snapshotting {
+    /// A snapshot strategy for comparing views based on pixel equality.
+    ///
+    /// - Parameters:
+    ///   - drawHierarchyInKeyWindow: Utilize the simulator's key window in order to render `UIAppearance` and `UIVisualEffect`s. This option requires a host application for your tests and will _not_ work for framework test targets.
+    ///   - precision: The percentage of pixels that must match.
+    ///   - perceptualPrecision: The percentage a pixel must match the source pixel to be considered a match. [98-99% mimics the precision of the human eye.](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e)
+    ///   - size: A view size override.
+    ///   - traits: A trait collection override.
+    public static func image(
+      drawHierarchyInKeyWindow: Bool = false,
+      precision: Float = 1,
+      perceptualPrecision: Float = 1,
+      size: CGSize? = nil,
+      traits: UITraitCollection = .init()
+    ) -> Snapshotting {
 
-    SimplySnapshotting.image(
-      precision: precision,
-      perceptualPrecision: perceptualPrecision,
-      scale: traits.displayScale
-    )
-    .pullback { @MainActor view in
-      await snapshotView(
-        config: .init(safeArea: .zero, size: size ?? view.frame.size, traits: .init()),
-        drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
-        traits: traits,
-        view: view,
-        viewController: .init()
+      SimplySnapshotting.image(
+        precision: precision,
+        perceptualPrecision: perceptualPrecision,
+        scale: traits.displayScale
       )
+      .pullback { @MainActor view in
+        await snapshotView(
+          config: .init(safeArea: .zero, size: size ?? view.frame.size, traits: .init()),
+          drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+          traits: traits,
+          view: view,
+          viewController: .init()
+        )
+      }
     }
   }
-}
 
-extension Snapshotting where Value == UIView, Format == String {
-  /// A snapshot strategy for comparing views based on a recursive description of their properties and hierarchies.
-  public static var recursiveDescription: Snapshotting {
-    return Snapshotting.recursiveDescription()
-  }
+  extension Snapshotting where Value == UIView, Format == String {
+    /// A snapshot strategy for comparing views based on a recursive description of their properties and hierarchies.
+    public static var recursiveDescription: Snapshotting {
+      return Snapshotting.recursiveDescription()
+    }
 
-  /// A snapshot strategy for comparing views based on a recursive description of their properties and hierarchies.
-  public static func recursiveDescription(
-    size: CGSize? = nil,
-    traits: UITraitCollection = .init()
+    /// A snapshot strategy for comparing views based on a recursive description of their properties and hierarchies.
+    public static func recursiveDescription(
+      size: CGSize? = nil,
+      traits: UITraitCollection = .init()
     )
-    -> Snapshotting<UIView, String> {
+      -> Snapshotting<UIView, String>
+    {
       return SimplySnapshotting.lines.pullback { @MainActor view in
         let dispose = prepareView(
           config: .init(safeArea: .zero, size: size ?? view.frame.size, traits: traits),
@@ -66,6 +67,6 @@ extension Snapshotting where Value == UIView, Format == String {
             as! String
         )
       }
+    }
   }
-}
 #endif

@@ -47,10 +47,10 @@ public struct Snapshotting<Value, Format> {
     }
   }
 
-//  @available(*, deprecated)
-//  public func snapshot(_ value: @autoclosure @escaping () throws -> Value) -> Async<Format> {
-//    .init(run: { try await self.snapshot { try value() } })
-//  }
+  //  @available(*, deprecated)
+  //  public func snapshot(_ value: @autoclosure @escaping () throws -> Value) -> Async<Format> {
+  //    .init(run: { try await self.snapshot { try value() } })
+  //  }
 
   /// Transforms a strategy on `Value`s into a strategy on `NewValue`s through a function `(NewValue) -> Value`.
   ///

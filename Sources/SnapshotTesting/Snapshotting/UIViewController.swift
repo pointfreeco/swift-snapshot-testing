@@ -1,127 +1,132 @@
 #if os(iOS) || os(tvOS)
-import UIKit
+  import UIKit
 
-extension Snapshotting where Value == UIViewController, Format == UIImage {
-  /// A snapshot strategy for comparing view controller views based on pixel equality.
-  public static var image: Snapshotting {
-    return .image()
-  }
+  extension Snapshotting where Value == UIViewController, Format == UIImage {
+    /// A snapshot strategy for comparing view controller views based on pixel equality.
+    public static var image: Snapshotting {
+      return .image()
+    }
 
-  /// A snapshot strategy for comparing view controller views based on pixel equality.
-  ///
-  /// - Parameters:
-  ///   - config: A set of device configuration settings.
-  ///   - precision: The percentage of pixels that must match.
-  ///   - perceptualPrecision: The percentage a pixel must match the source pixel to be considered a match. [98-99% mimics the precision of the human eye.](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e)
-  ///   - size: A view size override.
-  ///   - traits: A trait collection override.
-  public static func image(
-    on config: ViewImageConfig,
-    precision: Float = 1,
-    perceptualPrecision: Float = 1,
-    size: CGSize? = nil,
-    traits: UITraitCollection = .init()
-  ) -> Snapshotting {
+    /// A snapshot strategy for comparing view controller views based on pixel equality.
+    ///
+    /// - Parameters:
+    ///   - config: A set of device configuration settings.
+    ///   - precision: The percentage of pixels that must match.
+    ///   - perceptualPrecision: The percentage a pixel must match the source pixel to be considered a match. [98-99% mimics the precision of the human eye.](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e)
+    ///   - size: A view size override.
+    ///   - traits: A trait collection override.
+    public static func image(
+      on config: ViewImageConfig,
+      precision: Float = 1,
+      perceptualPrecision: Float = 1,
+      size: CGSize? = nil,
+      traits: UITraitCollection = .init()
+    ) -> Snapshotting {
 
-    SimplySnapshotting.image(
-      precision: precision,
-      perceptualPrecision: perceptualPrecision,
-      scale: traits.displayScale
+      SimplySnapshotting.image(
+        precision: precision,
+        perceptualPrecision: perceptualPrecision,
+        scale: traits.displayScale
+      )
+      .pullback { @MainActor viewController in
+        await snapshotView(
+          config:
+            size
+            .map { .init(safeArea: config.safeArea, size: $0, traits: config.traits) }
+            ?? config,
+          drawHierarchyInKeyWindow: false,
+          traits: traits,
+          view: viewController.view,
+          viewController: viewController
+        )
+      }
+    }
+
+    /// A snapshot strategy for comparing view controller views based on pixel equality.
+    ///
+    /// - Parameters:
+    ///   - drawHierarchyInKeyWindow: Utilize the simulator's key window in order to render `UIAppearance` and `UIVisualEffect`s. This option requires a host application for your tests and will _not_ work for framework test targets.
+    ///   - precision: The percentage of pixels that must match.
+    ///   - perceptualPrecision: The percentage a pixel must match the source pixel to be considered a match. [98-99% mimics the precision of the human eye.](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e)
+    ///   - size: A view size override.
+    ///   - traits: A trait collection override.
+    public static func image(
+      drawHierarchyInKeyWindow: Bool = false,
+      precision: Float = 1,
+      perceptualPrecision: Float = 1,
+      size: CGSize? = nil,
+      traits: UITraitCollection = .init()
     )
-    .pullback { @MainActor viewController in
-      await snapshotView(
-        config: size
-          .map { .init(safeArea: config.safeArea, size: $0, traits: config.traits) }
-        ?? config,
-        drawHierarchyInKeyWindow: false,
-        traits: traits,
-        view: viewController.view,
-        viewController: viewController
-      )
+      -> Snapshotting
+    {
+
+      SimplySnapshotting.image(
+        precision: precision,
+        perceptualPrecision: perceptualPrecision,
+        scale: traits.displayScale
+      ).pullback { @MainActor viewController in
+        await snapshotView(
+          config: .init(safeArea: .zero, size: size, traits: traits),
+          drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+          traits: traits,
+          view: viewController.view,
+          viewController: viewController
+        )
+      }
     }
   }
 
-  /// A snapshot strategy for comparing view controller views based on pixel equality.
-  ///
-  /// - Parameters:
-  ///   - drawHierarchyInKeyWindow: Utilize the simulator's key window in order to render `UIAppearance` and `UIVisualEffect`s. This option requires a host application for your tests and will _not_ work for framework test targets.
-  ///   - precision: The percentage of pixels that must match.
-  ///   - perceptualPrecision: The percentage a pixel must match the source pixel to be considered a match. [98-99% mimics the precision of the human eye.](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e)
-  ///   - size: A view size override.
-  ///   - traits: A trait collection override.
-  public static func image(
-    drawHierarchyInKeyWindow: Bool = false,
-    precision: Float = 1,
-    perceptualPrecision: Float = 1,
-    size: CGSize? = nil,
-    traits: UITraitCollection = .init()
-  )
-  -> Snapshotting {
+  extension Snapshotting where Value == UIViewController, Format == String {
+    /// A snapshot strategy for comparing view controllers based on their embedded controller hierarchy.
+    public static var hierarchy: Snapshotting {
+      Snapshotting<String, String>.lines.pullback { @MainActor viewController in
+        let dispose = prepareView(
+          config: .init(),
+          drawHierarchyInKeyWindow: false,
+          traits: .init(),
+          view: viewController.view,
+          viewController: viewController
+        )
+        defer { dispose() }
+        return purgePointers(
+          viewController.perform(Selector(("_printHierarchy"))).retain().takeUnretainedValue()
+            as! String
+        )
+      }
+    }
 
-    SimplySnapshotting.image(
-      precision: precision,
-      perceptualPrecision: perceptualPrecision,
-      scale: traits.displayScale
-    ).pullback { @MainActor viewController in
-      await snapshotView(
-        config: .init(safeArea: .zero, size: size, traits: traits),
-        drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
-        traits: traits,
-        view: viewController.view,
-        viewController: viewController
-      )
+    /// A snapshot strategy for comparing view controller views based on a recursive description of their properties and hierarchies.
+    public static var recursiveDescription: Snapshotting {
+      Snapshotting.recursiveDescription()
+    }
+
+    /// A snapshot strategy for comparing view controller views based on a recursive description of their properties and hierarchies.
+    ///
+    /// - Parameters:
+    ///   - config: A set of device configuration settings.
+    ///   - size: A view size override.
+    ///   - traits: A trait collection override.
+    public static func recursiveDescription(
+      on config: ViewImageConfig = .init(),
+      size: CGSize? = nil,
+      traits: UITraitCollection = .init()
+    ) -> Snapshotting<UIViewController, String> {
+      SimplySnapshotting.lines.pullback { @MainActor viewController in
+        let dispose = prepareView(
+          config: .init(
+            safeArea: config.safeArea, size: size ?? config.size, traits: config.traits),
+          drawHierarchyInKeyWindow: false,
+          traits: traits,
+          view: viewController.view,
+          viewController: viewController
+        )
+        defer { dispose() }
+        return purgePointers(
+          viewController.view.perform(Selector(("recursiveDescription"))).retain()
+            .takeUnretainedValue()
+            as! String
+        )
+      }
     }
   }
-}
-
-extension Snapshotting where Value == UIViewController, Format == String {
-  /// A snapshot strategy for comparing view controllers based on their embedded controller hierarchy.
-  public static var hierarchy: Snapshotting {
-    Snapshotting<String, String>.lines.pullback { @MainActor viewController in
-      let dispose = prepareView(
-        config: .init(),
-        drawHierarchyInKeyWindow: false,
-        traits: .init(),
-        view: viewController.view,
-        viewController: viewController
-      )
-      defer { dispose() }
-      return purgePointers(
-        viewController.perform(Selector(("_printHierarchy"))).retain().takeUnretainedValue() as! String
-      )
-    }
-  }
-
-  /// A snapshot strategy for comparing view controller views based on a recursive description of their properties and hierarchies.
-  public static var recursiveDescription: Snapshotting {
-    Snapshotting.recursiveDescription()
-  }
-
-  /// A snapshot strategy for comparing view controller views based on a recursive description of their properties and hierarchies.
-  ///
-  /// - Parameters:
-  ///   - config: A set of device configuration settings.
-  ///   - size: A view size override.
-  ///   - traits: A trait collection override.
-  public static func recursiveDescription(
-    on config: ViewImageConfig = .init(),
-    size: CGSize? = nil,
-    traits: UITraitCollection = .init()
-  ) -> Snapshotting<UIViewController, String> {
-    SimplySnapshotting.lines.pullback { @MainActor viewController in
-      let dispose = prepareView(
-        config: .init(safeArea: config.safeArea, size: size ?? config.size, traits: config.traits),
-        drawHierarchyInKeyWindow: false,
-        traits: traits,
-        view: viewController.view,
-        viewController: viewController
-      )
-      defer { dispose() }
-      return purgePointers(
-        viewController.view.perform(Selector(("recursiveDescription"))).retain().takeUnretainedValue()
-        as! String
-      )
-    }
-  }
-}
 #endif
