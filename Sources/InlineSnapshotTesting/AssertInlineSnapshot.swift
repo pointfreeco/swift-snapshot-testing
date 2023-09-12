@@ -75,7 +75,7 @@ public func assertInlineSnapshot<Value>(
     else {
       var failure = "Automatically recorded a new snapshot."
       if let expected = expected?(),
-        let difference = snapshotting.diffing.diff(expected, actual)?.0
+         let difference = snapshotting.diffing.diff(expected, actual)?.0
       {
         failure += " Difference: …\n\n\(difference.indenting(by: 2))"
       }
@@ -101,9 +101,11 @@ public func assertInlineSnapshot<Value>(
       )
       return
     }
-    if let difference = snapshotting.diffing.diff(actual, expected)?.0 {
-      let message = message()
-      syntaxDescriptor.fail(
+    guard let difference = snapshotting.diffing.diff(actual, expected)?.0
+    else { return }
+
+    let message = message()
+    syntaxDescriptor.fail(
         """
         \(message.isEmpty ? "Snapshot did not match. Difference: …" : message)
 
@@ -112,8 +114,7 @@ public func assertInlineSnapshot<Value>(
         file: file,
         line: line,
         column: column
-      )
-    }
+    )
   } catch {
     XCTFail("Threw error: \(error)", file: file, line: line)
   }
@@ -365,7 +366,7 @@ private final class SnapshotRewriter: SyntaxRewriter {
         leftBrace: .leftBraceToken(trailingTrivia: .newline),
         statements: CodeBlockItemListSyntax {
           StringLiteralExprSyntax(
-            leadingTrivia: .init(stringLiteral: leadingIndent),
+            leadingTrivia: Trivia(stringLiteral: leadingIndent),
             openingPounds: .rawStringPoundDelimiter(delimiter),
             openingQuote: .multilineStringQuoteToken(trailingTrivia: .newline),
             segments: [
@@ -376,13 +377,13 @@ private final class SnapshotRewriter: SyntaxRewriter {
               )
             ],
             closingQuote: .multilineStringQuoteToken(
-              leadingTrivia: .newline + .init(stringLiteral: leadingIndent)
+              leadingTrivia: .newline + Trivia(stringLiteral: leadingIndent)
             ),
             closingPounds: .rawStringPoundDelimiter(delimiter)
           )
         },
         rightBrace: .rightBraceToken(
-          leadingTrivia: .newline + .init(stringLiteral: leadingTrivia)
+          leadingTrivia: .newline + Trivia(stringLiteral: leadingTrivia)
         )
       )
 
@@ -494,8 +495,8 @@ private final class SnapshotVisitor: SyntaxVisitor {
     let location = functionCallExpr.calledExpression
       .endLocation(converter: self.sourceLocationConverter, afterTrailingTrivia: true)
     guard
-      Int(self.functionCallLine) == location.line,
-      Int(self.functionCallColumn) == location.column
+      self.functionCallLine == location.line,
+      self.functionCallColumn == location.column
     else { return .visitChildren }
 
     let arguments = functionCallExpr.arguments
