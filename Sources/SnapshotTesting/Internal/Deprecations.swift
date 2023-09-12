@@ -6,7 +6,8 @@ import XCTest
 @available(
   *,
   deprecated,
-  message: """
+  message:
+    """
     Use 'assertInlineSnapshot(of:)' from the 'InlineSnapshotTesting' module, instead.
     """
 )
@@ -38,7 +39,8 @@ public func _assertInlineSnapshot<Value>(
 @available(
   *,
   deprecated,
-  message: """
+  message:
+    """
     Use 'assertInlineSnapshot(of:)' from the 'InlineSnapshotTesting' module, instead.
     """
 )
