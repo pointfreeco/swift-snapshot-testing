@@ -225,11 +225,43 @@ final class InlineSnapshotTestingTests: XCTestCase {
 
     withDependencies {
       assertInlineSnapshot(of: "Hello", as: .dump) {
-        """
-        - "Hello"
+          """
+          - "Hello"
 
-        """
+          """
       }
+    }
+  }
+
+  func testCarriageReturnInlineSnapshot() {
+    let string = "This is a line\r\nAnd this is a line\r\n"
+    var request = URLRequest(url: URL(string: "https://www.example.com")!)
+    request.httpMethod = "POST"
+    request.httpBody = string.data(using: .utf8)!
+    assertInlineSnapshot(of: request, as: .raw) {
+      """
+      POST https://www.example.com
+
+      This is a line\r
+      And this is a line\r
+
+      """
+    }
+  }
+
+  func testCarriageReturnRawInlineSnapshot() {
+    let string = "\"\"\"#This is a line\r\nAnd this is a line\r\n"
+    var request = URLRequest(url: URL(string: "https://www.example.com")!)
+    request.httpMethod = "POST"
+    request.httpBody = string.data(using: .utf8)!
+    assertInlineSnapshot(of: request, as: .raw) {
+      ##"""
+      POST https://www.example.com
+
+      """#This is a line\##r
+      And this is a line\##r
+
+      """##
     }
   }
 }
