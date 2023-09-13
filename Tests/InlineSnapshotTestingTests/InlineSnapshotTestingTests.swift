@@ -232,6 +232,26 @@ final class InlineSnapshotTestingTests: XCTestCase {
       }
     }
   }
+
+  func testCarriageReturnInlineSnapshot() {
+    assertInlineSnapshot(of: "This is a line\r\nAnd this is a line\r\n", as: .lines) {
+      """
+      This is a line\r
+      And this is a line\r
+
+      """
+    }
+  }
+
+  func testCarriageReturnRawInlineSnapshot() {
+    assertInlineSnapshot(of: "\"\"\"#This is a line\r\nAnd this is a line\r\n", as: .lines) {
+      ##"""
+      """#This is a line\##r
+      And this is a line\##r
+
+      """##
+    }
+  }
 }
 
 private func assertCustomInlineSnapshot(
