@@ -225,10 +225,10 @@ final class InlineSnapshotTestingTests: XCTestCase {
 
     withDependencies {
       assertInlineSnapshot(of: "Hello", as: .dump) {
-          """
-          - "Hello"
+        """
+        - "Hello"
 
-          """
+        """
       }
     }
   }
