@@ -234,14 +234,8 @@ final class InlineSnapshotTestingTests: XCTestCase {
   }
 
   func testCarriageReturnInlineSnapshot() {
-    let string = "This is a line\r\nAnd this is a line\r\n"
-    var request = URLRequest(url: URL(string: "https://www.example.com")!)
-    request.httpMethod = "POST"
-    request.httpBody = string.data(using: .utf8)!
-    assertInlineSnapshot(of: request, as: .raw) {
+    assertInlineSnapshot(of: "This is a line\r\nAnd this is a line\r\n", as: .lines) {
       """
-      POST https://www.example.com
-
       This is a line\r
       And this is a line\r
 
@@ -250,14 +244,8 @@ final class InlineSnapshotTestingTests: XCTestCase {
   }
 
   func testCarriageReturnRawInlineSnapshot() {
-    let string = "\"\"\"#This is a line\r\nAnd this is a line\r\n"
-    var request = URLRequest(url: URL(string: "https://www.example.com")!)
-    request.httpMethod = "POST"
-    request.httpBody = string.data(using: .utf8)!
-    assertInlineSnapshot(of: request, as: .raw) {
+    assertInlineSnapshot(of: "\"\"\"#This is a line\r\nAnd this is a line\r\n", as: .lines) {
       ##"""
-      POST https://www.example.com
-
       """#This is a line\##r
       And this is a line\##r
 
