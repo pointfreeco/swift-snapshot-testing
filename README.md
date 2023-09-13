@@ -137,6 +137,11 @@ assertSnapshot(of: user, as: .dump)
 
 If your data can be represented as an image, text, or data, you can write a snapshot test for it!
 
+## Documentation
+
+The latest documentation is available
+[here](https://swiftpackageindex.com/pointfreeco/swift-snapshot-testing/main/documentation/snapshottesting).
+
 ## Installation
 
 ### Xcode
