@@ -1,0 +1,12 @@
+# This is manifest file for the Swift Package Index for it to auto-generate and
+# host DocC documentation.
+#
+# For reference see https://swiftpackageindex.com/swiftpackageindex/spimanifest/documentation/spimanifest/commonusecases#Host-DocC-documentation-in-the-Swift-Package-Index
+
+version: 1
+builder:
+  configs:
+    - documentation_targets:
+      # First item in the list is the "landing" (default) target
+      - SnapshotTesting
+      - InlineSnapshotTesting
