@@ -1,4 +1,4 @@
-// swift-tools-version:5.7
+// swift-tools-version:5.5
 
 import PackageDescription
 
@@ -10,23 +10,35 @@ let package = Package(
     .tvOS(.v13),
     .watchOS(.v6),
   ],
-  products: [
-    .library(
-      name: "SnapshotTesting",
-      targets: ["SnapshotTesting"]
+  products: products,
+  dependencies: dependencies,
+  targets: inlineSnapshottingTargets + [
+    .target(name: "SnapshotTesting"),
+    .testTarget(
+      name: "SnapshotTestingTests",
+      dependencies: [
+        "SnapshotTesting"
+      ],
+      exclude: [
+        "__Fixtures__",
+        "__Snapshots__",
+      ]
     ),
-    .library(
-      name: "InlineSnapshotTesting",
-      targets: ["InlineSnapshotTesting"]
-    ),
-  ],
-  dependencies: [
-    .package(url: "https://github.com/apple/swift-syntax.git", from: "509.0.0")
-  ],
-  targets: [
-    .target(
-      name: "SnapshotTesting"
-    ),
+  ]
+)
+
+let products: [Product]
+let inlineSnapshottingTargets: [Target]
+let dependencies: [Package.Dependency]
+#if swift(>=5.7)
+  products = [
+    .library(name: "SnapshotTesting", targets: ["SnapshotTesting"]),
+    .library(name: "InlineSnapshotTesting", targets: ["InlineSnapshotTesting"]),
+  ]
+  dependencies = [
+    .package(url: "https://github.com/apple/swift-syntax", from: "509.0.0")
+  ]
+  inlineSnapshottingTargets = [
     .target(
       name: "InlineSnapshotTesting",
       dependencies: [
@@ -42,15 +54,11 @@ let package = Package(
         "InlineSnapshotTesting"
       ]
     ),
-    .testTarget(
-      name: "SnapshotTestingTests",
-      dependencies: [
-        "SnapshotTesting"
-      ],
-      exclude: [
-        "__Fixtures__",
-        "__Snapshots__",
-      ]
-    ),
   ]
-)
+#else
+  products = [
+    .library(name: "SnapshotTesting", targets: ["SnapshotTesting"])
+  ]
+  dependencies = []
+  additionalTargets = []
+#endif
