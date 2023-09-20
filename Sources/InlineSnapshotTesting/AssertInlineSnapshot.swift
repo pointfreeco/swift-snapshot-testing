@@ -387,7 +387,11 @@ private final class SnapshotRewriter: SyntaxRewriter {
             segments: [
               .stringSegment(
                 StringSegmentSyntax(
-                  content: .stringSegment(snapshot.actual.indenting(with: leadingIndent))
+                  content: .stringSegment(
+                    snapshot.actual
+                      .replacingOccurrences(of: "\r", with: #"\\#(delimiter)r"#)
+                      .indenting(with: leadingIndent)
+                  )
                 )
               )
             ],
