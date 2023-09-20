@@ -12,7 +12,7 @@ public var diffTool: String? = nil
 public var isRecording = false
 
 /// Whether or not to create snapshots if they aren't found.
-/// It's recommended to set this to `false` in CI to avoid false negatives if the test is retried.
+/// It's recommended to set this to `false` in CI to avoid false positives if the test is retried.
 public var canGenerateNewSnapshots = true
 
 /// Whether or not to record all new references.
