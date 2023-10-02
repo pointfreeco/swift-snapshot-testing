@@ -6,10 +6,7 @@ import XCTest
 @available(
   *,
   deprecated,
-  message:
-    """
-    Use 'assertInlineSnapshot(of:)' from the 'InlineSnapshotTesting' module, instead.
-    """
+  message: """Use 'assertInlineSnapshot(of:)' from the 'InlineSnapshotTesting' module, instead."""
 )
 public func _assertInlineSnapshot<Value>(
   matching value: @autoclosure () throws -> Value,
@@ -39,10 +36,7 @@ public func _assertInlineSnapshot<Value>(
 @available(
   *,
   deprecated,
-  message:
-    """
-    Use 'assertInlineSnapshot(of:)' from the 'InlineSnapshotTesting' module, instead.
-    """
+  message: """Use 'assertInlineSnapshot(of:)' from the 'InlineSnapshotTesting' module, instead."""
 )
 public func _verifyInlineSnapshot<Value>(
   matching value: @autoclosure () throws -> Value,
