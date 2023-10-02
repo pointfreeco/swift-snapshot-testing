@@ -138,6 +138,11 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
   /// The default label describing an inline snapshot.
   public static let defaultTrailingClosureLabel = "matches"
 
+  /// A list of trailing closure labels from deprecated interfaces.
+  ///
+  /// Useful for providing migration paths for custom snapshot functions.
+  public var deprecatedTrailingClosureLabels: [String]
+
   /// The label of the trailing closure that returns the inline snapshot.
   public var trailingClosureLabel: String
 
@@ -172,9 +177,11 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
   ///   - trailingClosureOffset: The offset of the trailing closure that returns the inline
   ///     snapshot, relative to the first trailing closure.
   public init(
+    deprecatedTrailingClosureLabels: [String] = [],
     trailingClosureLabel: String = Self.defaultTrailingClosureLabel,
     trailingClosureOffset: Int = 0
   ) {
+    self.deprecatedTrailingClosureLabels = deprecatedTrailingClosureLabels
     self.trailingClosureLabel = trailingClosureLabel
     self.trailingClosureOffset = trailingClosureOffset
   }
@@ -215,6 +222,10 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
       file: file,
       line: trailingClosureLine.map(UInt.init) ?? line
     )
+  }
+
+  fileprivate func contains(_ label: String) -> Bool {
+    self.trailingClosureLabel == label || self.deprecatedTrailingClosureLabels.contains(label)
   }
 }
 
@@ -377,6 +388,9 @@ private final class SnapshotRewriter: SyntaxRewriter {
         repeating: "#", count: snapshot.actual.hashCount(isMultiline: true)
       )
       let leadingIndent = leadingTrivia + self.indent
+      let snapshotLabel = TokenSyntax(
+        stringLiteral: snapshot.syntaxDescriptor.trailingClosureLabel
+      )
       let snapshotClosure = ClosureExprSyntax(
         leftBrace: .leftBraceToken(trailingTrivia: .newline),
         statements: CodeBlockItemListSyntax {
@@ -425,6 +439,7 @@ private final class SnapshotRewriter: SyntaxRewriter {
       switch centeredTrailingClosureOffset {
       case ..<0:
         let index = arguments.index(arguments.startIndex, offsetBy: trailingClosureOffset)
+        functionCallExpr.arguments[index].label = snapshotLabel
         functionCallExpr.arguments[index].expression = ExprSyntax(snapshotClosure)
 
       case 0:
@@ -438,7 +453,7 @@ private final class SnapshotRewriter: SyntaxRewriter {
       case 1...:
         var newElement: MultipleTrailingClosureElementSyntax {
           MultipleTrailingClosureElementSyntax(
-            label: TokenSyntax(stringLiteral: snapshot.syntaxDescriptor.trailingClosureLabel),
+            label: snapshotLabel,
             closure: snapshotClosure.with(\.leadingTrivia, snapshotClosure.leadingTrivia + .space)
           )
         }
@@ -455,10 +470,11 @@ private final class SnapshotRewriter: SyntaxRewriter {
             limitedBy: endIndex
           )
         {
-          if functionCallExpr.additionalTrailingClosures[index].label.text
-            == snapshot.syntaxDescriptor.trailingClosureLabel
-          {
+          if snapshot.syntaxDescriptor.contains(
+            functionCallExpr.additionalTrailingClosures[index].label.text
+          ) {
             if snapshot.wasRecording {
+              functionCallExpr.additionalTrailingClosures[index].label = snapshotLabel
               functionCallExpr.additionalTrailingClosures[index].closure = snapshotClosure
             }
           } else {
