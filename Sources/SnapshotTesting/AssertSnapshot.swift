@@ -326,16 +326,16 @@ public func verifySnapshot<Value, Format>(
     let diffMessage =
       diffTool
       .map { "\($0) \"\(snapshotFileUrl.path)\" \"\(failedSnapshotFileUrl.path)\"" }
-      ?? """
-      @\(minus)
-      "\(snapshotFileUrl.absoluteString)"
-      @\(plus)
-      "\(failedSnapshotFileUrl.absoluteString)"
+        ?? """
+        @\(minus)
+        "\(snapshotFileUrl.absoluteString)"
+        @\(plus)
+        "\(failedSnapshotFileUrl.absoluteString)"
 
-      To configure output for a custom diff tool, like Kaleidoscope:
+        To configure output for a custom diff tool, like Kaleidoscope:
 
-          SnapshotTesting.diffTool = "ksdiff"
-      """
+            SnapshotTesting.diffTool = "ksdiff"
+        """
 
     let failureMessage: String
     if let name = name {
