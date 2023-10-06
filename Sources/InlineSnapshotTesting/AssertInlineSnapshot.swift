@@ -566,15 +566,15 @@ private final class SnapshotVisitor: SyntaxVisitor {
       }
 
     case 1...:
-      self.trailingClosureLine =
-        functionCallExpr.additionalTrailingClosures[
-          functionCallExpr.additionalTrailingClosures.index(
-            functionCallExpr.additionalTrailingClosures.startIndex,
-            offsetBy: centeredTrailingClosureOffset - 1
-          )
-        ]
-        .startLocation(converter: self.sourceLocationConverter)
-        .line
+      let index = functionCallExpr.additionalTrailingClosures.index(
+        functionCallExpr.additionalTrailingClosures.startIndex,
+        offsetBy: centeredTrailingClosureOffset - 1
+      )
+      if centeredTrailingClosureOffset - 1 < functionCallExpr.additionalTrailingClosures.count {
+        self.trailingClosureLine = functionCallExpr.additionalTrailingClosures[index]
+          .startLocation(converter: self.sourceLocationConverter)
+          .line
+      }
     default:
       break
     }
