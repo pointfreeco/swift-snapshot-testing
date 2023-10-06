@@ -11,4 +11,4 @@ builder:
       - SnapshotTesting
       - InlineSnapshotTesting
     - platform: watchOS
-      scheme: SnapshotTesting
+      scheme: InlineSnapshotTesting
