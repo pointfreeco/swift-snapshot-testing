@@ -571,7 +571,8 @@ private final class SnapshotVisitor: SyntaxVisitor {
         offsetBy: centeredTrailingClosureOffset - 1
       )
       if centeredTrailingClosureOffset - 1 < functionCallExpr.additionalTrailingClosures.count {
-        self.trailingClosureLine = functionCallExpr.additionalTrailingClosures[index]
+        self.trailingClosureLine =
+          functionCallExpr.additionalTrailingClosures[index]
           .startLocation(converter: self.sourceLocationConverter)
           .line
       }
