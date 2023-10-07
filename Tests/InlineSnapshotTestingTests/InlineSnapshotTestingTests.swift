@@ -103,6 +103,37 @@ final class InlineSnapshotTestingTests: XCTestCase {
     )
   }
 
+  func testArgumentlessInlineSnapshot() {
+    func assertArgumentlessInlineSnapshot(
+      expected: (() -> String)? = nil,
+      file: StaticString = #filePath,
+      function: StaticString = #function,
+      line: UInt = #line,
+      column: UInt = #column
+    ) {
+      assertInlineSnapshot(
+        of: "Hello",
+        as: .dump,
+        syntaxDescriptor: InlineSnapshotSyntaxDescriptor(
+          trailingClosureLabel: "is",
+          trailingClosureOffset: 1
+        ),
+        matches: expected,
+        file: file,
+        function: function,
+        line: line,
+        column: column
+      )
+    }
+
+    assertArgumentlessInlineSnapshot {
+      """
+      - "Hello"
+
+      """
+    }
+  }
+
   func testMultipleInlineSnapshots() {
     func assertResponse(
       of url: () -> String,

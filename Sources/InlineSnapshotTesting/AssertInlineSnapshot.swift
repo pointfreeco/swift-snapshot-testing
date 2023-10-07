@@ -502,6 +502,18 @@ private final class SnapshotRewriter: SyntaxRewriter {
         fatalError()
       }
     }
+
+    if
+      functionCallExpr.arguments.isEmpty,
+      functionCallExpr.trailingClosure != nil,
+      functionCallExpr.leftParen != nil,
+      functionCallExpr.rightParen != nil
+    {
+      functionCallExpr.leftParen = nil
+      functionCallExpr.rightParen = nil
+      functionCallExpr.calledExpression.trailingTrivia = .space
+    }
+
     return ExprSyntax(functionCallExpr)
   }
 }
