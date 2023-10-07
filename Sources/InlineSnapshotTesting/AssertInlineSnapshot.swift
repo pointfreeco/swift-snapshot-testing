@@ -505,8 +505,7 @@ private final class SnapshotRewriter: SyntaxRewriter {
       }
     }
 
-    if
-      functionCallExpr.arguments.isEmpty,
+    if functionCallExpr.arguments.isEmpty,
       functionCallExpr.trailingClosure != nil,
       functionCallExpr.leftParen != nil,
       functionCallExpr.rightParen != nil
