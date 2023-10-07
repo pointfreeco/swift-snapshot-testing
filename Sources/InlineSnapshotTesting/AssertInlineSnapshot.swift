@@ -73,6 +73,19 @@ public func assertInlineSnapshot<Value>(
     }
     guard !isRecording, let expected = expected?()
     else {
+      // NB: Write snapshot state before calling `XCTFail` in case `continueAfterFailure = false`
+      inlineSnapshotState[File(path: file), default: []].append(
+        InlineSnapshot(
+          expected: expected?(),
+          actual: actual,
+          wasRecording: isRecording,
+          syntaxDescriptor: syntaxDescriptor,
+          function: "\(function)",
+          line: line,
+          column: column
+        )
+      )
+
       var failure: String
       if syntaxDescriptor.trailingClosureLabel
         == InlineSnapshotSyntaxDescriptor.defaultTrailingClosureLabel
@@ -96,17 +109,6 @@ public func assertInlineSnapshot<Value>(
         """,
         file: file,
         line: line
-      )
-      inlineSnapshotState[File(path: file), default: []].append(
-        InlineSnapshot(
-          expected: expected?(),
-          actual: actual,
-          wasRecording: isRecording,
-          syntaxDescriptor: syntaxDescriptor,
-          function: "\(function)",
-          line: line,
-          column: column
-        )
       )
       return
     }
