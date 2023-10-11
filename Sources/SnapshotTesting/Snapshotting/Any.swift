@@ -1,7 +1,46 @@
 import Foundation
 
 extension Snapshotting where Format == String {
+  /// A snapshot strategy that captures a value's textual description from `String`'s
+  /// `init(describing:)` initializer.
+  ///
+  /// ``` swift
+  /// assertSnapshot(of: user, as: .description)
+  /// ```
+  ///
+  /// Records:
+  ///
+  /// ```
+  /// User(bio: "Blobbed around the world.", id: 1, name: "Blobby")
+  /// ```
+  public static var description: Snapshotting {
+    return SimplySnapshotting.lines.pullback(String.init(describing:))
+  }
+}
+
+extension Snapshotting where Format == String {
   /// A snapshot strategy for comparing any structure based on a sanitized text dump.
+  ///
+  /// The reference format looks a lot like the output of Swift's built-in `dump` function, though
+  /// it does its best to make output deterministic by stripping out pointer memory addresses and
+  /// sorting non-deterministic data, like dictionaries and sets.
+  ///
+  /// You can hook into how an instance of a type is rendered in this strategy by conforming to the
+  /// ``AnySnapshotStringConvertible`` protocol and defining the
+  /// ``AnySnapshotStringConvertible/snapshotDescription` property.
+  ///
+  /// ```swift
+  /// assertSnapshot(of: user, as: .dump)
+  /// ```
+  ///
+  /// Records:
+  ///
+  /// ```
+  /// ▿ User
+  ///   - bio: "Blobbed around the world."
+  ///   - id: 1
+  ///   - name: "Blobby"
+  /// ```
   public static var dump: Snapshotting {
     return SimplySnapshotting.lines.pullback { snap($0) }
   }
@@ -13,12 +52,14 @@ extension Snapshotting where Format == String {
   public static var json: Snapshotting {
     let options: JSONSerialization.WritingOptions = [
       .prettyPrinted,
-      .sortedKeys
+      .sortedKeys,
     ]
 
     var snapshotting = SimplySnapshotting.lines.pullback { (data: Value) in
-      try! String(decoding: JSONSerialization.data(withJSONObject: data,
-                                                   options: options), as: UTF8.self)
+      try! String(
+        decoding: JSONSerialization.data(
+          withJSONObject: data,
+          options: options), as: UTF8.self)
     }
     snapshotting.pathExtension = "json"
     return snapshotting
@@ -66,7 +107,8 @@ private func snap<T>(_ value: T, name: String? = nil, indent: Int = 0) -> String
     description = String(describing: value)
   }
 
-  let lines = ["\(indentation)\(bullet) \(name.map { "\($0): " } ?? "")\(description)\n"]
+  let lines =
+    ["\(indentation)\(bullet) \(name.map { "\($0): " } ?? "")\(description)\n"]
     + children.map { snap($1, name: $0, indent: indent + 2) }
 
   return lines.joined()
@@ -83,7 +125,8 @@ private func sort(_ children: Mirror.Children) -> Mirror.Children {
 
 /// A type with a customized snapshot dump representation.
 ///
-/// Types that conform to the `AnySnapshotStringConvertible` protocol can provide their own representation to be used when converting an instance to a `dump`-based snapshot.
+/// Types that conform to the `AnySnapshotStringConvertible` protocol can provide their own
+/// representation to be used when converting an instance to a `dump`-based snapshot.
 public protocol AnySnapshotStringConvertible {
   /// Whether or not to dump child nodes (defaults to `false`).
   static var renderChildren: Bool { get }
@@ -118,13 +161,13 @@ extension Date: AnySnapshotStringConvertible {
 
 extension NSObject: AnySnapshotStringConvertible {
   #if canImport(ObjectiveC)
-  @objc open var snapshotDescription: String {
-    return purgePointers(self.debugDescription)
-  }
+    @objc open var snapshotDescription: String {
+      return purgePointers(self.debugDescription)
+    }
   #else
-  open var snapshotDescription: String {
-    return purgePointers(self.debugDescription)
-  }
+    open var snapshotDescription: String {
+      return purgePointers(self.debugDescription)
+    }
   #endif
 }
 
@@ -156,5 +199,6 @@ private let snapshotDateFormatter: DateFormatter = {
 }()
 
 func purgePointers(_ string: String) -> String {
-  return string.replacingOccurrences(of: ":?\\s*0x[\\da-f]+(\\s*)", with: "$1", options: .regularExpression)
+  return string.replacingOccurrences(
+    of: ":?\\s*0x[\\da-f]+(\\s*)", with: "$1", options: .regularExpression)
 }
