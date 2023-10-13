@@ -292,7 +292,11 @@ private func testSource(file: File) throws -> TestSource {
     let filePath = "\(file.path)"
     let source = try String(contentsOfFile: filePath)
     let sourceFile = Parser.parse(source: source)
+    #if canImport(SwiftSyntax509)
     let sourceLocationConverter = SourceLocationConverter(fileName: filePath, tree: sourceFile)
+    #else
+    let sourceLocationConverter = SourceLocationConverter(file: filePath, tree: sourceFile)
+    #endif
     let testSource = TestSource(
       source: source,
       sourceFile: sourceFile,
@@ -378,9 +382,14 @@ private final class SnapshotRewriter: SyntaxRewriter {
     for snapshot in snapshots {
       guard snapshot.expected != snapshot.actual else { continue }
 
+      #if canImport(SwiftSyntax509)
       self.function =
         self.function
         ?? functionCallExpr.calledExpression.as(DeclReferenceExprSyntax.self)?.baseName.text
+      #else
+      self.function = self.function
+      ?? functionCallExpr.calledExpression.as(IdentifierExprSyntax.self)?.identifier.text
+      #endif
 
       let leadingTrivia = String(
         self.sourceLocationConverter.sourceLines[Int(snapshot.line) - 1]
@@ -390,9 +399,13 @@ private final class SnapshotRewriter: SyntaxRewriter {
         repeating: "#", count: snapshot.actual.hashCount(isMultiline: true)
       )
       let leadingIndent = leadingTrivia + self.indent
+      #if canImport(SwiftSyntax509)
       let snapshotLabel = TokenSyntax(
         stringLiteral: snapshot.syntaxDescriptor.trailingClosureLabel
       )
+      #else
+      let snapshotLabel = ???
+      #endif
       let snapshotClosure = ClosureExprSyntax(
         leftBrace: .leftBraceToken(trailingTrivia: .newline),
         statements: CodeBlockItemListSyntax {
