@@ -199,11 +199,9 @@ public func verifySnapshot<Value, Format>(
       }
 
       let testName = sanitizePathComponent(testName)
-      let myBundle = Bundle(for: CleanCounterBetweenTestCases.self)
-      let snapshotFileUrl = myBundle.path(forResource: "\(testName).\(identifier)", ofType: snapshotting.pathExtension)
-          .map { URL(fileURLWithPath: $0) } ?? snapshotDirectoryUrl
-          .appendingPathComponent("\(testName).\(identifier)")
-          .appendingPathExtension(snapshotting.pathExtension ?? "")
+      let snapshotFileUrl = snapshotDirectoryUrl
+        .appendingPathComponent("\(testName).\(identifier)")
+        .appendingPathExtension(snapshotting.pathExtension ?? "")
       let fileManager = FileManager.default
       try fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
 
