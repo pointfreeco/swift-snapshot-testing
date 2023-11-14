@@ -155,7 +155,7 @@ import Foundation
 /// A structure that describes the location of an inline snapshot.
 ///
 /// Provide this structure when defining custom snapshot functions that call
-/// ``assertInlineSnapshot(of:as:message:timeout:syntaxDescriptor:matches:file:function:line:column:)``
+/// ``assertInlineSnapshot(of:as:message:record:timeout:syntaxDescriptor:matches:file:function:line:column:)``
 /// under the hood.
 public struct InlineSnapshotSyntaxDescriptor: Hashable {
   /// The default label describing an inline snapshot.
