@@ -15,6 +15,7 @@ import Foundation
   ///   - value: A value to compare against a snapshot.
   ///   - snapshotting: A strategy for snapshotting and comparing values.
   ///   - message: An optional description of the assertion, for inclusion in test results.
+  ///   - isRecording: Whether or not to record a new reference.
   ///   - timeout: The amount of time a snapshot must be generated in.
   ///   - syntaxDescriptor: An optional description of where the snapshot is inlined. This parameter
   ///     should be omitted unless you are writing a custom helper that calls this function under
@@ -34,6 +35,7 @@ import Foundation
     of value: @autoclosure () throws -> Value,
     as snapshotting: Snapshotting<Value, String>,
     message: @autoclosure () -> String = "",
+    record isRecording: Bool = isRecording,
     timeout: TimeInterval = 5,
     syntaxDescriptor: InlineSnapshotSyntaxDescriptor = InlineSnapshotSyntaxDescriptor(),
     matches expected: (() -> String)? = nil,
@@ -114,7 +116,7 @@ import Foundation
         )
         return
       }
-      guard let difference = snapshotting.diffing.diff(actual, expected)?.0
+      guard let difference = snapshotting.diffing.diff(expected, actual)?.0
       else { return }
 
       let message = message()
@@ -153,7 +155,7 @@ import Foundation
 /// A structure that describes the location of an inline snapshot.
 ///
 /// Provide this structure when defining custom snapshot functions that call
-/// ``assertInlineSnapshot(of:as:message:timeout:syntaxDescriptor:matches:file:function:line:column:)``
+/// ``assertInlineSnapshot(of:as:message:record:timeout:syntaxDescriptor:matches:file:function:line:column:)``
 /// under the hood.
 public struct InlineSnapshotSyntaxDescriptor: Hashable {
   /// The default label describing an inline snapshot.

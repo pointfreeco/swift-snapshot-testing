@@ -68,7 +68,7 @@ Re-run "testMySnapshot" to test against the newly-recorded snapshot.
 
 ### Essentials
 
-- ``assertInlineSnapshot(of:as:message:timeout:syntaxDescriptor:matches:file:function:line:column:)``
+- ``assertInlineSnapshot(of:as:message:record:timeout:syntaxDescriptor:matches:file:function:line:column:)``
 
 ### Writing a custom helper
 
