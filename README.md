@@ -190,9 +190,9 @@ targets: [
 
 ## Features
 
-  - [**Dozens of snapshot strategies**](Documentation/Available-Snapshot-Strategies.md). Snapshot
+  - [**Dozens of snapshot strategies**][available-strategies]. Snapshot
     testing isn't just for `UIView`s and `CALayer`s. Write snapshots against _any_ value.
-  - [**Write your own snapshot strategies**](Documentation/Defining-Custom-Snapshot-Strategies.md).
+  - [**Write your own snapshot strategies**][defining-strategies].
     If you can convert it to an image, string, data, or your own diffable format, you can snapshot
     test it! Build your own snapshot strategies from scratch or transform existing ones.
   - **No configuration required.** Don't fuss with scheme settings and environment variables.
@@ -214,6 +214,9 @@ targets: [
     ``` swift
     SnapshotTesting.diffTool = "ksdiff"
     ```
+
+[available-strategies]: https://swiftpackageindex.com/pointfreeco/swift-snapshot-testing/main/documentation/snapshottesting/snapshotting
+[defining-strategies]: https://swiftpackageindex.com/pointfreeco/swift-snapshot-testing/main/documentation/snapshottesting/customstrategies
 
 ## Plug-ins
 
