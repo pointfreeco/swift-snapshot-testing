@@ -125,7 +125,7 @@
       var index = 0
       while index < byteCount {
         defer { index += 1 }
-        if oldRep[index] != newRep[offset] {
+        if oldRep[index] != newRep[index] {
           differentByteCount += 1
         }
       }
