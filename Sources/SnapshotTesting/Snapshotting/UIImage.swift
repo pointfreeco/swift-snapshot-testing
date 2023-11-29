@@ -319,9 +319,12 @@
     static let device = MTLCreateSystemDefaultDevice()
 
     static var isSupported: Bool {
+      guard let device = device else {
+        return false
+      }
       #if targetEnvironment(simulator)
-        guard let device = device, #available(iOS 14.0, tvOS 14.0, *) else {
-          // The MPSSupportsMTLDevice method throws an exception on iOS/tvOS simulators older than 14.0
+        guard #available(iOS 14.0, tvOS 14.0, *) else {
+          // The MPSSupportsMTLDevice method throws an exception on iOS/tvOS simulators < 14.0
           return false
         }
       #endif
