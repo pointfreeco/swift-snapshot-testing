@@ -236,10 +236,19 @@
       var failingPixelCount: Int = 0
       // rowBytes must be a multiple of 8, so vImage_Buffer pads the end of each row with bytes to meet the multiple of 0 requirement.
       // We must do 2D iteration of the vImage_Buffer in order to avoid loading the padding garbage bytes at the end of each row.
+      //
+      // NB: We are purposely using a verbose 'while' loop instead of a 'for in' loop.  When the
+      //     compiler doesn't have optimizations enabled, like in test targets, a `while` loop is
+      //     significantly faster than a `for` loop for iterating through the elements of a memory
+      //     buffer. Details can be found in [SR-6983](https://github.com/apple/swift/issues/49531)
       let componentStride = MemoryLayout<Float>.stride
-      fastForEach(in: 0..<Int(buffer.height)) { line in
+      var line = 0
+      while line < buffer.height {
+        defer { line += 1 }
         let lineOffset = buffer.rowBytes * line
-        fastForEach(in: 0..<Int(buffer.width)) { column in
+        var column = 0
+        while column < buffer.width {
+          defer { column += 1 }
           let byteOffset = lineOffset + column * componentStride
           let deltaE = buffer.data.load(fromByteOffset: byteOffset, as: Float.self)
           if deltaE > deltaThreshold {
@@ -361,13 +370,3 @@
     }
   }
 #endif
-
-/// When the compiler doesn't have optimizations enabled, like in test targets, a `while` loop is significantly faster than a `for` loop
-/// for iterating through the elements of a memory buffer. Details can be found in [SR-6983](https://github.com/apple/swift/issues/49531#issuecomment-1108286654)
-func fastForEach(in range: Range<Int>, _ body: (Int) -> Void) {
-  var index = range.lowerBound
-  while index < range.upperBound {
-    body(index)
-    index += 1
-  }
-}
