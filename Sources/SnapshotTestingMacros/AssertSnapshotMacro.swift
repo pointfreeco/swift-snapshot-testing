@@ -4,21 +4,38 @@ import SwiftSyntaxBuilder
 import SwiftSyntaxMacros
 import SwiftDiagnostics
 
-private enum AssertSnapShotParamList: String {
-    init?(rawValue: String?) {
-        if let rawValue, rawValue == "as" {
-            self = .as
+struct AssertSnapShotParam {
+    let param: AssertSnapShotParamList
+    let node: LabeledExprListSyntax
+    
+    var value: ExprSyntax? {
+        for next in node.children(viewMode: .all) {
+            switch param {
+            case .as:
+                if next.as(LabeledExprSyntax.self)?.label?.trimmed.text == param.rawValue {
+                    return next.as(LabeledExprSyntax.self)?.expression
+                } else {
+                   continue
+                }
+            case .of:
+                if next.as(LabeledExprSyntax.self)?.label?.trimmed.text == param.rawValue {
+                    return next.as(LabeledExprSyntax.self)?.expression
+                } else {
+                    continue
+                }
+            case .named:
+                if next.as(LabeledExprSyntax.self)?.label?.trimmed.text == param.rawValue {
+                    return next.as(LabeledExprSyntax.self)?.expression
+                } else {
+                    continue
+                }
+            }
         }
-        else if let rawValue, rawValue == "of" {
-            self = .of
-        }
-        else if let rawValue, rawValue == "named" {
-            self = .named
-        } else {
-            return nil
-        }
+        return nil
     }
-    case `as`, `of`, named
+}
+enum AssertSnapShotParamList: String {
+   case `as`, `of`, named
 }
 
 /// Implementation of the `AssertSnapshot` macro
@@ -31,25 +48,9 @@ public struct AssertSnapshotEqualMacro: ExpressionMacro {
             throw AssertSnapshotEqualError.message("AssertSnapshotEqual - Macro: the macro was not passed any arguments")
         }
         
-        var ofArg: ExprSyntax?
-        var asArg: ExprSyntax?
-        var nameArg: ExprSyntax?
-        
-        for next in node.argumentList.children(viewMode: .all) {
-            
-            if AssertSnapShotParamList(rawValue: next.as(LabeledExprSyntax.self)?.label?.trimmed.text) == .of, let value = next.as(LabeledExprSyntax.self)?.expression {
-                ofArg = value
-            }
-            
-            if AssertSnapShotParamList(rawValue: next.as(LabeledExprSyntax.self)?.label?.trimmed.text) == .as, let value = next.as(LabeledExprSyntax.self)?.expression {
-                asArg = value
-            }
-            
-            if AssertSnapShotParamList(rawValue: next.as(LabeledExprSyntax.self)?.label?.trimmed.text) == .named,
-               let value = next.as(LabeledExprSyntax.self)?.expression {
-                nameArg = value
-            }
-        }
+        let ofArg = AssertSnapShotParam(param: .of, node: node.argumentList).value
+        let asArg = AssertSnapShotParam(param: .as, node: node.argumentList).value
+        let nameArg = AssertSnapShotParam(param: .named, node: node.argumentList).value
 
         if let nameArg, let ofArg, let asArg {
             return "assertSnapshot(of: \(ofArg), as: \(asArg), named: \(nameArg))"
