@@ -10,3 +10,5 @@ builder:
       # First item in the list is the "landing" (default) target
       - SnapshotTesting
       - InlineSnapshotTesting
+    - platform: watchos
+      scheme: InlineSnapshotTesting
