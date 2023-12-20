@@ -460,6 +460,8 @@ final class SnapshotTestingTests: BaseTestCase {
           assertSnapshot(of: viewController, as: .image(on: .iPhoneXr), named: "iphone-xr")
           assertSnapshot(of: viewController, as: .image(on: .iPhoneXsMax), named: "iphone-xs-max")
           assertSnapshot(of: viewController, as: .image(on: .iPadMini), named: "ipad-mini")
+          assertSnapshot(
+            of: viewController, as: .image(on: .iPadMini6thGen), named: "ipad-mini-6th-gen")
           assertSnapshot(of: viewController, as: .image(on: .iPad9_7), named: "ipad-9-7")
           assertSnapshot(of: viewController, as: .image(on: .iPad10_2), named: "ipad-10-2")
           assertSnapshot(of: viewController, as: .image(on: .iPadPro10_5), named: "ipad-pro-10-5")
@@ -480,6 +482,9 @@ final class SnapshotTestingTests: BaseTestCase {
             of: viewController, as: .recursiveDescription(on: .iPhoneXsMax), named: "iphone-xs-max")
           assertSnapshot(
             of: viewController, as: .recursiveDescription(on: .iPadMini), named: "ipad-mini")
+          assertSnapshot(
+            of: viewController, as: .recursiveDescription(on: .iPadMini6thGen),
+            named: "ipad-mini-6th-gen")
           assertSnapshot(
             of: viewController, as: .recursiveDescription(on: .iPad9_7), named: "ipad-9-7")
           assertSnapshot(
@@ -503,6 +508,9 @@ final class SnapshotTestingTests: BaseTestCase {
             of: viewController, as: .image(on: .iPhoneXsMax(.portrait)), named: "iphone-xs-max")
           assertSnapshot(
             of: viewController, as: .image(on: .iPadMini(.landscape)), named: "ipad-mini")
+          assertSnapshot(
+            of: viewController, as: .image(on: .iPadMini6thGen(.landscape)),
+            named: "ipad-mini-6th-gen")
           assertSnapshot(
             of: viewController, as: .image(on: .iPad9_7(.landscape)), named: "ipad-9-7")
           assertSnapshot(
@@ -529,6 +537,22 @@ final class SnapshotTestingTests: BaseTestCase {
           assertSnapshot(
             of: viewController, as: .image(on: .iPadMini(.portrait(splitView: .twoThirds))),
             named: "ipad-mini-66-split-portrait")
+
+          assertSnapshot(
+            of: viewController, as: .image(on: .iPadMini6thGen(.landscape(splitView: .oneThird))),
+            named: "ipad-mini-6th-gen-33-split-landscape")
+          assertSnapshot(
+            of: viewController, as: .image(on: .iPadMini6thGen(.landscape(splitView: .oneHalf))),
+            named: "ipad-mini-6th-gen-50-split-landscape")
+          assertSnapshot(
+            of: viewController, as: .image(on: .iPadMini6thGen(.landscape(splitView: .twoThirds))),
+            named: "ipad-mini-6th-gen-66-split-landscape")
+          assertSnapshot(
+            of: viewController, as: .image(on: .iPadMini6thGen(.portrait(splitView: .oneThird))),
+            named: "ipad-mini-6th-gen-33-split-portrait")
+          assertSnapshot(
+            of: viewController, as: .image(on: .iPadMini6thGen(.portrait(splitView: .twoThirds))),
+            named: "ipad-mini-6th-gen-66-split-portrait")
 
           assertSnapshot(
             of: viewController, as: .image(on: .iPad9_7(.landscape(splitView: .oneThird))),
@@ -628,6 +652,10 @@ final class SnapshotTestingTests: BaseTestCase {
             named: "iphone-xs-max-alternative")
           assertSnapshot(
             of: viewController, as: .image(on: .iPadMini(.portrait)), named: "ipad-mini-alternative"
+          )
+          assertSnapshot(
+            of: viewController, as: .image(on: .iPadMini6thGen(.portrait)),
+            named: "ipad-mini-6th-gen-alternative"
           )
           assertSnapshot(
             of: viewController, as: .image(on: .iPad9_7(.portrait)), named: "ipad-9-7-alternative")
@@ -744,6 +772,8 @@ final class SnapshotTestingTests: BaseTestCase {
         assertSnapshot(of: viewController, as: .image(on: .iPhoneXr), named: "iphone-xr")
         assertSnapshot(of: viewController, as: .image(on: .iPhoneXsMax), named: "iphone-xs-max")
         assertSnapshot(of: viewController, as: .image(on: .iPadMini), named: "ipad-mini")
+        assertSnapshot(
+          of: viewController, as: .image(on: .iPadMini6thGen), named: "ipad-mini-6th-gen")
         assertSnapshot(of: viewController, as: .image(on: .iPad9_7), named: "ipad-9-7")
         assertSnapshot(of: viewController, as: .image(on: .iPad10_2), named: "ipad-10-2")
         assertSnapshot(of: viewController, as: .image(on: .iPadPro10_5), named: "ipad-pro-10-5")
@@ -758,8 +788,6 @@ final class SnapshotTestingTests: BaseTestCase {
         assertSnapshot(of: viewController, as: .image(on: .iPhoneXr(.portrait)), named: "iphone-xr")
         assertSnapshot(
           of: viewController, as: .image(on: .iPhoneXsMax(.portrait)), named: "iphone-xs-max")
-        assertSnapshot(
-          of: viewController, as: .image(on: .iPadMini(.landscape)), named: "ipad-mini")
         assertSnapshot(of: viewController, as: .image(on: .iPad9_7(.landscape)), named: "ipad-9-7")
         assertSnapshot(
           of: viewController, as: .image(on: .iPad10_2(.landscape)), named: "ipad-10-2")
@@ -786,6 +814,9 @@ final class SnapshotTestingTests: BaseTestCase {
           named: "iphone-xs-max-alternative")
         assertSnapshot(
           of: viewController, as: .image(on: .iPadMini(.portrait)), named: "ipad-mini-alternative")
+        assertSnapshot(
+          of: viewController, as: .image(on: .iPadMini6thGen(.portrait)),
+          named: "ipad-mini-6th-gen-alternative")
         assertSnapshot(
           of: viewController, as: .image(on: .iPad9_7(.portrait)), named: "ipad-9-7-alternative")
         assertSnapshot(
