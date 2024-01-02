@@ -220,7 +220,7 @@
       guard
         let thresholdOutputImage = try? deltaOutputImage.applyingThreshold(deltaThreshold),
         let averagePixel = thresholdOutputImage.applyingAreaAverage().renderSingleValue(in: context)
-      else  {
+      else {
         return "Newly-taken snapshot's data could not be processed."
       }
       actualPixelPrecision = 1 - averagePixel
@@ -259,7 +259,9 @@
           }
         }
       }
-      let failingPixelPercent = Float(failingPixelCount) / Float(deltaOutputImage.extent.width * deltaOutputImage.extent.height)
+      let failingPixelPercent =
+        Float(failingPixelCount)
+        / Float(deltaOutputImage.extent.width * deltaOutputImage.extent.height)
       actualPixelPrecision = 1 - failingPixelPercent
     }
 
@@ -268,9 +270,9 @@
     // DeltaE is in a 0-100 scale, so we need to divide by 100 to transform it to a percentage.
     let minimumPerceptualPrecision = 1 - min(maximumDeltaE / 100, 1)
     return """
-    The percentage of pixels that match \(actualPixelPrecision) is less than required \(pixelPrecision)
-    The lowest perceptual color precision \(minimumPerceptualPrecision) is less than required \(perceptualPrecision)
-    """
+      The percentage of pixels that match \(actualPixelPrecision) is less than required \(pixelPrecision)
+      The lowest perceptual color precision \(minimumPerceptualPrecision) is less than required \(perceptualPrecision)
+      """
   }
 
   extension CIImage {
@@ -295,15 +297,18 @@
     }
 
     func renderSingleValue(in context: CIContext) -> Float? {
-        guard let buffer = render(in: context) else { return nil }
-        defer { buffer.free() }
-        return buffer.data.load(fromByteOffset: 0, as: Float.self)
+      guard let buffer = render(in: context) else { return nil }
+      defer { buffer.free() }
+      return buffer.data.load(fromByteOffset: 0, as: Float.self)
     }
 
     func render(in context: CIContext, format: CIFormat = CIFormat.Rh) -> vImage_Buffer? {
       // Some hardware configurations (virtualized CPU renderers) do not support 32-bit float output formats,
       // so use a compatible 16-bit float format and convert the output value to 32-bit floats.
-      guard var buffer16 = try? vImage_Buffer(width: Int(extent.width), height: Int(extent.height), bitsPerPixel: 16) else { return nil }
+      guard
+        var buffer16 = try? vImage_Buffer(
+          width: Int(extent.width), height: Int(extent.height), bitsPerPixel: 16)
+      else { return nil }
       defer { buffer16.free() }
       context.render(
         self,
@@ -314,7 +319,8 @@
         colorSpace: nil
       )
       guard
-        var buffer32 = try? vImage_Buffer(width: Int(buffer16.width), height: Int(buffer16.height), bitsPerPixel: 32),
+        var buffer32 = try? vImage_Buffer(
+          width: Int(buffer16.width), height: Int(buffer16.height), bitsPerPixel: 32),
         vImageConvert_Planar16FtoPlanarF(&buffer16, &buffer32, 0) == kvImageNoError
       else { return nil }
       return buffer32
