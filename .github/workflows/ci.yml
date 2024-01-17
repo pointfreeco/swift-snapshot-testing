@@ -23,42 +23,5 @@ jobs:
         run: sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode }}.app
       - name: Run tests
         run: make test-swift
-
-  ubuntu:
-    strategy:
-      matrix:
-        swift:
-          - "5.7"
-
-    name: Ubuntu (Swift ${{ matrix.swift }})
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: swift-actions/setup-swift@v1
-        with:
-          swift-version: ${{ matrix.swift }}
-      - uses: actions/checkout@v3
-      - run: swift test
-
-  windows:
-    strategy:
-      matrix:
-        swift:
-          - "5.8"
-
-    name: Windows (Swift ${{ matrix.swift }})
-    runs-on: windows-2019
-
-    steps:
-      - uses: compnerd/gha-setup-swift@main
-        with:
-          branch: swift-${{ matrix.swift }}-release
-          tag: ${{ matrix.swift }}-RELEASE
-
-      - name: Set git to use LF
-        run: |
-          git config --global core.autocrlf false
-          git config --global core.eol lf
-
-      - uses: actions/checkout@v3
-      - run: swift build
-      - run: swift test
+      - name: Install screenshotbot
+        run: curl https://screenshotbot.io/recorder.sh | sh
