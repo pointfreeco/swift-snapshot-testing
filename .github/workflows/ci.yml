@@ -25,3 +25,14 @@ jobs:
         run: make test-swift
       - name: Install screenshotbot
         run: curl https://screenshotbot.io/recorder.sh | sh
+      - name: Run screenshotbot
+        env:
+          SCREENSHOTBOT_API_SECRET: ${{ secrets.SCREENSHOTBOT_API_SECRET }}
+          SCREENSHOTBOT_API_KEY: ${{ secrets.SCREENSHOTBOT_API_KEY }}
+        run: |
+              ~/screenshotbot/recorder \
+              --channel ...channel-name... \
+              --directory Tests/SnapshotTestingTests/__Snapshots__/SnapshotTestingTests \
+              --api-key ${SCREENSHOTBOT_API_KEY} \
+              --repo-url "https://github.com/PycKamil/swift-snapshot-testing" \
+              --api-secret ${SCREENSHOTBOT_API_SECRET} 
