@@ -36,3 +36,4 @@ jobs:
               --api-key ${SCREENSHOTBOT_API_KEY} \
               --repo-url "https://github.com/PycKamil/swift-snapshot-testing" \
               --api-secret ${SCREENSHOTBOT_API_SECRET} 
+              --main-branch main
