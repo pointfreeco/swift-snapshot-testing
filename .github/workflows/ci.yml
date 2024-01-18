@@ -34,6 +34,6 @@ jobs:
               --channel ...channel-name... \
               --directory Tests/SnapshotTestingTests/__Snapshots__/SnapshotTestingTests \
               --api-key ${SCREENSHOTBOT_API_KEY} \
-              --repo-url "https://github.com/PycKamil/swift-snapshot-testing" \
+              --repo-url https://github.com/PycKamil/swift-snapshot-testing.git \
               --api-secret ${SCREENSHOTBOT_API_SECRET} \
               --main-branch main
