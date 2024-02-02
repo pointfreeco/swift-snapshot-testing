@@ -388,8 +388,8 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
       self.wasRecording = snapshots.first?.wasRecording ?? isRecording
       self.indent = String(
         sourceLocationConverter.sourceLines
-          .first(where: { $0.first?.isWhitespace == true && $0 != "\n" })?
-          .prefix(while: { $0.isWhitespace })
+          .first { $0.first?.isWhitespace == true && $0.contains { !$0.isWhitespace } }?
+          .prefix { $0.isWhitespace }
           ?? "    "
       )
       self.snapshots = snapshots
