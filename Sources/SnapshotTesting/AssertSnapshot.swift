@@ -8,6 +8,8 @@ import XCTest
 /// ```
 public var diffTool: String? = nil
 
+public var accessedFilePaths: Set<URL> = []
+
 /// Whether or not to record all new references.
 public var isRecording = false
 
@@ -226,6 +228,8 @@ public func verifySnapshot<Value, Format>(
       .appendingPathExtension(snapshotting.pathExtension ?? "")
     let fileManager = FileManager.default
     try fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
+      
+    accessedFilePaths.insert(snapshotFileUrl)
 
     let tookSnapshot = XCTestExpectation(description: "Took snapshot")
     var optionalDiffable: Format?
