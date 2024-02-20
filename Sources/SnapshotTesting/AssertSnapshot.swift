@@ -14,7 +14,7 @@ public var isRecording = false
 /// Whether or not to fail when a recording changes
 /// This should only be turned off when running swift-snapshot-testcase with an external screenshot tracking service
 /// such as Screenshotbot. Incorrectly turning this off can hide real regressions.
-public var isFailOnNewRecording = true
+public var screenshotbotMode = true
 
 /// Whether or not to record all new references.
 ///
@@ -61,7 +61,7 @@ public func assertSnapshot<Value, Format>(
   )
   guard let message = failure else { return }
 
-  if isFailOnNewRecording {
+  if !screenshotbotMode {
     XCTFail(message, file: file, line: line)
   }
 }
@@ -202,7 +202,7 @@ public func verifySnapshot<Value, Format>(
 ) -> String? {
 
   CleanCounterBetweenTestCases.registerIfNeeded()
-  let recording = recording || isRecording || !isFailOnNewRecording
+  let recording = recording || isRecording || screenshotbotMode
 
   do {
     let fileUrl = URL(fileURLWithPath: "\(file)", isDirectory: false)
