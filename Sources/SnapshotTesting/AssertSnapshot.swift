@@ -61,7 +61,7 @@ public func assertSnapshot<Value, Format>(
   )
   guard let message = failure else { return }
 
-  if (isFailOnNewRecording) {
+  if isFailOnNewRecording {
     XCTFail(message, file: file, line: line)
   }
 }
