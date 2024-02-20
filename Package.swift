@@ -1,33 +1,56 @@
-// swift-tools-version:5.0
-import Foundation
+// swift-tools-version:5.7
+
 import PackageDescription
 
 let package = Package(
-  name: "SnapshotTesting",
+  name: "swift-snapshot-testing",
   platforms: [
-    .iOS(.v11),
-    .macOS(.v10_10),
-    .tvOS(.v10)
+    .iOS(.v13),
+    .macOS(.v10_15),
+    .tvOS(.v13),
+    .watchOS(.v6),
   ],
   products: [
     .library(
       name: "SnapshotTesting",
-      targets: ["SnapshotTesting"]),
+      targets: ["SnapshotTesting"]
+    ),
+    .library(
+      name: "InlineSnapshotTesting",
+      targets: ["InlineSnapshotTesting"]
+    ),
+  ],
+  dependencies: [
+    .package(url: "https://github.com/apple/swift-syntax.git", "508.0.1"..<"510.0.0")
   ],
   targets: [
     .target(
-      name: "SnapshotTesting",
-      dependencies: []),
+      name: "SnapshotTesting"
+    ),
+    .target(
+      name: "InlineSnapshotTesting",
+      dependencies: [
+        "SnapshotTesting",
+        .product(name: "SwiftParser", package: "swift-syntax"),
+        .product(name: "SwiftSyntax", package: "swift-syntax"),
+        .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
+      ]
+    ),
+    .testTarget(
+      name: "InlineSnapshotTestingTests",
+      dependencies: [
+        "InlineSnapshotTesting"
+      ]
+    ),
     .testTarget(
       name: "SnapshotTestingTests",
-      dependencies: ["SnapshotTesting"]),
+      dependencies: [
+        "SnapshotTesting"
+      ],
+      exclude: [
+        "__Fixtures__",
+        "__Snapshots__",
+      ]
+    ),
   ]
 )
-
-if ProcessInfo.processInfo.environment.keys.contains("PF_DEVELOP") {
-  package.dependencies.append(
-    contentsOf: [
-      .package(url: "https://github.com/yonaskolb/XcodeGen.git", .exact("2.15.1")),
-    ]
-  )
-}
