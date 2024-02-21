@@ -61,7 +61,7 @@ public func assertSnapshot<Value, Format>(
   )
   guard let message = failure else { return }
 
-    if !(screenshotbotMode && isPng(snapshotting: snapshotting)) {
+  if !(screenshotbotMode && isPng(snapshotting: snapshotting)) {
     XCTFail(message, file: file, line: line)
   }
 }
@@ -202,7 +202,8 @@ public func verifySnapshot<Value, Format>(
 ) -> String? {
 
   CleanCounterBetweenTestCases.registerIfNeeded()
-  let recording = recording || isRecording || (screenshotbotMode && isPng(snapshotting: snapshotting))
+  let recording =
+    recording || isRecording || (screenshotbotMode && isPng(snapshotting: snapshotting))
 
   do {
     let fileUrl = URL(fileURLWithPath: "\(file)", isDirectory: false)
@@ -370,8 +371,8 @@ private let counterQueue = DispatchQueue(label: "co.pointfree.SnapshotTesting.co
 private var counterMap: [URL: Int] = [:]
 
 func isPng<Value, Format>(snapshotting: Snapshotting<Value, Format>) -> Bool {
-    let ext = snapshotting.pathExtension ?? ""
-    return ext == "png"
+  let ext = snapshotting.pathExtension ?? ""
+  return ext == "png"
 }
 
 func sanitizePathComponent(_ string: String) -> String {
