@@ -18,7 +18,7 @@ jobs:
     name: macOS 13 (Xcode ${{ matrix.xcode }})
     runs-on: macos-13
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Select Xcode ${{ matrix.xcode }}
         run: sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode }}.app
       - name: Run tests
@@ -36,8 +36,17 @@ jobs:
       - uses: swift-actions/setup-swift@v1
         with:
           swift-version: ${{ matrix.swift }}
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: swift test
+
+  wasm:
+    name: Wasm
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: swiftwasm/swiftwasm-action@v5.9
+        with:
+          shell-action: carton test
 
   windows:
     strategy:
@@ -59,6 +68,6 @@ jobs:
           git config --global core.autocrlf false
           git config --global core.eol lf
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: swift build
       - run: swift test
