@@ -14,7 +14,7 @@
     /// assertSnapshot(of: layer, as: .image(precision: 0.99))
     /// ```
     public static var image: Snapshotting {
-      return .image(precision: 1)
+      return .image(precision: SnapshottingDefaults.precision)
     }
 
     /// A snapshot strategy for comparing layers based on pixel equality.
@@ -25,7 +25,7 @@
     ///     match. 98-99% mimics
     ///     [the precision](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e) of the
     ///     human eye.
-    public static func image(precision: Float, perceptualPrecision: Float = 1) -> Snapshotting {
+    public static func image(precision: Float, perceptualPrecision: Float = SnapshottingDefaults.perceptualPrecision) -> Snapshotting {
       return SimplySnapshotting.image(
         precision: precision, perceptualPrecision: perceptualPrecision
       ).pullback { layer in
@@ -59,7 +59,7 @@
     ///     human eye.
     ///   - traits: A trait collection override.
     public static func image(
-      precision: Float = 1, perceptualPrecision: Float = 1, traits: UITraitCollection = .init()
+      precision: Float = SnapshottingDefaults.precision, perceptualPrecision: Float = SnapshottingDefaults.perceptualPrecision, traits: UITraitCollection = .init()
     )
       -> Snapshotting
     {
