@@ -18,6 +18,7 @@ Powerfully flexible snapshot testing.
 ### Configuration
 
 - ``isRecording``
+- ``canGenerateNewSnapshots``
 - ``diffTool``
 
 ### Deprecations
