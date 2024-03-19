@@ -103,9 +103,7 @@ import Foundation
             Automatically recorded a new snapshot for "\(syntaxDescriptor.trailingClosureLabel)".
             """
         }
-        if let expected,
-          let difference = snapshotting.diffing.diff(expected, actual ?? "")?.0
-        {
+        if let difference = snapshotting.diffing.diff(expected ?? "", actual ?? "")?.0 {
           failure += " Difference: …\n\n\(difference.indenting(by: 2))"
         }
         XCTFail(
@@ -540,7 +538,9 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
                   functionCallExpr.additionalTrailingClosures.remove(at: index)
                 }
               }
-            } else if let newElement {
+            } else if let newElement,
+              snapshot.wasRecording || index == functionCallExpr.additionalTrailingClosures.endIndex
+            {
               functionCallExpr.additionalTrailingClosures.insert(
                 newElement.with(\.trailingTrivia, .space),
                 at: index
