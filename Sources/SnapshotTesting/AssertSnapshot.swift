@@ -7,6 +7,7 @@ import XCTest
 /// diffTool = "ksdiff"
 /// ```
 public var diffTool: String? = nil
+public var diffToolSuffix: String = ""
 
 /// Whether or not to record all new references.
 public var isRecording = false
@@ -325,7 +326,7 @@ public func verifySnapshot<Value, Format>(
 
     let diffMessage =
       diffTool
-      .map { "\($0) \"\(snapshotFileUrl.path)\" \"\(failedSnapshotFileUrl.path)\"" }
+      .map { "\($0) \"\(snapshotFileUrl.path)\" \"\(failedSnapshotFileUrl.path)\" \(diffToolSuffix)" }
         ?? """
         @\(minus)
         "\(snapshotFileUrl.absoluteString)"
@@ -335,6 +336,10 @@ public func verifySnapshot<Value, Format>(
         To configure output for a custom diff tool, like Kaleidoscope:
 
             SnapshotTesting.diffTool = "ksdiff"
+
+        or ImageMagick:
+            SnapshotTesting.diffTool = "magick compare"
+            SnapshotTesting.diffToolSuffix = "diff.png && open diff.png"
         """
 
     let failureMessage: String
