@@ -210,9 +210,9 @@ targets: [
   - **`Codable` support**. Snapshot encodable data structures into their JSON and property list
     representations.
   - **Custom diff tool integration**. Configure failure messages to print diff commands for
-    [Kaleidoscope](https://kaleidoscope.app) (or your diff tool of choice).
+    [Kaleidoscope](https://kaleidoscope.app) or your diff tool of choice.
     ``` swift
-    SnapshotTesting.diffTool = "ksdiff"
+    SnapshotTesting.diffToolBuilder = { "ksdiff \($0) \($1)" }
     ```
 
 [available-strategies]: https://swiftpackageindex.com/pointfreeco/swift-snapshot-testing/main/documentation/snapshottesting/snapshotting
