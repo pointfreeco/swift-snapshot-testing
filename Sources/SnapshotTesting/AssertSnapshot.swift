@@ -8,6 +8,14 @@ import XCTest
 /// ```
 public var diffTool: String? = nil
 
+/// Enhances failure messages with a diff tool expression created by the closure, such as an clickable
+/// URL or a complex command.
+///
+/// ```swift
+/// diffToolBuilder = { "compare \"\($0.path)\" \"\($1.path)\" png: | open -f -a Preview.app" }
+/// ```
+public var diffToolBuilder: ((URL, URL) -> String)?
+
 /// Whether or not to record all new references.
 public var isRecording = false
 
@@ -323,9 +331,11 @@ public func verifySnapshot<Value, Format>(
       #endif
     }
 
+    let diffToolMessage = diffToolBuilder?(snapshotFileUrl, failedSnapshotFileUrl) ??
+      (diffTool
+        .map { "\($0) \"\(snapshotFileUrl.path)\" \"\(failedSnapshotFileUrl.path)\"" })
     let diffMessage =
-      diffTool
-      .map { "\($0) \"\(snapshotFileUrl.path)\" \"\(failedSnapshotFileUrl.path)\"" }
+      diffToolMessage
         ?? """
         @\(minus)
         "\(snapshotFileUrl.absoluteString)"
