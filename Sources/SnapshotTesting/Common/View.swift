@@ -844,7 +844,7 @@
         
         public static func iPhone15(_ orientation: ViewImageConfig.Orientation) -> UITraitCollection {
             let base: [UITraitCollection] = [
-              .init(forceTouchCapability: .available),
+              .init(forceTouchCapability: .unavailable),
               .init(layoutDirection: .leftToRight),
               .init(preferredContentSizeCategory: .medium),
               .init(userInterfaceIdiom: .phone)
@@ -869,7 +869,7 @@
 
           public static func iPhone15Plus(_ orientation: ViewImageConfig.Orientation) -> UITraitCollection {
             let base: [UITraitCollection] = [
-              .init(forceTouchCapability: .available),
+              .init(forceTouchCapability: .unavailable),
               .init(layoutDirection: .leftToRight),
               .init(preferredContentSizeCategory: .medium),
               .init(userInterfaceIdiom: .phone)
@@ -894,7 +894,7 @@
 
           public static func iPhone15Pro(_ orientation: ViewImageConfig.Orientation) -> UITraitCollection {
             let base: [UITraitCollection] = [
-              .init(forceTouchCapability: .available),
+              .init(forceTouchCapability: .unavailable),
               .init(layoutDirection: .leftToRight),
               .init(preferredContentSizeCategory: .medium),
               .init(userInterfaceIdiom: .phone)
@@ -919,7 +919,7 @@
 
           public static func iPhone15ProMax(_ orientation: ViewImageConfig.Orientation) -> UITraitCollection {
             let base: [UITraitCollection] = [
-              .init(forceTouchCapability: .available),
+              .init(forceTouchCapability: .unavailable),
               .init(layoutDirection: .leftToRight),
               .init(preferredContentSizeCategory: .medium),
               .init(userInterfaceIdiom: .phone)
