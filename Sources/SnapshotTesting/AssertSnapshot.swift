@@ -376,7 +376,7 @@ private class CleanCounterBetweenTestCases: NSObject, XCTestObservation {
     if Thread.isMainThread {
       doRegisterIfNeeded()
     } else {
-      DispatchQueue.main.sync { 
+      DispatchQueue.main.sync {
         doRegisterIfNeeded()
       }
     }

@@ -489,7 +489,7 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
           if snapshot.wasRecording || functionCallExpr.trailingClosure == nil {
             functionCallExpr.rightParen?.trailingTrivia = .space
             if let snapshotClosure {
-              functionCallExpr.trailingClosure = snapshotClosure // FIXME: ?? multipleTrailingClosures.removeFirst()
+              functionCallExpr.trailingClosure = snapshotClosure  // FIXME: ?? multipleTrailingClosures.removeFirst()
             } else if !functionCallExpr.additionalTrailingClosures.isEmpty {
               let additionalTrailingClosure = functionCallExpr.additionalTrailingClosures.remove(
                 at: functionCallExpr.additionalTrailingClosures.startIndex
