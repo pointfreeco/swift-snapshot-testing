@@ -212,7 +212,7 @@ targets: [
   - **Custom diff tool integration**. Configure failure messages to print diff commands for
     [Kaleidoscope](https://kaleidoscope.app) or your diff tool of choice.
     ``` swift
-    SnapshotTesting.diffToolBuilder = { "ksdiff \($0) \($1)" }
+    SnapshotTesting.diffToolCommand = { "ksdiff \($0) \($1)" }
     ```
 
 [available-strategies]: https://swiftpackageindex.com/pointfreeco/swift-snapshot-testing/main/documentation/snapshottesting/snapshotting
