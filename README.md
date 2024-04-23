@@ -258,6 +258,9 @@ targets: [
   - [SnapshotTestingHEIC](https://github.com/alexey1312/SnapshotTestingHEIC) adds image support
   using the HEIC storage format which reduces file sizes in comparison to PNG.
 
+  - [SnapshotVision](https://github.com/gregersson/swift-snapshot-testing-vision) adds snapshot
+    strategy for text recognition on views and images. Uses Apples Vision framework.
+
 Have you written your own SnapshotTesting plug-in?
 [Add it here](https://github.com/pointfreeco/swift-snapshot-testing/edit/master/README.md) and
 submit a pull request!
