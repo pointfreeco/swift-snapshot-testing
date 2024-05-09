@@ -1,4 +1,4 @@
-#if os(iOS) || os(tvOS)
+#if os(iOS) || os(tvOS) || os(visionOS)
   import UIKit
   import XCTest
 
@@ -24,7 +24,11 @@
       if let scale = scale, scale != 0.0 {
         imageScale = scale
       } else {
-        imageScale = UIScreen.main.scale
+        #if os(visionOS)
+          imageScale = UITraitCollection.current.displayScale
+        #else
+          imageScale = UIScreen.main.scale
+        #endif
       }
 
       return Diffing(
@@ -130,7 +134,7 @@
     if precision >= 1, perceptualPrecision >= 1 {
       return "Newly-taken snapshot does not match reference."
     }
-    if perceptualPrecision < 1, #available(iOS 11.0, tvOS 11.0, *) {
+    if perceptualPrecision < 1, #available(iOS 11.0, tvOS 11.0, visionOS 1.0, *) {
       return perceptuallyCompare(
         CIImage(cgImage: oldCgImage),
         CIImage(cgImage: newCgImage),
@@ -191,12 +195,12 @@
   }
 #endif
 
-#if os(iOS) || os(tvOS) || os(macOS)
+#if os(iOS) || os(tvOS) || os(macOS) || os(visionOS)
   import Accelerate.vImage
   import CoreImage.CIKernel
   import MetalPerformanceShaders
 
-  @available(iOS 10.0, tvOS 10.0, macOS 10.13, *)
+  @available(iOS 10.0, tvOS 10.0, macOS 10.13, visionOS 1.0, *)
   func perceptuallyCompare(
     _ old: CIImage, _ new: CIImage, pixelPrecision: Float, perceptualPrecision: Float
   ) -> String? {
@@ -328,7 +332,7 @@
   }
 
   // Copied from https://developer.apple.com/documentation/coreimage/ciimageprocessorkernel
-  @available(iOS 10.0, tvOS 10.0, macOS 10.13, *)
+  @available(iOS 10.0, tvOS 10.0, macOS 10.13, visionOS 1.0, *)
   final class ThresholdImageProcessorKernel: CIImageProcessorKernel {
     static let inputThresholdKey = "thresholdValue"
     static let device = MTLCreateSystemDefaultDevice()
@@ -338,7 +342,7 @@
         return false
       }
       #if targetEnvironment(simulator)
-        guard #available(iOS 14.0, tvOS 14.0, *) else {
+        guard #available(iOS 14.0, tvOS 14.0, visionOS 1.0, *) else {
           // The MPSSupportsMTLDevice method throws an exception on iOS/tvOS simulators < 14.0
           return false
         }

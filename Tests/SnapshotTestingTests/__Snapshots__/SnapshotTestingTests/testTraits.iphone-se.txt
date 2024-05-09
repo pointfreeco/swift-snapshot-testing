@@ -1,5 +1,5 @@
-<UIView; frame = (0 0; 320 568); autoresize = W+H; layer = <CALayer>>
-   | <UILabel; frame = (133.667 20; 52.6667 19.3333); text = 'What's'; userInteractionEnabled = NO; layer = <_UILabelLayer>>
-   | <UILabel; frame = (0 284.333; 23.6667 19.3333); text = 'the'; userInteractionEnabled = NO; layer = <_UILabelLayer>>
-   | <UILabel; frame = (283 284.333; 37 19.3333); text = 'point'; userInteractionEnabled = NO; layer = <_UILabelLayer>>
-   | <UILabel; frame = (156.333 551; 7.33333 17); text = '?'; userInteractionEnabled = NO; layer = <_UILabelLayer>>
+<UIView; frame = (0 0; 320 568); autoresize = W+H; backgroundColor = UIExtendedGrayColorSpace 1 1; layer = <CALayer>>
+   | <UILabel; frame = (133.333 20; 53.6667 19.3333); text = 'What's'; userInteractionEnabled = NO; backgroundColor = UIExtendedGrayColorSpace 0 0; layer = <_UILabelLayer>>
+   | <UILabel; frame = (0 284.333; 23.6667 19.3333); text = 'the'; userInteractionEnabled = NO; backgroundColor = UIExtendedGrayColorSpace 0 0; layer = <_UILabelLayer>>
+   | <UILabel; frame = (283 284.333; 37 19.3333); text = 'point'; userInteractionEnabled = NO; backgroundColor = UIExtendedGrayColorSpace 0 0; layer = <_UILabelLayer>>
+   | <UILabel; frame = (156.333 551; 7.33333 17); text = '?'; userInteractionEnabled = NO; backgroundColor = UIExtendedGrayColorSpace 0 0; layer = <_UILabelLayer>>
