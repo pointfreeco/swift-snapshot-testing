@@ -16,7 +16,7 @@ extension Snapshotting where Value: Encodable, Format == String {
   ///   "name" : "Blobby"
   /// }
   /// ```
-  @available(iOS 11.0, macOS 10.13, tvOS 11.0, watchOS 4.0, *)
+  @available(iOS 11.0, macOS 10.13, tvOS 11.0, watchOS 4.0, visionOS 1.0, *)
   public static var json: Snapshotting {
     let encoder = JSONEncoder()
     encoder.outputFormatting = [.prettyPrinted, .sortedKeys]

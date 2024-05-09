@@ -203,8 +203,7 @@ targets: [
     collections from a single simulator.
   - **First-class Xcode support.** Image differences are captured as XCTest attachments. Text
     differences are rendered in inline error messages.
-  - **Supports any platform that supports Swift.** Write snapshot tests for iOS, Linux, macOS, and
-    tvOS.
+  - **Supports any platform that supports Swift.** Write snapshot tests for iOS, Linux, macOS, tvOS and visionOS.
   - **SceneKit, SpriteKit, and WebKit support.** Most snapshot testing libraries don't support these
     view subclasses.
   - **`Codable` support**. Snapshot encodable data structures into their JSON and property list
