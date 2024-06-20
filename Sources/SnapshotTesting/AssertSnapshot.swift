@@ -151,7 +151,7 @@ public func assertSnapshots<Value, Format>(
 ///
 ///     let snapshotDirectory = ProcessInfo.processInfo.environment["SNAPSHOT_REFERENCE_DIR"]! + "/" + #file
 ///     let failure = verifySnapshot(
-///       of: value,
+///       of: try value(),
 ///       as: snapshotting,
 ///       named: name,
 ///       record: recording,
