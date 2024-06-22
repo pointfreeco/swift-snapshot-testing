@@ -371,15 +371,21 @@ func sanitizePathComponent(_ string: String) -> String {
 // We need to clean counter between tests executions in order to support test-iterations.
 private class CleanCounterBetweenTestCases: NSObject, XCTestObservation {
   private static var registered = false
-  private static var registerQueue = DispatchQueue(
-    label: "co.pointfree.SnapshotTesting.testObserver")
 
   static func registerIfNeeded() {
-    registerQueue.sync {
-      if !registered {
-        registered = true
-        XCTestObservationCenter.shared.addTestObserver(CleanCounterBetweenTestCases())
+    if Thread.isMainThread {
+      doRegisterIfNeeded()
+    } else {
+      DispatchQueue.main.sync {
+        doRegisterIfNeeded()
       }
+    }
+  }
+
+  private static func doRegisterIfNeeded() {
+    if !registered {
+      registered = true
+      XCTestObservationCenter.shared.addTestObserver(CleanCounterBetweenTestCases())
     }
   }
 

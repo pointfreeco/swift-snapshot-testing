@@ -43,10 +43,10 @@ jobs:
     strategy:
       matrix:
         swift:
-          - "5.8"
+          - "5.9.1"
 
     name: Windows (Swift ${{ matrix.swift }})
-    runs-on: windows-2019
+    runs-on: windows-latest
 
     steps:
       - uses: compnerd/gha-setup-swift@main
@@ -59,6 +59,6 @@ jobs:
           git config --global core.autocrlf false
           git config --global core.eol lf
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: swift build
       - run: swift test
