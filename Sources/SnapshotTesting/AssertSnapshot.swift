@@ -8,6 +8,14 @@ import XCTest
 /// ```
 public var diffTool: String? = nil
 
+/// Enhances failure messages with a command line diff tool expression that can be copied and pasted
+/// into a terminal.
+///
+/// ```swift
+/// diffMessageConverter = { "magick compare \($0) \($1) diff.png ; open diff.png" }
+/// ```
+public var diffMessageConverter: (String, String) -> String? = { _,_ in  nil }
+
 /// Whether or not to record all new references.
 public var isRecording = false
 
@@ -326,6 +334,7 @@ public func verifySnapshot<Value, Format>(
     let diffMessage =
       diffTool
       .map { "\($0) \"\(snapshotFileUrl.path)\" \"\(failedSnapshotFileUrl.path)\"" }
+        ?? diffMessageConverter(snapshotFileUrl.path, failedSnapshotFileUrl.path)
         ?? """
         @\(minus)
         "\(snapshotFileUrl.absoluteString)"
@@ -333,8 +342,9 @@ public func verifySnapshot<Value, Format>(
         "\(failedSnapshotFileUrl.absoluteString)"
 
         To configure output for a custom diff tool, like Kaleidoscope:
-
             SnapshotTesting.diffTool = "ksdiff"
+        or ImageMagick:
+            SnapshotTesting.diffMessageConverter = { "magick compare \\"\\($0)\\" \\"\\($1)\\" diff.png ; open diff.png" }
         """
 
     let failureMessage: String
