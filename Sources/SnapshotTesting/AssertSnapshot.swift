@@ -9,7 +9,16 @@ import XCTest
 public var diffTool: String? = nil
 
 /// Whether or not to record all new references.
-public var isRecording = false
+public var isRecording: Bool = {
+  let args = ProcessInfo.processInfo.arguments
+  if let index = args.firstIndex(of: "-co.pointfree.SnapshotTesting.IsRecording"),
+      index < args.count - 1,
+      args[index + 1] == "1"
+  {
+    return true
+  }
+  return false
+}()
 
 /// Whether or not to record all new references.
 ///
