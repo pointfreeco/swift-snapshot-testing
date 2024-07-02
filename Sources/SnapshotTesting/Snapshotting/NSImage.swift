@@ -108,8 +108,8 @@
     }
     if perceptualPrecision < 1, #available(macOS 10.13, *) {
       return perceptuallyCompare(
-        CIImage(cgImage: oldCgImage),
-        CIImage(cgImage: newCgImage),
+        CIImage(cgImage: oldContext.makeImage() ?? oldCgImage),
+        CIImage(cgImage: newerContext.makeImage() ?? newerCgImage),
         pixelPrecision: precision,
         perceptualPrecision: perceptualPrecision
       )
@@ -139,7 +139,7 @@
 
   private func context(for cgImage: CGImage) -> CGContext? {
     guard
-      let space = cgImage.colorSpace,
+      let space = CGColorSpace(name: CGColorSpace.sRGB) ?? cgImage.colorSpace,
       let context = CGContext(
         data: nil,
         width: cgImage.width,
