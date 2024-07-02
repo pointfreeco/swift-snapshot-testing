@@ -301,10 +301,13 @@ public func verifySnapshot<Value, Format>(
       return nil
     }
 
-    let artifactsUrl = URL(
-      fileURLWithPath: ProcessInfo.processInfo.environment["SNAPSHOT_ARTIFACTS"]
-        ?? NSTemporaryDirectory(), isDirectory: true
-    )
+    let artifactsDirectory: String
+    if let value = ProcessInfo.processInfo.environment["SNAPSHOT_ARTIFACTS"], !value.isEmpty {
+      artifactsDirectory = value
+    } else {
+      artifactsDirectory = NSTemporaryDirectory()
+    }
+    let artifactsUrl = URL(fileURLWithPath: artifactsDirectory, isDirectory: true)
     let artifactsSubUrl = artifactsUrl.appendingPathComponent(fileName)
     try fileManager.createDirectory(at: artifactsSubUrl, withIntermediateDirectories: true)
     let failedSnapshotFileUrl = artifactsSubUrl.appendingPathComponent(
