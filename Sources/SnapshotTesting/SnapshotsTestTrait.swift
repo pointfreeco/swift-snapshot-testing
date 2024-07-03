@@ -4,8 +4,8 @@
   @_spi(Experimental)
   extension TestTrait where Self == _SnapshotsTestTrait {
     public static func snapshots(
-      diffTool: SnapshotTestingConfiguration.DiffTool? = nil,
-      record: SnapshotTestingConfiguration.Record? = nil
+      diffTool: SnapshotTestingConfiguration.DiffTool = .default,
+      record: SnapshotTestingConfiguration.Record = .ifMissing
     ) -> Self {
       _SnapshotsTestTrait(
         configuration: SnapshotTestingConfiguration(

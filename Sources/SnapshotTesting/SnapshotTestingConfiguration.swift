@@ -4,7 +4,10 @@ public func withSnapshotTesting<R>(
   operation: () async throws -> R
 ) async rethrows -> R {
   try await SnapshotTestingConfiguration.$current.withValue(
-    SnapshotTestingConfiguration(diffTool: diffTool, record: record)
+    SnapshotTestingConfiguration(
+      diffTool: diffTool ?? SnapshotTestingConfiguration.current.diffTool,
+      record: record ?? SnapshotTestingConfiguration.current.record
+    )
   ) {
     try await operation()
   }
@@ -16,7 +19,10 @@ public func withSnapshotTesting<R>(
   operation: () throws -> R
 ) rethrows -> R {
   try SnapshotTestingConfiguration.$current.withValue(
-    SnapshotTestingConfiguration(diffTool: diffTool, record: record)
+    SnapshotTestingConfiguration(
+      diffTool: diffTool ?? SnapshotTestingConfiguration.current.diffTool,
+      record: record ?? SnapshotTestingConfiguration.current.record
+    )
   ) {
     try operation()
   }
@@ -24,14 +30,17 @@ public func withSnapshotTesting<R>(
 
 public struct SnapshotTestingConfiguration: Sendable {
   @_spi(Internals)
-  @TaskLocal public static var current = Self()
+  @TaskLocal public static var current = Self(
+    diffTool: .default,
+    record: .ifMissing
+  )
 
-  public var diffTool: DiffTool?
-  public var record: Record?
+  public var diffTool: DiffTool
+  public var record: Record
 
   public init(
-    diffTool: DiffTool? = nil,
-    record: Record? = nil
+    diffTool: DiffTool,
+    record: Record
   ) {
     self.diffTool = diffTool
     self.record = record
@@ -55,6 +64,18 @@ public struct SnapshotTestingConfiguration: Sendable {
     }
     public static let ksdiff = Self {
       "ksdiff \($0) \($1)"
+    }
+    public static let `default` = Self {
+      """
+      @\(minus)
+      "file://\($0)"
+      @\(plus)
+      "file://\($1)"
+
+      To configure output for a custom diff tool, like Kaleidoscope:
+
+          SnapshotTesting.diffTool = "ksdiff"
+      """
     }
     public func callAsFunction(currentFilePath: String, failedFilePath: String) -> String {
       self.tool(currentFilePath, failedFilePath)

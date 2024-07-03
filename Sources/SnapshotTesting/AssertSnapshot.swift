@@ -242,7 +242,7 @@ public func verifySnapshot<Value, Format>(
     record: (recording == true ? .always : recording == false ? .ifMissing : nil)
       ?? SnapshotTestingConfiguration.current.record
       ?? _record
-  ) {
+  ) { () -> String? in
     do {
       let fileUrl = URL(fileURLWithPath: "\(file)", isDirectory: false)
       let fileName = fileUrl.deletingPathExtension().lastPathComponent
@@ -302,6 +302,29 @@ public func verifySnapshot<Value, Format>(
       guard var diffable = optionalDiffable else {
         return "Couldn't snapshot value"
       }
+
+
+      switch (fileManager.fileExists(atPath: snapshotFileUrl.path), SnapshotTestingConfiguration.current.record) {
+
+      case (true, .always):
+        // record snapshot and show diff of recorded file
+        break
+
+      case (false, .always), (false, .ifMissing):
+        // record new snapshot
+        break
+
+      case (true, .never), (true, .ifMissing):
+        // assert
+        break
+
+      case (false, .never):
+        // No reference found
+        break
+
+      }
+
+
 
       guard
         SnapshotTestingConfiguration.current.record == .never,
@@ -373,20 +396,11 @@ public func verifySnapshot<Value, Format>(
         #endif
       }
 
-      let diffMessage =
-        SnapshotTestingConfiguration.current.diffTool.map { tool in
-          tool(currentFilePath: snapshotFileUrl.path, failedFilePath: failedSnapshotFileUrl.path)
-        }
-        ?? """
-        @\(minus)
-        "\(snapshotFileUrl.absoluteString)"
-        @\(plus)
-        "\(failedSnapshotFileUrl.absoluteString)"
-
-        To configure output for a custom diff tool, like Kaleidoscope:
-
-            SnapshotTesting.diffTool = "ksdiff"
-        """
+      // TODO: maybe pass URLs to diffTool so that we can do absolute path for default 
+      let diffMessage = SnapshotTestingConfiguration.current.diffTool(
+        currentFilePath: snapshotFileUrl.path,
+        failedFilePath: failedSnapshotFileUrl.path
+      )
 
       let failureMessage: String
       if let name = name {
