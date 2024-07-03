@@ -92,3 +92,8 @@ extension SnapshotTestingConfiguration.Record: ExpressibleByBooleanLiteral {
     self = value ? .always : .ifMissing
   }
 }
+//extension Bool {
+//  var recordMode: SnapshotTestingConfiguration.Record {
+//    self ? .always : .never
+//  }
+//}

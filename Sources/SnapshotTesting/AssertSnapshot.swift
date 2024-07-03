@@ -84,7 +84,7 @@ public func assertSnapshot<Value, Format>(
   of value: @autoclosure () throws -> Value,
   as snapshotting: Snapshotting<Value, Format>,
   named name: String? = nil,
-  record recording: SnapshotTestingConfiguration.Record? = nil,
+  record recording: Bool? = nil,
   timeout: TimeInterval = 5,
   file: StaticString = #file,
   testName: String = #function,
@@ -94,7 +94,7 @@ public func assertSnapshot<Value, Format>(
     of: try value(),
     as: snapshotting,
     named: name,
-    record: recording,
+    record: isRecording,
     timeout: timeout,
     file: file,
     testName: testName,
@@ -121,7 +121,7 @@ public func assertSnapshot<Value, Format>(
 public func assertSnapshots<Value, Format>(
   of value: @autoclosure () throws -> Value,
   as strategies: [String: Snapshotting<Value, Format>],
-  record recording: SnapshotTestingConfiguration.Record? = nil,
+  record recording: Bool? = nil,
   timeout: TimeInterval = 5,
   file: StaticString = #file,
   testName: String = #function,
@@ -132,7 +132,7 @@ public func assertSnapshots<Value, Format>(
       of: try value(),
       as: strategy,
       named: name,
-      record: recording,
+      record: isRecording,
       timeout: timeout,
       file: file,
       testName: testName,
@@ -157,7 +157,7 @@ public func assertSnapshots<Value, Format>(
 public func assertSnapshots<Value, Format>(
   of value: @autoclosure () throws -> Value,
   as strategies: [Snapshotting<Value, Format>],
-  record recording: SnapshotTestingConfiguration.Record? = nil,
+  record recording: Bool? = nil,
   timeout: TimeInterval = 5,
   file: StaticString = #file,
   testName: String = #function,
@@ -231,14 +231,18 @@ public func verifySnapshot<Value, Format>(
   of value: @autoclosure () throws -> Value,
   as snapshotting: Snapshotting<Value, Format>,
   named name: String? = nil,
-  record recording: SnapshotTestingConfiguration.Record? = nil,
+  record recording: Bool? = nil,
   snapshotDirectory: String? = nil,
   timeout: TimeInterval = 5,
   file: StaticString = #file,
   testName: String = #function,
   line: UInt = #line
 ) -> String? {
-  withSnapshotTesting(record: recording ?? _record) { () -> String? in
+  withSnapshotTesting(
+    record: (recording == true ? .always : recording == false ? .ifMissing : nil)
+      ?? SnapshotTestingConfiguration.current.record
+      ?? _record
+  ) {
     do {
       let fileUrl = URL(fileURLWithPath: "\(file)", isDirectory: false)
       let fileName = fileUrl.deletingPathExtension().lastPathComponent
