@@ -5,8 +5,8 @@ public func withSnapshotTesting<R>(
 ) async rethrows -> R {
   try await SnapshotTestingConfiguration.$current.withValue(
     SnapshotTestingConfiguration(
-      diffTool: diffTool ?? SnapshotTestingConfiguration.current.diffTool,
-      record: record ?? SnapshotTestingConfiguration.current.record
+      diffTool: diffTool ?? SnapshotTestingConfiguration.current?.diffTool ?? _diffTool,
+      record: record ?? SnapshotTestingConfiguration.current?.record ?? _record
     )
   ) {
     try await operation()
@@ -20,8 +20,8 @@ public func withSnapshotTesting<R>(
 ) rethrows -> R {
   try SnapshotTestingConfiguration.$current.withValue(
     SnapshotTestingConfiguration(
-      diffTool: diffTool ?? SnapshotTestingConfiguration.current.diffTool,
-      record: record ?? SnapshotTestingConfiguration.current.record
+      diffTool: diffTool ?? SnapshotTestingConfiguration.current?.diffTool ?? SnapshotTesting._diffTool,
+      record: record ?? SnapshotTestingConfiguration.current?.record ?? _record
     )
   ) {
     try operation()
@@ -30,11 +30,8 @@ public func withSnapshotTesting<R>(
 
 public struct SnapshotTestingConfiguration: Sendable {
   @_spi(Internals)
-  @TaskLocal public static var current = Self(
-    diffTool: .default,
-    record: .ifMissing
-  )
-
+  @TaskLocal public static var current: Self?
+  
   public var diffTool: DiffTool
   public var record: Record
 
@@ -47,9 +44,9 @@ public struct SnapshotTestingConfiguration: Sendable {
   }
 
   public enum Record: String, Sendable {
-    case always
-    case ifMissing
-    case never
+    case all
+    case missing
+    case none
   }
 
   public struct DiffTool: Sendable, ExpressibleByStringLiteral {
@@ -110,11 +107,36 @@ public struct SnapshotTestingConfiguration: Sendable {
 )
 extension SnapshotTestingConfiguration.Record: ExpressibleByBooleanLiteral {
   public init(booleanLiteral value: BooleanLiteralType) {
-    self = value ? .always : .ifMissing
+    self = value ? .all : .missing
   }
 }
-//extension Bool {
-//  var recordMode: SnapshotTestingConfiguration.Record {
-//    self ? .always : .never
-//  }
-//}
+@available(
+  iOS,
+  deprecated: 9999,
+  message: "Use 'SnapshotTestingConfiguration.Diff.default' instead of a 'nil' value for 'diffTool'."
+)
+@available(
+  macOS,
+  deprecated: 1,
+  message: "Use 'SnapshotTestingConfiguration.Diff.default' instead of a 'nil' value for 'diffTool'."
+)
+@available(
+  tvOS,
+  deprecated: 9999,
+  message: "Use 'SnapshotTestingConfiguration.Diff.default' instead of a 'nil' value for 'diffTool'."
+)
+@available(
+  watchOS,
+  deprecated: 9999,
+  message: "Use 'SnapshotTestingConfiguration.Diff.default' instead of a 'nil' value for 'diffTool'."
+)
+@available(
+  visionOS,
+  deprecated: 9999,
+  message: "Use 'SnapshotTestingConfiguration.Diff.default' instead of a 'nil' value for 'diffTool'."
+)
+extension SnapshotTestingConfiguration.DiffTool: ExpressibleByNilLiteral {
+  public init(nilLiteral: ()) {
+    self = .default
+  }
+}

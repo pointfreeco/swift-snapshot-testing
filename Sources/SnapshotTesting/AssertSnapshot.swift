@@ -15,7 +15,11 @@ import XCTest
 @available(
   visionOS, deprecated: 9999, message: "Use 'withSnapshotTesting' to customize the diff tool."
 )
-public var diffTool: SnapshotTestingConfiguration.DiffTool? = nil
+public var diffTool: SnapshotTestingConfiguration.DiffTool {
+  get { _diffTool }
+  set { _diffTool = newValue }
+}
+public var _diffTool: SnapshotTestingConfiguration.DiffTool = .default
 
 /// Whether or not to record all new references.
 @available(
@@ -33,38 +37,29 @@ public var diffTool: SnapshotTestingConfiguration.DiffTool? = nil
 )
 public var isRecording: Bool {
   get {
-    switch SnapshotTestingConfiguration.current.record ?? _record {
-    case .always:
+    switch SnapshotTestingConfiguration.current?.record ?? _record {
+    case .all:
       return true
-    case .ifMissing:
+    case .missing:
       return false
-    case .never:
+    case .none:
       return false
     }
   }
   set {
-    _record = newValue ? .always : .ifMissing
+    _record = newValue ? .all : .missing
   }
 }
 
-var _record: SnapshotTestingConfiguration.Record = {
-  if
-    let value = ProcessInfo.processInfo.environment["SNAPSHOT_TESTING_RECORD"],
+@_spi(Internals)
+public var _record: SnapshotTestingConfiguration.Record = {
+  if let value = ProcessInfo.processInfo.environment["SNAPSHOT_TESTING_RECORD"],
     let record = SnapshotTestingConfiguration.Record(rawValue: value)
   {
     return record
   }
-  return .ifMissing
+  return .missing
 }()
-
-/// Whether or not to record all new references.
-///
-/// Due to a name clash in Xcode 12, this has been renamed to `isRecording`.
-@available(*, deprecated, renamed: "isRecording")
-public var record: Bool {
-  get { isRecording }
-  set { isRecording = newValue }
-}
 
 /// Asserts that a given value matches a reference on disk.
 ///
@@ -101,7 +96,7 @@ public func assertSnapshot<Value, Format>(
     line: line
   )
   guard let message = failure else { return }
-  XCTFail(message, file: file, line: line)
+  recordIssue(message, file: file, line: line)
 }
 
 /// Asserts that a given value matches references on disk.
@@ -238,11 +233,11 @@ public func verifySnapshot<Value, Format>(
   testName: String = #function,
   line: UInt = #line
 ) -> String? {
-  withSnapshotTesting(
-    record: (recording == true ? .always : recording == false ? .ifMissing : nil)
-      ?? SnapshotTestingConfiguration.current.record
-      ?? _record
-  ) { () -> String? in
+  let record =
+    (recording == true ? .all : recording == false ? .missing : nil)
+    ?? SnapshotTestingConfiguration.current?.record
+    ?? _record
+  return withSnapshotTesting(record: record) { () -> String? in
     do {
       let fileUrl = URL(fileURLWithPath: "\(file)", isDirectory: false)
       let fileName = fileUrl.deletingPathExtension().lastPathComponent
@@ -303,32 +298,12 @@ public func verifySnapshot<Value, Format>(
         return "Couldn't snapshot value"
       }
 
-
-      switch (fileManager.fileExists(atPath: snapshotFileUrl.path), SnapshotTestingConfiguration.current.record) {
-
-      case (true, .always):
-        // record snapshot and show diff of recorded file
-        break
-
-      case (false, .always), (false, .ifMissing):
-        // record new snapshot
-        break
-
-      case (true, .never), (true, .ifMissing):
-        // assert
-        break
-
-      case (false, .never):
-        // No reference found
-        break
-
-      }
-
-
-
       guard
-        SnapshotTestingConfiguration.current.record == .never,
-        fileManager.fileExists(atPath: snapshotFileUrl.path)
+        record != .all,
+        record != .missing
+          || fileManager.fileExists(
+            atPath: snapshotFileUrl.path
+          )
       else {
         try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)
         #if !os(Linux) && !os(Windows)
@@ -340,7 +315,7 @@ public func verifySnapshot<Value, Format>(
           }
         #endif
 
-        return SnapshotTestingConfiguration.current.record == .always
+        return SnapshotTestingConfiguration.current?.record == .all
           ? """
           Record mode is on. Automatically recorded snapshot: …
 
@@ -396,8 +371,8 @@ public func verifySnapshot<Value, Format>(
         #endif
       }
 
-      // TODO: maybe pass URLs to diffTool so that we can do absolute path for default 
-      let diffMessage = SnapshotTestingConfiguration.current.diffTool(
+      // TODO: maybe pass URLs to diffTool so that we can do absolute path for default
+      let diffMessage = (SnapshotTestingConfiguration.current?.diffTool ?? _diffTool)(
         currentFilePath: snapshotFileUrl.path,
         failedFilePath: failedSnapshotFileUrl.path
       )

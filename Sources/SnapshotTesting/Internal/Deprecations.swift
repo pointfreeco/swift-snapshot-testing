@@ -30,7 +30,7 @@ public func _assertInlineSnapshot<Value>(
     line: line
   )
   guard let message = failure else { return }
-  XCTFail(message, file: file, line: line)
+  recordIssue(message, file: file, line: line)
 }
 
 @available(

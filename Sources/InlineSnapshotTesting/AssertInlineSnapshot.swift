@@ -1,7 +1,7 @@
 import Foundation
 
 #if canImport(SwiftSyntax509)
-  import SnapshotTesting
+  @_spi(Internals) import SnapshotTesting
   import SwiftParser
   import SwiftSyntax
   import SwiftSyntaxBuilder
@@ -35,7 +35,7 @@ import Foundation
     of value: @autoclosure () throws -> Value?,
     as snapshotting: Snapshotting<Value, String>,
     message: @autoclosure () -> String = "",
-    record isRecording: Bool = isRecording,
+    record isRecording: Bool? = nil,
     timeout: TimeInterval = 5,
     syntaxDescriptor: InlineSnapshotSyntaxDescriptor = InlineSnapshotSyntaxDescriptor(),
     matches expected: (() -> String)? = nil,
@@ -44,20 +44,24 @@ import Foundation
     line: UInt = #line,
     column: UInt = #column
   ) {
-    let _: Void = installTestObserver
-    do {
-      var actual: String?
-      let expectation = XCTestExpectation()
-      if let value = try value() {
-        snapshotting.snapshot(value).run {
-          actual = $0
-          expectation.fulfill()
-        }
-        switch XCTWaiter.wait(for: [expectation], timeout: timeout) {
-        case .completed:
-          break
-        case .timedOut:
-          XCTFail(
+    let record = (isRecording == true ? .all : isRecording == false ? .missing : nil)
+    ?? SnapshotTestingConfiguration.current?.record
+    ?? _record
+    withSnapshotTesting(record: record) {
+      let _: Void = installTestObserver
+      do {
+        var actual: String?
+        let expectation = XCTestExpectation()
+        if let value = try value() {
+          snapshotting.snapshot(value).run {
+            actual = $0
+            expectation.fulfill()
+          }
+          switch XCTWaiter.wait(for: [expectation], timeout: timeout) {
+          case .completed:
+            break
+          case .timedOut:
+            recordIssue(
             """
             Exceeded timeout of \(timeout) seconds waiting for snapshot.
 
@@ -67,46 +71,48 @@ import Foundation
             """,
             file: file,
             line: line
-          )
-          return
-        case .incorrectOrder, .interrupted, .invertedFulfillment:
-          XCTFail("Couldn't snapshot value", file: file, line: line)
-          return
-        @unknown default:
-          XCTFail("Couldn't snapshot value", file: file, line: line)
-          return
+            )
+            return
+          case .incorrectOrder, .interrupted, .invertedFulfillment:
+            recordIssue("Couldn't snapshot value", file: file, line: line)
+            return
+          @unknown default:
+            recordIssue("Couldn't snapshot value", file: file, line: line)
+            return
+          }
         }
-      }
-      let expected = expected?()
-      guard !isRecording, let expected
-      else {
-        // NB: Write snapshot state before calling `XCTFail` in case `continueAfterFailure = false`
-        inlineSnapshotState[File(path: file), default: []].append(
-          InlineSnapshot(
-            expected: expected,
-            actual: actual,
-            wasRecording: isRecording,
-            syntaxDescriptor: syntaxDescriptor,
-            function: "\(function)",
-            line: line,
-            column: column
+        let expected = expected?()
+        guard
+          record != .all,
+          record != .missing || expected != nil
+        else {
+          // NB: Write snapshot state before calling `XCTFail` in case `continueAfterFailure = false`
+          inlineSnapshotState[File(path: file), default: []].append(
+            InlineSnapshot(
+              expected: expected,
+              actual: actual,
+              wasRecording: record == .all,
+              syntaxDescriptor: syntaxDescriptor,
+              function: "\(function)",
+              line: line,
+              column: column
+            )
           )
-        )
 
-        var failure: String
-        if syntaxDescriptor.trailingClosureLabel
-          == InlineSnapshotSyntaxDescriptor.defaultTrailingClosureLabel
-        {
-          failure = "Automatically recorded a new snapshot."
-        } else {
-          failure = """
+          var failure: String
+          if syntaxDescriptor.trailingClosureLabel
+              == InlineSnapshotSyntaxDescriptor.defaultTrailingClosureLabel
+          {
+            failure = "Automatically recorded a new snapshot."
+          } else {
+            failure = """
             Automatically recorded a new snapshot for "\(syntaxDescriptor.trailingClosureLabel)".
             """
-        }
-        if let difference = snapshotting.diffing.diff(expected ?? "", actual ?? "")?.0 {
-          failure += " Difference: …\n\n\(difference.indenting(by: 2))"
-        }
-        XCTFail(
+          }
+          if let difference = snapshotting.diffing.diff(expected ?? "", actual ?? "")?.0 {
+            failure += " Difference: …\n\n\(difference.indenting(by: 2))"
+          }
+          recordIssue(
           """
           \(failure)
 
@@ -114,14 +120,26 @@ import Foundation
           """,
           file: file,
           line: line
-        )
-        return
-      }
-      guard let difference = snapshotting.diffing.diff(expected, actual ?? "")?.0
-      else { return }
+          )
+          return
+        }
 
-      let message = message()
-      syntaxDescriptor.fail(
+        guard let expected
+        else {
+          recordIssue("""
+            TODO: No expected value to assert against.
+            """,
+            file: file,
+            line: line
+          )
+          return
+        }
+        guard
+          let difference = snapshotting.diffing.diff(expected, actual ?? "")?.0
+        else { return }
+
+        let message = message()
+        syntaxDescriptor.fail(
         """
         \(message.isEmpty ? "Snapshot did not match. Difference: …" : message)
 
@@ -130,9 +148,10 @@ import Foundation
         file: file,
         line: line,
         column: column
-      )
-    } catch {
-      XCTFail("Threw error: \(error)", file: file, line: line)
+        )
+      } catch {
+        recordIssue("Threw error: \(error)", file: file, line: line)
+      }
     }
   }
 #else
@@ -242,7 +261,7 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
         visitor.walk(testSource.sourceFile)
         trailingClosureLine = visitor.trailingClosureLine
       }
-      XCTFail(
+      recordIssue(
         message(),
         file: file,
         line: trailingClosureLine.map(UInt.init) ?? line
@@ -386,7 +405,7 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
     ) {
       self.file = file
       self.line = snapshots.first?.line
-      self.wasRecording = snapshots.first?.wasRecording ?? isRecording
+      self.wasRecording = snapshots.first?.wasRecording ?? false
       self.indent = String(
         sourceLocationConverter.sourceLines
           .first { $0.first?.isWhitespace == true && $0.contains { !$0.isWhitespace } }?

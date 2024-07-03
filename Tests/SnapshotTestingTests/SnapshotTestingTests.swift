@@ -21,15 +21,13 @@ import XCTest
 #endif
 
 final class SnapshotTestingTests: XCTestCase {
-  override func setUp() {
-    super.setUp()
-    diffTool = "ksdiff"
-    // isRecording = true
-  }
-
-  override func tearDown() {
-    isRecording = false
-    super.tearDown()
+  override func invokeTest() {
+    withSnapshotTesting(
+      diffTool: .ksdiff,
+      record: .missing
+    ) {
+      super.invokeTest()
+    }
   }
 
   func testAny() {
@@ -1316,15 +1314,6 @@ final class SnapshotTestingTests: XCTestCase {
       assertSnapshot(of: view, as: .image(layout: .device(config: .tv)), named: "device")
     }
   #endif
-
-  @available(*, deprecated)
-  func testIsRecordingProxy() {
-    SnapshotTesting.record = true
-    XCTAssertEqual(isRecording, true)
-
-    SnapshotTesting.record = false
-    XCTAssertEqual(isRecording, false)
-  }
 }
 
 #if os(iOS)
