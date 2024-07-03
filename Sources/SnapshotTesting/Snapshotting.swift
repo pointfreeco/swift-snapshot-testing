@@ -20,7 +20,6 @@ public struct Snapshotting<Value, Format> {
   ///   - diffing: How to diff and convert the snapshot format to and from data.
   ///   - asyncSnapshot: An asynchronous transform function from a value into a diffable snapshot
   ///     format.
-  ///   - value: A value to be converted.
   public init(
     pathExtension: String?,
     diffing: Diffing<Format>,
@@ -37,7 +36,6 @@ public struct Snapshotting<Value, Format> {
   ///   - pathExtension: The path extension applied to references saved to disk.
   ///   - diffing: How to diff and convert the snapshot format to and from data.
   ///   - snapshot: A transform function from a value into a diffable snapshot format.
-  ///   - value: A snapshot value to be converted.
   public init(
     pathExtension: String?,
     diffing: Diffing<Format>,

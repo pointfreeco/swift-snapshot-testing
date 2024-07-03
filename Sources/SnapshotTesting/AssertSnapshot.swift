@@ -6,35 +6,17 @@ import XCTest
 /// ```swift
 /// diffTool = "ksdiff"
 /// ```
-@available(iOS, deprecated: 9999, message: "Use 'withSnapshotTesting' to customize the diff tool.")
-@available(macOS, deprecated: 1, message: "Use 'withSnapshotTesting' to customize the diff tool.")
-@available(tvOS, deprecated: 9999, message: "Use 'withSnapshotTesting' to customize the diff tool.")
-@available(
-  watchOS, deprecated: 9999, message: "Use 'withSnapshotTesting' to customize the diff tool."
-)
-@available(
-  visionOS, deprecated: 9999, message: "Use 'withSnapshotTesting' to customize the diff tool."
-)
+@available(*, deprecated, message: "Use 'withSnapshotTesting' to customize the diff tool.")
 public var diffTool: SnapshotTestingConfiguration.DiffTool {
   get { _diffTool }
   set { _diffTool = newValue }
 }
+
+@_spi(Internals)
 public var _diffTool: SnapshotTestingConfiguration.DiffTool = .default
 
 /// Whether or not to record all new references.
-@available(
-  iOS, deprecated: 9999, message: "Use 'withSnapshotTesting' to customize the record mode."
-)
-@available(macOS, deprecated: 1, message: "Use 'withSnapshotTesting' to customize the record mode.")
-@available(
-  tvOS, deprecated: 9999, message: "Use 'withSnapshotTesting' to customize the record mode."
-)
-@available(
-  watchOS, deprecated: 9999, message: "Use 'withSnapshotTesting' to customize the record mode."
-)
-@available(
-  visionOS, deprecated: 9999, message: "Use 'withSnapshotTesting' to customize the record mode."
-)
+@available(*, deprecated, message: "Use 'withSnapshotTesting' to customize the record mode.")
 public var isRecording: Bool {
   get {
     switch SnapshotTestingConfiguration.current?.record ?? _record {

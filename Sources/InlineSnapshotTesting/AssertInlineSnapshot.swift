@@ -216,6 +216,8 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
   /// Initializes an inline snapshot syntax descriptor.
   ///
   /// - Parameters:
+  ///   - deprecatedTrailingClosureLabels: An array of deprecated labels to consider for the inline
+  ///     snapshot.
   ///   - trailingClosureLabel: The label of the trailing closure that returns the inline snapshot.
   ///   - trailingClosureOffset: The offset of the trailing closure that returns the inline
   ///     snapshot, relative to the first trailing closure.

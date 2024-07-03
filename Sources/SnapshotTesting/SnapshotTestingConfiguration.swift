@@ -1,3 +1,28 @@
+/// Customizes `assertSnapshot` for the duration of an operation.
+///
+/// Use this operation to customize how the `assertSnapshot` function behaves in a test. It is most
+/// convenient to use in the context of XCTest where you can wrap `invokeTest` of an `XCTestCase`
+/// subclass so that the configuration applies to every test method.
+///
+/// > Note: To customize tests when using Swift's native Testing library, use the
+/// ``Testing/Trait/snapshots(diffTool:record:)`` trait.
+///
+/// For example, to specify to put an entire test class in record mode you do the following:
+///
+/// ```swift
+/// class StringifyTests: XCTestCase {
+///   override func invokeTest() {
+///     withSnapshotTesting(record: .all) {
+///       super.invokeTest()
+///     }
+///   }
+/// }
+/// ```
+///
+/// - Parameters:
+///   - diffTool: The difftool to use while asserting snapshots.
+///   - record: The record mode to use while asserting snapshots.
+///   - operation: The operation to perform.
 public func withSnapshotTesting<R>(
   diffTool: SnapshotTestingConfiguration.DiffTool? = nil,
   record: SnapshotTestingConfiguration.Record? = nil,
@@ -13,6 +38,9 @@ public func withSnapshotTesting<R>(
   }
 }
 
+/// Customizes `assertSnapshot` for the duration of an operation.
+///
+/// See ``withSnapshotTesting(diffTool:record:operation:)-7xmhk`` for more information.
 public func withSnapshotTesting<R>(
   diffTool: SnapshotTestingConfiguration.DiffTool? = nil,
   record: SnapshotTestingConfiguration.Record? = nil,
@@ -28,6 +56,7 @@ public func withSnapshotTesting<R>(
   }
 }
 
+/// The configuration for a snapshot test.
 public struct SnapshotTestingConfiguration: Sendable {
   @_spi(Internals)
   @TaskLocal public static var current: Self?
@@ -42,13 +71,18 @@ public struct SnapshotTestingConfiguration: Sendable {
     self.diffTool = diffTool
     self.record = record
   }
-
+  
+  /// The record mode of the snapshot test.
   public enum Record: String, Sendable {
+    /// Records all snapshots.
     case all
+    /// Records snapshots that are missing.
     case missing
+    /// Does not record any snapshots. If a snapshot is missing a test failure will be raised.
     case none
   }
-
+  
+  /// Describes the diff command used to diff two files on disk.
   public struct DiffTool: Sendable, ExpressibleByStringLiteral {
     var tool: @Sendable (String, String) -> String
     public init(
@@ -59,9 +93,11 @@ public struct SnapshotTestingConfiguration: Sendable {
     public init(stringLiteral value: StringLiteralType) {
       self.tool = { _, _ in value }
     }
+    /// The [Kaleidoscope](http://kaleidoscope.app) diff tool.
     public static let ksdiff = Self {
       "ksdiff \($0) \($1)"
     }
+    /// The default diff tool.
     public static let `default` = Self {
       """
       @\(minus)
@@ -87,7 +123,7 @@ public struct SnapshotTestingConfiguration: Sendable {
 )
 @available(
   macOS, 
-  deprecated: 1,
+  deprecated: 9999,
   message: "Use 'SnapshotTestingConfiguration.Record' instead of a boolean for the record mode."
 )
 @available(
@@ -117,7 +153,7 @@ extension SnapshotTestingConfiguration.Record: ExpressibleByBooleanLiteral {
 )
 @available(
   macOS,
-  deprecated: 1,
+  deprecated: 9999,
   message: "Use 'SnapshotTestingConfiguration.Diff.default' instead of a 'nil' value for 'diffTool'."
 )
 @available(
