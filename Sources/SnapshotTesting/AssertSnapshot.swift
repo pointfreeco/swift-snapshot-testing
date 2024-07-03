@@ -6,10 +6,56 @@ import XCTest
 /// ```swift
 /// diffTool = "ksdiff"
 /// ```
-public var diffTool: String? = nil
+@available(iOS, deprecated: 9999, message: "Use 'withSnapshotTesting' to customize the diff tool.")
+@available(macOS, deprecated: 1, message: "Use 'withSnapshotTesting' to customize the diff tool.")
+@available(tvOS, deprecated: 9999, message: "Use 'withSnapshotTesting' to customize the diff tool.")
+@available(
+  watchOS, deprecated: 9999, message: "Use 'withSnapshotTesting' to customize the diff tool."
+)
+@available(
+  visionOS, deprecated: 9999, message: "Use 'withSnapshotTesting' to customize the diff tool."
+)
+public var diffTool: SnapshotTestingConfiguration.DiffTool? = nil
 
 /// Whether or not to record all new references.
-public var isRecording = false
+@available(
+  iOS, deprecated: 9999, message: "Use 'withSnapshotTesting' to customize the record mode."
+)
+@available(macOS, deprecated: 1, message: "Use 'withSnapshotTesting' to customize the record mode.")
+@available(
+  tvOS, deprecated: 9999, message: "Use 'withSnapshotTesting' to customize the record mode."
+)
+@available(
+  watchOS, deprecated: 9999, message: "Use 'withSnapshotTesting' to customize the record mode."
+)
+@available(
+  visionOS, deprecated: 9999, message: "Use 'withSnapshotTesting' to customize the record mode."
+)
+public var isRecording: Bool {
+  get {
+    switch SnapshotTestingConfiguration.current.record ?? _record {
+    case .always:
+      return true
+    case .ifMissing:
+      return false
+    case .never:
+      return false
+    }
+  }
+  set {
+    _record = newValue ? .always : .ifMissing
+  }
+}
+
+var _record: SnapshotTestingConfiguration.Record = {
+  if
+    let value = ProcessInfo.processInfo.environment["SNAPSHOT_TESTING_RECORD"],
+    let record = SnapshotTestingConfiguration.Record(rawValue: value)
+  {
+    return record
+  }
+  return .ifMissing
+}()
 
 /// Whether or not to record all new references.
 ///
@@ -38,7 +84,7 @@ public func assertSnapshot<Value, Format>(
   of value: @autoclosure () throws -> Value,
   as snapshotting: Snapshotting<Value, Format>,
   named name: String? = nil,
-  record recording: Bool = false,
+  record recording: SnapshotTestingConfiguration.Record? = nil,
   timeout: TimeInterval = 5,
   file: StaticString = #file,
   testName: String = #function,
@@ -75,7 +121,7 @@ public func assertSnapshot<Value, Format>(
 public func assertSnapshots<Value, Format>(
   of value: @autoclosure () throws -> Value,
   as strategies: [String: Snapshotting<Value, Format>],
-  record recording: Bool = false,
+  record recording: SnapshotTestingConfiguration.Record? = nil,
   timeout: TimeInterval = 5,
   file: StaticString = #file,
   testName: String = #function,
@@ -111,7 +157,7 @@ public func assertSnapshots<Value, Format>(
 public func assertSnapshots<Value, Format>(
   of value: @autoclosure () throws -> Value,
   as strategies: [Snapshotting<Value, Format>],
-  record recording: Bool = false,
+  record recording: SnapshotTestingConfiguration.Record? = nil,
   timeout: TimeInterval = 5,
   file: StaticString = #file,
   testName: String = #function,
@@ -185,147 +231,148 @@ public func verifySnapshot<Value, Format>(
   of value: @autoclosure () throws -> Value,
   as snapshotting: Snapshotting<Value, Format>,
   named name: String? = nil,
-  record recording: Bool = false,
+  record recording: SnapshotTestingConfiguration.Record? = nil,
   snapshotDirectory: String? = nil,
   timeout: TimeInterval = 5,
   file: StaticString = #file,
   testName: String = #function,
   line: UInt = #line
 ) -> String? {
+  withSnapshotTesting(record: recording ?? _record) { () -> String? in
+    do {
+      let fileUrl = URL(fileURLWithPath: "\(file)", isDirectory: false)
+      let fileName = fileUrl.deletingPathExtension().lastPathComponent
 
-  CleanCounterBetweenTestCases.registerIfNeeded()
-  let recording = recording || isRecording
+      let snapshotDirectoryUrl =
+        snapshotDirectory.map { URL(fileURLWithPath: $0, isDirectory: true) }
+        ?? fileUrl
+        .deletingLastPathComponent()
+        .appendingPathComponent("__Snapshots__")
+        .appendingPathComponent(fileName)
 
-  do {
-    let fileUrl = URL(fileURLWithPath: "\(file)", isDirectory: false)
-    let fileName = fileUrl.deletingPathExtension().lastPathComponent
-
-    let snapshotDirectoryUrl =
-      snapshotDirectory.map { URL(fileURLWithPath: $0, isDirectory: true) }
-      ?? fileUrl
-      .deletingLastPathComponent()
-      .appendingPathComponent("__Snapshots__")
-      .appendingPathComponent(fileName)
-
-    let identifier: String
-    if let name = name {
-      identifier = sanitizePathComponent(name)
-    } else {
-      let counter = counterQueue.sync { () -> Int in
-        let key = snapshotDirectoryUrl.appendingPathComponent(testName)
-        counterMap[key, default: 0] += 1
-        return counterMap[key]!
-      }
-      identifier = String(counter)
-    }
-
-    let testName = sanitizePathComponent(testName)
-    let snapshotFileUrl =
-      snapshotDirectoryUrl
-      .appendingPathComponent("\(testName).\(identifier)")
-      .appendingPathExtension(snapshotting.pathExtension ?? "")
-    let fileManager = FileManager.default
-    try fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
-
-    let tookSnapshot = XCTestExpectation(description: "Took snapshot")
-    var optionalDiffable: Format?
-    snapshotting.snapshot(try value()).run { b in
-      optionalDiffable = b
-      tookSnapshot.fulfill()
-    }
-    let result = XCTWaiter.wait(for: [tookSnapshot], timeout: timeout)
-    switch result {
-    case .completed:
-      break
-    case .timedOut:
-      return """
-        Exceeded timeout of \(timeout) seconds waiting for snapshot.
-
-        This can happen when an asynchronously rendered view (like a web view) has not loaded. \
-        Ensure that every subview of the view hierarchy has loaded to avoid timeouts, or, if a \
-        timeout is unavoidable, consider setting the "timeout" parameter of "assertSnapshot" to \
-        a higher value.
-        """
-    case .incorrectOrder, .invertedFulfillment, .interrupted:
-      return "Couldn't snapshot value"
-    @unknown default:
-      return "Couldn't snapshot value"
-    }
-
-    guard var diffable = optionalDiffable else {
-      return "Couldn't snapshot value"
-    }
-
-    guard !recording, fileManager.fileExists(atPath: snapshotFileUrl.path) else {
-      try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)
-      #if !os(Linux) && !os(Windows)
-        if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
-          XCTContext.runActivity(named: "Attached Recorded Snapshot") { activity in
-            let attachment = XCTAttachment(contentsOfFile: snapshotFileUrl)
-            activity.add(attachment)
-          }
+      let identifier: String
+      if let name = name {
+        identifier = sanitizePathComponent(name)
+      } else {
+        let counter = counterQueue.sync { () -> Int in
+          let key = snapshotDirectoryUrl.appendingPathComponent(testName)
+          counterMap[key, default: 0] += 1
+          return counterMap[key]!
         }
-      #endif
-
-      return recording
-        ? """
-        Record mode is on. Automatically recorded snapshot: …
-
-        open "\(snapshotFileUrl.absoluteString)"
-
-        Turn record mode off and re-run "\(testName)" to assert against the newly-recorded snapshot
-        """
-        : """
-        No reference was found on disk. Automatically recorded snapshot: …
-
-        open "\(snapshotFileUrl.absoluteString)"
-
-        Re-run "\(testName)" to assert against the newly-recorded snapshot.
-        """
-    }
-
-    let data = try Data(contentsOf: snapshotFileUrl)
-    let reference = snapshotting.diffing.fromData(data)
-
-    #if os(iOS) || os(tvOS)
-      // If the image generation fails for the diffable part and the reference was empty, use the reference
-      if let localDiff = diffable as? UIImage,
-        let refImage = reference as? UIImage,
-        localDiff.size == .zero && refImage.size == .zero
-      {
-        diffable = reference
+        identifier = String(counter)
       }
-    #endif
 
-    guard let (failure, attachments) = snapshotting.diffing.diff(reference, diffable) else {
-      return nil
-    }
+      let testName = sanitizePathComponent(testName)
+      let snapshotFileUrl =
+        snapshotDirectoryUrl
+        .appendingPathComponent("\(testName).\(identifier)")
+        .appendingPathExtension(snapshotting.pathExtension ?? "")
+      let fileManager = FileManager.default
+      try fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
 
-    let artifactsUrl = URL(
-      fileURLWithPath: ProcessInfo.processInfo.environment["SNAPSHOT_ARTIFACTS"]
-        ?? NSTemporaryDirectory(), isDirectory: true
-    )
-    let artifactsSubUrl = artifactsUrl.appendingPathComponent(fileName)
-    try fileManager.createDirectory(at: artifactsSubUrl, withIntermediateDirectories: true)
-    let failedSnapshotFileUrl = artifactsSubUrl.appendingPathComponent(
-      snapshotFileUrl.lastPathComponent)
-    try snapshotting.diffing.toData(diffable).write(to: failedSnapshotFileUrl)
+      let tookSnapshot = XCTestExpectation(description: "Took snapshot")
+      var optionalDiffable: Format?
+      snapshotting.snapshot(try value()).run { b in
+        optionalDiffable = b
+        tookSnapshot.fulfill()
+      }
+      let result = XCTWaiter.wait(for: [tookSnapshot], timeout: timeout)
+      switch result {
+      case .completed:
+        break
+      case .timedOut:
+        return """
+          Exceeded timeout of \(timeout) seconds waiting for snapshot.
 
-    if !attachments.isEmpty {
-      #if !os(Linux) && !os(Windows)
-        if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
-          XCTContext.runActivity(named: "Attached Failure Diff") { activity in
-            attachments.forEach {
-              activity.add($0)
+          This can happen when an asynchronously rendered view (like a web view) has not loaded. \
+          Ensure that every subview of the view hierarchy has loaded to avoid timeouts, or, if a \
+          timeout is unavoidable, consider setting the "timeout" parameter of "assertSnapshot" to \
+          a higher value.
+          """
+      case .incorrectOrder, .invertedFulfillment, .interrupted:
+        return "Couldn't snapshot value"
+      @unknown default:
+        return "Couldn't snapshot value"
+      }
+
+      guard var diffable = optionalDiffable else {
+        return "Couldn't snapshot value"
+      }
+
+      guard
+        SnapshotTestingConfiguration.current.record == .never,
+        fileManager.fileExists(atPath: snapshotFileUrl.path)
+      else {
+        try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)
+        #if !os(Linux) && !os(Windows)
+          if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
+            XCTContext.runActivity(named: "Attached Recorded Snapshot") { activity in
+              let attachment = XCTAttachment(contentsOfFile: snapshotFileUrl)
+              activity.add(attachment)
             }
           }
+        #endif
+
+        return SnapshotTestingConfiguration.current.record == .always
+          ? """
+          Record mode is on. Automatically recorded snapshot: …
+
+          open "\(snapshotFileUrl.absoluteString)"
+
+          Turn record mode off and re-run "\(testName)" to assert against the newly-recorded snapshot
+          """
+          : """
+          No reference was found on disk. Automatically recorded snapshot: …
+
+          open "\(snapshotFileUrl.absoluteString)"
+
+          Re-run "\(testName)" to assert against the newly-recorded snapshot.
+          """
+      }
+
+      let data = try Data(contentsOf: snapshotFileUrl)
+      let reference = snapshotting.diffing.fromData(data)
+
+      #if os(iOS) || os(tvOS)
+        // If the image generation fails for the diffable part and the reference was empty, use the reference
+        if let localDiff = diffable as? UIImage,
+          let refImage = reference as? UIImage,
+          localDiff.size == .zero && refImage.size == .zero
+        {
+          diffable = reference
         }
       #endif
-    }
 
-    let diffMessage =
-      diffTool
-      .map { "\($0) \"\(snapshotFileUrl.path)\" \"\(failedSnapshotFileUrl.path)\"" }
+      guard let (failure, attachments) = snapshotting.diffing.diff(reference, diffable) else {
+        return nil
+      }
+
+      let artifactsUrl = URL(
+        fileURLWithPath: ProcessInfo.processInfo.environment["SNAPSHOT_ARTIFACTS"]
+          ?? NSTemporaryDirectory(), isDirectory: true
+      )
+      let artifactsSubUrl = artifactsUrl.appendingPathComponent(fileName)
+      try fileManager.createDirectory(at: artifactsSubUrl, withIntermediateDirectories: true)
+      let failedSnapshotFileUrl = artifactsSubUrl.appendingPathComponent(
+        snapshotFileUrl.lastPathComponent)
+      try snapshotting.diffing.toData(diffable).write(to: failedSnapshotFileUrl)
+
+      if !attachments.isEmpty {
+        #if !os(Linux) && !os(Windows)
+          if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
+            XCTContext.runActivity(named: "Attached Failure Diff") { activity in
+              attachments.forEach {
+                activity.add($0)
+              }
+            }
+          }
+        #endif
+      }
+
+      let diffMessage =
+        SnapshotTestingConfiguration.current.diffTool.map { tool in
+          tool(currentFilePath: snapshotFileUrl.path, failedFilePath: failedSnapshotFileUrl.path)
+        }
         ?? """
         @\(minus)
         "\(snapshotFileUrl.absoluteString)"
@@ -337,22 +384,23 @@ public func verifySnapshot<Value, Format>(
             SnapshotTesting.diffTool = "ksdiff"
         """
 
-    let failureMessage: String
-    if let name = name {
-      failureMessage = "Snapshot \"\(name)\" does not match reference."
-    } else {
-      failureMessage = "Snapshot does not match reference."
+      let failureMessage: String
+      if let name = name {
+        failureMessage = "Snapshot \"\(name)\" does not match reference."
+      } else {
+        failureMessage = "Snapshot does not match reference."
+      }
+
+      return """
+        \(failureMessage)
+
+        \(diffMessage)
+
+        \(failure.trimmingCharacters(in: .whitespacesAndNewlines))
+        """
+    } catch {
+      return error.localizedDescription
     }
-
-    return """
-      \(failureMessage)
-
-      \(diffMessage)
-
-      \(failure.trimmingCharacters(in: .whitespacesAndNewlines))
-      """
-  } catch {
-    return error.localizedDescription
   }
 }
 
