@@ -2,7 +2,7 @@
   @_spi(Experimental) import Testing
 
   @_spi(Experimental)
-  extension TestTrait where Self == _SnapshotsTestTrait {
+  extension Trait where Self == _SnapshotsTestTrait {
     public static func snapshots(
       diffTool: SnapshotTestingConfiguration.DiffTool = .default,
       record: SnapshotTestingConfiguration.Record = .missing
