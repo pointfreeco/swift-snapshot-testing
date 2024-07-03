@@ -1,5 +1,9 @@
 import XCTest
 
+#if canImport(Testing)
+  import Testing
+#endif
+
 /// Enhances failure messages with a command line diff tool expression that can be copied and pasted
 /// into a terminal.
 ///
@@ -55,7 +59,35 @@ public func assertSnapshot<Value, Format>(
     line: line
   )
   guard let message = failure else { return }
-  XCTFail(message, file: file, line: line)
+
+  // Inspired by: https://stackoverflow.com/a/28972600
+  if Thread.callStackSymbols
+    .contains(
+      where: {
+        $0.range(of: "XCTest", options: .caseInsensitive) != nil
+      }
+    ) {
+    XCTFail(message, file: file, line: line)
+  } else {
+    #if canImport(Testing)
+      Issue.record(SnapshotError.message(message), filePath: String(describing: file), line: Int(line))
+    #else
+      fatalError("Unsupported test environment.")
+    #endif
+  }
+}
+
+enum SnapshotError: Error {
+  case message(String)
+}
+
+extension SnapshotError: CustomStringConvertible {
+  var description: String {
+    switch self {
+    case let .message(value):
+      return value
+    }
+  }
 }
 
 /// Asserts that a given value matches references on disk.
