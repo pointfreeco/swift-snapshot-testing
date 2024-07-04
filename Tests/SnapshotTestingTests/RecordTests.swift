@@ -12,18 +12,20 @@ class RecordTests: XCTestCase {
 
     let testName = String(
       self.name
-      .split(separator: " ")
-      .flatMap { String($0).split(separator: ".") }
-      .last!
+        .split(separator: " ")
+        .flatMap { String($0).split(separator: ".") }
+        .last!
     )
-      .prefix(while: { $0 != "]" })
+    .prefix(while: { $0 != "]" })
     let fileURL = URL(fileURLWithPath: #file, isDirectory: false)
     let testClassName = fileURL.deletingPathExtension().lastPathComponent
-    let testDirectory = fileURL
+    let testDirectory =
+      fileURL
       .deletingLastPathComponent()
       .appendingPathComponent("__Snapshots__")
       .appendingPathComponent(testClassName)
-    snapshotURL = testDirectory
+    snapshotURL =
+      testDirectory
       .appendingPathComponent("\(testName).1.json")
     try? FileManager.default
       .removeItem(at: snapshotURL.deletingLastPathComponent())
@@ -165,7 +167,7 @@ class RecordTests: XCTestCase {
   func testRecordFailed_NoFailure() throws {
     try Data("42".utf8).write(to: snapshotURL)
     let modifiedDate =
-    try FileManager.default
+      try FileManager.default
       .attributesOfItem(atPath: snapshotURL.path)[FileAttributeKey.modificationDate] as! Date
 
     withSnapshotTesting(record: .failed) {
@@ -183,20 +185,23 @@ class RecordTests: XCTestCase {
     )
   }
 
-  func testRecordFailed_MissingFile() throws {
-    XCTExpectFailure {
-      withSnapshotTesting(record: .failed) {
-        assertSnapshot(of: 42, as: .json)
+  #if canImport(Darwin)
+    func testRecordFailed_MissingFile() throws {
+      XCTExpectFailure {
+        withSnapshotTesting(record: .failed) {
+          assertSnapshot(of: 42, as: .json)
+        }
+      } issueMatcher: {
+        $0.compactDescription.hasPrefix(
+          """
+          failed - No reference was found on disk. Automatically recorded snapshot: …
+          """)
       }
-    } issueMatcher: {
-      $0.compactDescription.hasPrefix("""
-        failed - No reference was found on disk. Automatically recorded snapshot: …
-        """)
-    }
 
-    try XCTAssertEqual(
-      String(decoding: Data(contentsOf: snapshotURL), as: UTF8.self),
-      "42"
-    )
-  }
+      try XCTAssertEqual(
+        String(decoding: Data(contentsOf: snapshotURL), as: UTF8.self),
+        "42"
+      )
+    }
+  #endif
 }
