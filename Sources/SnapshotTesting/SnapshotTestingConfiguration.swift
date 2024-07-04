@@ -73,13 +73,40 @@ public struct SnapshotTestingConfiguration: Sendable {
   }
   
   /// The record mode of the snapshot test.
-  public enum Record: String, Sendable {
+  public struct Record: Equatable, Sendable {
+    private let storage: Storage
+    
+    public init?(rawValue: String) {
+      switch rawValue {
+      case "all":
+        self.storage = .all
+      case "missing":
+        self.storage = .missing
+      case "none":
+        self.storage = .none
+      default:
+        return nil
+      }
+    }
+
     /// Records all snapshots.
-    case all
+    public static let all = Self(storage: .all)
+
     /// Records snapshots that are missing.
-    case missing
+    public static let missing = Self(storage: .missing)
+
     /// Does not record any snapshots. If a snapshot is missing a test failure will be raised.
-    case none
+    public static let none = Self(storage: .none)
+
+    private init(storage: Storage) {
+      self.storage = storage
+    }
+
+    private enum Storage: Equatable, Sendable {
+      case all
+      case missing
+      case none
+    }
   }
   
   /// Describes the diff command used to diff two files on disk.
