@@ -2,15 +2,19 @@ import SnapshotTesting
 import XCTest
 
 class RecordTests: XCTestCase {
-  override func tearDown() {
-    try? FileManager.default
-      .removeItem(at: snapshotURL().deletingLastPathComponent())
+  override func setUp() {
+    super.setUp()
     try? FileManager.default
       .createDirectory(
         at: snapshotURL().deletingLastPathComponent(), withIntermediateDirectories: true)
   }
+  override func tearDown() {
+    super.tearDown()
+    try? FileManager.default
+      .removeItem(at: snapshotURL().deletingLastPathComponent())
+  }
 
-  #if !os(Linux)
+  #if canImport(Darwin)
     func testRecordNever() {
       let snapshotURL = snapshotURL()
 
@@ -31,7 +35,7 @@ class RecordTests: XCTestCase {
     }
   #endif
 
-  #if !os(Linux)
+  #if canImport(Darwin)
     func testRecordMissing() {
       let snapshotURL = snapshotURL()
       try? FileManager.default.removeItem(at: snapshotURL)
@@ -54,7 +58,7 @@ class RecordTests: XCTestCase {
     }
   #endif
 
-  #if !os(Linux)
+  #if canImport(Darwin)
     func testRecordMissing_ExistingFile() throws {
       let snapshotURL = snapshotURL()
       try? FileManager.default.removeItem(at: snapshotURL)
@@ -78,7 +82,7 @@ class RecordTests: XCTestCase {
     }
   #endif
 
-  #if !os(Linux)
+  #if canImport(Darwin)
     func testRecordAll_Fresh() throws {
       let snapshotURL = snapshotURL()
       try? FileManager.default.removeItem(at: snapshotURL)
@@ -101,7 +105,7 @@ class RecordTests: XCTestCase {
     }
   #endif
 
-  #if !os(Linux)
+  #if canImport(Darwin)
     func testRecordAll_Overwrite() throws {
       let snapshotURL = snapshotURL()
       try? FileManager.default.removeItem(at: snapshotURL)
@@ -125,7 +129,7 @@ class RecordTests: XCTestCase {
     }
   #endif
 
-  #if !os(Linux)
+  #if canImport(Darwin)
     func testRecordFailed_WhenFailure() throws {
       let snapshotURL = snapshotURL()
       try? FileManager.default.removeItem(at: snapshotURL)
