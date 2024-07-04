@@ -1,12 +1,28 @@
 import XCTest
 
 /// Enhances failure messages with a command line diff tool expression that can be copied and pasted
-/// into a terminal.
+/// into a terminal. For more complex difftool needs, see `diffToolCommand`.
 ///
 /// ```swift
 /// diffTool = "ksdiff"
 /// ```
-public var diffTool: String? = nil
+public var diffTool: String? {
+    get { diffToolCommand?("", "").trimmingCharacters(in: .whitespaces) }
+    set {
+        diffToolCommand = newValue.map { value in
+            { [value, $0, $1].joined(separator: " ") }
+        }
+    }
+}
+
+/// Enhances failure messages with a diff tool expression created by the closure, such as an clickable
+/// URL or a complex command. The closure will receive the existing screenshot path and the failed
+/// screenshot path as arguments.
+///
+/// ```swift
+/// diffToolCommand = { "compare \"\($0)\" \"\($1)\" png: | open -f -a Preview.app" }
+/// ```
+public var diffToolCommand: ((String, String) -> String)?
 
 /// Whether or not to record all new references.
 public var isRecording: Bool = {
@@ -333,8 +349,7 @@ public func verifySnapshot<Value, Format>(
     }
 
     let diffMessage =
-      diffTool
-      .map { "\($0) \"\(snapshotFileUrl.path)\" \"\(failedSnapshotFileUrl.path)\"" }
+      diffToolCommand?(snapshotFileUrl.path, failedSnapshotFileUrl.path)
         ?? """
         @\(minus)
         "\(snapshotFileUrl.absoluteString)"
