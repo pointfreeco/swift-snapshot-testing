@@ -12,8 +12,8 @@ public var diffTool: String? = nil
 public var isRecording: Bool = {
   let args = ProcessInfo.processInfo.arguments
   if let index = args.firstIndex(of: "-co.pointfree.SnapshotTesting.IsRecording"),
-      index < args.count - 1,
-      args[index + 1] == "1"
+    index < args.count - 1,
+    args[index + 1] == "1"
   {
     return true
   }
