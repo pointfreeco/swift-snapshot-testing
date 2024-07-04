@@ -81,7 +81,7 @@ struct FeatureTests {
 }
 ```
 
-> Note: You must import SnapshotTesting with the `@_spi(Experimental)` attribute to get access to
-this functionality because Swift Testing's own `CustomExecutionTrait` is hidden behind the same
+> Important: You must import SnapshotTesting with the `@_spi(Experimental)` attribute to get access
+to this functionality because Swift Testing's own `CustomExecutionTrait` is hidden behind the same
 SPI flag. This means this API is subject to change in the future, but hopefully Apple will 
 publicize this tool soon.

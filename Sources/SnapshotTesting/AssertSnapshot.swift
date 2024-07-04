@@ -278,8 +278,7 @@ public func verifySnapshot<Value, Format>(
 
       guard
         record != .all,
-        record != .missing
-          || fileManager.fileExists(atPath: snapshotFileUrl.path)
+        record != .missing || fileManager.fileExists(atPath: snapshotFileUrl.path)
       else {
         try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)
         #if !os(Linux) && !os(Windows)

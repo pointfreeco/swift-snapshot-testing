@@ -43,24 +43,66 @@ allows you to customize how the `assertSnapshot` tool behaves for a well-defined
 Rather than overriding `isRecording` or `diffTool` directly in your tests, you can wrap your test in
 `withSnapshotTesting`:
 
-```swift
-withSnapshotTesting(diffTool: .ksdiff, record: .all) {
-  // Assertions in here
+@Row {
+  @Column {
+    ```swift
+    // Before
+
+    func testFeature() {
+      isRecording = true 
+      diffTool = "ksdiff"
+      assertSnapshot(…)
+    }
+    ```
+  }
+  @Column {
+    ```swift
+    // After
+
+    func testFeature() {
+      withSnapshotTesting(record: .all, diffTool: .ksdiff) {
+        assertSnapshot(…)
+      }
+    }
+    ```
+  }
 }
-```
 
 If you want to override the options for an entire test class, you can override the `invokeTest`
 method of `XCTestCase`:
 
-```swift
-class FeatureTests: XCTestCase {
-  override func invokeTest() {
-    withSnapshotTesting(diffTool: .ksdiff, record: .all) {
-      super.invokeTest()
+@Row {
+  @Column {
+    ```swift
+    // Before
+
+    class FeatureTests: XCTestCase {
+      override func invokeTest() {
+        isRecording = true 
+        diffTool = "ksdiff"
+        defer { 
+          isRecording = false
+          diffTool = nil
+        }
+        super.invokeTest()
+      }
     }
+    ```
+  }
+  @Column {
+    ```swift
+    // After
+
+    class FeatureTests: XCTestCase {
+      override func invokeTest() {
+        withSnapshotTesting(diffTool: .ksdiff, record: .all) {
+          super.invokeTest()
+        }
+      }
+    }
+    ```
   }
 }
-```
 
 And if you want to override these settings for _all_ tests, then you can implement a base
 `XCTestCase` subclass and have your tests inherit from it.
@@ -117,3 +159,7 @@ struct FeatureTests {
 ```
 
 That will override the `diffTool` and `record` options for the entire `FeatureTests` suite.
+
+> Important: As evident by the usage of `@_spi(Experimental)` this API is subject to change. As
+soon as the Swift Testing library finalizes its API for `CustomExecutionTrait` we will update
+the library accordingly and remove the `@_spi` annotation.
