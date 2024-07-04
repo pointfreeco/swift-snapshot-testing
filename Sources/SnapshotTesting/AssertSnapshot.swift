@@ -344,7 +344,6 @@ public func verifySnapshot<Value, Format>(
         #endif
       }
 
-      // TODO: maybe pass URLs to diffTool so that we can do absolute path for default
       let diffMessage = (SnapshotTestingConfiguration.current?.diffTool ?? _diffTool)(
         currentFilePath: snapshotFileUrl.path,
         failedFilePath: failedSnapshotFileUrl.path
