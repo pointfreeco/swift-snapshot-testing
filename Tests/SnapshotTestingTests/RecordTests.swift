@@ -7,13 +7,13 @@ class RecordTests: XCTestCase {
   override func setUp() {
     super.setUp()
 
-    let testName = self.testRun!.test.name.split(separator: " ").last!.dropLast()
+    let testName = dump(self.testRun!.test.name.split(separator: " ").last!.dropLast(), name: "TEST NAME")
     let fileURL = URL(fileURLWithPath: #file, isDirectory: false)
-    let fileName = fileURL.deletingPathExtension().lastPathComponent
+    let testClassName = fileURL.deletingPathExtension().lastPathComponent
     let testDirectory = fileURL
       .deletingLastPathComponent()
       .appendingPathComponent("__Snapshots__")
-      .appendingPathComponent(fileName)
+      .appendingPathComponent(testClassName)
     snapshotURL = testDirectory
       .appendingPathComponent("\(testName).1.json")
     try? FileManager.default
