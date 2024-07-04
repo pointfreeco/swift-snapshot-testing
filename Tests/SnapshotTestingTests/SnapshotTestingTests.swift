@@ -23,8 +23,8 @@ import XCTest
 final class SnapshotTestingTests: XCTestCase {
   override func invokeTest() {
     withSnapshotTesting(
-      diffTool: .ksdiff,
-      record: .missing
+      record: .missing, 
+      diffTool: .ksdiff
     ) {
       super.invokeTest()
     }

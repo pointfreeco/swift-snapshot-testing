@@ -276,10 +276,7 @@ public func verifySnapshot<Value, Format>(
         return "Couldn't snapshot value"
       }
 
-      guard
-        record != .all,
-        record != .missing || fileManager.fileExists(atPath: snapshotFileUrl.path)
-      else {
+      func recordSnapshot() throws {
         try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)
         #if !os(Linux) && !os(Windows)
           if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
@@ -289,6 +286,13 @@ public func verifySnapshot<Value, Format>(
             }
           }
         #endif
+      }
+
+      guard
+        record != .all,
+        record != .missing || fileManager.fileExists(atPath: snapshotFileUrl.path)
+      else {
+        try recordSnapshot()
 
         return SnapshotTestingConfiguration.current?.record == .all
           ? """
@@ -351,11 +355,16 @@ public func verifySnapshot<Value, Format>(
         failedFilePath: failedSnapshotFileUrl.path
       )
 
-      let failureMessage: String
+      var failureMessage: String
       if let name = name {
         failureMessage = "Snapshot \"\(name)\" does not match reference."
       } else {
         failureMessage = "Snapshot does not match reference."
+      }
+
+      if record == .failed {
+        try recordSnapshot()
+        failureMessage += " A new snapshot was automatically recorded."
       }
 
       return """

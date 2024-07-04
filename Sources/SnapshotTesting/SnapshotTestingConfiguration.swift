@@ -81,8 +81,9 @@ public struct SnapshotTestingConfiguration: Sendable {
   
   /// The record mode of the snapshot test.
   ///
-  /// There are 3 primary strategies for recording: ``Record-swift.struct/all``,
-  /// ``Record-swift.struct/missing`` and ``Record-swift.struct/none``.
+  /// There are 4 primary strategies for recording: ``Record-swift.struct/all``,
+  /// ``Record-swift.struct/missing``, ``Record-swift.struct/never`` and
+  /// ``Record-swift.struct/failed``
   public struct Record: Equatable, Sendable {
     private let storage: Storage
     
@@ -90,23 +91,32 @@ public struct SnapshotTestingConfiguration: Sendable {
       switch rawValue {
       case "all":
         self.storage = .all
+      case "failed":
+        self.storage = .failed
       case "missing":
         self.storage = .missing
-      case "none":
-        self.storage = .none
+      case "never":
+        self.storage = .never
       default:
         return nil
       }
     }
 
-    /// Records all snapshots.
+    /// Records all snapshots to disk, no matter what.
     public static let all = Self(storage: .all)
 
-    /// Records snapshots that are missing.
+    /// Records snapshots for assertions that fail. This can be useful for tests that use precision
+    /// thresholds so that passing tests do not re-record snapshots that are subtly different but
+    /// still within the threshold.
+    public static let failed = Self(storage: .failed)
+
+    /// Records only the snapshots that are missing from disk.
     public static let missing = Self(storage: .missing)
 
-    /// Does not record any snapshots. If a snapshot is missing a test failure will be raised.
-    public static let none = Self(storage: .none)
+    /// Does not record any snapshots. If a snapshot is missing a test failure will be raised. This 
+    /// option is appropriate when running tests on CI so that re-tries of tests do not
+    /// surprisingly pass after snapshots are unexpectedly generated.
+    public static let never = Self(storage: .never)
 
     private init(storage: Storage) {
       self.storage = storage
@@ -114,8 +124,9 @@ public struct SnapshotTestingConfiguration: Sendable {
 
     private enum Storage: Equatable, Sendable {
       case all
+      case failed
       case missing
-      case none
+      case never
     }
   }
   

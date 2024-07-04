@@ -122,12 +122,17 @@ Further, the `diffTool` and `record` arguments have extra customization capabili
   }
   ```
 
-  * `record` is now a [type](<doc:SnapshotTestingConfiguration/Record-swift.struct>) with 3
-    choices: `all`, `missing`, `none`. When set to `all`, snapshots will be generated and saved to 
-    disk. When set to `missing` only the snapshots that are missing from the disk will be generated
-    and saved. And when set to `none` snapshots will never be generated, even if they are missing.
-    This option is appropriate when running tests on CI so that re-tries of tests do not
-    surprisingly pass after snapshots are unexpectedly generated.
+  * `record` is now a [type](<doc:SnapshotTestingConfiguration/Record-swift.struct>) with 4
+    choices: `all`, `missing`, `never`, `failed`:
+    * `all`: All snapshots will be generated and saved to disk. 
+    * `missing`: only the snapshots that are missing from the disk will be generated
+    and saved. 
+    * `never`: No snapshots will be generated, even if they are missing. This option is appropriate
+    when running tests on CI so that re-tries of tests do not surprisingly pass after snapshots are
+    unexpectedly generated.
+    * `failed`: Snapshots only for failing tests will be generated. This can be useful for tests
+    that use precision thresholds so that passing tests do not re-record snapshots that are 
+    subtly different but still within the threshold.
 
 ## Beta support for Swift Testing
 
