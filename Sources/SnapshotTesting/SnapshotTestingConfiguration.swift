@@ -65,8 +65,8 @@ public struct SnapshotTestingConfiguration: Sendable {
   public var record: Record
 
   public init(
-    diffTool: DiffTool,
-    record: Record
+    diffTool: DiffTool = .ksdiff,
+    record: Record = .missing
   ) {
     self.diffTool = diffTool
     self.record = record
