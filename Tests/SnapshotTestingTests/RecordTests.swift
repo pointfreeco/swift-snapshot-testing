@@ -6,136 +6,155 @@ class RecordTests: XCTestCase {
     try? FileManager.default
       .removeItem(at: snapshotURL().deletingLastPathComponent())
     try? FileManager.default
-      .createDirectory(at: snapshotURL().deletingLastPathComponent(), withIntermediateDirectories: true)
+      .createDirectory(
+        at: snapshotURL().deletingLastPathComponent(), withIntermediateDirectories: true)
   }
 
-  func testRecordNever() {
-    let snapshotURL = snapshotURL()
+  #if !os(Linux)
+    func testRecordNever() {
+      let snapshotURL = snapshotURL()
 
-    XCTExpectFailure {
-      withSnapshotTesting(record: .never) {
-        assertSnapshot(of: 42, as: .json)
+      XCTExpectFailure {
+        withSnapshotTesting(record: .never) {
+          assertSnapshot(of: 42, as: .json)
+        }
+      } issueMatcher: {
+        $0.compactDescription == """
+          failed - The file “testRecordNever.1.json” couldn’t be opened because there is no such file.
+          """
       }
-    } issueMatcher: {
-      $0.compactDescription == """
-        failed - The file “testRecordNever.1.json” couldn’t be opened because there is no such file.
-        """
+
+      XCTAssertEqual(
+        FileManager.default.fileExists(atPath: snapshotURL.path),
+        false
+      )
     }
+  #endif
 
-    XCTAssertEqual(
-      FileManager.default.fileExists(atPath: snapshotURL.path),
-      false
-    )
-  }
+  #if !os(Linux)
+    func testRecordMissing() {
+      let snapshotURL = snapshotURL()
+      try? FileManager.default.removeItem(at: snapshotURL)
 
-  func testRecordMissing() {
-    let snapshotURL = snapshotURL()
-    try? FileManager.default.removeItem(at: snapshotURL)
-
-    XCTExpectFailure {
-      withSnapshotTesting(record: .missing) {
-        assertSnapshot(of: 42, as: .json)
+      XCTExpectFailure {
+        withSnapshotTesting(record: .missing) {
+          assertSnapshot(of: 42, as: .json)
+        }
+      } issueMatcher: {
+        $0.compactDescription.hasPrefix(
+          """
+          failed - No reference was found on disk. Automatically recorded snapshot: …
+          """)
       }
-    } issueMatcher: {
-      $0.compactDescription.hasPrefix("""
-        failed - No reference was found on disk. Automatically recorded snapshot: …
-        """)
+
+      try XCTAssertEqual(
+        String(decoding: Data(contentsOf: snapshotURL), as: UTF8.self),
+        "42"
+      )
     }
+  #endif
 
-    try XCTAssertEqual(
-      String(decoding: Data(contentsOf: snapshotURL), as: UTF8.self),
-      "42"
-    )
-  }
+  #if !os(Linux)
+    func testRecordMissing_ExistingFile() throws {
+      let snapshotURL = snapshotURL()
+      try? FileManager.default.removeItem(at: snapshotURL)
+      try Data("999".utf8).write(to: snapshotURL)
 
-  func testRecordMissing_ExistingFile() throws {
-    let snapshotURL = snapshotURL()
-    try? FileManager.default.removeItem(at: snapshotURL)
-    try Data("999".utf8).write(to: snapshotURL)
-
-    XCTExpectFailure {
-      withSnapshotTesting(record: .missing) {
-        assertSnapshot(of: 42, as: .json)
+      XCTExpectFailure {
+        withSnapshotTesting(record: .missing) {
+          assertSnapshot(of: 42, as: .json)
+        }
+      } issueMatcher: {
+        $0.compactDescription.hasPrefix(
+          """
+          failed - Snapshot does not match reference.
+          """)
       }
-    } issueMatcher: {
-      $0.compactDescription.hasPrefix("""
-        failed - Snapshot does not match reference.
-        """)
+
+      try XCTAssertEqual(
+        String(decoding: Data(contentsOf: snapshotURL), as: UTF8.self),
+        "999"
+      )
     }
+  #endif
 
-    try XCTAssertEqual(
-      String(decoding: Data(contentsOf: snapshotURL), as: UTF8.self),
-      "999"
-    )
-  }
+  #if !os(Linux)
+    func testRecordAll_Fresh() throws {
+      let snapshotURL = snapshotURL()
+      try? FileManager.default.removeItem(at: snapshotURL)
 
-  func testRecordAll_Fresh() throws {
-    let snapshotURL = snapshotURL()
-    try? FileManager.default.removeItem(at: snapshotURL)
-
-    XCTExpectFailure {
-      withSnapshotTesting(record: .all) {
-        assertSnapshot(of: 42, as: .json)
+      XCTExpectFailure {
+        withSnapshotTesting(record: .all) {
+          assertSnapshot(of: 42, as: .json)
+        }
+      } issueMatcher: {
+        $0.compactDescription.hasPrefix(
+          """
+          failed - Record mode is on. Automatically recorded snapshot: …
+          """)
       }
-    } issueMatcher: {
-      $0.compactDescription.hasPrefix("""
-        failed - Record mode is on. Automatically recorded snapshot: …
-        """)
+
+      try XCTAssertEqual(
+        String(decoding: Data(contentsOf: snapshotURL), as: UTF8.self),
+        "42"
+      )
     }
+  #endif
 
-    try XCTAssertEqual(
-      String(decoding: Data(contentsOf: snapshotURL), as: UTF8.self),
-      "42"
-    )
-  }
+  #if !os(Linux)
+    func testRecordAll_Overwrite() throws {
+      let snapshotURL = snapshotURL()
+      try? FileManager.default.removeItem(at: snapshotURL)
+      try Data("999".utf8).write(to: snapshotURL)
 
-  func testRecordAll_Overwrite() throws {
-    let snapshotURL = snapshotURL()
-    try? FileManager.default.removeItem(at: snapshotURL)
-    try Data("999".utf8).write(to: snapshotURL)
-
-    XCTExpectFailure {
-      withSnapshotTesting(record: .all) {
-        assertSnapshot(of: 42, as: .json)
+      XCTExpectFailure {
+        withSnapshotTesting(record: .all) {
+          assertSnapshot(of: 42, as: .json)
+        }
+      } issueMatcher: {
+        $0.compactDescription.hasPrefix(
+          """
+          failed - Record mode is on. Automatically recorded snapshot: …
+          """)
       }
-    } issueMatcher: {
-      $0.compactDescription.hasPrefix("""
-        failed - Record mode is on. Automatically recorded snapshot: …
-        """)
+
+      try XCTAssertEqual(
+        String(decoding: Data(contentsOf: snapshotURL), as: UTF8.self),
+        "42"
+      )
     }
+  #endif
 
-    try XCTAssertEqual(
-      String(decoding: Data(contentsOf: snapshotURL), as: UTF8.self),
-      "42"
-    )
-  }
+  #if !os(Linux)
+    func testRecordFailed_WhenFailure() throws {
+      let snapshotURL = snapshotURL()
+      try? FileManager.default.removeItem(at: snapshotURL)
+      try Data("999".utf8).write(to: snapshotURL)
 
-  func testRecordFailed_WhenFailure() throws {
-    let snapshotURL = snapshotURL()
-    try? FileManager.default.removeItem(at: snapshotURL)
-    try Data("999".utf8).write(to: snapshotURL)
-
-    XCTExpectFailure {
-      withSnapshotTesting(record: .failed) {
-        assertSnapshot(of: 42, as: .json)
+      XCTExpectFailure {
+        withSnapshotTesting(record: .failed) {
+          assertSnapshot(of: 42, as: .json)
+        }
+      } issueMatcher: {
+        $0.compactDescription.hasPrefix(
+          """
+          failed - Snapshot does not match reference. A new snapshot was automatically recorded.
+          """)
       }
-    } issueMatcher: {
-      $0.compactDescription.hasPrefix("""
-        failed - Snapshot does not match reference. A new snapshot was automatically recorded.
-        """)
-    }
 
-    try XCTAssertEqual(
-      String(decoding: Data(contentsOf: snapshotURL), as: UTF8.self),
-      "42"
-    )
-  }
+      try XCTAssertEqual(
+        String(decoding: Data(contentsOf: snapshotURL), as: UTF8.self),
+        "42"
+      )
+    }
+  #endif
 
   func testRecordFailed_NoFailure() throws {
     let snapshotURL = snapshotURL()
     try? FileManager.default.removeItem(at: snapshotURL)
     try Data("42".utf8).write(to: snapshotURL)
-    let modifiedDate = try FileManager.default
+    let modifiedDate =
+      try FileManager.default
       .attributesOfItem(atPath: snapshotURL.path)[FileAttributeKey.modificationDate] as! Date
 
     withSnapshotTesting(record: .failed) {
@@ -153,10 +172,11 @@ class RecordTests: XCTestCase {
     )
   }
 
-  func snapshotURL(_ function: StaticString = #function) ->  URL {
+  func snapshotURL(_ function: StaticString = #function) -> URL {
     let fileURL = URL(fileURLWithPath: #file, isDirectory: false)
     let fileName = fileURL.deletingPathExtension().lastPathComponent
-    return fileURL
+    return
+      fileURL
       .deletingLastPathComponent()
       .appendingPathComponent("__Snapshots__")
       .appendingPathComponent(fileName)
