@@ -36,6 +36,10 @@ public var isRecording: Bool = {
   return false
 }()
 
+/// Whether or not to create snapshots if they aren't found.
+/// It's recommended to set this to `false` in CI to avoid false positives if the test is retried.
+public var canGenerateNewSnapshots = true
+
 /// Whether or not to record all new references.
 ///
 /// Due to a name clash in Xcode 12, this has been renamed to `isRecording`.
@@ -281,7 +285,7 @@ public func verifySnapshot<Value, Format>(
       return "Couldn't snapshot value"
     }
 
-    guard !recording, fileManager.fileExists(atPath: snapshotFileUrl.path) else {
+    guard !recording, canGenerateNewSnapshots, fileManager.fileExists(atPath: snapshotFileUrl.path) else {
       try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)
       #if !os(Linux) && !os(Windows)
         if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
