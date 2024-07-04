@@ -52,7 +52,7 @@ withSnapshotTesting(record: .all) {
   assertSnapshot(of: vc3, as: .image)
 }
 
-// Record all tests in an XCTestCase subclass:
+// Record all snapshots in an XCTestCase subclass:
 class FeatureTests: XCTestCase {
   override func invokeTest() {
     withSnapshotTesting(record: .all) {
