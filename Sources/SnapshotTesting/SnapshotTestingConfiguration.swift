@@ -30,8 +30,9 @@ public func withSnapshotTesting<R>(
 ) rethrows -> R {
   try SnapshotTestingConfiguration.$current.withValue(
     SnapshotTestingConfiguration(
-      diffTool: diffTool ?? SnapshotTestingConfiguration.current?.diffTool ?? SnapshotTesting._diffTool,
-      record: record ?? SnapshotTestingConfiguration.current?.record ?? _record
+      record: record ?? SnapshotTestingConfiguration.current?.record ?? _record,
+      diffTool: diffTool ?? SnapshotTestingConfiguration.current?.diffTool
+        ?? SnapshotTesting._diffTool
     )
   ) {
     try operation()
@@ -48,8 +49,8 @@ public func withSnapshotTesting<R>(
 ) async rethrows -> R {
   try await SnapshotTestingConfiguration.$current.withValue(
     SnapshotTestingConfiguration(
-      diffTool: diffTool ?? SnapshotTestingConfiguration.current?.diffTool ?? _diffTool,
-      record: record ?? SnapshotTestingConfiguration.current?.record ?? _record
+      record: record ?? SnapshotTestingConfiguration.current?.record ?? _record,
+      diffTool: diffTool ?? SnapshotTestingConfiguration.current?.diffTool ?? _diffTool
     )
   ) {
     try await operation()
@@ -72,11 +73,11 @@ public struct SnapshotTestingConfiguration: Sendable {
   public var record: Record
 
   public init(
-    diffTool: DiffTool = .default,
-    record: Record = .missing
+    record: Record = .missing,
+    diffTool: DiffTool = .default
   ) {
-    self.diffTool = diffTool
     self.record = record
+    self.diffTool = diffTool
   }
   
   /// The record mode of the snapshot test.

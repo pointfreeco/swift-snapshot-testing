@@ -34,7 +34,11 @@ These customization options have a few downsides currently.
 
 And the ``diffTool`` variable allows one to specify a command line tool to use for visualizing
 diffs of files, but only works when the command line tool accepts a very narrow set of arguments, 
-_e.g._ `ksdiff /path/to/file1.png /path/to/file2.png`.
+_e.g._:
+
+```sh
+$ ksdiff /path/to/file1.png /path/to/file2.png
+```
 
 We have greatly improved upon all of these problems by introducing the new 
 ``withSnapshotTesting(record:diffTool:operation:)-2kuyr`` tool for customizing snapshots. It 
@@ -51,7 +55,7 @@ Rather than overriding `isRecording` or `diffTool` directly in your tests, you c
     func testFeature() {
       isRecording = true 
       diffTool = "ksdiff"
-      assertSnapshot(…)
+      assertSnapshot(/* ... */)
     }
     ```
   }
@@ -60,8 +64,11 @@ Rather than overriding `isRecording` or `diffTool` directly in your tests, you c
     // After
 
     func testFeature() {
-      withSnapshotTesting(record: .all, diffTool: .ksdiff) {
-        assertSnapshot(…)
+      withSnapshotTesting(
+        record: .all,
+        diffTool: .ksdiff
+      ) {
+        assertSnapshot(/* ... */)
       }
     }
     ```
@@ -95,7 +102,10 @@ method of `XCTestCase`:
 
     class FeatureTests: XCTestCase {
       override func invokeTest() {
-        withSnapshotTesting(diffTool: .ksdiff, record: .all) {
+        withSnapshotTesting(
+          record: .all,
+          diffTool: .ksdiff
+        ) {
           super.invokeTest()
         }
       }
@@ -124,15 +134,15 @@ Further, the `diffTool` and `record` arguments have extra customization capabili
 
   * `record` is now a [type](<doc:SnapshotTestingConfiguration/Record-swift.struct>) with 4
     choices: `all`, `missing`, `never`, `failed`:
-    * `all`: All snapshots will be generated and saved to disk. 
-    * `missing`: only the snapshots that are missing from the disk will be generated
-    and saved. 
-    * `never`: No snapshots will be generated, even if they are missing. This option is appropriate
-    when running tests on CI so that re-tries of tests do not surprisingly pass after snapshots are
-    unexpectedly generated.
-    * `failed`: Snapshots only for failing tests will be generated. This can be useful for tests
-    that use precision thresholds so that passing tests do not re-record snapshots that are 
-    subtly different but still within the threshold.
+      * `all`: All snapshots will be generated and saved to disk.
+      * `missing`: only the snapshots that are missing from the disk will be generated
+        and saved.
+      * `never`: No snapshots will be generated, even if they are missing. This option is
+        appropriate when running tests on CI so that re-tries of tests do not surprisingly pass
+        after snapshots are unexpectedly generated.
+      * `failed`: Snapshots only for failing tests will be generated. This can be useful for tests
+        that use precision thresholds so that passing tests do not re-record snapshots that are
+        subtly different but still within the threshold.
 
 ## Beta support for Swift Testing
 
@@ -157,7 +167,7 @@ you to customize snapshots for a `@Test` or `@Suite`, but to get access to it yo
 ```swift
 @_spi(Experimental) import SnapshotTesting
 
-@Suite(.snapshots(diffTool: .ksdiff, record: .all))
+@Suite(.snapshots(record: .all, diffTool: .ksdiff))
 struct FeatureTests {
   …
 }
