@@ -2,22 +2,34 @@ import SnapshotTesting
 import XCTest
 
 class RecordTests: XCTestCase {
+  var snapshotURL: URL!
+
   override func setUp() {
     super.setUp()
+
+    let testName = self.testRun!.test.name.split(separator: " ").last!.dropLast()
+    let fileURL = URL(fileURLWithPath: #file, isDirectory: false)
+    let fileName = fileURL.deletingPathExtension().lastPathComponent
+    let testDirectory = fileURL
+      .deletingLastPathComponent()
+      .appendingPathComponent("__Snapshots__")
+      .appendingPathComponent(fileName)
+    snapshotURL = testDirectory
+      .appendingPathComponent("\(testName).1.json")
     try? FileManager.default
-      .createDirectory(
-        at: snapshotURL().deletingLastPathComponent(), withIntermediateDirectories: true)
+      .removeItem(at: snapshotURL.deletingLastPathComponent())
+    try? FileManager.default
+      .createDirectory(at: testDirectory, withIntermediateDirectories: true)
   }
+
   override func tearDown() {
     super.tearDown()
     try? FileManager.default
-      .removeItem(at: snapshotURL().deletingLastPathComponent())
+      .removeItem(at: snapshotURL.deletingLastPathComponent())
   }
 
   #if canImport(Darwin)
     func testRecordNever() {
-      let snapshotURL = snapshotURL()
-
       XCTExpectFailure {
         withSnapshotTesting(record: .never) {
           assertSnapshot(of: 42, as: .json)
@@ -37,9 +49,6 @@ class RecordTests: XCTestCase {
 
   #if canImport(Darwin)
     func testRecordMissing() {
-      let snapshotURL = snapshotURL()
-      try? FileManager.default.removeItem(at: snapshotURL)
-
       XCTExpectFailure {
         withSnapshotTesting(record: .missing) {
           assertSnapshot(of: 42, as: .json)
@@ -60,8 +69,6 @@ class RecordTests: XCTestCase {
 
   #if canImport(Darwin)
     func testRecordMissing_ExistingFile() throws {
-      let snapshotURL = snapshotURL()
-      try? FileManager.default.removeItem(at: snapshotURL)
       try Data("999".utf8).write(to: snapshotURL)
 
       XCTExpectFailure {
@@ -84,9 +91,6 @@ class RecordTests: XCTestCase {
 
   #if canImport(Darwin)
     func testRecordAll_Fresh() throws {
-      let snapshotURL = snapshotURL()
-      try? FileManager.default.removeItem(at: snapshotURL)
-
       XCTExpectFailure {
         withSnapshotTesting(record: .all) {
           assertSnapshot(of: 42, as: .json)
@@ -107,8 +111,6 @@ class RecordTests: XCTestCase {
 
   #if canImport(Darwin)
     func testRecordAll_Overwrite() throws {
-      let snapshotURL = snapshotURL()
-      try? FileManager.default.removeItem(at: snapshotURL)
       try Data("999".utf8).write(to: snapshotURL)
 
       XCTExpectFailure {
@@ -131,8 +133,6 @@ class RecordTests: XCTestCase {
 
   #if canImport(Darwin)
     func testRecordFailed_WhenFailure() throws {
-      let snapshotURL = snapshotURL()
-      try? FileManager.default.removeItem(at: snapshotURL)
       try Data("999".utf8).write(to: snapshotURL)
 
       XCTExpectFailure {
@@ -154,8 +154,6 @@ class RecordTests: XCTestCase {
   #endif
 
   func testRecordFailed_NoFailure() throws {
-    let snapshotURL = snapshotURL()
-    try? FileManager.default.removeItem(at: snapshotURL)
     try Data("42".utf8).write(to: snapshotURL)
     let modifiedDate =
       try FileManager.default
@@ -174,16 +172,5 @@ class RecordTests: XCTestCase {
         .attributesOfItem(atPath: snapshotURL.path)[FileAttributeKey.modificationDate] as! Date,
       modifiedDate
     )
-  }
-
-  func snapshotURL(_ function: StaticString = #function) -> URL {
-    let fileURL = URL(fileURLWithPath: #file, isDirectory: false)
-    let fileName = fileURL.deletingPathExtension().lastPathComponent
-    return
-      fileURL
-      .deletingLastPathComponent()
-      .appendingPathComponent("__Snapshots__")
-      .appendingPathComponent(fileName)
-      .appendingPathComponent("\(String(describing: function).dropLast(2)).1.json")
   }
 }
