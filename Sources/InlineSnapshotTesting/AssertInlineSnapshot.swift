@@ -44,9 +44,10 @@ import Foundation
     line: UInt = #line,
     column: UInt = #column
   ) {
-    let record = (isRecording == true ? .all : isRecording == false ? .missing : nil)
-    ?? SnapshotTestingConfiguration.current?.record
-    ?? _record
+    let record =
+      (isRecording == true ? .all : isRecording == false ? .missing : nil)
+      ?? SnapshotTestingConfiguration.current?.record
+      ?? _record
     withSnapshotTesting(record: record) {
       let _: Void = installTestObserver
       do {
@@ -62,15 +63,15 @@ import Foundation
             break
           case .timedOut:
             recordIssue(
-            """
-            Exceeded timeout of \(timeout) seconds waiting for snapshot.
+              """
+              Exceeded timeout of \(timeout) seconds waiting for snapshot.
 
-            This can happen when an asynchronously loaded value (like a network response) has not \
-            loaded. If a timeout is unavoidable, consider setting the "timeout" parameter of
-            "assertInlineSnapshot" to a higher value.
-            """,
-            file: file,
-            line: line
+              This can happen when an asynchronously loaded value (like a network response) has not \
+              loaded. If a timeout is unavoidable, consider setting the "timeout" parameter of
+              "assertInlineSnapshot" to a higher value.
+              """,
+              file: file,
+              line: line
             )
             return
           case .incorrectOrder, .interrupted, .invertedFulfillment:
@@ -101,33 +102,34 @@ import Foundation
 
           var failure: String
           if syntaxDescriptor.trailingClosureLabel
-              == InlineSnapshotSyntaxDescriptor.defaultTrailingClosureLabel
+            == InlineSnapshotSyntaxDescriptor.defaultTrailingClosureLabel
           {
             failure = "Automatically recorded a new snapshot."
           } else {
             failure = """
-            Automatically recorded a new snapshot for "\(syntaxDescriptor.trailingClosureLabel)".
-            """
+              Automatically recorded a new snapshot for "\(syntaxDescriptor.trailingClosureLabel)".
+              """
           }
           if let difference = snapshotting.diffing.diff(expected ?? "", actual ?? "")?.0 {
             failure += " Difference: …\n\n\(difference.indenting(by: 2))"
           }
           recordIssue(
-          """
-          \(failure)
+            """
+            \(failure)
 
-          Re-run "\(function)" to assert against the newly-recorded snapshot.
-          """,
-          file: file,
-          line: line
+            Re-run "\(function)" to assert against the newly-recorded snapshot.
+            """,
+            file: file,
+            line: line
           )
           return
         }
 
         guard let expected
         else {
-          recordIssue("""
-            TODO: No expected value to assert against.
+          recordIssue(
+            """
+            No expected value to assert against.
             """,
             file: file,
             line: line
@@ -140,14 +142,14 @@ import Foundation
 
         let message = message()
         syntaxDescriptor.fail(
-        """
-        \(message.isEmpty ? "Snapshot did not match. Difference: …" : message)
+          """
+          \(message.isEmpty ? "Snapshot did not match. Difference: …" : message)
 
-        \(difference.indenting(by: 2))
-        """,
-        file: file,
-        line: line,
-        column: column
+          \(difference.indenting(by: 2))
+          """,
+          file: file,
+          line: line,
+          column: column
         )
       } catch {
         recordIssue("Threw error: \(error)", file: file, line: line)

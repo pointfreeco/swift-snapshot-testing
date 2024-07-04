@@ -10,7 +10,7 @@
 /// For example, to specify to put an entire test class in record mode you do the following:
 ///
 /// ```swift
-/// class StringifyTests: XCTestCase {
+/// class FeatureTests: XCTestCase {
 ///   override func invokeTest() {
 ///     withSnapshotTesting(record: .all) {
 ///       super.invokeTest()

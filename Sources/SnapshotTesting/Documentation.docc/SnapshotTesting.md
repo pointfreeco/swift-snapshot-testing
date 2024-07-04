@@ -7,6 +7,7 @@ Powerfully flexible snapshot testing.
 ### Essentials
 
 - ``assertSnapshot(of:as:named:record:timeout:file:testName:line:)``
+- <doc:MigrationGuides>
 
 ### Strategies
 
