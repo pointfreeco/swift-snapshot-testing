@@ -7,7 +7,16 @@ class RecordTests: XCTestCase {
   override func setUp() {
     super.setUp()
 
-    let testName = dump(self.testRun!.test.name, name: "TEST NAME").split(separator: " ").last!.dropLast()
+    //RecordTests.testRecordFailed_NoFailure
+    //-[RecordTests testRecordAll_Fresh]
+
+    let testName = String(
+      self.name
+      .split(separator: " ")
+      .flatMap { String($0).split(separator: ".") }
+      .last!
+    )
+      .prefix(while: { $0 != "]" })
     let fileURL = URL(fileURLWithPath: #file, isDirectory: false)
     let testClassName = fileURL.deletingPathExtension().lastPathComponent
     let testDirectory = fileURL
