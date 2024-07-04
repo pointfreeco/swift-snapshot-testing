@@ -415,3 +415,9 @@ public func verifySnapshot<Value, Format>(
 
 @available(*, deprecated, renamed: "XCTestCase")
 public typealias SnapshotTestCase = XCTestCase
+
+@available(*, deprecated, renamed: "isRecording")
+public var record: Bool {
+  get { isRecording }
+  set { isRecording = newValue }
+}
