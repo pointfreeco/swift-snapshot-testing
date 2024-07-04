@@ -69,7 +69,8 @@ Further, the `diffTool` and `record` arguments have extra customization capabili
 
   * `diffTool` is now a [function](<doc:SnapshotTestingConfiguration/DiffTool-swift.struct>) 
     `(String, String) -> String` that is handed the current snapshot file and the failed snapshot
-    file. It can return the command that one can run to display a diff:
+    file. It can return the command that one can run to display a diff. For example, to use
+    ImageMagick's `compare` command and open the result in Preview.app:
 
   ```swift
   extension SnapshotTestingConfiguration.DiffTool {
