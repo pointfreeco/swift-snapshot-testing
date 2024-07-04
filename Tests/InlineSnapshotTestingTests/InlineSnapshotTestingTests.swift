@@ -5,7 +5,7 @@ import XCTest
 
 final class InlineSnapshotTestingTests: XCTestCase {
   override func invokeTest() {
-    withSnapshotTesting(diffTool: .ksdiff, record: .missing) {
+    withSnapshotTesting(record: .missing, diffTool: .ksdiff) {
       super.invokeTest()
     }
   }
