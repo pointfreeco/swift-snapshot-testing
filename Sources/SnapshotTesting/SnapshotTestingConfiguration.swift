@@ -212,7 +212,7 @@ public struct SnapshotTestingConfiguration: Sendable {
   message: "Use '.all' instead of 'true', and '.missing' instead of 'false'."
 )
 @available(
-  visionOS, 
+  visionOS,
   deprecated: 9999,
   message: "Use '.all' instead of 'true', and '.missing' instead of 'false'."
 )
@@ -223,32 +223,8 @@ extension SnapshotTestingConfiguration.Record: ExpressibleByBooleanLiteral {
 }
 
 @available(
-  iOS,
-  deprecated: 9999,
-  renamed: "SnapshotTestingConfiguration.DiffTool.default",
-  message: "Use '.default' instead of a 'nil' value for 'diffTool'."
-)
-@available(
-  macOS,
-  deprecated: 9999,
-  renamed: "SnapshotTestingConfiguration.DiffTool.default",
-  message: "Use '.default' instead of a 'nil' value for 'diffTool'."
-)
-@available(
-  tvOS,
-  deprecated: 9999,
-  renamed: "SnapshotTestingConfiguration.DiffTool.default",
-  message: "Use '.default' instead of a 'nil' value for 'diffTool'."
-)
-@available(
-  watchOS,
-  deprecated: 9999,
-  renamed: "SnapshotTestingConfiguration.DiffTool.default",
-  message: "Use '.default' instead of a 'nil' value for 'diffTool'."
-)
-@available(
-  visionOS,
-  deprecated: 9999,
+  *,
+  deprecated,
   renamed: "SnapshotTestingConfiguration.DiffTool.default",
   message: "Use '.default' instead of a 'nil' value for 'diffTool'."
 )
