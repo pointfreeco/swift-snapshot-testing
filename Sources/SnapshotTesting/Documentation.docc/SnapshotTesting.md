@@ -18,9 +18,9 @@ Powerfully flexible snapshot testing.
 
 ### Configuration
 
-- ``withSnapshotTesting(diffTool:record:operation:)-7xmhk``
+- ``withSnapshotTesting(record:diffTool:operation:)-59u9g``
 - ``SnapshotTestingConfiguration``
 
 ### Deprecations
 
-- <doc:Deprecations>
+- <doc:SnapshotTestingDeprecations>

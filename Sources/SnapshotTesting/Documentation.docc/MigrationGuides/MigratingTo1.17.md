@@ -37,7 +37,7 @@ diffs of files, but only works when the command line tool accepts a very narrow 
 _e.g._ `ksdiff /path/to/file1.png /path/to/file2.png`.
 
 We have greatly improved upon all of these problems by introducing the new 
-``withSnapshotTesting(diffTool:record:operation:)-7xmhk`` tool for customizing snapshots. It 
+``withSnapshotTesting(record:diffTool:operation:)-59u9g`` tool for customizing snapshots. It 
 allows you to customize how the `assertSnapshot` tool behaves for a well-defined scope.
 
 Rather than overriding `isRecording` or `diffTool` directly in your tests, you can wrap your test in

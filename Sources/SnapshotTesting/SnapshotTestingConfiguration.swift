@@ -20,12 +20,12 @@
 /// ```
 ///
 /// - Parameters:
-///   - diffTool: The diff tool to use while asserting snapshots.
 ///   - record: The record mode to use while asserting snapshots.
+///   - diffTool: The diff tool to use while asserting snapshots.
 ///   - operation: The operation to perform.
 public func withSnapshotTesting<R>(
-  diffTool: SnapshotTestingConfiguration.DiffTool? = nil,
   record: SnapshotTestingConfiguration.Record? = nil,
+  diffTool: SnapshotTestingConfiguration.DiffTool? = nil,
   operation: () throws -> R
 ) rethrows -> R {
   try SnapshotTestingConfiguration.$current.withValue(
@@ -40,10 +40,10 @@ public func withSnapshotTesting<R>(
 
 /// Customizes `assertSnapshot` for the duration of an asynchronous operation.
 ///
-/// See ``withSnapshotTesting(diffTool:record:operation:)-7xmhk`` for more information.
+/// See ``withSnapshotTesting(record:diffTool:operation:)-59u9g`` for more information.
 public func withSnapshotTesting<R>(
-  diffTool: SnapshotTestingConfiguration.DiffTool? = nil,
   record: SnapshotTestingConfiguration.Record? = nil,
+  diffTool: SnapshotTestingConfiguration.DiffTool? = nil,
   operation: () async throws -> R
 ) async rethrows -> R {
   try await SnapshotTestingConfiguration.$current.withValue(

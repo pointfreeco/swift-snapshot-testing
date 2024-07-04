@@ -33,8 +33,8 @@
       testCase: Test.Case?
     ) async throws {
       try await withSnapshotTesting(
-        diffTool: configuration.diffTool,
-        record: configuration.record
+        record: configuration.record,
+        diffTool: configuration.diffTool
       ) {
         try await function()
       }
