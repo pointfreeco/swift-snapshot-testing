@@ -1,7 +1,7 @@
-# ``withSnapshotTesting(diffCommand:record:operation:)-4s6ad``
+# ``SnapshotTesting/withSnapshotTesting(diffTool:record:operation:)-7xmhk``
 
 ## Topics
 
 ### Overloads
 
-- ``withSnapshotTesting(diffCommand:record:operation:)-7xmhk``
+- ``withSnapshotTesting(diffTool:record:operation:)-4s6ad``

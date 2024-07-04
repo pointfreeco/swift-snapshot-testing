@@ -21,6 +21,6 @@ public func recordIssue(
       XCTFail(message(), file: file, line: line)
     }
   #else
-    XCTFail(message(), file: filePath, line: line)
+    XCTFail(message(), file: file, line: line)
   #endif
 }
