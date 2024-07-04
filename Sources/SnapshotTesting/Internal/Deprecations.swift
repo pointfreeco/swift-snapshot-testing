@@ -316,10 +316,7 @@ private var recordings: Recordings = [:]
 
 // Deprecated after 1.11.1:
 
-@available(iOS, deprecated: 10000, message: "Use `assertSnapshot(of:…:)` instead.")
-@available(macOS, deprecated: 10000, message: "Use `assertSnapshot(of:…:)` instead.")
-@available(tvOS, deprecated: 10000, message: "Use `assertSnapshot(of:…:)` instead.")
-@available(watchOS, deprecated: 10000, message: "Use `assertSnapshot(of:…:)` instead.")
+@available(*, deprecated, renamed: "assertSnapshot(of:as:named:record:timeout:file:testName:line:)")
 public func assertSnapshot<Value, Format>(
   matching value: @autoclosure () throws -> Value,
   as snapshotting: Snapshotting<Value, Format>,
@@ -342,10 +339,9 @@ public func assertSnapshot<Value, Format>(
   )
 }
 
-@available(iOS, deprecated: 10000, message: "Use `assertSnapshots(of:…:)` instead.")
-@available(macOS, deprecated: 10000, message: "Use `assertSnapshots(of:…:)` instead.")
-@available(tvOS, deprecated: 10000, message: "Use `assertSnapshots(of:…:)` instead.")
-@available(watchOS, deprecated: 10000, message: "Use `assertSnapshots(of:…:)` instead.")
+@available(
+  *, deprecated, renamed: "assertSnapshots(of:as:named:record:timeout:file:testName:line:)"
+)
 public func assertSnapshots<Value, Format>(
   matching value: @autoclosure () throws -> Value,
   as strategies: [String: Snapshotting<Value, Format>],
@@ -366,10 +362,9 @@ public func assertSnapshots<Value, Format>(
   )
 }
 
-@available(iOS, deprecated: 10000, message: "Use `assertSnapshots(of:…:)` instead.")
-@available(macOS, deprecated: 10000, message: "Use `assertSnapshots(of:…:)` instead.")
-@available(tvOS, deprecated: 10000, message: "Use `assertSnapshots(of:…:)` instead.")
-@available(watchOS, deprecated: 10000, message: "Use `assertSnapshots(of:…:)` instead.")
+@available(
+  *, deprecated, renamed: "assertSnapshots(of:as:named:record:timeout:file:testName:line:)"
+)
 public func assertSnapshots<Value, Format>(
   matching value: @autoclosure () throws -> Value,
   as strategies: [Snapshotting<Value, Format>],
@@ -390,10 +385,10 @@ public func assertSnapshots<Value, Format>(
   )
 }
 
-@available(iOS, deprecated: 10000, message: "Use `verifySnapshot(of:…:)` instead.")
-@available(macOS, deprecated: 10000, message: "Use `verifySnapshot(of:…:)` instead.")
-@available(tvOS, deprecated: 10000, message: "Use `verifySnapshot(of:…:)` instead.")
-@available(watchOS, deprecated: 10000, message: "Use `verifySnapshot(of:…:)` instead.")
+@available(
+  *, deprecated,
+  renamed: "verifySnapshot(of:as:named:record:snapshotDirectory:timeout:file:testName:line:)"
+)
 public func verifySnapshot<Value, Format>(
   matching value: @autoclosure () throws -> Value,
   as snapshotting: Snapshotting<Value, Format>,
