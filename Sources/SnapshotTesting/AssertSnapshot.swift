@@ -7,12 +7,12 @@ import XCTest
 /// diffTool = "ksdiff"
 /// ```
 public var diffTool: String? {
-    get { diffToolCommand?("", "").trimmingCharacters(in: .whitespaces) }
-    set {
-        diffToolCommand = newValue.map { value in
-            { [value, $0, $1].joined(separator: " ") }
-        }
+  get { diffToolCommand?("", "").trimmingCharacters(in: .whitespaces) }
+  set {
+    diffToolCommand = newValue.map { value in
+      { [value, $0, $1].joined(separator: " ") }
     }
+  }
 }
 
 /// Enhances failure messages with a diff tool expression created by the closure, such as an clickable
