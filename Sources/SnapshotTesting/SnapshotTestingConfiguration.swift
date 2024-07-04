@@ -156,26 +156,31 @@ extension SnapshotTestingConfiguration.Record: ExpressibleByBooleanLiteral {
 @available(
   iOS,
   deprecated: 9999,
+  renamed: "SnapshotTestingConfiguration.DiffTool.default",
   message: "Use '.default' instead of a 'nil' value for 'diffTool'."
 )
 @available(
   macOS,
   deprecated: 9999,
+  renamed: "SnapshotTestingConfiguration.DiffTool.default",
   message: "Use '.default' instead of a 'nil' value for 'diffTool'."
 )
 @available(
   tvOS,
   deprecated: 9999,
+  renamed: "SnapshotTestingConfiguration.DiffTool.default",
   message: "Use '.default' instead of a 'nil' value for 'diffTool'."
 )
 @available(
   watchOS,
   deprecated: 9999,
+  renamed: "SnapshotTestingConfiguration.DiffTool.default",
   message: "Use '.default' instead of a 'nil' value for 'diffTool'."
 )
 @available(
   visionOS,
   deprecated: 9999,
+  renamed: "SnapshotTestingConfiguration.DiffTool.default",
   message: "Use '.default' instead of a 'nil' value for 'diffTool'."
 )
 extension SnapshotTestingConfiguration.DiffTool: ExpressibleByNilLiteral {
