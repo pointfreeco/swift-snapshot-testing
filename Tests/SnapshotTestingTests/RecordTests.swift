@@ -165,7 +165,7 @@ class RecordTests: XCTestCase {
   func testRecordFailed_NoFailure() throws {
     try Data("42".utf8).write(to: snapshotURL)
     let modifiedDate =
-      try FileManager.default
+    try FileManager.default
       .attributesOfItem(atPath: snapshotURL.path)[FileAttributeKey.modificationDate] as! Date
 
     withSnapshotTesting(record: .failed) {
@@ -180,6 +180,23 @@ class RecordTests: XCTestCase {
       try FileManager.default
         .attributesOfItem(atPath: snapshotURL.path)[FileAttributeKey.modificationDate] as! Date,
       modifiedDate
+    )
+  }
+
+  func testRecordFailed_MissingFile() throws {
+    XCTExpectFailure {
+      withSnapshotTesting(record: .failed) {
+        assertSnapshot(of: 42, as: .json)
+      }
+    } issueMatcher: {
+      $0.compactDescription.hasPrefix("""
+        failed - No reference was found on disk. Automatically recorded snapshot: …
+        """)
+    }
+
+    try XCTAssertEqual(
+      String(decoding: Data(contentsOf: snapshotURL), as: UTF8.self),
+      "42"
     )
   }
 }

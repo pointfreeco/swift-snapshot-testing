@@ -290,7 +290,8 @@ public func verifySnapshot<Value, Format>(
 
       guard
         record != .all,
-        record != .missing || fileManager.fileExists(atPath: snapshotFileUrl.path)
+        (record != .missing && record != .failed)
+          || fileManager.fileExists(atPath: snapshotFileUrl.path)
       else {
         try recordSnapshot()
 
