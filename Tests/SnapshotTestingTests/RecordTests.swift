@@ -2,6 +2,13 @@ import SnapshotTesting
 import XCTest
 
 class RecordTests: XCTestCase {
+  override func tearDown() {
+    try? FileManager.default
+      .removeItem(at: snapshotURL().deletingLastPathComponent())
+    try? FileManager.default
+      .createDirectory(at: snapshotURL().deletingLastPathComponent(), withIntermediateDirectories: true)
+  }
+
   func testRecordNever() {
     let snapshotURL = snapshotURL()
 
