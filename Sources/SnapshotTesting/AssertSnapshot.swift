@@ -2,7 +2,12 @@ import XCTest
 
 /// Enhances failure messages with a command line diff tool expression that can be copied and pasted
 /// into a terminal.
-@available(*, deprecated, message: "Use 'withSnapshotTesting' to customize the diff tool. See the documentation for more information.")
+@available(
+  *,
+  deprecated,
+  message:
+    "Use 'withSnapshotTesting' to customize the diff tool. See the documentation for more information."
+)
 public var diffTool: SnapshotTestingConfiguration.DiffTool {
   get { _diffTool }
   set { _diffTool = newValue }
@@ -12,7 +17,11 @@ public var diffTool: SnapshotTestingConfiguration.DiffTool {
 public var _diffTool: SnapshotTestingConfiguration.DiffTool = .default
 
 /// Whether or not to record all new references.
-@available(*, deprecated, message: "Use 'withSnapshotTesting' to customize the record mode. See the documentation for more information.")
+@available(
+  *, deprecated,
+  message:
+    "Use 'withSnapshotTesting' to customize the record mode. See the documentation for more information."
+)
 public var isRecording: Bool {
   get { SnapshotTestingConfiguration.current?.record ?? _record == .all }
   set { _record = newValue ? .all : .missing }
