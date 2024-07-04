@@ -3,6 +3,10 @@
 
   @_spi(Experimental)
   extension Trait where Self == _SnapshotsTestTrait {
+    /// Configure snapshot testing in a suite or test.
+    /// - Parameters:
+    ///   - diffTool: The diff tool to use in failure messages.
+    ///   - record: The record mode of the test.
     public static func snapshots(
       diffTool: SnapshotTestingConfiguration.DiffTool = .default,
       record: SnapshotTestingConfiguration.Record = .missing
@@ -14,7 +18,9 @@
         )
       )
     }
-
+    
+    /// Configure snapshot testing in a suite or test.
+    /// - Parameter configuration: The configuration to use.
     public static func snapshots(
       _ configuration: SnapshotTestingConfiguration
     ) -> Self {
@@ -22,6 +28,7 @@
     }
   }
 
+  /// A type representing the configuration of snapshot testing.
   @_spi(Experimental)
   public struct _SnapshotsTestTrait: CustomExecutionTrait, SuiteTrait, TestTrait {
     public let isRecursive = true
