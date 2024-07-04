@@ -206,6 +206,8 @@ public func verifySnapshot<Value, Format>(
   testName: String = #function,
   line: UInt = #line
 ) -> String? {
+  CleanCounterBetweenTestCases.registerIfNeeded()
+  
   let record =
     (recording == true ? .all : recording == false ? .missing : nil)
     ?? SnapshotTestingConfiguration.current?.record
