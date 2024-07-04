@@ -7,6 +7,7 @@ Powerfully flexible snapshot testing.
 ### Essentials
 
 - ``assertSnapshot(of:as:named:record:timeout:file:testName:line:)``
+- <doc:IntegratingWithTestFrameworks>
 - <doc:MigrationGuides>
 
 ### Strategies
@@ -18,7 +19,8 @@ Powerfully flexible snapshot testing.
 
 ### Configuration
 
-- ``withSnapshotTesting(record:diffTool:operation:)-59u9g``
+- ``Testing/Trait/snapshots(diffTool:record:)``
+- ``withSnapshotTesting(record:diffTool:operation:)-2kuyr``
 - ``SnapshotTestingConfiguration``
 
 ### Deprecations

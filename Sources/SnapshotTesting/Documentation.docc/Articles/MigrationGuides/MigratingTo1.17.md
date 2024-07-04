@@ -37,7 +37,7 @@ diffs of files, but only works when the command line tool accepts a very narrow 
 _e.g._ `ksdiff /path/to/file1.png /path/to/file2.png`.
 
 We have greatly improved upon all of these problems by introducing the new 
-``withSnapshotTesting(record:diffTool:operation:)-59u9g`` tool for customizing snapshots. It 
+``withSnapshotTesting(record:diffTool:operation:)-2kuyr`` tool for customizing snapshots. It 
 allows you to customize how the `assertSnapshot` tool behaves for a well-defined scope.
 
 Rather than overriding `isRecording` or `diffTool` directly in your tests, you can wrap your test in
@@ -74,12 +74,12 @@ Further, the `diffTool` and `record` arguments have extra customization capabili
   ```swift
   extension SnapshotTestingConfiguration.DiffTool {
     static let compare = Self { 
-      "compare \"\($0.path)\" \"\($1.path)\" png: | open -f -a Preview.app" 
+      "compare \"\($0)\" \"\($1)\" png: | open -f -a Preview.app" 
     }
   }
   ```
 
-  * `record` is now an [enum](<doc:SnapshotTestingConfiguration/Record-swift.enum>) with 3
+  * `record` is now a [type](<doc:SnapshotTestingConfiguration/Record-swift.struct>) with 3
     choices: `all`, `missing`, `none`. When set to `all`, snapshots will be generated and saved to 
     disk. When set to `missing` only the snapshots that are missing from the disk will be generated
     and saved. And when set to `none` snapshots will never be generated, even if they are missing.

@@ -40,7 +40,7 @@ public func withSnapshotTesting<R>(
 
 /// Customizes `assertSnapshot` for the duration of an asynchronous operation.
 ///
-/// See ``withSnapshotTesting(record:diffTool:operation:)-59u9g`` for more information.
+/// See ``withSnapshotTesting(record:diffTool:operation:)-2kuyr`` for more information.
 public func withSnapshotTesting<R>(
   record: SnapshotTestingConfiguration.Record? = nil,
   diffTool: SnapshotTestingConfiguration.DiffTool? = nil,
@@ -61,7 +61,14 @@ public struct SnapshotTestingConfiguration: Sendable {
   @_spi(Internals)
   @TaskLocal public static var current: Self?
   
+  /// The diff tool use to print helpful test failure messages.
+  ///
+  /// See ``DiffTool-swift.struct`` for more information.
   public var diffTool: DiffTool
+  
+  /// The recording strategy to use while running snapshot tests.
+  ///
+  /// See ``Record-swift.struct`` for more information.
   public var record: Record
 
   public init(
@@ -73,6 +80,9 @@ public struct SnapshotTestingConfiguration: Sendable {
   }
   
   /// The record mode of the snapshot test.
+  ///
+  /// There are 3 primary strategies for recording: ``Record-swift.struct/all``,
+  /// ``Record-swift.struct/missing`` and ``Record-swift.struct/none``.
   public struct Record: Equatable, Sendable {
     private let storage: Storage
     
@@ -110,8 +120,29 @@ public struct SnapshotTestingConfiguration: Sendable {
   }
   
   /// Describes the diff command used to diff two files on disk.
+  ///
+  /// This type can be created with a closure that takes two arguments: the first argument is
+  /// is a file path to the currently recorded snapshot on disk, and the second argument is the
+  /// file path to a _failed_ snapshot that was recorded to a temporary location on disk. You can
+  /// use these two file paths to construct a command that can be used to compare the two files.
+  /// 
+  /// For example, to use ImageMagick's `compare` tool and pipe the result into Preview.app, you
+  /// could create the following `DiffTool`:
+  ///
+  /// ```swift
+  /// extension SnapshotTestingConfiguration.DiffTool {
+  ///   static let compare = Self {
+  ///     "compare \"\($0)\" \"\($1)\" png: | open -f -a Preview.app"
+  ///   }
+  /// }
+  /// ```
+  ///
+  /// `DiffTool` also comes with two values: ``DiffTool-swift.struct/ksdiff`` for printing a
+  /// command for opening [Kaleidoscope](https://kaleidoscope.app), and
+  /// ``DiffTool-swift.struct/default`` for simply printing the two URLs to the test failure
+  /// message.
   public struct DiffTool: Sendable, ExpressibleByStringLiteral {
-    var tool: @Sendable (String, String) -> String
+    var tool: @Sendable (_ currentFilePath: String, _ failedFilePath: String) -> String
 
     public init(
       _ tool: @escaping @Sendable (_ currentFilePath: String, _ failedFilePath: String) -> String
