@@ -119,27 +119,27 @@ public struct SnapshotTestingConfiguration: Sendable {
 @available(
   iOS, 
   deprecated: 9999,
-  message: "Use 'SnapshotTestingConfiguration.Record' instead of a boolean for the record mode."
+  message: "Use 'SnapshotTestingConfiguration.Record.all' instead of 'true', and '.missing' instead of 'false'."
 )
 @available(
   macOS, 
   deprecated: 9999,
-  message: "Use 'SnapshotTestingConfiguration.Record' instead of a boolean for the record mode."
+  message: "Use 'SnapshotTestingConfiguration.Record.all' instead of 'true', and '.missing' instead of 'false'."
 )
 @available(
   tvOS, 
   deprecated: 9999,
-  message: "Use 'SnapshotTestingConfiguration.Record' instead of a boolean for the record mode."
+  message: "Use 'SnapshotTestingConfiguration.Record.all' instead of 'true', and '.missing' instead of 'false'."
 )
 @available(
   watchOS, 
   deprecated: 9999,
-  message: "Use 'SnapshotTestingConfiguration.Record' instead of a boolean for the record mode."
+  message: "Use 'SnapshotTestingConfiguration.Record.all' instead of 'true', and '.missing' instead of 'false'."
 )
 @available(
   visionOS, 
   deprecated: 9999,
-  message: "Use 'SnapshotTestingConfiguration.Record' instead of a boolean for the record mode."
+  message: "Use 'SnapshotTestingConfiguration.Record.all' instead of 'true', and '.missing' instead of 'false'."
 )
 extension SnapshotTestingConfiguration.Record: ExpressibleByBooleanLiteral {
   public init(booleanLiteral value: BooleanLiteralType) {
