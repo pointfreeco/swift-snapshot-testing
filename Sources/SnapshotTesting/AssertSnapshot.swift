@@ -285,7 +285,8 @@ public func verifySnapshot<Value, Format>(
       return "Couldn't snapshot value"
     }
 
-    guard !recording, canGenerateNewSnapshots, fileManager.fileExists(atPath: snapshotFileUrl.path) else {
+    guard !recording, canGenerateNewSnapshots, fileManager.fileExists(atPath: snapshotFileUrl.path)
+    else {
       try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)
       #if !os(Linux) && !os(Windows)
         if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
