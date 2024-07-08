@@ -36,7 +36,7 @@ struct SnapshotsTraitTests {
         #expect(SnapshotTestingConfiguration.current?.record == .all)
       }
 
-      @Suite(.snapshots(diffTool: "diff", record: .failed))
+      @Suite(.snapshots(record: .failed, diffTool: "diff"))
       struct OverrideDiffToolAndRecord {
         @Test
         func config() {
