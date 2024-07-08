@@ -15,7 +15,7 @@
     ///     [the precision](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e) of the
     ///     human eye.
     /// - Returns: A new diffing strategy.
-    public static func image(precision: Float = 1, perceptualPrecision: Float = 1) -> Diffing {
+    public static func image(precision: Float = SnapshottingDefaults.precision, perceptualPrecision: Float = SnapshottingDefaults.perceptualPrecision) -> Diffing {
       return .init(
         toData: { NSImagePNGRepresentation($0)! },
         fromData: { NSImage(data: $0)! }

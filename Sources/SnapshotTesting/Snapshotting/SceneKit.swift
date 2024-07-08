@@ -17,7 +17,7 @@
       ///     [the precision](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e) of the
       ///     human eye.
       ///   - size: The size of the scene.
-      public static func image(precision: Float = 1, perceptualPrecision: Float = 1, size: CGSize)
+      public static func image(precision: Float = SnapshottingDefaults.precision, perceptualPrecision: Float = SnapshottingDefaults.perceptualPrecision, size: CGSize)
         -> Snapshotting
       {
         return .scnScene(precision: precision, perceptualPrecision: perceptualPrecision, size: size)
@@ -34,7 +34,7 @@
       ///     [the precision](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e) of the
       ///     human eye.
       ///   - size: The size of the scene.
-      public static func image(precision: Float = 1, perceptualPrecision: Float = 1, size: CGSize)
+      public static func image(precision: Float = SnapshottingDefaults.precision, perceptualPrecision: Float = SnapshottingDefaults.perceptualPrecision, size: CGSize)
         -> Snapshotting
       {
         return .scnScene(precision: precision, perceptualPrecision: perceptualPrecision, size: size)
