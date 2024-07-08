@@ -7,9 +7,6 @@ class RecordTests: XCTestCase {
   override func setUp() {
     super.setUp()
 
-    //RecordTests.testRecordFailed_NoFailure
-    //-[RecordTests testRecordAll_Fresh]
-
     let testName = String(
       self.name
         .split(separator: " ")
