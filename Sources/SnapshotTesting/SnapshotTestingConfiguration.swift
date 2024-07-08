@@ -73,8 +73,8 @@ public struct SnapshotTestingConfiguration: Sendable {
   public var record: Record?
 
   public init(
-    diffTool: DiffTool?,
-    record: Record?
+    record: Record?,
+    diffTool: DiffTool?
   ) {
     self.diffTool = diffTool
     self.record = record
