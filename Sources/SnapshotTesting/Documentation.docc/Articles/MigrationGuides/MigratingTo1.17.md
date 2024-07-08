@@ -36,9 +36,9 @@ These customization options have a few downsides currently.
     diffs of files, but only works when the command line tool accepts a very narrow set of 
     arguments,  _e.g.:
 
-```sh
-ksdiff /path/to/file1.png /path/to/file2.png
-```
+    ```sh
+    ksdiff /path/to/file1.png /path/to/file2.png
+    ```
 
 Because of these reasons, the globals ``isRecording`` and ``diffTool`` are now deprecated, and we
 hvae introduced a new tool that greatly improves upon all of these problems. There is now a function
