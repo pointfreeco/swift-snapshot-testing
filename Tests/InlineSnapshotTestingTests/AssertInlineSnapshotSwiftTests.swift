@@ -1,16 +1,16 @@
+#if canImport(Testing)
+import Testing
 import Foundation
 import InlineSnapshotTesting
-import SnapshotTesting
-import XCTest
+@_spi(Experimental) import SnapshotTesting
 
-final class InlineSnapshotTestingTests: XCTestCase {
-  override func invokeTest() {
-    withSnapshotTesting(record: .missing, diffTool: .ksdiff) {
-      super.invokeTest()
-    }
-  }
-
-  func testInlineSnapshot() {
+@Suite(
+  .snapshots(
+    record: .missing
+  )
+)
+struct AssertInlineSnapshotTests {
+  @Test func inlineSnapshot() {
     assertInlineSnapshot(of: ["Hello", "World"], as: .dump) {
       """
       ▿ 2 elements
@@ -21,7 +21,7 @@ final class InlineSnapshotTestingTests: XCTestCase {
     }
   }
 
-  func testInlineSnapshot_NamedTrailingClosure() {
+  @Test func inlineSnapshot_NamedTrailingClosure() {
     assertInlineSnapshot(
       of: ["Hello", "World"], as: .dump,
       matches: {
@@ -34,7 +34,7 @@ final class InlineSnapshotTestingTests: XCTestCase {
       })
   }
 
-  func testInlineSnapshot_Escaping() {
+  @Test func inlineSnapshot_Escaping() {
     assertInlineSnapshot(of: "Hello\"\"\"#, world", as: .lines) {
       ##"""
       Hello"""#, world
@@ -42,7 +42,7 @@ final class InlineSnapshotTestingTests: XCTestCase {
     }
   }
 
-  func testCustomInlineSnapshot() {
+  @Test func customInlineSnapshot() {
     assertCustomInlineSnapshot {
       "Hello"
     } is: {
@@ -53,7 +53,7 @@ final class InlineSnapshotTestingTests: XCTestCase {
     }
   }
 
-  func testCustomInlineSnapshot_Multiline() {
+  @Test func customInlineSnapshot_Multiline() {
     assertCustomInlineSnapshot {
       """
       "Hello"
@@ -67,7 +67,7 @@ final class InlineSnapshotTestingTests: XCTestCase {
     }
   }
 
-  func testCustomInlineSnapshot_SingleTrailingClosure() {
+  @Test func customInlineSnapshot_SingleTrailingClosure() {
     assertCustomInlineSnapshot(of: { "Hello" }) {
       """
       - "Hello"
@@ -76,7 +76,7 @@ final class InlineSnapshotTestingTests: XCTestCase {
     }
   }
 
-  func testCustomInlineSnapshot_MultilineSingleTrailingClosure() {
+  @Test func customInlineSnapshot_MultilineSingleTrailingClosure() {
     assertCustomInlineSnapshot(
       of: { "Hello" }
     ) {
@@ -87,7 +87,7 @@ final class InlineSnapshotTestingTests: XCTestCase {
     }
   }
 
-  func testCustomInlineSnapshot_NoTrailingClosure() {
+  @Test func customInlineSnapshot_NoTrailingClosure() {
     assertCustomInlineSnapshot(
       of: { "Hello" },
       is: {
@@ -99,7 +99,7 @@ final class InlineSnapshotTestingTests: XCTestCase {
     )
   }
 
-  func testArgumentlessInlineSnapshot() {
+  @Test func argumentlessInlineSnapshot() {
     func assertArgumentlessInlineSnapshot(
       expected: (() -> String)? = nil,
       file: StaticString = #filePath,
@@ -130,7 +130,7 @@ final class InlineSnapshotTestingTests: XCTestCase {
     }
   }
 
-  func testMultipleInlineSnapshots() {
+  @Test func multipleInlineSnapshots() {
     func assertResponse(
       of url: () -> String,
       head: (() -> String)? = nil,
@@ -211,7 +211,7 @@ final class InlineSnapshotTestingTests: XCTestCase {
     }
   }
 
-  func testAsyncThrowing() async throws {
+  @Test func asyncThrowing() async throws {
     func assertAsyncThrowingInlineSnapshot(
       of value: () -> String,
       is expected: (() -> String)? = nil,
@@ -245,7 +245,7 @@ final class InlineSnapshotTestingTests: XCTestCase {
     }
   }
 
-  func testNestedInClosureFunction() {
+  @Test func nestedInClosureFunction() {
     func withDependencies(operation: () -> Void) {
       operation()
     }
@@ -260,7 +260,7 @@ final class InlineSnapshotTestingTests: XCTestCase {
     }
   }
 
-  func testCarriageReturnInlineSnapshot() {
+  @Test func carriageReturnInlineSnapshot() {
     assertInlineSnapshot(of: "This is a line\r\nAnd this is a line\r\n", as: .lines) {
       """
       This is a line\r
@@ -270,7 +270,7 @@ final class InlineSnapshotTestingTests: XCTestCase {
     }
   }
 
-  func testCarriageReturnRawInlineSnapshot() {
+  @Test func carriageReturnRawInlineSnapshot() {
     assertInlineSnapshot(of: "\"\"\"#This is a line\r\nAnd this is a line\r\n", as: .lines) {
       ##"""
       """#This is a line\##r
@@ -303,3 +303,5 @@ private func assertCustomInlineSnapshot(
     column: column
   )
 }
+
+#endif

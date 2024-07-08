@@ -14,16 +14,11 @@ public struct Diffing<Value> {
   public var diff: (Value, Value) -> (String, [XCTAttachment])?
 
   /// Creates a new `Diffing` on `Value`.
-  ///
+  ///  
   /// - Parameters:
   ///   - toData: A function used to convert a value _to_ data.
-  ///   - value: A value to convert into data.
   ///   - fromData: A function used to produce a value _from_ data.
-  ///   - data: Data to convert into a value.
   ///   - diff: A function used to compare two values. If the values do not match, returns a failure
-  ///     message and artifacts describing the failure.
-  ///   - lhs: A value to compare.
-  ///   - rhs: Another value to compare.
   public init(
     toData: @escaping (_ value: Value) -> Data,
     fromData: @escaping (_ data: Data) -> Value,

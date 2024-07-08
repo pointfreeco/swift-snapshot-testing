@@ -21,15 +21,13 @@ import XCTest
 #endif
 
 final class SnapshotTestingTests: XCTestCase {
-  override func setUp() {
-    super.setUp()
-    diffTool = "ksdiff"
-    // isRecording = true
-  }
-
-  override func tearDown() {
-    isRecording = false
-    super.tearDown()
+  override func invokeTest() {
+    withSnapshotTesting(
+      record: .missing, 
+      diffTool: .ksdiff
+    ) {
+      super.invokeTest()
+    }
   }
 
   func testAny() {
@@ -1316,15 +1314,6 @@ final class SnapshotTestingTests: XCTestCase {
       assertSnapshot(of: view, as: .image(layout: .device(config: .tv)), named: "device")
     }
   #endif
-
-  @available(*, deprecated)
-  func testIsRecordingProxy() {
-    SnapshotTesting.record = true
-    XCTAssertEqual(isRecording, true)
-
-    SnapshotTesting.record = false
-    XCTAssertEqual(isRecording, false)
-  }
 }
 
 #if os(iOS)
@@ -1343,31 +1332,4 @@ final class SnapshotTestingTests: XCTestCase {
       "accessibility-extra-extra-large": .accessibilityExtraExtraLarge,
       "accessibility-extra-extra-extra-large": .accessibilityExtraExtraExtraLarge,
     ]
-#endif
-
-#if os(Linux) || os(Windows)
-  extension SnapshotTestingTests {
-    static var allTests: [(String, (SnapshotTestingTests) -> () throws -> Void)] {
-      return [
-        ("testAny", testAny),
-        ("testAnySnapshotStringConvertible", testAnySnapshotStringConvertible),
-        ("testAutolayout", testAutolayout),
-        ("testDeterministicDictionaryAndSetSnapshots", testDeterministicDictionaryAndSetSnapshots),
-        ("testEncodable", testEncodable),
-        ("testMixedViews", testMixedViews),
-        ("testMultipleSnapshots", testMultipleSnapshots),
-        ("testNamedAssertion", testNamedAssertion),
-        ("testPrecision", testPrecision),
-        ("testSCNView", testSCNView),
-        ("testSKView", testSKView),
-        ("testTableViewController", testTableViewController),
-        ("testTraits", testTraits),
-        ("testTraitsEmbeddedInTabNavigation", testTraitsEmbeddedInTabNavigation),
-        ("testTraitsWithView", testTraitsWithView),
-        ("testUIView", testUIView),
-        ("testURLRequest", testURLRequest),
-        ("testWebView", testWebView),
-      ]
-    }
-  }
 #endif
