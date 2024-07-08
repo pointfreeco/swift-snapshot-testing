@@ -100,7 +100,7 @@ method of `XCTestCase`:
 
     class FeatureTests: XCTestCase {
       override func invokeTest() {
-        withSnapshotTesting(diffTool: .ksdiff, record: .all) {
+        withSnapshotTesting(record: .all, diffTool: .ksdiff) {
           super.invokeTest()
         }
       }
@@ -162,7 +162,7 @@ you to customize snapshots for a `@Test` or `@Suite`, but to get access to it yo
 ```swift
 @_spi(Experimental) import SnapshotTesting
 
-@Suite(.snapshots(diffTool: .ksdiff, record: .all))
+@Suite(.snapshots(record: .all, diffTool: .ksdiff))
 struct FeatureTests {
   …
 }

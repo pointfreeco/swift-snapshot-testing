@@ -56,8 +56,8 @@ simplest way to do this is to override the `invokeTest` method on `XCTestCase` a
 class FeatureTests: XCTestCase {
   override func invokeTest() {
     withSnapshotTesting(
-      diffTool: .ksdiff, 
-      record: .missing
+      record: .missing,
+      diffTool: .ksdiff 
     ) {
       super.invokeTest()
     }
@@ -75,7 +75,7 @@ be attached to any `@Test` or `@Suite` to configure snapshot testing:
 ```swift
 @_spi(Experimental) import SnapshotTesting
 
-@Suite(.snapshots(diffTool: .ksdiff, record: .all))
+@Suite(.snapshots(record: .all, diffTool: .ksdiff))
 struct FeatureTests {
   …
 }
