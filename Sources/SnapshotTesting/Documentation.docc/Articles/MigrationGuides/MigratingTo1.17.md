@@ -119,13 +119,13 @@ Further, the `diffTool` and `record` arguments have extra customization capabili
     file. It can return the command that one can run to display a diff. For example, to use
     ImageMagick's `compare` command and open the result in Preview.app:
 
-  ```swift
-  extension SnapshotTestingConfiguration.DiffTool {
-    static let compare = Self { 
-      "compare \"\($0)\" \"\($1)\" png: | open -f -a Preview.app" 
+    ```swift
+    extension SnapshotTestingConfiguration.DiffTool {
+      static let compare = Self { 
+        "compare \"\($0)\" \"\($1)\" png: | open -f -a Preview.app" 
+      }
     }
-  }
-  ```
+    ```
 
   * `record` is now a [type](<doc:SnapshotTestingConfiguration/Record-swift.struct>) with 4
     choices: `all`, `missing`, `never`, `failed`:
