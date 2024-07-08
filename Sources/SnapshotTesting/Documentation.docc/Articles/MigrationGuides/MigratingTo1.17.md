@@ -41,7 +41,7 @@ These customization options have a few downsides currently.
     ```
 
 Because of these reasons, the globals ``isRecording`` and ``diffTool`` are now deprecated, and we
-hvae introduced a new tool that greatly improves upon all of these problems. There is now a function
+have introduced a new tool that greatly improves upon all of these problems. There is now a function
 called ``withSnapshotTesting(record:diffTool:operation:)-2kuyr`` for customizing snapshots. It 
 allows you to customize how the `assertSnapshot` tool behaves for a well-defined scope.
 
