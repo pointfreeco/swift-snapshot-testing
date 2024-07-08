@@ -32,16 +32,17 @@ These customization options have a few downsides currently.
     users wanted an option between these two extremes, where snapshots would not be generated if the
     file does not exist on disk.
 
-And the ``diffTool`` variable allows one to specify a command line tool to use for visualizing
-diffs of files, but only works when the command line tool accepts a very narrow set of arguments, 
-_e.g._:
+    And the ``diffTool`` variable allows one to specify a command line tool to use for visualizing
+    diffs of files, but only works when the command line tool accepts a very narrow set of 
+    arguments,  _e.g.:
 
 ```sh
-$ ksdiff /path/to/file1.png /path/to/file2.png
+ksdiff /path/to/file1.png /path/to/file2.png
 ```
 
-We have greatly improved upon all of these problems by introducing the new 
-``withSnapshotTesting(record:diffTool:operation:)-2kuyr`` tool for customizing snapshots. It 
+Because of these reasons, the globals ``isRecording`` and ``diffTool`` are now deprecated, and we
+hvae introduced a new tool that greatly improves upon all of these problems. There is now a function
+called ``withSnapshotTesting(record:diffTool:operation:)-2kuyr`` for customizing snapshots. It 
 allows you to customize how the `assertSnapshot` tool behaves for a well-defined scope.
 
 Rather than overriding `isRecording` or `diffTool` directly in your tests, you can wrap your test in
@@ -55,7 +56,7 @@ Rather than overriding `isRecording` or `diffTool` directly in your tests, you c
     func testFeature() {
       isRecording = true 
       diffTool = "ksdiff"
-      assertSnapshot(/* ... */)
+      assertSnapshot(…)
     }
     ```
   }
@@ -64,11 +65,8 @@ Rather than overriding `isRecording` or `diffTool` directly in your tests, you c
     // After
 
     func testFeature() {
-      withSnapshotTesting(
-        record: .all,
-        diffTool: .ksdiff
-      ) {
-        assertSnapshot(/* ... */)
+      withSnapshotTesting(record: .all, diffTool: .ksdiff) {
+        assertSnapshot(…)
       }
     }
     ```
@@ -102,10 +100,7 @@ method of `XCTestCase`:
 
     class FeatureTests: XCTestCase {
       override func invokeTest() {
-        withSnapshotTesting(
-          record: .all,
-          diffTool: .ksdiff
-        ) {
+        withSnapshotTesting(diffTool: .ksdiff, record: .all) {
           super.invokeTest()
         }
       }
@@ -134,15 +129,15 @@ Further, the `diffTool` and `record` arguments have extra customization capabili
 
   * `record` is now a [type](<doc:SnapshotTestingConfiguration/Record-swift.struct>) with 4
     choices: `all`, `missing`, `never`, `failed`:
-      * `all`: All snapshots will be generated and saved to disk.
-      * `missing`: only the snapshots that are missing from the disk will be generated
-        and saved.
-      * `never`: No snapshots will be generated, even if they are missing. This option is
-        appropriate when running tests on CI so that re-tries of tests do not surprisingly pass
-        after snapshots are unexpectedly generated.
-      * `failed`: Snapshots only for failing tests will be generated. This can be useful for tests
-        that use precision thresholds so that passing tests do not re-record snapshots that are
-        subtly different but still within the threshold.
+    * `all`: All snapshots will be generated and saved to disk. 
+    * `missing`: only the snapshots that are missing from the disk will be generated
+    and saved. 
+    * `never`: No snapshots will be generated, even if they are missing. This option is appropriate
+    when running tests on CI so that re-tries of tests do not surprisingly pass after snapshots are
+    unexpectedly generated.
+    * `failed`: Snapshots only for failing tests will be generated. This can be useful for tests
+    that use precision thresholds so that passing tests do not re-record snapshots that are 
+    subtly different but still within the threshold.
 
 ## Beta support for Swift Testing
 
@@ -167,7 +162,7 @@ you to customize snapshots for a `@Test` or `@Suite`, but to get access to it yo
 ```swift
 @_spi(Experimental) import SnapshotTesting
 
-@Suite(.snapshots(record: .all, diffTool: .ksdiff))
+@Suite(.snapshots(diffTool: .ksdiff, record: .all))
 struct FeatureTests {
   …
 }
