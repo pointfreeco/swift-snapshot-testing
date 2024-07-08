@@ -19,7 +19,7 @@
         )
       )
     }
-    
+
     /// Configure snapshot testing in a suite or test.
     ///
     /// - Parameter configuration: The configuration to use.

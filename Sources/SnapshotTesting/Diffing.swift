@@ -14,7 +14,7 @@ public struct Diffing<Value> {
   public var diff: (Value, Value) -> (String, [XCTAttachment])?
 
   /// Creates a new `Diffing` on `Value`.
-  ///  
+  ///
   /// - Parameters:
   ///   - toData: A function used to convert a value _to_ data.
   ///   - fromData: A function used to produce a value _from_ data.

@@ -61,7 +61,7 @@ public func withSnapshotTesting<R>(
 public struct SnapshotTestingConfiguration: Sendable {
   @_spi(Internals)
   @TaskLocal public static var current: Self?
-  
+
   /// The diff tool use to print helpful test failure messages.
   ///
   /// See ``DiffTool-swift.struct`` for more information.
@@ -79,7 +79,7 @@ public struct SnapshotTestingConfiguration: Sendable {
     self.diffTool = diffTool
     self.record = record
   }
-  
+
   /// The record mode of the snapshot test.
   ///
   /// There are 4 primary strategies for recording: ``Record-swift.struct/all``,
@@ -87,7 +87,7 @@ public struct SnapshotTestingConfiguration: Sendable {
   /// ``Record-swift.struct/failed``
   public struct Record: Equatable, Sendable {
     private let storage: Storage
-    
+
     public init?(rawValue: String) {
       switch rawValue {
       case "all":
@@ -114,7 +114,7 @@ public struct SnapshotTestingConfiguration: Sendable {
     /// Records only the snapshots that are missing from disk.
     public static let missing = Self(storage: .missing)
 
-    /// Does not record any snapshots. If a snapshot is missing a test failure will be raised. This 
+    /// Does not record any snapshots. If a snapshot is missing a test failure will be raised. This
     /// option is appropriate when running tests on CI so that re-tries of tests do not
     /// surprisingly pass after snapshots are unexpectedly generated.
     public static let never = Self(storage: .never)
@@ -130,14 +130,14 @@ public struct SnapshotTestingConfiguration: Sendable {
       case never
     }
   }
-  
+
   /// Describes the diff command used to diff two files on disk.
   ///
   /// This type can be created with a closure that takes two arguments: the first argument is
   /// is a file path to the currently recorded snapshot on disk, and the second argument is the
   /// file path to a _failed_ snapshot that was recorded to a temporary location on disk. You can
   /// use these two file paths to construct a command that can be used to compare the two files.
-  /// 
+  ///
   /// For example, to use ImageMagick's `compare` tool and pipe the result into Preview.app, you
   /// could create the following `DiffTool`:
   ///
@@ -193,22 +193,22 @@ public struct SnapshotTestingConfiguration: Sendable {
 }
 
 @available(
-  iOS, 
+  iOS,
   deprecated: 9999,
   message: "Use '.all' instead of 'true', and '.missing' instead of 'false'."
 )
 @available(
-  macOS, 
+  macOS,
   deprecated: 9999,
   message: "Use '.all' instead of 'true', and '.missing' instead of 'false'."
 )
 @available(
-  tvOS, 
+  tvOS,
   deprecated: 9999,
   message: "Use '.all' instead of 'true', and '.missing' instead of 'false'."
 )
 @available(
-  watchOS, 
+  watchOS,
   deprecated: 9999,
   message: "Use '.all' instead of 'true', and '.missing' instead of 'false'."
 )
