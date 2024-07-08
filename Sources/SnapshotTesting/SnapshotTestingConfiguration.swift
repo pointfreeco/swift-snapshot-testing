@@ -65,19 +65,19 @@ public struct SnapshotTestingConfiguration: Sendable {
   /// The diff tool use to print helpful test failure messages.
   ///
   /// See ``DiffTool-swift.struct`` for more information.
-  public var diffTool: DiffTool
-  
+  public var diffTool: DiffTool?
+
   /// The recording strategy to use while running snapshot tests.
   ///
   /// See ``Record-swift.struct`` for more information.
-  public var record: Record
+  public var record: Record?
 
   public init(
-    record: Record = .missing,
-    diffTool: DiffTool = .default
+    diffTool: DiffTool?,
+    record: Record?
   ) {
-    self.record = record
     self.diffTool = diffTool
+    self.record = record
   }
   
   /// The record mode of the snapshot test.
@@ -163,7 +163,7 @@ public struct SnapshotTestingConfiguration: Sendable {
     }
 
     public init(stringLiteral value: StringLiteralType) {
-      self.tool = { _, _ in value }
+      self.tool = { "\(value) \($0) \($1)" }
     }
 
     /// The [Kaleidoscope](http://kaleidoscope.app) diff tool.

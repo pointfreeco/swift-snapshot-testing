@@ -9,8 +9,8 @@
     ///   - record: The record mode of the test.
     ///   - diffTool: The diff tool to use in failure messages.
     public static func snapshots(
-      record: SnapshotTestingConfiguration.Record = .missing,
-      diffTool: SnapshotTestingConfiguration.DiffTool = .default
+      record: SnapshotTestingConfiguration.Record? = nil,
+      diffTool: SnapshotTestingConfiguration.DiffTool? = nil
     ) -> Self {
       _SnapshotsTestTrait(
         configuration: SnapshotTestingConfiguration(
