@@ -1,4 +1,4 @@
-#if canImport(Testing)
+#if compiler(>=6) && canImport(Testing)
 @_spi(Experimental) import Testing
 @_spi(Experimental) @_spi(Internals) import SnapshotTesting
 
