@@ -45,21 +45,27 @@ public var _record: SnapshotTestingConfiguration.Record = {
 ///   - name: An optional description of the snapshot.
 ///   - recording: Whether or not to record a new reference.
 ///   - timeout: The amount of time a snapshot must be generated in.
-///   - file: The file in which failure occurred. Defaults to the file name of the test case in
+///   - fileID: The file ID in which failure occurred. Defaults to the file ID of the test case in
+///     which this function was called.
+///   - file: The file in which failure occurred. Defaults to the file path of the test case in
 ///     which this function was called.
 ///   - testName: The name of the test in which failure occurred. Defaults to the function name of
 ///     the test case in which this function was called.
 ///   - line: The line number on which failure occurred. Defaults to the line number on which this
 ///     function was called.
+///   - column: The column on which failure occurred. Defaults to the column on which this function
+///     was called.
 public func assertSnapshot<Value, Format>(
   of value: @autoclosure () throws -> Value,
   as snapshotting: Snapshotting<Value, Format>,
   named name: String? = nil,
   record recording: Bool? = nil,
   timeout: TimeInterval = 5,
-  file: StaticString = #file,
+  fileID: StaticString = #fileID,
+  file filePath: StaticString = #filePath,
   testName: String = #function,
-  line: UInt = #line
+  line: UInt = #line,
+  column: UInt = #column
 ) {
   let failure = verifySnapshot(
     of: try value(),
@@ -67,12 +73,20 @@ public func assertSnapshot<Value, Format>(
     named: name,
     record: recording,
     timeout: timeout,
-    file: file,
+    fileID: fileID,
+    file: filePath,
     testName: testName,
-    line: line
+    line: line,
+    column: column
   )
   guard let message = failure else { return }
-  recordIssue(message, file: file, line: line)
+  recordIssue(
+    message,
+    fileID: fileID,
+    filePath: filePath,
+    line: line,
+    column: column
+  )
 }
 
 /// Asserts that a given value matches references on disk.
@@ -83,20 +97,26 @@ public func assertSnapshot<Value, Format>(
 ///     comparing values.
 ///   - recording: Whether or not to record a new reference.
 ///   - timeout: The amount of time a snapshot must be generated in.
-///   - file: The file in which failure occurred. Defaults to the file name of the test case in
+///   - fileID: The file ID in which failure occurred. Defaults to the file ID of the test case in
+///     which this function was called.
+///   - file: The file in which failure occurred. Defaults to the file path of the test case in
 ///     which this function was called.
 ///   - testName: The name of the test in which failure occurred. Defaults to the function name of
 ///     the test case in which this function was called.
 ///   - line: The line number on which failure occurred. Defaults to the line number on which this
 ///     function was called.
+///   - column: The column on which failure occurred. Defaults to the column on which this function
+///     was called.
 public func assertSnapshots<Value, Format>(
   of value: @autoclosure () throws -> Value,
   as strategies: [String: Snapshotting<Value, Format>],
   record recording: Bool? = nil,
   timeout: TimeInterval = 5,
-  file: StaticString = #file,
+  fileID: StaticString = #fileID,
+  file filePath: StaticString = #filePath,
   testName: String = #function,
-  line: UInt = #line
+  line: UInt = #line,
+  column: UInt = #column
 ) {
   try? strategies.forEach { name, strategy in
     assertSnapshot(
@@ -105,9 +125,11 @@ public func assertSnapshots<Value, Format>(
       named: name,
       record: recording,
       timeout: timeout,
-      file: file,
+      fileID: fileID,
+      file: filePath,
       testName: testName,
-      line: line
+      line: line,
+      column: column
     )
   }
 }
@@ -119,20 +141,26 @@ public func assertSnapshots<Value, Format>(
 ///   - strategies: An array of strategies for serializing, deserializing, and comparing values.
 ///   - recording: Whether or not to record a new reference.
 ///   - timeout: The amount of time a snapshot must be generated in.
-///   - file: The file in which failure occurred. Defaults to the file name of the test case in
+///   - fileID: The file ID in which failure occurred. Defaults to the file ID of the test case in
+///     which this function was called.
+///   - file: The file in which failure occurred. Defaults to the file path of the test case in
 ///     which this function was called.
 ///   - testName: The name of the test in which failure occurred. Defaults to the function name of
 ///     the test case in which this function was called.
 ///   - line: The line number on which failure occurred. Defaults to the line number on which this
 ///     function was called.
+///   - column: The column on which failure occurred. Defaults to the column on which this function
+///     was called.
 public func assertSnapshots<Value, Format>(
   of value: @autoclosure () throws -> Value,
   as strategies: [Snapshotting<Value, Format>],
   record recording: Bool? = nil,
   timeout: TimeInterval = 5,
-  file: StaticString = #file,
+  fileID: StaticString = #fileID,
+  file filePath: StaticString = #filePath,
   testName: String = #function,
-  line: UInt = #line
+  line: UInt = #line,
+  column: UInt = #column
 ) {
   try? strategies.forEach { strategy in
     assertSnapshot(
@@ -140,9 +168,11 @@ public func assertSnapshots<Value, Format>(
       as: strategy,
       record: recording,
       timeout: timeout,
-      file: file,
+      fileID: fileID,
+      file: filePath,
       testName: testName,
-      line: line
+      line: line,
+      column: column
     )
   }
 }
@@ -205,9 +235,11 @@ public func verifySnapshot<Value, Format>(
   record recording: Bool? = nil,
   snapshotDirectory: String? = nil,
   timeout: TimeInterval = 5,
-  file: StaticString = #file,
+  fileID: StaticString = #fileID,
+  file filePath: StaticString = #file,
   testName: String = #function,
-  line: UInt = #line
+  line: UInt = #line,
+  column: UInt = #column
 ) -> String? {
   CleanCounterBetweenTestCases.registerIfNeeded()
 
@@ -217,7 +249,7 @@ public func verifySnapshot<Value, Format>(
     ?? _record
   return withSnapshotTesting(record: record) { () -> String? in
     do {
-      let fileUrl = URL(fileURLWithPath: "\(file)", isDirectory: false)
+      let fileUrl = URL(fileURLWithPath: "\(filePath)", isDirectory: false)
       let fileName = fileUrl.deletingPathExtension().lastPathComponent
 
       let snapshotDirectoryUrl =

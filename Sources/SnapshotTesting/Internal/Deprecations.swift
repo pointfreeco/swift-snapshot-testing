@@ -14,9 +14,11 @@ public func _assertInlineSnapshot<Value>(
   record recording: Bool = false,
   timeout: TimeInterval = 5,
   with reference: String,
-  file: StaticString = #file,
+  fileID: StaticString = #fileID,
+  file filePath: StaticString = #filePath,
   testName: String = #function,
-  line: UInt = #line
+  line: UInt = #line,
+  column: UInt = #column
 ) {
 
   let failure = _verifyInlineSnapshot(
@@ -25,12 +27,14 @@ public func _assertInlineSnapshot<Value>(
     record: recording,
     timeout: timeout,
     with: reference,
-    file: file,
+    fileID: fileID,
+    file: filePath,
     testName: testName,
-    line: line
+    line: line,
+    column: column
   )
   guard let message = failure else { return }
-  recordIssue(message, file: file, line: line)
+  recordIssue(message, fileID: fileID, filePath: filePath, line: line, column: column)
 }
 
 @available(
@@ -44,9 +48,11 @@ public func _verifyInlineSnapshot<Value>(
   record recording: Bool = false,
   timeout: TimeInterval = 5,
   with reference: String,
-  file: StaticString = #file,
+  fileID: StaticString = #fileID,
+  file filePath: StaticString = #filePath,
   testName: String = #function,
-  line: UInt = #line
+  line: UInt = #line,
+  column: UInt = #column
 )
   -> String?
 {
@@ -94,7 +100,7 @@ public func _verifyInlineSnapshot<Value>(
 
     // If that diff failed, we either record or fail.
     if recording || trimmedReference.isEmpty {
-      let fileName = "\(file)"
+      let fileName = "\(filePath)"
       let sourceCodeFilePath = URL(fileURLWithPath: fileName, isDirectory: false)
       let sourceCode = try String(contentsOf: sourceCodeFilePath)
       var newRecordings = recordings
