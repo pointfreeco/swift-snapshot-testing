@@ -252,10 +252,13 @@ public func verifySnapshot<Value, Format>(
 ) -> String? {
   CleanCounterBetweenTestCases.registerIfNeeded()
 
+  if (screenshotbotMode && isPng(snapshotting: snapshotting)) {
+    recording = true
+  }
   let record =
-    (((recording == true ? .all : recording == false ? .missing : nil)
+    (recording == true ? .all : recording == false ? .missing : nil)
     ?? SnapshotTestingConfiguration.current?.record
-    ?? _record) || (screenshotbotMode && isPng(snapshotting: snapshotting)))
+    ?? _record
   return withSnapshotTesting(record: record) { () -> String? in
     do {
       let fileUrl = URL(fileURLWithPath: "\(filePath)", isDirectory: false)
