@@ -1,7 +1,7 @@
 import Foundation
 
 #if canImport(SwiftSyntax509)
-  import SnapshotTesting
+  @_spi(Internals) import SnapshotTesting
   import SwiftParser
   import SwiftSyntax
   import SwiftSyntaxBuilder
@@ -32,10 +32,10 @@ import Foundation
   ///   - column: The column where the assertion occurs. The default is the line column you call
   ///     this function.
   public func assertInlineSnapshot<Value>(
-    of value: @autoclosure () throws -> Value,
+    of value: @autoclosure () throws -> Value?,
     as snapshotting: Snapshotting<Value, String>,
     message: @autoclosure () -> String = "",
-    record isRecording: Bool = isRecording,
+    record isRecording: Bool? = nil,
     timeout: TimeInterval = 5,
     syntaxDescriptor: InlineSnapshotSyntaxDescriptor = InlineSnapshotSyntaxDescriptor(),
     matches expected: (() -> String)? = nil,
@@ -44,94 +44,116 @@ import Foundation
     line: UInt = #line,
     column: UInt = #column
   ) {
-    let _: Void = installTestObserver
-    do {
-      var actual: String!
-      let expectation = XCTestExpectation()
-      try snapshotting.snapshot(value()).run {
-        actual = $0
-        expectation.fulfill()
-      }
-      switch XCTWaiter.wait(for: [expectation], timeout: timeout) {
-      case .completed:
-        break
-      case .timedOut:
-        XCTFail(
-          """
-          Exceeded timeout of \(timeout) seconds waiting for snapshot.
+    let record =
+      (isRecording == true ? .all : isRecording == false ? .missing : nil)
+      ?? SnapshotTestingConfiguration.current?.record
+      ?? _record
+    withSnapshotTesting(record: record) {
+      let _: Void = installTestObserver
+      do {
+        var actual: String?
+        let expectation = XCTestExpectation()
+        if let value = try value() {
+          snapshotting.snapshot(value).run {
+            actual = $0
+            expectation.fulfill()
+          }
+          switch XCTWaiter.wait(for: [expectation], timeout: timeout) {
+          case .completed:
+            break
+          case .timedOut:
+            recordIssue(
+              """
+              Exceeded timeout of \(timeout) seconds waiting for snapshot.
 
-          This can happen when an asynchronously loaded value (like a network response) has not \
-          loaded. If a timeout is unavoidable, consider setting the "timeout" parameter of
-          "assertInlineSnapshot" to a higher value.
-          """,
-          file: file,
-          line: line
-        )
-        return
-      case .incorrectOrder, .interrupted, .invertedFulfillment:
-        XCTFail("Couldn't snapshot value", file: file, line: line)
-        return
-      @unknown default:
-        XCTFail("Couldn't snapshot value", file: file, line: line)
-        return
-      }
-      guard !isRecording, let expected = expected?()
-      else {
-        // NB: Write snapshot state before calling `XCTFail` in case `continueAfterFailure = false`
-        inlineSnapshotState[File(path: file), default: []].append(
-          InlineSnapshot(
-            expected: expected?(),
-            actual: actual,
-            wasRecording: isRecording,
-            syntaxDescriptor: syntaxDescriptor,
-            function: "\(function)",
-            line: line,
-            column: column
+              This can happen when an asynchronously loaded value (like a network response) has not \
+              loaded. If a timeout is unavoidable, consider setting the "timeout" parameter of
+              "assertInlineSnapshot" to a higher value.
+              """,
+              file: file,
+              line: line
+            )
+            return
+          case .incorrectOrder, .interrupted, .invertedFulfillment:
+            recordIssue("Couldn't snapshot value", file: file, line: line)
+            return
+          @unknown default:
+            recordIssue("Couldn't snapshot value", file: file, line: line)
+            return
+          }
+        }
+        let expected = expected?()
+        guard
+          record != .all,
+          record != .missing || expected != nil
+        else {
+          // NB: Write snapshot state before calling `XCTFail` in case `continueAfterFailure = false`
+          inlineSnapshotState[File(path: file), default: []].append(
+            InlineSnapshot(
+              expected: expected,
+              actual: actual,
+              wasRecording: record == .all,
+              syntaxDescriptor: syntaxDescriptor,
+              function: "\(function)",
+              line: line,
+              column: column
+            )
           )
-        )
 
-        var failure: String
-        if syntaxDescriptor.trailingClosureLabel
-          == InlineSnapshotSyntaxDescriptor.defaultTrailingClosureLabel
-        {
-          failure = "Automatically recorded a new snapshot."
-        } else {
-          failure = """
-            Automatically recorded a new snapshot for "\(syntaxDescriptor.trailingClosureLabel)".
+          var failure: String
+          if syntaxDescriptor.trailingClosureLabel
+            == InlineSnapshotSyntaxDescriptor.defaultTrailingClosureLabel
+          {
+            failure = "Automatically recorded a new snapshot."
+          } else {
+            failure = """
+              Automatically recorded a new snapshot for "\(syntaxDescriptor.trailingClosureLabel)".
+              """
+          }
+          if let difference = snapshotting.diffing.diff(expected ?? "", actual ?? "")?.0 {
+            failure += " Difference: …\n\n\(difference.indenting(by: 2))"
+          }
+          recordIssue(
             """
-        }
-        if let expected = expected?(),
-          let difference = snapshotting.diffing.diff(expected, actual)?.0
-        {
-          failure += " Difference: …\n\n\(difference.indenting(by: 2))"
-        }
-        XCTFail(
-          """
-          \(failure)
+            \(failure)
 
-          Re-run "\(function)" to assert against the newly-recorded snapshot.
+            Re-run "\(function)" to assert against the newly-recorded snapshot.
+            """,
+            file: file,
+            line: line
+          )
+          return
+        }
+
+        guard let expected
+        else {
+          recordIssue(
+            """
+            No expected value to assert against.
+            """,
+            file: file,
+            line: line
+          )
+          return
+        }
+        guard
+          let difference = snapshotting.diffing.diff(expected, actual ?? "")?.0
+        else { return }
+
+        let message = message()
+        syntaxDescriptor.fail(
+          """
+          \(message.isEmpty ? "Snapshot did not match. Difference: …" : message)
+
+          \(difference.indenting(by: 2))
           """,
           file: file,
-          line: line
+          line: line,
+          column: column
         )
-        return
+      } catch {
+        recordIssue("Threw error: \(error)", file: file, line: line)
       }
-      guard let difference = snapshotting.diffing.diff(expected, actual)?.0
-      else { return }
-
-      let message = message()
-      syntaxDescriptor.fail(
-        """
-        \(message.isEmpty ? "Snapshot did not match. Difference: …" : message)
-
-        \(difference.indenting(by: 2))
-        """,
-        file: file,
-        line: line,
-        column: column
-      )
-    } catch {
-      XCTFail("Threw error: \(error)", file: file, line: line)
     }
   }
 #else
@@ -196,6 +218,8 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
   /// Initializes an inline snapshot syntax descriptor.
   ///
   /// - Parameters:
+  ///   - deprecatedTrailingClosureLabels: An array of deprecated labels to consider for the inline
+  ///     snapshot.
   ///   - trailingClosureLabel: The label of the trailing closure that returns the inline snapshot.
   ///   - trailingClosureOffset: The offset of the trailing closure that returns the inline
   ///     snapshot, relative to the first trailing closure.
@@ -241,7 +265,7 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
         visitor.walk(testSource.sourceFile)
         trailingClosureLine = visitor.trailingClosureLine
       }
-      XCTFail(
+      recordIssue(
         message(),
         file: file,
         line: trailingClosureLine.map(UInt.init) ?? line
@@ -304,7 +328,7 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
 
   private struct InlineSnapshot: Hashable {
     var expected: String?
-    var actual: String
+    var actual: String?
     var wasRecording: Bool
     var syntaxDescriptor: InlineSnapshotSyntaxDescriptor
     var function: String
@@ -385,7 +409,7 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
     ) {
       self.file = file
       self.line = snapshots.first?.line
-      self.wasRecording = snapshots.first?.wasRecording ?? isRecording
+      self.wasRecording = snapshots.first?.wasRecording ?? false
       self.indent = String(
         sourceLocationConverter.sourceLines
           .first { $0.first?.isWhitespace == true && $0.contains { !$0.isWhitespace } }?
@@ -421,40 +445,42 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
             .prefix(while: { $0 == " " || $0 == "\t" })
         )
         let delimiter = String(
-          repeating: "#", count: snapshot.actual.hashCount(isMultiline: true)
+          repeating: "#", count: (snapshot.actual ?? "").hashCount(isMultiline: true)
         )
         let leadingIndent = leadingTrivia + self.indent
         let snapshotLabel = TokenSyntax(
           stringLiteral: snapshot.syntaxDescriptor.trailingClosureLabel
         )
-        let snapshotClosure = ClosureExprSyntax(
-          leftBrace: .leftBraceToken(trailingTrivia: .newline),
-          statements: CodeBlockItemListSyntax {
-            StringLiteralExprSyntax(
-              leadingTrivia: Trivia(stringLiteral: leadingIndent),
-              openingPounds: .rawStringPoundDelimiter(delimiter),
-              openingQuote: .multilineStringQuoteToken(trailingTrivia: .newline),
-              segments: [
-                .stringSegment(
-                  StringSegmentSyntax(
-                    content: .stringSegment(
-                      snapshot.actual
-                        .replacingOccurrences(of: "\r", with: #"\\#(delimiter)r"#)
-                        .indenting(with: leadingIndent)
+        let snapshotClosure = snapshot.actual.map { actual in
+          ClosureExprSyntax(
+            leftBrace: .leftBraceToken(trailingTrivia: .newline),
+            statements: CodeBlockItemListSyntax {
+              StringLiteralExprSyntax(
+                leadingTrivia: Trivia(stringLiteral: leadingIndent),
+                openingPounds: .rawStringPoundDelimiter(delimiter),
+                openingQuote: .multilineStringQuoteToken(trailingTrivia: .newline),
+                segments: [
+                  .stringSegment(
+                    StringSegmentSyntax(
+                      content: .stringSegment(
+                        actual
+                          .replacingOccurrences(of: "\r", with: #"\\#(delimiter)r"#)
+                          .indenting(with: leadingIndent)
+                      )
                     )
                   )
-                )
-              ],
-              closingQuote: .multilineStringQuoteToken(
-                leadingTrivia: .newline + Trivia(stringLiteral: leadingIndent)
-              ),
-              closingPounds: .rawStringPoundDelimiter(delimiter)
+                ],
+                closingQuote: .multilineStringQuoteToken(
+                  leadingTrivia: .newline + Trivia(stringLiteral: leadingIndent)
+                ),
+                closingPounds: .rawStringPoundDelimiter(delimiter)
+              )
+            },
+            rightBrace: .rightBraceToken(
+              leadingTrivia: .newline + Trivia(stringLiteral: leadingTrivia)
             )
-          },
-          rightBrace: .rightBraceToken(
-            leadingTrivia: .newline + Trivia(stringLiteral: leadingTrivia)
           )
-        )
+        }
 
         let arguments = functionCallExpr.arguments
         let firstTrailingClosureOffset =
@@ -475,23 +501,41 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
         switch centeredTrailingClosureOffset {
         case ..<0:
           let index = arguments.index(arguments.startIndex, offsetBy: trailingClosureOffset)
-          functionCallExpr.arguments[index].label = snapshotLabel
-          functionCallExpr.arguments[index].expression = ExprSyntax(snapshotClosure)
+          if let snapshotClosure {
+            functionCallExpr.arguments[index].label = snapshotLabel
+            functionCallExpr.arguments[index].expression = ExprSyntax(snapshotClosure)
+          } else {
+            functionCallExpr.arguments.remove(at: index)
+          }
 
         case 0:
           if snapshot.wasRecording || functionCallExpr.trailingClosure == nil {
             functionCallExpr.rightParen?.trailingTrivia = .space
-            functionCallExpr.trailingClosure = snapshotClosure
+            if let snapshotClosure {
+              functionCallExpr.trailingClosure = snapshotClosure  // FIXME: ?? multipleTrailingClosures.removeFirst()
+            } else if !functionCallExpr.additionalTrailingClosures.isEmpty {
+              let additionalTrailingClosure = functionCallExpr.additionalTrailingClosures.remove(
+                at: functionCallExpr.additionalTrailingClosures.startIndex
+              )
+              functionCallExpr.trailingClosure = additionalTrailingClosure.closure
+            } else {
+              functionCallExpr.rightParen?.trailingTrivia = ""
+              functionCallExpr.trailingClosure = nil
+            }
           } else {
             fatalError()
           }
 
         case 1...:
-          var newElement: MultipleTrailingClosureElementSyntax {
-            MultipleTrailingClosureElementSyntax(
-              label: snapshotLabel,
-              closure: snapshotClosure.with(\.leadingTrivia, snapshotClosure.leadingTrivia + .space)
-            )
+          var newElement: MultipleTrailingClosureElementSyntax? {
+            snapshotClosure.map { snapshotClosure in
+              MultipleTrailingClosureElementSyntax(
+                label: snapshotLabel,
+                closure: snapshotClosure.with(
+                  \.leadingTrivia, snapshotClosure.leadingTrivia + .space
+                )
+              )
+            }
           }
 
           if !functionCallExpr.additionalTrailingClosures.isEmpty,
@@ -510,16 +554,22 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
               functionCallExpr.additionalTrailingClosures[index].label.text
             ) {
               if snapshot.wasRecording {
-                functionCallExpr.additionalTrailingClosures[index].label = snapshotLabel
-                functionCallExpr.additionalTrailingClosures[index].closure = snapshotClosure
+                if let snapshotClosure {
+                  functionCallExpr.additionalTrailingClosures[index].label = snapshotLabel
+                  functionCallExpr.additionalTrailingClosures[index].closure = snapshotClosure
+                } else {
+                  functionCallExpr.additionalTrailingClosures.remove(at: index)
+                }
               }
-            } else {
+            } else if let newElement,
+              snapshot.wasRecording || index == functionCallExpr.additionalTrailingClosures.endIndex
+            {
               functionCallExpr.additionalTrailingClosures.insert(
                 newElement.with(\.trailingTrivia, .space),
                 at: index
               )
             }
-          } else if centeredTrailingClosureOffset >= 1 {
+          } else if centeredTrailingClosureOffset >= 1, let newElement {
             if let index = functionCallExpr.additionalTrailingClosures.index(
               functionCallExpr.additionalTrailingClosures.endIndex,
               offsetBy: -1,

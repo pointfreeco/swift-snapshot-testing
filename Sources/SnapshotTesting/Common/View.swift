@@ -12,7 +12,7 @@
   #endif
 
   #if os(iOS) || os(tvOS)
-    public struct ViewImageConfig {
+    public struct ViewImageConfig: Sendable {
       public enum Orientation {
         case landscape
         case portrait

@@ -5,13 +5,9 @@ import XCTest
 
 final class InlineSnapshotTestingTests: XCTestCase {
   override func invokeTest() {
-    SnapshotTesting.diffTool = "ksdiff"
-    // SnapshotTesting.isRecording = true
-    defer {
-      SnapshotTesting.diffTool = nil
-      SnapshotTesting.isRecording = false
+    withSnapshotTesting(record: .missing, diffTool: .ksdiff) {
+      super.invokeTest()
     }
-    super.invokeTest()
   }
 
   func testInlineSnapshot() {

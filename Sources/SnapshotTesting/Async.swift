@@ -20,7 +20,6 @@ public struct Async<Value> {
   ///
   /// - Parameters:
   ///   - run: A function that, when called, can hand a value to a callback.
-  ///   - callback: A function that can be called with a value.
   public init(run: @escaping (_ callback: @escaping (Value) -> Void) -> Void) {
     self.run = run
   }
