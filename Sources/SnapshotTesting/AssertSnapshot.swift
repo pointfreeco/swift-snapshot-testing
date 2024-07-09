@@ -219,13 +219,11 @@ public func verifySnapshot<Value, Format>(
   line: UInt = #line
 ) -> String? {
   CleanCounterBetweenTestCases.registerIfNeeded()
-  let recording =
-    recording || isRecording || (screenshotbotMode && isPng(snapshotting: snapshotting))
 
   let record =
     (recording == true ? .all : recording == false ? .missing : nil)
     ?? SnapshotTestingConfiguration.current?.record
-    ?? _record
+    ?? _record) || (screenshotbotMode && isPng(snapshotting: snapshotting))
   return withSnapshotTesting(record: record) { () -> String? in
     do {
       let fileUrl = URL(fileURLWithPath: "\(file)", isDirectory: false)
