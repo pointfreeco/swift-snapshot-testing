@@ -23,14 +23,16 @@ import Foundation
   ///   - expected: An optional closure that returns a previously generated snapshot. When omitted,
   ///     the library will automatically write a snapshot into your test file at the call sight of
   ///     the assertion.
-  ///   - file: The file where the assertion occurs. The default is the filename of the test case
-  ///     where you call this function.
+  ///   - fileID: The file ID in which failure occurred. Defaults to the file ID of the test case in
+  ///     which this function was called.
+  ///   - file: The file in which failure occurred. Defaults to the file path of the test case in
+  ///     which this function was called.
   ///   - function: The function where the assertion occurs. The default is the name of the test
   ///     method where you call this function.
-  ///   - line: The line where the assertion occurs. The default is the line number where you call
-  ///     this function.
-  ///   - column: The column where the assertion occurs. The default is the line column you call
-  ///     this function.
+  ///   - line: The line number on which failure occurred. Defaults to the line number on which this
+  ///     function was called.
+  ///   - column: The column on which failure occurred. Defaults to the column on which this
+  ///     function was called.
   public func assertInlineSnapshot<Value>(
     of value: @autoclosure () throws -> Value?,
     as snapshotting: Snapshotting<Value, String>,
@@ -39,7 +41,8 @@ import Foundation
     timeout: TimeInterval = 5,
     syntaxDescriptor: InlineSnapshotSyntaxDescriptor = InlineSnapshotSyntaxDescriptor(),
     matches expected: (() -> String)? = nil,
-    file: StaticString = #filePath,
+    fileID: StaticString = #fileID,
+    file filePath: StaticString = #filePath,
     function: StaticString = #function,
     line: UInt = #line,
     column: UInt = #column
@@ -70,15 +73,29 @@ import Foundation
               loaded. If a timeout is unavoidable, consider setting the "timeout" parameter of
               "assertInlineSnapshot" to a higher value.
               """,
-              file: file,
-              line: line
+              fileID: fileID,
+              filePath: filePath,
+              line: line,
+              column: column
             )
             return
           case .incorrectOrder, .interrupted, .invertedFulfillment:
-            recordIssue("Couldn't snapshot value", file: file, line: line)
+            recordIssue(
+              "Couldn't snapshot value",
+              fileID: fileID,
+              filePath: filePath,
+              line: line,
+              column: column
+            )
             return
           @unknown default:
-            recordIssue("Couldn't snapshot value", file: file, line: line)
+            recordIssue(
+              "Couldn't snapshot value",
+              fileID: fileID,
+              filePath: filePath,
+              line: line,
+              column: column
+            )
             return
           }
         }
@@ -88,7 +105,7 @@ import Foundation
           record != .missing || expected != nil
         else {
           // NB: Write snapshot state before calling `XCTFail` in case `continueAfterFailure = false`
-          inlineSnapshotState[File(path: file), default: []].append(
+          inlineSnapshotState[File(path: filePath), default: []].append(
             InlineSnapshot(
               expected: expected,
               actual: actual,
@@ -119,8 +136,10 @@ import Foundation
 
             Re-run "\(function)" to assert against the newly-recorded snapshot.
             """,
-            file: file,
-            line: line
+            fileID: fileID,
+            filePath: filePath,
+            line: line,
+            column: column
           )
           return
         }
@@ -131,8 +150,10 @@ import Foundation
             """
             No expected value to assert against.
             """,
-            file: file,
-            line: line
+            fileID: fileID,
+            filePath: filePath,
+            line: line,
+            column: column
           )
           return
         }
@@ -147,25 +168,34 @@ import Foundation
 
           \(difference.indenting(by: 2))
           """,
-          file: file,
+          fileID: fileID,
+          file: filePath,
           line: line,
           column: column
         )
       } catch {
-        recordIssue("Threw error: \(error)", file: file, line: line)
+        recordIssue(
+          "Threw error: \(error)",
+          fileID: fileID,
+          filePath: filePath,
+          line: line,
+          column: column
+        )
       }
     }
   }
 #else
   @available(*, unavailable, message: "'assertInlineSnapshot' requires 'swift-syntax' >= 509.0.0")
   public func assertInlineSnapshot<Value>(
-    of value: @autoclosure () throws -> Value,
+    of value: @autoclosure () throws -> Value?,
     as snapshotting: Snapshotting<Value, String>,
     message: @autoclosure () -> String = "",
+    record isRecording: Bool? = nil,
     timeout: TimeInterval = 5,
     syntaxDescriptor: InlineSnapshotSyntaxDescriptor = InlineSnapshotSyntaxDescriptor(),
     matches expected: (() -> String)? = nil,
-    file: StaticString = #filePath,
+    fileID: StaticString = #fileID,
+    file filePath: StaticString = #filePath,
     function: StaticString = #function,
     line: UInt = #line,
     column: UInt = #column
@@ -242,20 +272,23 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
     ///
     /// - Parameters:
     ///   - message: An optional description of the assertion, for inclusion in test results.
-    ///   - file: The file where the assertion occurs. The default is the filename of the test case
-    ///     where you call `assertInlineSnapshot`.
-    ///   - line: The line where the assertion occurs. The default is the line number where you call
-    ///     `assertInlineSnapshot`.
-    ///   - column: The column where the assertion occurs. The default is the column where you call
-    ///     `assertInlineSnapshot`.
+    ///   - fileID: The file ID in which failure occurred. Defaults to the file ID of the test case
+    ///     in which this function was called.
+    ///   - file: The file in which failure occurred. Defaults to the file path of the test case in
+    ///     which this function was called.
+    ///   - line: The line number on which failure occurred. Defaults to the line number on which
+    ///     this function was called.
+    ///   - column: The column on which failure occurred. Defaults to the column on which this
+    ///     function was called.
     public func fail(
       _ message: @autoclosure () -> String = "",
-      file: StaticString,
+      fileID: StaticString,
+      file filePath: StaticString,
       line: UInt,
       column: UInt
     ) {
       var trailingClosureLine: Int?
-      if let testSource = try? testSource(file: File(path: file)) {
+      if let testSource = try? testSource(file: File(path: filePath)) {
         let visitor = SnapshotVisitor(
           functionCallLine: Int(line),
           functionCallColumn: Int(column),
@@ -267,8 +300,10 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
       }
       recordIssue(
         message(),
-        file: file,
-        line: trailingClosureLine.map(UInt.init) ?? line
+        fileID: fileID,
+        filePath: filePath,
+        line: trailingClosureLine.map(UInt.init) ?? line,
+        column: column
       )
     }
 
@@ -279,7 +314,8 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
     @available(*, unavailable, message: "'assertInlineSnapshot' requires 'swift-syntax' >= 509.0.0")
     public func fail(
       _ message: @autoclosure () -> String = "",
-      file: StaticString,
+      fileID: StaticString,
+      file filePath: StaticString,
       line: UInt,
       column: UInt
     ) {

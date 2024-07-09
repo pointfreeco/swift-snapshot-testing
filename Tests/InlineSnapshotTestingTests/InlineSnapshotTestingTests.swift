@@ -102,7 +102,8 @@ final class InlineSnapshotTestingTests: XCTestCase {
   func testArgumentlessInlineSnapshot() {
     func assertArgumentlessInlineSnapshot(
       expected: (() -> String)? = nil,
-      file: StaticString = #filePath,
+      fileID: StaticString = #fileID,
+      file filePath: StaticString = #filePath,
       function: StaticString = #function,
       line: UInt = #line,
       column: UInt = #column
@@ -115,7 +116,8 @@ final class InlineSnapshotTestingTests: XCTestCase {
           trailingClosureOffset: 1
         ),
         matches: expected,
-        file: file,
+        fileID: fileID,
+        file: filePath,
         function: function,
         line: line,
         column: column
@@ -135,7 +137,8 @@ final class InlineSnapshotTestingTests: XCTestCase {
       of url: () -> String,
       head: (() -> String)? = nil,
       body: (() -> String)? = nil,
-      file: StaticString = #filePath,
+      fileID: StaticString = #fileID,
+      file filePath: StaticString = #filePath,
       function: StaticString = #function,
       line: UInt = #line,
       column: UInt = #column
@@ -152,7 +155,8 @@ final class InlineSnapshotTestingTests: XCTestCase {
           trailingClosureOffset: 1
         ),
         matches: head,
-        file: file,
+        fileID: fileID,
+        file: filePath,
         function: function,
         line: line,
         column: column
@@ -178,7 +182,8 @@ final class InlineSnapshotTestingTests: XCTestCase {
           trailingClosureOffset: 2
         ),
         matches: body,
-        file: file,
+        fileID: fileID,
+        file: filePath,
         function: function,
         line: line,
         column: column
@@ -215,7 +220,8 @@ final class InlineSnapshotTestingTests: XCTestCase {
     func assertAsyncThrowingInlineSnapshot(
       of value: () -> String,
       is expected: (() -> String)? = nil,
-      file: StaticString = #filePath,
+      fileID: StaticString = #fileID,
+      file filePath: StaticString = #filePath,
       function: StaticString = #function,
       line: UInt = #line,
       column: UInt = #column
@@ -228,7 +234,8 @@ final class InlineSnapshotTestingTests: XCTestCase {
           trailingClosureOffset: 1
         ),
         matches: expected,
-        file: file,
+        fileID: fileID,
+        file: filePath,
         function: function,
         line: line,
         column: column
@@ -284,7 +291,8 @@ final class InlineSnapshotTestingTests: XCTestCase {
 private func assertCustomInlineSnapshot(
   of value: () -> String,
   is expected: (() -> String)? = nil,
-  file: StaticString = #filePath,
+  fileID: StaticString = #fileID,
+  file filePath: StaticString = #filePath,
   function: StaticString = #function,
   line: UInt = #line,
   column: UInt = #column
@@ -297,7 +305,8 @@ private func assertCustomInlineSnapshot(
       trailingClosureOffset: 1
     ),
     matches: expected,
-    file: file,
+    fileID: fileID,
+    file: filePath,
     function: function,
     line: line,
     column: column
