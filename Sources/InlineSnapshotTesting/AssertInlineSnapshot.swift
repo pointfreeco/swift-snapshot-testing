@@ -70,8 +70,10 @@ import Foundation
               loaded. If a timeout is unavoidable, consider setting the "timeout" parameter of
               "assertInlineSnapshot" to a higher value.
               """,
-              file: file,
-              line: line
+              fileID: file,
+              filePath: file,
+              line: line,
+              column: 0
             )
             return
           case .incorrectOrder, .interrupted, .invertedFulfillment:
@@ -267,8 +269,11 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
       }
       recordIssue(
         message(),
-        file: file,
-        line: trailingClosureLine.map(UInt.init) ?? line
+        fileID: file,
+        filePath: file,
+        line: trailingClosureLine.map(UInt.init) ?? line,
+        column: 0
+
       )
     }
 
