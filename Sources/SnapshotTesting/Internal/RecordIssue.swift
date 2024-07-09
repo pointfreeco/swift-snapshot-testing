@@ -7,10 +7,10 @@ import XCTest
 @_spi(Internals)
 public func recordIssue(
   _ message: @autoclosure () -> String,
-  fileID: StaticString = #fileID,
-  filePath: StaticString = #filePath,
-  line: UInt = #line,
-  column: UInt = #column
+  fileID: StaticString,
+  filePath: StaticString,
+  line: UInt,
+  column: UInt
 ) {
   #if canImport(Testing)
     if Test.current != nil {
