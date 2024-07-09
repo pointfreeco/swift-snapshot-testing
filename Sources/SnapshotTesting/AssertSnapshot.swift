@@ -221,7 +221,7 @@ public func verifySnapshot<Value, Format>(
   CleanCounterBetweenTestCases.registerIfNeeded()
 
   let record =
-    (recording == true ? .all : recording == false ? .missing : nil)
+    ((recording == true ? .all : recording == false ? .missing : nil)
     ?? SnapshotTestingConfiguration.current?.record
     ?? _record) || (screenshotbotMode && isPng(snapshotting: snapshotting))
   return withSnapshotTesting(record: record) { () -> String? in
