@@ -39,7 +39,7 @@ import Foundation
     timeout: TimeInterval = 5,
     syntaxDescriptor: InlineSnapshotSyntaxDescriptor = InlineSnapshotSyntaxDescriptor(),
     matches expected: (() -> String)? = nil,
-    file: StaticString = #filePath,
+    file: StaticString = #file,
     function: StaticString = #function,
     line: UInt = #line,
     column: UInt = #column
@@ -77,10 +77,22 @@ import Foundation
             )
             return
           case .incorrectOrder, .interrupted, .invertedFulfillment:
-            recordIssue("Couldn't snapshot value", file: file, line: line)
+            recordIssue(
+              "Couldn't snapshot value",
+              fileID: file,
+              filePath: file,
+              line: line,
+              column: 0
+            )
             return
           @unknown default:
-            recordIssue("Couldn't snapshot value", file: file, line: line)
+            recordIssue(
+              "Couldn't snapshot value",
+              fileID: file,
+              filePath: file,
+              line: line,
+              column: 0
+            )
             return
           }
         }
@@ -121,8 +133,10 @@ import Foundation
 
             Re-run "\(function)" to assert against the newly-recorded snapshot.
             """,
-            file: file,
-            line: line
+            fileID: file,
+            filePath: file,
+            line: line,
+            column: 0
           )
           return
         }
@@ -133,8 +147,10 @@ import Foundation
             """
             No expected value to assert against.
             """,
-            file: file,
-            line: line
+            fileID: file,
+            filePath: file,
+            line: line,
+            column: 0
           )
           return
         }
@@ -154,7 +170,13 @@ import Foundation
           column: column
         )
       } catch {
-        recordIssue("Threw error: \(error)", file: file, line: line)
+        recordIssue(
+          "Threw error: \(error)",
+          fileID: file,
+          filePath: file,
+          line: line,
+          column: 0
+        )
       }
     }
   }
