@@ -7,18 +7,24 @@ import XCTest
 @_spi(Internals)
 public func recordIssue(
   _ message: @autoclosure () -> String,
-  file: StaticString = #filePath,
-  line: UInt = #line
+  fileID: StaticString = #fileID,
+  filePath: StaticString = #filePath,
+  line: UInt = #line,
+  column: UInt = #column
 ) {
   #if canImport(Testing)
     if Test.current != nil {
       Issue.record(
         Comment(rawValue: message()),
-        filePath: file.description,
-        line: Int(line)
+        sourceLocation: SourceLocation(
+          fileID: fileID.description,
+          filePath: filePath.description,
+          line: Int(line),
+          column: Int(column)
+        )
       )
     } else {
-      XCTFail(message(), file: file, line: line)
+      XCTFail(message(), file: filePath, line: line)
     }
   #else
     XCTFail(message(), file: file, line: line)

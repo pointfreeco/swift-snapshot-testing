@@ -30,7 +30,7 @@ public func _assertInlineSnapshot<Value>(
     line: line
   )
   guard let message = failure else { return }
-  recordIssue(message, file: file, line: line)
+  recordIssue(message, fileID: file, filePath: file, line: line, column: 0)
 }
 
 @available(

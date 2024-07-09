@@ -72,7 +72,7 @@ public func assertSnapshot<Value, Format>(
     line: line
   )
   guard let message = failure else { return }
-  recordIssue(message, file: file, line: line)
+  recordIssue(message, fileID: file, filePath: file, line: line, column: 0)
 }
 
 /// Asserts that a given value matches references on disk.
