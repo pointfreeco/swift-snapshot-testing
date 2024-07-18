@@ -100,22 +100,25 @@ import Foundation
           }
         }
         let expected = expected?()
-        guard
-          record != .all,
-          record != .missing || expected != nil
-        else {
+        func recordSnapshot() {
           // NB: Write snapshot state before calling `XCTFail` in case `continueAfterFailure = false`
           inlineSnapshotState[File(path: filePath), default: []].append(
             InlineSnapshot(
               expected: expected,
               actual: actual,
-              wasRecording: record == .all,
+              wasRecording: record == .all || record == .failed,
               syntaxDescriptor: syntaxDescriptor,
               function: "\(function)",
               line: line,
               column: column
             )
           )
+        }
+        guard
+          record != .all,
+          (record != .missing && record != .failed) || expected != nil
+        else {
+          recordSnapshot()
 
           var failure: String
           if syntaxDescriptor.trailingClosureLabel
@@ -162,12 +165,19 @@ import Foundation
         else { return }
 
         let message = message()
-        syntaxDescriptor.fail(
-          """
+        var failureMessage = """
           \(message.isEmpty ? "Snapshot did not match. Difference: …" : message)
-
+          
           \(difference.indenting(by: 2))
-          """,
+          """
+
+        if record == .failed {
+          recordSnapshot()
+          failureMessage += "\n\nA new snapshot was automatically recorded."
+        }
+
+        syntaxDescriptor.fail(
+          failureMessage,
           fileID: fileID,
           file: filePath,
           line: line,
@@ -352,27 +362,27 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
     }
   }
 
-  private struct File: Hashable {
-    let path: StaticString
-    static func == (lhs: Self, rhs: Self) -> Bool {
+@_spi(Internals) public struct File: Hashable {
+  public let path: StaticString
+  public static func == (lhs: Self, rhs: Self) -> Bool {
       "\(lhs.path)" == "\(rhs.path)"
     }
-    func hash(into hasher: inout Hasher) {
+  public func hash(into hasher: inout Hasher) {
       hasher.combine("\(self.path)")
     }
   }
 
-  private struct InlineSnapshot: Hashable {
-    var expected: String?
-    var actual: String?
-    var wasRecording: Bool
-    var syntaxDescriptor: InlineSnapshotSyntaxDescriptor
-    var function: String
-    var line: UInt
-    var column: UInt
+@_spi(Internals) public struct InlineSnapshot: Hashable {
+  public var expected: String?
+  public var actual: String?
+  public var wasRecording: Bool
+  public var syntaxDescriptor: InlineSnapshotSyntaxDescriptor
+  public var function: String
+  public var line: UInt
+  public var column: UInt
   }
 
-  private var inlineSnapshotState: [File: [InlineSnapshot]] = [:]
+  @_spi(Internals) public var inlineSnapshotState: [File: [InlineSnapshot]] = [:]
 
   private struct TestSource {
     let source: String
