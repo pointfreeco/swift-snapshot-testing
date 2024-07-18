@@ -167,7 +167,7 @@ import Foundation
         let message = message()
         var failureMessage = """
           \(message.isEmpty ? "Snapshot did not match. Difference: …" : message)
-          
+
           \(difference.indenting(by: 2))
           """
 
@@ -362,24 +362,24 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
     }
   }
 
-@_spi(Internals) public struct File: Hashable {
-  public let path: StaticString
-  public static func == (lhs: Self, rhs: Self) -> Bool {
+  @_spi(Internals) public struct File: Hashable {
+    public let path: StaticString
+    public static func == (lhs: Self, rhs: Self) -> Bool {
       "\(lhs.path)" == "\(rhs.path)"
     }
-  public func hash(into hasher: inout Hasher) {
+    public func hash(into hasher: inout Hasher) {
       hasher.combine("\(self.path)")
     }
   }
 
-@_spi(Internals) public struct InlineSnapshot: Hashable {
-  public var expected: String?
-  public var actual: String?
-  public var wasRecording: Bool
-  public var syntaxDescriptor: InlineSnapshotSyntaxDescriptor
-  public var function: String
-  public var line: UInt
-  public var column: UInt
+  @_spi(Internals) public struct InlineSnapshot: Hashable {
+    public var expected: String?
+    public var actual: String?
+    public var wasRecording: Bool
+    public var syntaxDescriptor: InlineSnapshotSyntaxDescriptor
+    public var function: String
+    public var line: UInt
+    public var column: UInt
   }
 
   @_spi(Internals) public var inlineSnapshotState: [File: [InlineSnapshot]] = [:]

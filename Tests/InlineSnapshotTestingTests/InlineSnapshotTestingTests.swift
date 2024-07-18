@@ -287,68 +287,68 @@ final class InlineSnapshotTestingTests: XCTestCase {
     }
   }
 
-#if canImport(Darwin)
-  func testRecordFailed_IncorrectExpectation() throws {
-    let initialInlineSnapshotState = inlineSnapshotState
-    defer { inlineSnapshotState = initialInlineSnapshotState }
+  #if canImport(Darwin)
+    func testRecordFailed_IncorrectExpectation() throws {
+      let initialInlineSnapshotState = inlineSnapshotState
+      defer { inlineSnapshotState = initialInlineSnapshotState }
 
-    XCTExpectFailure {
-      withSnapshotTesting(record: .failed) {
-        assertInlineSnapshot(of: 42, as: .json) {
-        """
-        4
-        """
+      XCTExpectFailure {
+        withSnapshotTesting(record: .failed) {
+          assertInlineSnapshot(of: 42, as: .json) {
+            """
+            4
+            """
+          }
         }
-      }
-    } issueMatcher: {
-      $0.compactDescription == """
-        failed - Snapshot did not match. Difference: …
-        
-          @@ −1,1 +1,1 @@
-          −4
-          +42
-        
-        A new snapshot was automatically recorded.
-        """
-    }
+      } issueMatcher: {
+        $0.compactDescription == """
+          failed - Snapshot did not match. Difference: …
 
-    XCTAssertEqual(inlineSnapshotState.count, 1)
-    XCTAssertEqual(
-      String(describing: inlineSnapshotState.keys.first!.path)
-        .hasSuffix("InlineSnapshotTestingTests.swift"),
-      true
-    )
-  }
+            @@ −1,1 +1,1 @@
+            −4
+            +42
+
+          A new snapshot was automatically recorded.
+          """
+      }
+
+      XCTAssertEqual(inlineSnapshotState.count, 1)
+      XCTAssertEqual(
+        String(describing: inlineSnapshotState.keys.first!.path)
+          .hasSuffix("InlineSnapshotTestingTests.swift"),
+        true
+      )
+    }
   #endif
 
-#if canImport(Darwin)
-  func testRecordFailed_MissingExpectation() throws {
-    let initialInlineSnapshotState = inlineSnapshotState
-    defer { inlineSnapshotState = initialInlineSnapshotState }
+  #if canImport(Darwin)
+    func testRecordFailed_MissingExpectation() throws {
+      let initialInlineSnapshotState = inlineSnapshotState
+      defer { inlineSnapshotState = initialInlineSnapshotState }
 
-    XCTExpectFailure {
-      withSnapshotTesting(record: .failed) {
-        assertInlineSnapshot(of: 42, as: .json)
+      XCTExpectFailure {
+        withSnapshotTesting(record: .failed) {
+          assertInlineSnapshot(of: 42, as: .json)
+        }
+      } issueMatcher: {
+        $0.compactDescription == """
+          failed - Automatically recorded a new snapshot. Difference: …
+
+            @@ −1,1 +1,1 @@
+            −
+            +42
+
+          Re-run "testRecordFailed_MissingExpectation()" to assert against the newly-recorded snapshot.
+          """
       }
-    } issueMatcher: {
-      $0.compactDescription == """
-        failed - Automatically recorded a new snapshot. Difference: …
 
-          @@ −1,1 +1,1 @@
-          −
-          +42
-
-        Re-run "testRecordFailed_MissingExpectation()" to assert against the newly-recorded snapshot.
-        """
+      XCTAssertEqual(inlineSnapshotState.count, 1)
+      XCTAssertEqual(
+        String(describing: inlineSnapshotState.keys.first!.path)
+          .hasSuffix("InlineSnapshotTestingTests.swift"),
+        true
+      )
     }
-
-    XCTAssertEqual(inlineSnapshotState.count, 1)
-    XCTAssertEqual(
-      String(describing: inlineSnapshotState.keys.first!.path)
-        .hasSuffix("InlineSnapshotTestingTests.swift"),
-      true
-    )
-  }
   #endif
 }
 
