@@ -106,7 +106,7 @@ import Foundation
             InlineSnapshot(
               expected: expected,
               actual: actual,
-              wasRecording: record == .all || record == .failed, // todo
+              wasRecording: record == .all || record == .failed,
               syntaxDescriptor: syntaxDescriptor,
               function: "\(function)",
               line: line,
