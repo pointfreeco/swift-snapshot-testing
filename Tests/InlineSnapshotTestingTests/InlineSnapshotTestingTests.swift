@@ -287,7 +287,7 @@ final class InlineSnapshotTestingTests: XCTestCase {
     }
   }
 
-
+#if canImport(Darwin)
   func testRecordFailed_IncorrectExpectation() throws {
     let initialInlineSnapshotState = inlineSnapshotState
     defer { inlineSnapshotState = initialInlineSnapshotState }
@@ -319,7 +319,9 @@ final class InlineSnapshotTestingTests: XCTestCase {
       true
     )
   }
+  #endif
 
+#if canImport(Darwin)
   func testRecordFailed_MissingExpectation() throws {
     let initialInlineSnapshotState = inlineSnapshotState
     defer { inlineSnapshotState = initialInlineSnapshotState }
@@ -347,6 +349,7 @@ final class InlineSnapshotTestingTests: XCTestCase {
       true
     )
   }
+  #endif
 }
 
 private func assertCustomInlineSnapshot(
