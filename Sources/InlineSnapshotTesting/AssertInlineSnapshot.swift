@@ -100,22 +100,25 @@ import Foundation
           }
         }
         let expected = expected?()
-        guard
-          record != .all,
-          record != .missing || expected != nil
-        else {
+        func recordSnapshot() {
           // NB: Write snapshot state before calling `XCTFail` in case `continueAfterFailure = false`
           inlineSnapshotState[File(path: filePath), default: []].append(
             InlineSnapshot(
               expected: expected,
               actual: actual,
-              wasRecording: record == .all,
+              wasRecording: record == .all || record == .failed, // todo
               syntaxDescriptor: syntaxDescriptor,
               function: "\(function)",
               line: line,
               column: column
             )
           )
+        }
+        guard
+          record != .all,
+          (record != .missing && record != .failed) || expected != nil
+        else {
+          recordSnapshot()
 
           var failure: String
           if syntaxDescriptor.trailingClosureLabel
@@ -162,12 +165,19 @@ import Foundation
         else { return }
 
         let message = message()
-        syntaxDescriptor.fail(
-          """
+        var failureMessage = """
           \(message.isEmpty ? "Snapshot did not match. Difference: …" : message)
-
+          
           \(difference.indenting(by: 2))
-          """,
+          """
+
+        if record == .failed {
+          recordSnapshot()
+          failureMessage += "\n\nA new snapshot was automatically recorded."
+        }
+
+        syntaxDescriptor.fail(
+          failureMessage,
           fileID: fileID,
           file: filePath,
           line: line,

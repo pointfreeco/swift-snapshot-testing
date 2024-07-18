@@ -286,6 +286,18 @@ final class InlineSnapshotTestingTests: XCTestCase {
       """##
     }
   }
+
+
+  func testRecordFailed_Real() throws {
+    withSnapshotTesting(record: .failed) {
+      assertInlineSnapshot(of: 42, as: .json) {
+        """
+        42
+        """
+      }
+    }
+  }
+
 }
 
 private func assertCustomInlineSnapshot(
