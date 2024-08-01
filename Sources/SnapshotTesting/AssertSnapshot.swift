@@ -311,10 +311,9 @@ public func verifySnapshot<Value, Format>(
       func recordSnapshot() throws {
         try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)
         #if !os(Linux) && !os(Windows)
-          if
-            !isSwiftTesting,
+          if !isSwiftTesting,
             ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS")
-        {
+          {
             XCTContext.runActivity(named: "Attached Recorded Snapshot") { activity in
               let attachment = XCTAttachment(contentsOfFile: snapshotFileUrl)
               activity.add(attachment)

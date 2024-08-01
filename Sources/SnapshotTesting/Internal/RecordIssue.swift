@@ -5,10 +5,10 @@ import XCTest
 #endif
 
 var isSwiftTesting: Bool {
-#if canImport(Testing)
-  return Test.current != nil
+  #if canImport(Testing)
+    return Test.current != nil
   #else
-  return false
+    return false
   #endif
 }
 
