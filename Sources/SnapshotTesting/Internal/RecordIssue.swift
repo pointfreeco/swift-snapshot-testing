@@ -4,6 +4,14 @@ import XCTest
   import Testing
 #endif
 
+var isSwiftTesting: Bool {
+  #if canImport(Testing)
+    return Test.current != nil
+  #else
+    return false
+  #endif
+}
+
 @_spi(Internals)
 public func recordIssue(
   _ message: @autoclosure () -> String,
