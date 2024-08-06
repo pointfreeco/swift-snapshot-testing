@@ -4,8 +4,8 @@
 
 ### Multiple snapshots
 
-- ``assertSnapshots(of:as:record:timeout:file:testName:line:)-98vsq``
-- ``assertSnapshots(of:as:record:timeout:file:testName:line:)-4upll``
+- ``assertSnapshots(of:as:record:timeout:file:testName:line:)-6mdbp``
+- ``assertSnapshots(of:as:record:timeout:file:testName:line:)-6c4fe``
 
 ### Custom assertions
 
@@ -14,6 +14,6 @@
 ### Deprecations
 
 - ``assertSnapshot(matching:as:named:record:timeout:file:testName:line:)``
-- ``assertSnapshots(matching:as:record:timeout:file:testName:line:)-3i804``
-- ``assertSnapshots(matching:as:record:timeout:file:testName:line:)-6bvvj``
+- ``assertSnapshots(matching:as:record:timeout:file:testName:line:)-4fz7d``
+- ``assertSnapshots(matching:as:record:timeout:file:testName:line:)-wq4j``
 - ``verifySnapshot(matching:as:named:record:snapshotDirectory:timeout:file:testName:line:)``
