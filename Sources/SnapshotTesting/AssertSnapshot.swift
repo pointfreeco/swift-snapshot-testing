@@ -18,7 +18,6 @@ public var diffTool: SnapshotTestingConfiguration.DiffTool {
 /// such as Screenshotbot. Incorrectly turning this off can hide real regressions.
 public var screenshotbotMode = true
 
-
 @_spi(Internals)
 public var _diffTool: SnapshotTestingConfiguration.DiffTool = .default
 
@@ -90,10 +89,10 @@ public func assertSnapshot<Value, Format>(
   if !(screenshotbotMode && isPng(snapshotting: snapshotting)) {
     recordIssue(
       message,
-        fileID: fileID,
-        filePath: filePath,
-        line: line,
-        column: column
+      fileID: fileID,
+      filePath: filePath,
+      line: line,
+      column: column
     )
   }
 }
@@ -253,7 +252,10 @@ public func verifySnapshot<Value, Format>(
   CleanCounterBetweenTestCases.registerIfNeeded()
 
   let record =
-    (recording == true ? .all : (screenshotbotMode && isPng(snapshotting: snapshotting) || recording == false) ? .missing : nil)
+    (recording == true
+      ? .all
+      : (screenshotbotMode && isPng(snapshotting: snapshotting) || recording == false)
+        ? .missing : nil)
 
     ?? SnapshotTestingConfiguration.current?.record
     ?? _record
