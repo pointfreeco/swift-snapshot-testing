@@ -1,13 +1,12 @@
 #if compiler(>=6) && canImport(Testing)
-  @_spi(Experimental) import Testing
+import Testing
   @_spi(Experimental) @_spi(Internals) import SnapshotTesting
 
   struct SnapshotsTraitTests {
     @Test(.snapshots(diffTool: "ksdiff"))
     func testDiffTool() {
       #expect(
-        SnapshotTestingConfiguration.current?
-          .diffTool?(currentFilePath: "old.png", failedFilePath: "new.png")
+        _diffTool(currentFilePath: "old.png", failedFilePath: "new.png")
           == "ksdiff old.png new.png"
       )
     }
@@ -17,8 +16,7 @@
       @Test(.snapshots(diffTool: "difftool"))
       func testDiffToolOverride() {
         #expect(
-          SnapshotTestingConfiguration.current?
-            .diffTool?(currentFilePath: "old.png", failedFilePath: "new.png")
+          _diffTool(currentFilePath: "old.png", failedFilePath: "new.png")
             == "difftool old.png new.png"
         )
       }
@@ -28,11 +26,10 @@
         @Test
         func config() {
           #expect(
-            SnapshotTestingConfiguration.current?
-              .diffTool?(currentFilePath: "old.png", failedFilePath: "new.png")
+            _diffTool(currentFilePath: "old.png", failedFilePath: "new.png")
               == "ksdiff old.png new.png"
           )
-          #expect(SnapshotTestingConfiguration.current?.record == .all)
+          #expect(_record == .all)
         }
 
         @Suite(.snapshots(record: .failed, diffTool: "diff"))
@@ -40,11 +37,10 @@
           @Test
           func config() {
             #expect(
-              SnapshotTestingConfiguration.current?
-                .diffTool?(currentFilePath: "old.png", failedFilePath: "new.png")
+              _diffTool(currentFilePath: "old.png", failedFilePath: "new.png")
                 == "diff old.png new.png"
             )
-            #expect(SnapshotTestingConfiguration.current?.record == .failed)
+            #expect(_record == .failed)
           }
         }
       }
