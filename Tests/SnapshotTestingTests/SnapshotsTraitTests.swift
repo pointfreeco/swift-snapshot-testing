@@ -1,5 +1,5 @@
 #if compiler(>=6) && canImport(Testing)
-import Testing
+  import Testing
   @_spi(Experimental) @_spi(Internals) import SnapshotTesting
 
   struct SnapshotsTraitTests {
