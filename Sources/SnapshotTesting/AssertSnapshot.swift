@@ -41,6 +41,9 @@ public var _diffTool: SnapshotTestingConfiguration.DiffTool {
 @_spi(Internals)
 public var __diffTool: SnapshotTestingConfiguration.DiffTool = .default
 
+/// Whether or not to automatically record snapshots when an existing file is not found.
+public var recordMissingSnapshots = true
+
 /// Whether or not to record all new references.
 @available(
   *, deprecated,
@@ -371,6 +374,12 @@ public func verifySnapshot<Value, Format>(
         (record != .missing && record != .failed)
           || fileManager.fileExists(atPath: snapshotFileUrl.path)
       else {
+        if !recording && !recordMissingSnapshots {
+        return """
+                No reference was found on disk, and `recordMissingSnapshots` is false.
+                Did not record snapshot.
+                """
+        }
         try recordSnapshot()
 
         return SnapshotTestingConfiguration.current?.record == .all
