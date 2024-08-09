@@ -38,16 +38,28 @@ Repeat test runs will load this reference and compare it with the runtime value.
 match, the test will fail and describe the difference. Failures can be inspected from Xcode's Report
 Navigator or by inspecting the file URLs of the failure.
 
-You can record a new reference by setting the `record` parameter to `true` on the assertion or
-setting `isRecording` globally.
+You can record a new reference by customizing snapshots inline with the assertion, or using the
+`withSnapshotTesting` tool:
 
-``` swift
-assertSnapshot(of: vc, as: .image, record: true)
+```swift
+// Record just this one snapshot
+assertSnapshot(of: vc, as: .image, record: .all)
 
-// or globally
+// Record all snapshots in a scope:
+withSnapshotTesting(record: .all) {
+  assertSnapshot(of: vc1, as: .image)
+  assertSnapshot(of: vc2, as: .image)
+  assertSnapshot(of: vc3, as: .image)
+}
 
-isRecording = true
-assertSnapshot(of: vc, as: .image)
+// Record all snapshots in an XCTestCase subclass:
+class FeatureTests: XCTestCase {
+  override func invokeTest() {
+    withSnapshotTesting(record: .all) {
+      super.invokeTest()
+    }
+  }
+}
 ```
 
 ## Snapshot Anything
@@ -210,9 +222,9 @@ targets: [
   - **`Codable` support**. Snapshot encodable data structures into their JSON and property list
     representations.
   - **Custom diff tool integration**. Configure failure messages to print diff commands for
-    [Kaleidoscope](https://kaleidoscope.app) (or your diff tool of choice).
+    [Kaleidoscope](https://kaleidoscope.app) or your diff tool of choice.
     ``` swift
-    SnapshotTesting.diffTool = "ksdiff"
+    SnapshotTesting.diffToolCommand = { "ksdiff \($0) \($1)" }
     ```
 
 [available-strategies]: https://swiftpackageindex.com/pointfreeco/swift-snapshot-testing/main/documentation/snapshottesting/snapshotting
