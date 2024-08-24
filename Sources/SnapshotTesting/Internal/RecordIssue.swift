@@ -24,12 +24,10 @@ public func recordIssue(
     if Test.current != nil {
       Issue.record(
         Comment(rawValue: message()),
-        sourceLocation: SourceLocation(
-          fileID: fileID.description,
-          filePath: filePath.description,
-          line: Int(line),
-          column: Int(column)
-        )
+        fileID: fileID.description,
+        filePath: filePath.description,
+        line: Int(line),
+        column: Int(column)
       )
     } else {
       XCTFail(message(), file: filePath, line: line)
