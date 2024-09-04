@@ -8,6 +8,9 @@ public var diffTool: String? = nil
 /// Whether or not to record all new references.
 public var record = false
 
+/// We can set the image format globally to better test
+public var imageFormat = ImageFormat.defaultValue
+
 /// Asserts that a given value matches a reference on disk.
 ///
 /// - Parameters:

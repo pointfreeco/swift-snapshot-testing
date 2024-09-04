@@ -4,7 +4,7 @@ import Cocoa
 extension Snapshotting where Value == NSBezierPath, Format == NSImage {
   /// A snapshot strategy for comparing bezier paths based on pixel equality.
   public static var image: Snapshotting {
-    return .image(format: .defaultValue)
+    return .image(format: imageFormat)
   }
 
   /// A snapshot strategy for comparing bezier paths based on pixel equality.

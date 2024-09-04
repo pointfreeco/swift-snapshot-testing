@@ -4,7 +4,7 @@ import Cocoa
 extension Snapshotting where Value == CALayer, Format == NSImage {
   /// A snapshot strategy for comparing layers based on pixel equality.
   public static var image: Snapshotting {
-    return .image(precision: 1, format: .defaultValue)
+    return .image(precision: 1, format: imageFormat)
   }
 
   /// A snapshot strategy for comparing layers based on pixel equality.
@@ -29,7 +29,7 @@ import UIKit
 extension Snapshotting where Value == CALayer, Format == UIImage {
   /// A snapshot strategy for comparing layers based on pixel equality.
   public static var image: Snapshotting {
-    return .image(format: .defaultValue)
+    return .image(format: imageFormat)
   }
 
   /// A snapshot strategy for comparing layers based on pixel equality.

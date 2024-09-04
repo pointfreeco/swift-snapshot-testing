@@ -4,7 +4,7 @@ import UIKit
 extension Snapshotting where Value == UIViewController, Format == UIImage {
   /// A snapshot strategy for comparing view controller views based on pixel equality.
   public static var image: Snapshotting {
-    return .image(format: .defaultValue)
+    return .image(format: imageFormat)
   }
 
   /// A snapshot strategy for comparing view controller views based on pixel equality.
@@ -19,7 +19,7 @@ extension Snapshotting where Value == UIViewController, Format == UIImage {
     precision: Float = 1,
     size: CGSize? = nil,
     traits: UITraitCollection = .init(),
-    format: ImageFormat = .defaultValue
+    format: ImageFormat = imageFormat
   )
     -> Snapshotting {
 

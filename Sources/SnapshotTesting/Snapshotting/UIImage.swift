@@ -4,7 +4,7 @@ import XCTest
 
 extension Diffing where Value == UIImage {
   /// A pixel-diffing strategy for UIImage's which requires a 100% match.
-  public static let image = Diffing.image(precision: 1, scale: nil, format: .defaultValue)
+  public static let image = Diffing.image(precision: 1, scale: nil, format: imageFormat)
 
   /// A pixel-diffing strategy for UIImage that allows customizing how precise the matching must be.
   ///
@@ -56,7 +56,7 @@ extension Diffing where Value == UIImage {
 extension Snapshotting where Value == UIImage, Format == UIImage {
   /// A snapshot strategy for comparing images based on pixel equality.
   public static var image: Snapshotting {
-    return .image(precision: 1, scale: nil, format: .defaultValue)
+    return .image(precision: 1, scale: nil, format: imageFormat)
   }
 
   /// A snapshot strategy for comparing images based on pixel equality.
