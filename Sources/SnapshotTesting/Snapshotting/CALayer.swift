@@ -1,49 +1,77 @@
 #if os(macOS)
-import Cocoa
+  import AppKit
+  import Cocoa
+  import QuartzCore
 
-extension Snapshotting where Value == CALayer, Format == NSImage {
-  /// A snapshot strategy for comparing layers based on pixel equality.
-  public static var image: Snapshotting {
-    return .image(precision: 1, format: imageFormat)
-  }
+  extension Snapshotting where Value == CALayer, Format == NSImage {
+    /// A snapshot strategy for comparing layers based on pixel equality.
+    ///
+    /// ``` swift
+    /// // Match reference perfectly.
+    /// assertSnapshot(of: layer, as: .image)
+    ///
+    /// // Allow for a 1% pixel difference.
+    /// assertSnapshot(of: layer, as: .image(precision: 0.99))
+    /// ```
+    public static var image: Snapshotting {
+      return .image(precision: 1, format: imageFormat)
+    }
 
-  /// A snapshot strategy for comparing layers based on pixel equality.
-  ///
-  /// - Parameter precision: The percentage of pixels that must match.
-  public static func image(precision: Float, format: ImageFormat) -> Snapshotting {
-    return SimplySnapshotting.image(precision: precision, format: format).pullback { layer in
-      let image = NSImage(size: layer.bounds.size)
-      image.lockFocus()
-      let context = NSGraphicsContext.current!.cgContext
-      layer.setNeedsLayout()
-      layer.layoutIfNeeded()
-      layer.render(in: context)
-      image.unlockFocus()
-      return image
+    /// A snapshot strategy for comparing layers based on pixel equality.
+    ///
+    /// - Parameters:
+    ///   - precision: The percentage of pixels that must match.
+    ///   - perceptualPrecision: The percentage a pixel must match the source pixel to be considered a
+    ///     match. 98-99% mimics
+    ///     [the precision](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e) of the
+    ///     human eye.
+    public static func image(precision: Float, perceptualPrecision: Float = 1, format: ImageFormat) -> Snapshotting {
+      return SimplySnapshotting.image(
+        precision: precision, perceptualPrecision: perceptualPrecision, format: format
+      ).pullback { layer in
+        let image = NSImage(size: layer.bounds.size)
+        image.lockFocus()
+        let context = NSGraphicsContext.current!.cgContext
+        layer.setNeedsLayout()
+        layer.layoutIfNeeded()
+        layer.render(in: context)
+        image.unlockFocus()
+        return image
+      }
     }
   }
-}
 #elseif os(iOS) || os(tvOS)
-import UIKit
+  import UIKit
 
-extension Snapshotting where Value == CALayer, Format == UIImage {
-  /// A snapshot strategy for comparing layers based on pixel equality.
-  public static var image: Snapshotting {
-    return .image(format: imageFormat)
-  }
+  extension Snapshotting where Value == CALayer, Format == UIImage {
+    /// A snapshot strategy for comparing layers based on pixel equality.
+    public static var image: Snapshotting {
+      return .image(format: imageFormat)
+    }
 
-  /// A snapshot strategy for comparing layers based on pixel equality.
-  ///
-  /// - Parameter precision: The percentage of pixels that must match.
-  public static func image(precision: Float = 1, traits: UITraitCollection = .init(), format: ImageFormat)
-    -> Snapshotting {
-      return SimplySnapshotting.image(precision: precision, scale: traits.displayScale, format: format).pullback { layer in
+    /// A snapshot strategy for comparing layers based on pixel equality.
+    ///
+    /// - Parameters:
+    ///   - precision: The percentage of pixels that must match.
+    ///   - perceptualPrecision: The percentage a pixel must match the source pixel to be considered a
+    ///     match. 98-99% mimics
+    ///     [the precision](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e) of the
+    ///     human eye.
+    ///   - traits: A trait collection override.
+    public static func image(
+      precision: Float = 1, perceptualPrecision: Float = 1, traits: UITraitCollection = .init(), format: ImageFormat
+    )
+      -> Snapshotting
+    {
+      return SimplySnapshotting.image(
+        precision: precision, perceptualPrecision: perceptualPrecision, scale: traits.displayScale, format: format
+      ).pullback { layer in
         renderer(bounds: layer.bounds, for: traits).image { ctx in
           layer.setNeedsLayout()
           layer.layoutIfNeeded()
           layer.render(in: ctx.cgContext)
         }
       }
+    }
   }
-}
 #endif
