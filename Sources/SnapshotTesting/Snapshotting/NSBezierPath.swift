@@ -4,14 +4,14 @@ import Cocoa
 extension Snapshotting where Value == NSBezierPath, Format == NSImage {
   /// A snapshot strategy for comparing bezier paths based on pixel equality.
   public static var image: Snapshotting {
-    return .image()
+    return .image(format: .defaultValue)
   }
 
   /// A snapshot strategy for comparing bezier paths based on pixel equality.
   ///
   /// - Parameter precision: The percentage of pixels that must match.
-  public static func image(precision: Float = 1) -> Snapshotting {
-    return SimplySnapshotting.image(precision: precision).pullback { path in
+  public static func image(precision: Float = 1, format: ImageFormat) -> Snapshotting {
+    return SimplySnapshotting.image(precision: precision, format: format).pullback { path in
       // Move path info frame:
       let bounds = path.bounds
       let transform = AffineTransform(translationByX: -bounds.origin.x, byY: -bounds.origin.y)

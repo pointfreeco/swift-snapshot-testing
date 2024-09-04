@@ -13,8 +13,8 @@ extension Snapshotting where Value == SKScene, Format == NSImage {
   /// - Parameters:
   ///   - precision: The percentage of pixels that must match.
   ///   - size: The size of the scene.
-  public static func image(precision: Float = 1, size: CGSize) -> Snapshotting {
-    return .skScene(precision: precision, size: size)
+  public static func image(precision: Float = 1, size: CGSize, format: ImageFormat) -> Snapshotting {
+    return .skScene(precision: precision, size: size, format: format)
   }
 }
 #elseif os(iOS) || os(tvOS)
@@ -24,15 +24,15 @@ extension Snapshotting where Value == SKScene, Format == UIImage {
   /// - Parameters:
   ///   - precision: The percentage of pixels that must match.
   ///   - size: The size of the scene.
-  public static func image(precision: Float = 1, size: CGSize) -> Snapshotting {
-    return .skScene(precision: precision, size: size)
+  public static func image(precision: Float = 1, size: CGSize, format: ImageFormat) -> Snapshotting {
+    return .skScene(precision: precision, size: size, format: format)
   }
 }
 #endif
 
 fileprivate extension Snapshotting where Value == SKScene, Format == Image {
-  static func skScene(precision: Float, size: CGSize) -> Snapshotting {
-    return Snapshotting<View, Image>.image(precision: precision).pullback { scene in
+  static func skScene(precision: Float, size: CGSize, format: ImageFormat) -> Snapshotting {
+    return Snapshotting<View, Image>.image(precision: precision, format: format).pullback { scene in
       let view = SKView(frame: .init(x: 0, y: 0, width: size.width, height: size.height))
       view.presentScene(scene)
       return view
