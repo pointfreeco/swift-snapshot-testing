@@ -19,7 +19,7 @@ extension Snapshotting where Value == UIView, Format == UIImage {
     precision: Float = 1,
     size: CGSize? = nil,
     traits: UITraitCollection = .init(),
-    format: ImageFormat
+    format: ImageFormat = .defaultValue
   )
     -> Snapshotting {
 

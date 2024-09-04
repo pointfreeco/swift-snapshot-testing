@@ -27,7 +27,7 @@ final class SnapshotTestingTests: XCTestCase {
   }
 
   override func tearDown() {
-    record = false
+//    record = false
     super.tearDown()
   }
 

@@ -35,7 +35,7 @@ extension Snapshotting where Value: SwiftUI.View, Format == UIImage {
     precision: Float = 1,
     layout: SwiftUISnapshotLayout = .sizeThatFits,
     traits: UITraitCollection = .init(),
-    format: ImageFormat
+    format: ImageFormat = .defaultValue
     )
     -> Snapshotting {
       let config: ViewImageConfig
