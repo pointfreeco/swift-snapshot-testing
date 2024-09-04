@@ -30,13 +30,7 @@ private func DecodePNGImage(_ data: Data) -> SnapImage? {
 
 #endif
 
-package protocol DefaultValueProvider<Value> {
-  associatedtype Value
-
-  static var defaultValue: Value { get }
-}
-
-public enum ImageFormat: String, DefaultValueProvider {
+public enum ImageFormat: String {
   case jxl
   case png
   
