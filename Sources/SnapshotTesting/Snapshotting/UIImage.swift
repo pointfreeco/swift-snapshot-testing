@@ -65,7 +65,7 @@
   extension Snapshotting where Value == UIImage, Format == UIImage {
     /// A snapshot strategy for comparing images based on pixel equality.
     public static var image: Snapshotting {
-      return .image()
+      return .image(format: imageFormat)
     }
 
     /// A snapshot strategy for comparing images based on pixel equality.
@@ -93,7 +93,7 @@
   private let imageContextBitsPerComponent = 8
   private let imageContextBytesPerPixel = 4
 
-  private func compare(_ old: UIImage, _ new: UIImage, precision: Float, perceptualPrecision: Float)
+  private func compare(_ old: UIImage, _ new: UIImage, precision: Float, perceptualPrecision: Float, format: ImageFormat)
     -> String?
   {
     guard let oldCgImage = old.cgImage else {

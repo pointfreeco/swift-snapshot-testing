@@ -21,9 +21,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/swiftlang/swift-syntax", "509.0.0"..<"601.0.0-prerelease")
-  ],
-  dependencies: [
+    .package(url: "https://github.com/swiftlang/swift-syntax", "509.0.0"..<"601.0.0-prerelease"),
     .package(url: "https://github.com/awxkee/jxl-coder-swift.git", from: "1.7.3")
   ],
   targets: [
@@ -31,8 +29,7 @@ let package = Package(
       name: "SnapshotTesting",
       dependencies: [
         .product(name: "JxlCoder", package: "jxl-coder-swift")
-      ]),
-      name: "SnapshotTesting"
+      ]
     ),
     .target(
       name: "InlineSnapshotTesting",

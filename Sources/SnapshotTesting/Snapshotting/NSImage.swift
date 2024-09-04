@@ -85,7 +85,7 @@
     let byteCount = oldContext.height * oldContext.bytesPerRow
     if memcmp(oldData, newData, byteCount) == 0 { return nil }
     guard
-      let imageData = EncodeImage(image: new, format)!,,
+      let imageData = EncodeImage(image: new, format),
       let newerCgImage = NSImage(data: imageData)?.cgImage(
         forProposedRect: nil, context: nil, hints: nil),
       let newerContext = context(for: newerCgImage),

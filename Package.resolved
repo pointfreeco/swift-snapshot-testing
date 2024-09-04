@@ -1,5 +1,15 @@
 {
+  "originHash" : "a16ed5d1f17dce3ee0b7cce7a04802759ee4b2faa99485261811c56f1adff67d",
   "pins" : [
+    {
+      "identity" : "jxl-coder-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/awxkee/jxl-coder-swift.git",
+      "state" : {
+        "revision" : "179264567c7dc0dd489859d5572773222358a7f5",
+        "version" : "1.7.3"
+      }
+    },
     {
       "identity" : "swift-syntax",
       "kind" : "remoteSourceControl",
@@ -10,5 +20,5 @@
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }
