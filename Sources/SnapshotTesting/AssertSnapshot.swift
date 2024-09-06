@@ -403,7 +403,7 @@ public func verifySnapshot<Value, Format>(
         }
       #endif
 
-      guard let (failure, attachments) = snapshotting.diffing.diff(reference, diffable) else {
+      guard let (failure, attachments, diffValue) = snapshotting.diffing.diff(reference, diffable) else {
         return nil
       }
 
@@ -413,9 +413,22 @@ public func verifySnapshot<Value, Format>(
       )
       let artifactsSubUrl = artifactsUrl.appendingPathComponent(fileName)
       try fileManager.createDirectory(at: artifactsSubUrl, withIntermediateDirectories: true)
+
+      func artifactFileURL(
+        for artifactType: ArtifactType,
+        artifactsDirectory: URL,
+        pathExtension: String
+      ) -> URL {
+        let baseFileName = "\(testName).\(identifier)"
+        let artifactFileName = "\(baseFileName)\(artifactType.suffix)"
+        let result = URL(fileURLWithPath: artifactFileName, isDirectory: false)
+        return result.appendingPathExtension(snapshotting.pathExtension ?? "")
+      }
+
       let failedSnapshotFileUrl = artifactsSubUrl.appendingPathComponent(
         snapshotFileUrl.lastPathComponent)
       try snapshotting.diffing.toData(diffable).write(to: failedSnapshotFileUrl)
+
 
       if !attachments.isEmpty {
         #if !os(Linux) && !os(Windows)
@@ -495,6 +508,23 @@ private class CleanCounterBetweenTestCases: NSObject, XCTestObservation {
   func testCaseDidFinish(_ testCase: XCTestCase) {
     counterQueue.sync {
       counterMap = [:]
+    }
+  }
+}
+
+private enum ArtifactType {
+  case failure
+  case reference
+  case diff
+
+  var suffix: String {
+    switch self {
+    case .failure:
+      return "_failure"
+    case .reference:
+      return "_reference"
+    case .diff:
+      return "_diff"
     }
   }
 }
