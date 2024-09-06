@@ -46,7 +46,7 @@
         return (
           message,
           [oldAttachment, newAttachment, differenceAttachment],
-          nil
+          difference
         )
       }
     }
