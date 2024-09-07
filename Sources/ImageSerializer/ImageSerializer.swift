@@ -50,6 +50,5 @@ public enum ImageFormat: String {
   case heic
   case webp
 
-  /// The default image format, set to `.png`.
   public static var defaultValue = ImageFormat.png
 }
