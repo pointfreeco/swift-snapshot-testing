@@ -16,6 +16,10 @@ let package = Package(
       targets: ["SnapshotTesting"]
     ),
     .library(
+      name: "JPEGXLImageSerializer",
+      targets: ["JPEGXLImageSerializer"]
+    ),
+    .library(
       name: "InlineSnapshotTesting",
       targets: ["InlineSnapshotTesting"]
     ),
@@ -28,8 +32,18 @@ let package = Package(
     .target(
       name: "SnapshotTesting",
       dependencies: [
+        "ImageSerializer"
+      ]
+    ),
+    .target(
+      name: "JPEGXLImageSerializer",
+      dependencies: [
+        "ImageSerializer",
         .product(name: "JxlCoder", package: "jxl-coder-swift")
       ]
+    ),
+    .target(
+      name: "ImageSerializer"
     ),
     .target(
       name: "InlineSnapshotTesting",
