@@ -36,14 +36,14 @@ let package = Package(
       ]
     ),
     .target(
+      name: "ImageSerializer"
+    ),
+    .target(
       name: "JPEGXLImageSerializer",
       dependencies: [
         "ImageSerializer",
         .product(name: "JxlCoder", package: "jxl-coder-swift")
       ]
-    ),
-    .target(
-      name: "ImageSerializer"
     ),
     .target(
       name: "InlineSnapshotTesting",
