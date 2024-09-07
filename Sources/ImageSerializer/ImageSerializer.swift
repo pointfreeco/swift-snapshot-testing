@@ -41,13 +41,15 @@ package struct ImageSerializer {
 /// - `.jxl`: JPEG XL format.
 /// - `.png`: PNG format.
 /// - `.heic`: HEIC format.
+/// - `.webp`: WEBP format.
 ///
 /// The `defaultValue` is set to `.png`.
 public enum ImageFormat: String {
   case jxl
   case png
   case heic
-  
+  case webp
+
   /// The default image format, set to `.png`.
   public static var defaultValue = ImageFormat.png
 }

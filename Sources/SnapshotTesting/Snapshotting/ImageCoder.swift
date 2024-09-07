@@ -5,6 +5,10 @@ import Foundation
 import JPEGXLImageSerializer
 #endif
 
+#if canImport(WEBPImageSerializer)
+import WEBPImageSerializer
+#endif
+
 /// Encodes an image into the specified format.
 ///
 /// This function takes a `SnapImage` and encodes it into a `Data` representation using the specified `ImageFormat`.
@@ -27,11 +31,17 @@ package func EncodeImage(image: SnapImage, _ format: ImageFormat) -> Data? {
     case .jxl: serializer = ImageSerializer.png
 #endif
     case .png: serializer = ImageSerializer.png
+    case .webp:
+      serializer = ImageSerializer.png
+#if canImport(WEBPImageSerializer)
+      if #available(iOS 13.0, macOS 10.10, tvOS 13.0, watchOS 6.0, *) {
+        serializer = ImageSerializer.webp
+      }
+#endif
     case .heic:
+      serializer = ImageSerializer.png
       if #available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *) {
         serializer = ImageSerializer.heic
-      } else {
-        serializer = ImageSerializer.png
       }
   }
   return serializer.encodeImage(image)
@@ -59,6 +69,13 @@ package func DecodeImage(data: Data, _ format: ImageFormat) -> SnapImage? {
     case .jxl: serializer = ImageSerializer.png
 #endif
     case .png: serializer = ImageSerializer.png
+    case .webp:
+      serializer = ImageSerializer.png
+#if canImport(WEBPImageSerializer)
+      if #available(iOS 13.0, macOS 10.10, tvOS 13.0, watchOS 6.0, *) {
+        serializer = ImageSerializer.webp
+      }
+#endif
     case .heic:
       if #available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *) {
         serializer = ImageSerializer.heic

@@ -20,13 +20,18 @@ let package = Package(
       targets: ["JPEGXLImageSerializer"]
     ),
     .library(
+      name: "WEBPImageSerializer",
+      targets: ["WEBPImageSerializer"]
+    ),
+    .library(
       name: "InlineSnapshotTesting",
       targets: ["InlineSnapshotTesting"]
     ),
   ],
   dependencies: [
     .package(url: "https://github.com/swiftlang/swift-syntax", "509.0.0"..<"601.0.0-prerelease"),
-    .package(url: "https://github.com/awxkee/jxl-coder-swift.git", from: "1.7.3")
+    .package(url: "https://github.com/awxkee/jxl-coder-swift.git", from: "1.7.3"),
+    .package(url: "https://github.com/awxkee/webp.swift.git", from: "1.1.1"),
   ],
   targets: [
     .target(
@@ -43,6 +48,13 @@ let package = Package(
       dependencies: [
         "ImageSerializer",
         .product(name: "JxlCoder", package: "jxl-coder-swift")
+      ]
+    ),
+    .target(
+      name: "WEBPImageSerializer",
+      dependencies: [
+        "ImageSerializer",
+        .product(name: "webp", package: "webp.swift")
       ]
     ),
     .target(
