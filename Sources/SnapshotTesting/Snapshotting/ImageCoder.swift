@@ -28,7 +28,7 @@ package func EncodeImage(image: SnapImage, _ format: ImageFormat) -> Data? {
 #endif
     case .png: serializer = ImageSerializer.png
     case .heic:
-      if #available(iOS 14.0, *) {
+      if #available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *) {
         serializer = ImageSerializer.heic
       } else {
         serializer = ImageSerializer.png
@@ -60,7 +60,7 @@ package func DecodeImage(data: Data, _ format: ImageFormat) -> SnapImage? {
 #endif
     case .png: serializer = ImageSerializer.png
     case .heic:
-      if #available(iOS 14.0, *) {
+      if #available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *) {
         serializer = ImageSerializer.heic
       } else {
         serializer = ImageSerializer.png
