@@ -1,7 +1,7 @@
 import XCTest
 
 #if canImport(Testing)
-  import Testing
+  @_implementationOnly import Testing
 #endif
 
 var isSwiftTesting: Bool {
