@@ -1,5 +1,5 @@
 #if canImport(Testing)
-  import Testing
+@_implementationOnly import Testing
 
   @_spi(Experimental)
   extension Trait where Self == _SnapshotsTestTrait {

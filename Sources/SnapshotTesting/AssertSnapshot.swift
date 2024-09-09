@@ -1,7 +1,7 @@
 import XCTest
 
 #if canImport(Testing)
-  import Testing
+@_implementationOnly import Testing
 #endif
 
 /// Enhances failure messages with a command line diff tool expression that can be copied and pasted
