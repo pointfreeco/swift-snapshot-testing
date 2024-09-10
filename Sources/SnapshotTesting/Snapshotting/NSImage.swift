@@ -19,8 +19,8 @@
     public static func image(precision: Float = 1, perceptualPrecision: Float = 1, imageFormat: ImageSerializationFormat) -> Diffing {
       let imageSerializer = ImageSerializer()
       return .init(
-        toData: {  imageSerializer.encodeImage($0, format: imageFormat)! },
-        fromData: { imageSerializer.decodeImage($0, format: imageFormat)! }
+        toData: {  imageSerializer.encodeImage($0, imageFormat: imageFormat)! },
+        fromData: { imageSerializer.decodeImage($0, imageFormat: imageFormat)! }
       ) { old, new in
         guard
           let message = compare(
@@ -88,8 +88,8 @@
     if memcmp(oldData, newData, byteCount) == 0 { return nil }
     let imageSerializer = ImageSerializer()
     guard
-      let imageData = imageSerializer.encodeImage(new, format: imageFormat),
-      let newerCgImage = imageSerializer.decodeImage(imageData, format: imageFormat)?.cgImage(
+      let imageData = imageSerializer.encodeImage(new, imageFormat: imageFormat),
+      let newerCgImage = imageSerializer.decodeImage(imageData, imageFormat: imageFormat)?.cgImage(
         forProposedRect: nil, context: nil, hints: nil),
       let newerContext = context(for: newerCgImage),
       let newerData = newerContext.data

@@ -1,9 +1,9 @@
+import ImageSerializationPlugin
 #if os(macOS)
 
   import AppKit
   import Cocoa
   import CoreGraphics
-  import ImageSerializationPlugin
 
   extension Snapshotting where Value == CGPath, Format == NSImage {
     /// A snapshot strategy for comparing bezier paths based on pixel equality.

@@ -29,8 +29,8 @@
       }
       let imageSerializer = ImageSerializer()
       return Diffing(
-        toData: { imageSerializer.encodeImage($0, format: imageFormat) ?? emptyImage().pngData()! }, // this seems inconsistant with macOS implementation
-        fromData: { imageSerializer.decodeImage($0, format: imageFormat)! } // missing imageScale here
+        toData: { imageSerializer.encodeImage($0, imageFormat: imageFormat) ?? emptyImage().pngData()! }, // this seems inconsistant with macOS implementation
+        fromData: { imageSerializer.decodeImage($0, imageFormat: imageFormat)! } // missing imageScale here
       ) { old, new in
         guard
           let message = compare(
@@ -82,7 +82,7 @@
       precision: Float = 1, perceptualPrecision: Float = 1, scale: CGFloat? = nil, imageFormat: ImageSerializationFormat
     ) -> Snapshotting {
       return .init(
-        pathExtension: format.rawValue,
+        pathExtension: imageFormat.rawValue,
         diffing: .image(
           precision: precision, perceptualPrecision: perceptualPrecision, scale: scale, imageFormat: imageFormat)
       )
@@ -121,8 +121,8 @@
     var newerBytes = [UInt8](repeating: 0, count: byteCount)
     let imageSerializer = ImageSerializer()
     guard
-      let imageData = imageSerializer.encodeImage(new, format: imageFormat),
-      let newerCgImage = imageSerializer.decodeImage(imageData, format: imageFormat)?.cgImage,
+      let imageData = imageSerializer.encodeImage(new, imageFormat: imageFormat),
+      let newerCgImage = imageSerializer.decodeImage(imageData, imageFormat: imageFormat)?.cgImage,
       let newerContext = context(for: newerCgImage, data: &newerBytes),
       let newerData = newerContext.data
     else {

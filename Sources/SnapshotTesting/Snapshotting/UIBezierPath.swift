@@ -18,7 +18,7 @@
     ///     human eye.
     ///   - scale: The scale to use when loading the reference image from disk.
     public static func image(
-      precision: Float = 1, perceptualPrecision: Float = 1, scale: CGFloat = 1, format imageFormat: ImageSerializationFormat
+      precision: Float = 1, perceptualPrecision: Float = 1, scale: CGFloat = 1, imageFormat: ImageSerializationFormat
     ) -> Snapshotting {
       return SimplySnapshotting.image(
         precision: precision, perceptualPrecision: perceptualPrecision, scale: scale, imageFormat: imageFormat

@@ -16,9 +16,9 @@ public class ImageSerializer {
   // public func encodeImage(_ image: SnapImage, format: KeyPath<ImageSerializationFormat.Type, String>) -> Data? {
   
   // async throws will be added later
-  public func encodeImage(_ image: SnapImage, format: ImageSerializationFormat) /*async throws*/ -> Data? {
+  public func encodeImage(_ image: SnapImage, imageFormat: ImageSerializationFormat) /*async throws*/ -> Data? {
     for plugin in PluginRegistry.shared.allPlugins() {
-      if type(of: plugin).identifier == format.rawValue {
+      if type(of: plugin).identifier == imageFormat.rawValue {
         return /*try await*/ plugin.encodeImage(image)
       }
     }
@@ -27,9 +27,9 @@ public class ImageSerializer {
   }
   
   // async throws will be added later
-  public func decodeImage(_ data: Data, format: ImageSerializationFormat) /*async throws*/ -> SnapImage? {
+  public func decodeImage(_ data: Data, imageFormat: ImageSerializationFormat) /*async throws*/ -> SnapImage? {
     for plugin in PluginRegistry.shared.allPlugins() {
-      if type(of: plugin).identifier == format.rawValue {
+      if type(of: plugin).identifier == imageFormat.rawValue {
         return /*try await*/ plugin.decodeImage(data)
       }
     }
