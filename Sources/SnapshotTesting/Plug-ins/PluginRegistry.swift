@@ -19,6 +19,8 @@ public class PluginRegistry {
   }
 }
 
+// If we are not on macOS the autoregistration mechanism won't work.
+#if canImport(ObjectiveC.runtime)
 // MARK: - AutoRegistry
 import Foundation
 import ObjectiveC.runtime
@@ -41,4 +43,4 @@ func registerAllPlugins() {
   }
   classes.deallocate()
 }
-
+#endif
