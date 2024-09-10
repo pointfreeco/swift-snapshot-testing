@@ -11,7 +11,7 @@ public typealias SnapImage = NSImage
 // I would like to have something like this as something that represent the fileformat/identifier
 // but due to the limitation of @objc that can only represent have Int for RawType for enum i'ml blocked.
 // I need this to behave like a string
-public enum ImageSerializationFormat: RawRepresentable {
+public enum ImageSerializationFormat: RawRepresentable, Sendable {
   case png
   case plugins(String)
   
@@ -28,6 +28,10 @@ public enum ImageSerializationFormat: RawRepresentable {
     case let .plugins(value): return value
     }
   }
+}
+
+public protocol ImageSerializationPublicFormat {
+  static var imageFormat: ImageSerializationFormat { get }
 }
 
 @objc // Required initializer for creating instances dynamically
