@@ -32,7 +32,8 @@ public enum ImageSerializationFormat: RawRepresentable {
 
 @objc // Required initializer for creating instances dynamically
 public protocol ImageSerializationPlugin {
-  static var fileExt: String { get }
+  // This should be the fileExtention
+  static var identifier: String { get }
   init() // Required initializer for creating instances dynamically
   func encodeImage(_ image: SnapImage) /*async throws*/ -> Data?
   func decodeImage(_ data: Data) /*async throws*/ -> SnapImage?
