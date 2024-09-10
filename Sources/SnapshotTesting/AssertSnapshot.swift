@@ -1,10 +1,14 @@
 import XCTest
+import ImageSerializationPlugin
 
 #if canImport(Testing)
   // NB: We are importing only the implementation of Testing because that framework is not available
   //     in Xcode UI test targets.
   @_implementationOnly import Testing
 #endif
+
+/// We can set the image format globally to better test
+public var imageFormat = ImageSerializationFormat.png
 
 /// Enhances failure messages with a command line diff tool expression that can be copied and pasted
 /// into a terminal.
