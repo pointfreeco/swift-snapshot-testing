@@ -75,6 +75,7 @@ public class PluginRegistry {
     for i in 0..<Int(classCount) {
       guard
         let someClass = classes[i],
+        class_conformsToProtocol(someClass, SnapshotTestingPlugin.self),
         let pluginType = someClass as? SnapshotTestingPlugin.Type
       else { continue }
       self.registerPlugin(pluginType.init())

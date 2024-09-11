@@ -1,3 +1,5 @@
+import ImageSerializationPlugin
+
 /// Customizes `assertSnapshot` for the duration of an operation.
 ///
 /// Use this operation to customize how the `assertSnapshot` function behaves in a test. It is most
@@ -26,13 +28,14 @@
 public func withSnapshotTesting<R>(
   record: SnapshotTestingConfiguration.Record? = nil,
   diffTool: SnapshotTestingConfiguration.DiffTool? = nil,
+  imageFormat: ImageSerializationFormat? = nil,
   operation: () throws -> R
 ) rethrows -> R {
   try SnapshotTestingConfiguration.$current.withValue(
     SnapshotTestingConfiguration(
       record: record ?? SnapshotTestingConfiguration.current?.record ?? _record,
-      diffTool: diffTool ?? SnapshotTestingConfiguration.current?.diffTool
-        ?? SnapshotTesting._diffTool
+      diffTool: diffTool ?? SnapshotTestingConfiguration.current?.diffTool ?? SnapshotTesting._diffTool,
+      imageFormat: imageFormat ?? SnapshotTestingConfiguration.current?.imageFormat ?? _imageFormat
     )
   ) {
     try operation()
@@ -45,12 +48,14 @@ public func withSnapshotTesting<R>(
 public func withSnapshotTesting<R>(
   record: SnapshotTestingConfiguration.Record? = nil,
   diffTool: SnapshotTestingConfiguration.DiffTool? = nil,
+  imageFormat: ImageSerializationFormat? = nil,
   operation: () async throws -> R
 ) async rethrows -> R {
   try await SnapshotTestingConfiguration.$current.withValue(
     SnapshotTestingConfiguration(
       record: record ?? SnapshotTestingConfiguration.current?.record ?? _record,
-      diffTool: diffTool ?? SnapshotTestingConfiguration.current?.diffTool ?? _diffTool
+      diffTool: diffTool ?? SnapshotTestingConfiguration.current?.diffTool ?? _diffTool,
+      imageFormat: imageFormat ?? SnapshotTestingConfiguration.current?.imageFormat ?? _imageFormat
     )
   ) {
     try await operation()
@@ -71,13 +76,17 @@ public struct SnapshotTestingConfiguration: Sendable {
   ///
   /// See ``Record-swift.struct`` for more information.
   public var record: Record?
+  
+  public var imageFormat: ImageSerializationFormat?
 
   public init(
     record: Record?,
-    diffTool: DiffTool?
+    diffTool: DiffTool?,
+    imageFormat: ImageSerializationFormat?
   ) {
     self.diffTool = diffTool
     self.record = record
+    self.imageFormat = imageFormat
   }
 
   /// The record mode of the snapshot test.

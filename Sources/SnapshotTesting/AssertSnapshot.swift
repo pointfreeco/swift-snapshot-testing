@@ -7,8 +7,35 @@ import ImageSerializationPlugin
   @_implementationOnly import Testing
 #endif
 
-/// We can set the image format globally to better test
-public var imageFormat = ImageSerializationFormat.png
+public var imageFormat: ImageSerializationFormat {
+  get {
+    _imageFormat
+  }
+  set { _imageFormat = newValue }
+}
+
+@_spi(Internals)
+public var _imageFormat: ImageSerializationFormat {
+  get {
+#if canImport(Testing)
+    if let test = Test.current {
+      for trait in test.traits.reversed() {
+        if let diffTool = (trait as? _SnapshotsTestTrait)?.configuration.imageFormat {
+          return diffTool
+        }
+      }
+    }
+#endif
+    return __imageFormat
+  }
+  set {
+    __imageFormat = newValue
+  }
+}
+
+@_spi(Internals)
+public var __imageFormat: ImageSerializationFormat = .png
+
 
 /// Enhances failure messages with a command line diff tool expression that can be copied and pasted
 /// into a terminal.
