@@ -1,12 +1,8 @@
 #if canImport(SwiftUI) && canImport(ObjectiveC)
 import ImageSerializationPlugin
+import SnapshotTestingPlugin
 
-@objc
-public protocol SnapshotTestingPlugin {
-  static var identifier: String { get }
-  init()
-}
-
+// MARK: - PluginRegistry
 public class PluginRegistry {
   public static let shared = PluginRegistry()
   private var plugins: [String: AnyObject] = [:]
@@ -30,9 +26,9 @@ public class PluginRegistry {
   }
 }
 
+// MARK: - Plugin AutoRegistry
 // If we are not on macOS the autoregistration mechanism won't work.
 #if canImport(ObjectiveC.runtime)
-// MARK: - AutoRegistry
 import Foundation
 import ObjectiveC.runtime
 
