@@ -1,5 +1,6 @@
 #if canImport(SwiftUI)
 import Foundation
+import SnapshotTestingPlugin
 
 #if canImport(UIKit)
 import UIKit.UIImage
@@ -9,21 +10,17 @@ import AppKit.NSImage
 public typealias SnapImage = NSImage
 #endif
 
-public protocol ImageSerializationPublicFormat {
-  static var imageFormat: ImageSerializationFormat { get }
-}
+// Way to go around the limitation of @objc
+public typealias ImageSerializationPlugin = ImageSerialization & SnapshotTestingPlugin
 
-@objc // Required initializer for creating instances dynamically
-public protocol ImageSerializationPlugin {
-  // This should be the fileExtention
-  static var identifier: String { get }
-  init() // Required initializer for creating instances dynamically
+public protocol ImageSerialization {
+  static var imageFormat: ImageSerializationFormat { get }
   func encodeImage(_ image: SnapImage) /*async throws*/ -> Data?
   func decodeImage(_ data: Data) /*async throws*/ -> SnapImage?
 }
 #endif
 
-public enum ImageSerializationFormat: RawRepresentable, Sendable {
+public enum ImageSerializationFormat: RawRepresentable, Sendable, Equatable {
   case png
   case plugins(String)
   

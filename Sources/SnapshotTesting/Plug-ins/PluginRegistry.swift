@@ -1,22 +1,32 @@
 #if canImport(SwiftUI)
 import ImageSerializationPlugin
 
+@objc
+public protocol SnapshotTestingPlugin {
+  static var identifier: String { get }
+  init()
+}
+
 public class PluginRegistry {
   public static let shared = PluginRegistry()
-  private var plugins: [String: ImageSerializationPlugin] = [:]
+  private var plugins: [String: AnyObject] = [:]
   
   private init() {}
   
-  public func registerPlugin(_ plugin: ImageSerializationPlugin) {
+  public func registerPlugin(_ plugin: SnapshotTestingPlugin) {
     plugins[type(of: plugin).identifier] = plugin
   }
   
-  public func plugin(for identifier: String) -> ImageSerializationPlugin? {
-    return plugins[identifier]
+  public func plugin(for identifier: String) -> SnapshotTestingPlugin? {
+    return plugins[identifier] as? SnapshotTestingPlugin
   }
   
-  public func allPlugins() -> [ImageSerializationPlugin] {
-    return Array(plugins.values)
+  public func allPlugins() -> [SnapshotTestingPlugin] {
+    return Array(plugins.values.compactMap { $0 as? SnapshotTestingPlugin })
+  }
+  
+  public func imageSerializerPlugins() -> [ImageSerialization] {
+    return Array(plugins.values).compactMap { $0 as? ImageSerialization  }
   }
 }
 
@@ -36,8 +46,8 @@ func registerAllPlugins() {
   objc_getClassList(autoreleasingClasses, count)
   
   for i in 0..<Int(count) {
-    if let cls: AnyClass = classes[i], class_conformsToProtocol(cls, ImageSerializationPlugin.self) {
-      if let pluginType = cls as? ImageSerializationPlugin.Type {
+    if let cls: AnyClass = classes[i], class_conformsToProtocol(cls, SnapshotTestingPlugin.self) {
+      if let pluginType = cls as? SnapshotTestingPlugin.Type {
         PluginRegistry.shared.registerPlugin(pluginType.init())
       }
     }
