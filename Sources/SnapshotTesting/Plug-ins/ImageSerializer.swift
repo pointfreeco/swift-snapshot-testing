@@ -10,11 +10,7 @@ import AppKit
 
 public class ImageSerializer {
   public init() {}
-  
-  // 🥲 waiting for SE-0438 to land https://github.com/swiftlang/swift-evolution/blob/main/proposals/0438-metatype-keypath.md
-  // or using ImageSerializationFormat as an extensible enum
-  // public func encodeImage(_ image: SnapImage, format: KeyPath<ImageSerializationFormat.Type, String>) -> Data? {
-  
+
   // async throws will be added later
   public func encodeImage(_ image: SnapImage, imageFormat: ImageSerializationFormat) /*async throws*/ -> Data? {
     for plugin in PluginRegistry.shared.imageSerializerPlugins()  {
