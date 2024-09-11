@@ -1,10 +1,10 @@
+#if canImport(SwiftUI)
 import Foundation
 import ImageSerializationPlugin
 
 #if canImport(UIKit)
 import UIKit
-#endif
-#if canImport(AppKit)
+#elseif canImport(AppKit)
 import AppKit
 #endif
 
@@ -39,9 +39,9 @@ public class ImageSerializer {
   
   // MARK: - Actual default Image Serializer
   private func encodePNG(_ image: SnapImage) -> Data? {
-#if !os(macOS)
+#if canImport(UIKit)
     return image.pngData()
-#else
+#elseif canImport(AppKit)
     guard let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
       return nil
     }
@@ -51,10 +51,11 @@ public class ImageSerializer {
   }
   
   private func decodePNG(_ data: Data) -> SnapImage? {
-#if !os(macOS)
+#if canImport(UIKit)
     return UIImage(data: data)
-#else
+#elseif canImport(AppKit)
     return NSImage(data: data)
 #endif
   }
 }
+#endif

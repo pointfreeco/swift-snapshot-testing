@@ -1,3 +1,4 @@
+#if canImport(SwiftUI)
 import ImageSerializationPlugin
 
 public class PluginRegistry {
@@ -43,4 +44,5 @@ func registerAllPlugins() {
   }
   classes.deallocate()
 }
+#endif
 #endif

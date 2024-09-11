@@ -1,9 +1,10 @@
+#if canImport(SwiftUI)
 import Foundation
 
-#if !os(macOS)
+#if canImport(UIKit)
 import UIKit.UIImage
 public typealias SnapImage = UIImage
-#else
+#elseif canImport(AppKit)
 import AppKit.NSImage
 public typealias SnapImage = NSImage
 #endif
@@ -39,3 +40,4 @@ public protocol ImageSerializationPlugin {
   func encodeImage(_ image: SnapImage) /*async throws*/ -> Data?
   func decodeImage(_ data: Data) /*async throws*/ -> SnapImage?
 }
+#endif
