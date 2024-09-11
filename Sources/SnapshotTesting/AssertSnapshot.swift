@@ -360,9 +360,11 @@ public func verifySnapshot<Value, Format>(
           if !isSwiftTesting,
             ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS")
           {
-            XCTContext.runActivity(named: "Attached Recorded Snapshot") { activity in
-              let attachment = XCTAttachment(contentsOfFile: snapshotFileUrl)
-              activity.add(attachment)
+            runOnMainThread {
+              XCTContext.runActivity(named: "Attached Recorded Snapshot") { activity in
+                let attachment = XCTAttachment(contentsOfFile: snapshotFileUrl)
+                activity.add(attachment)
+              }
             }
           }
         #endif
@@ -422,9 +424,11 @@ public func verifySnapshot<Value, Format>(
       if !attachments.isEmpty {
         #if !os(Linux) && !os(Windows)
           if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
-            XCTContext.runActivity(named: "Attached Failure Diff") { activity in
-              attachments.forEach {
-                activity.add($0)
+            runOnMainThread {
+              XCTContext.runActivity(named: "Attached Failure Diff") { activity in
+                attachments.forEach {
+                  activity.add($0)
+                }
               }
             }
           }
@@ -498,5 +502,13 @@ private class CleanCounterBetweenTestCases: NSObject, XCTestObservation {
     counterQueue.sync {
       counterMap = [:]
     }
+  }
+}
+
+private func runOnMainThread(action: () -> Void) {
+  if Thread.isMainThread {
+    action()
+  } else {
+    DispatchQueue.main.sync(execute: action)
   }
 }
