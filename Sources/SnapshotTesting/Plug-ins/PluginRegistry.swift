@@ -1,4 +1,6 @@
 #if canImport(SwiftUI) && canImport(ObjectiveC)
+import Foundation
+import ObjectiveC.runtime
 import ImageSerializationPlugin
 import SnapshotTestingPlugin
 
@@ -6,8 +8,10 @@ import SnapshotTestingPlugin
 public class PluginRegistry {
   public static let shared = PluginRegistry()
   private var plugins: [String: AnyObject] = [:]
-  
-  private init() {}
+
+  private init() {
+    defer { registerAllPlugins() }
+  }
   
   public func registerPlugin(_ plugin: SnapshotTestingPlugin) {
     plugins[type(of: plugin).identifier] = plugin
@@ -24,31 +28,21 @@ public class PluginRegistry {
   public func imageSerializerPlugins() -> [ImageSerialization] {
     return Array(plugins.values).compactMap { $0 as? ImageSerialization  }
   }
-}
-
-// MARK: - Plugin AutoRegistry
-// If we are not on macOS the autoregistration mechanism won't work.
-#if canImport(ObjectiveC.runtime)
-import Foundation
-import ObjectiveC.runtime
-
-var hasRegisterPlugins = false
-func registerAllPlugins() {
-  if hasRegisterPlugins { return }
-  defer { hasRegisterPlugins = true }
-  let count = objc_getClassList(nil, 0)
-  let classes = UnsafeMutablePointer<AnyClass?>.allocate(capacity: Int(count))
-  let autoreleasingClasses = AutoreleasingUnsafeMutablePointer<AnyClass>(classes)
-  objc_getClassList(autoreleasingClasses, count)
-  
-  for i in 0..<Int(count) {
-    if let cls: AnyClass = classes[i], class_conformsToProtocol(cls, SnapshotTestingPlugin.self) {
-      if let pluginType = cls as? SnapshotTestingPlugin.Type {
-        PluginRegistry.shared.registerPlugin(pluginType.init())
+    
+  func registerAllPlugins() {
+    let count = objc_getClassList(nil, 0)
+    let classes = UnsafeMutablePointer<AnyClass?>.allocate(capacity: Int(count))
+    let autoreleasingClasses = AutoreleasingUnsafeMutablePointer<AnyClass>(classes)
+    objc_getClassList(autoreleasingClasses, count)
+    
+    for i in 0..<Int(count) {
+      if let cls: AnyClass = classes[i], class_conformsToProtocol(cls, SnapshotTestingPlugin.self) {
+        if let pluginType = cls as? SnapshotTestingPlugin.Type {
+          self.registerPlugin(pluginType.init())
+        }
       }
     }
+    classes.deallocate()
   }
-  classes.deallocate()
 }
-#endif
 #endif
