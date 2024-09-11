@@ -9,25 +9,6 @@ import AppKit.NSImage
 public typealias SnapImage = NSImage
 #endif
 
-public enum ImageSerializationFormat: RawRepresentable, Sendable {
-  case png
-  case plugins(String)
-  
-  public init?(rawValue: String) {
-    switch rawValue {
-    case "png": self = .png
-    default: self = .plugins(rawValue)
-    }
-  }
-
-  public var rawValue: String {
-    switch self {
-    case .png: return "png"
-    case let .plugins(value): return value
-    }
-  }
-}
-
 public protocol ImageSerializationPublicFormat {
   static var imageFormat: ImageSerializationFormat { get }
 }
@@ -41,3 +22,22 @@ public protocol ImageSerializationPlugin {
   func decodeImage(_ data: Data) /*async throws*/ -> SnapImage?
 }
 #endif
+
+public enum ImageSerializationFormat: RawRepresentable, Sendable {
+  case png
+  case plugins(String)
+  
+  public init?(rawValue: String) {
+    switch rawValue {
+    case "png": self = .png
+    default: self = .plugins(rawValue)
+    }
+  }
+  
+  public var rawValue: String {
+    switch self {
+    case .png: return "png"
+    case let .plugins(value): return value
+    }
+  }
+}
