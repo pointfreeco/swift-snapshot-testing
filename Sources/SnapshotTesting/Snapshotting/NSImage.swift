@@ -16,7 +16,7 @@
     ///     [the precision](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e) of the
     ///     human eye.
     /// - Returns: A new diffing strategy.
-    public static func image(precision: Float = 1, perceptualPrecision: Float = 1, imageFormat: ImageSerializationFormat) -> Diffing {
+    public static func image(precision: Float = 1, perceptualPrecision: Float = 1, imageFormat: ImageSerializationFormat = imageFormat) -> Diffing {
       let imageSerializer = ImageSerializer()
       return .init(
         toData: {  imageSerializer.encodeImage($0, imageFormat: imageFormat)! },
@@ -55,7 +55,7 @@
     ///     match. 98-99% mimics
     ///     [the precision](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e) of the
     ///     human eye.
-    public static func image(precision: Float = 1, perceptualPrecision: Float = 1, imageFormat: ImageSerializationFormat) -> Snapshotting {
+    public static func image(precision: Float = 1, perceptualPrecision: Float = 1, imageFormat: ImageSerializationFormat = imageFormat) -> Snapshotting {
       return .init(
         pathExtension: imageFormat.rawValue,
         diffing: .image(precision: precision, perceptualPrecision: perceptualPrecision, imageFormat: imageFormat)
