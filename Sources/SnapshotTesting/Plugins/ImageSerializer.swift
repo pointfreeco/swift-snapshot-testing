@@ -35,7 +35,7 @@ public class ImageSerializer {
   public func encodeImage(_ image: SnapImage, imageFormat: ImageSerializationFormat) /*async throws*/ -> Data? {
     for plugin in self.plugins  {
       if type(of: plugin).imageFormat == imageFormat {
-        return /*try await*/ plugin.encodeImage(image)
+        return plugin.encodeImage(image)
       }
     }
     // Default to PNG
@@ -55,7 +55,7 @@ public class ImageSerializer {
   public func decodeImage(_ data: Data, imageFormat: ImageSerializationFormat) /*async throws*/ -> SnapImage? {
     for plugin in self.plugins {
       if type(of: plugin).imageFormat == imageFormat {
-        return /*try await*/ plugin.decodeImage(data)
+        return plugin.decodeImage(data)
       }
     }
     // Default to PNG
