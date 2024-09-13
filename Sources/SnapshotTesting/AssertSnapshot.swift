@@ -7,6 +7,13 @@ import ImageSerializationPlugin
   @_implementationOnly import Testing
 #endif
 
+/// Whether or not to change the default output image format to something else.
+@available(
+  *,
+  deprecated,
+  message:
+    "Use 'withSnapshotTesting' to customize the image output format. See the documentation for more information."
+)
 public var imageFormat: ImageSerializationFormat {
   get {
     _imageFormat

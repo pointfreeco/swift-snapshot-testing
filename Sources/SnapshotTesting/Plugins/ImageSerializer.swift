@@ -19,7 +19,7 @@ public class ImageSerializer {
   let plugins: [ImageSerialization]
   
   public init() {
-    self.plugins = PluginRegistry.shared.allPlugins()
+    self.plugins = PluginRegistry.allPlugins()
   }
 
   // TODO: async throws will be added later

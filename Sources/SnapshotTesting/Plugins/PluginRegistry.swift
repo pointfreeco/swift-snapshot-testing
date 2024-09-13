@@ -11,7 +11,7 @@ import SnapshotTestingPlugin
 /// and filter plugins that conform to the `ImageSerialization` protocol.
 public class PluginRegistry {
   /// The shared instance of the `PluginRegistry`, providing a single point of access.
-  public static let shared = PluginRegistry()
+  private static let shared = PluginRegistry()
 
   /// A dictionary holding the registered plugins, keyed by their identifier.
   private var plugins: [String: AnyObject] = [:]
@@ -20,13 +20,42 @@ public class PluginRegistry {
   ///
   /// Upon initialization, the registry automatically calls `registerAllPlugins()` to discover and register plugins.
   private init() {
-    defer { registerAllPlugins() }
+    defer { automaticPluginRegistration() }
   }
   
   /// Registers a given plugin in the registry.
   ///
   /// - Parameter plugin: An instance of a class conforming to `SnapshotTestingPlugin`.
-  public func registerPlugin(_ plugin: SnapshotTestingPlugin) {
+  public static func registerPlugin(_ plugin: SnapshotTestingPlugin) {
+    PluginRegistry.shared.registerPlugin(plugin)
+  }
+
+  /// Retrieves a plugin from the registry by its identifier and casts it to the specified type.
+  ///
+  /// This method attempts to find a plugin in the registry that matches the given identifier and cast it to the specified generic type `Output`.
+  /// If the plugin exists and can be cast to the specified type, it is returned; otherwise, `nil` is returned.
+  ///
+  /// - Parameter identifier: A unique string identifier for the plugin.
+  /// - Returns: The plugin instance cast to the specified type `Output` if found and castable, otherwise `nil`.
+  public static func plugin<Output>(for identifier: String) -> Output? {
+    PluginRegistry.shared.plugin(for: identifier)
+  }
+  
+  /// Returns all registered plugins that can be cast to the specified type.
+  ///
+  /// This method retrieves all registered plugins and attempts to cast each one to the specified generic type `Output`.
+  /// Only the plugins that can be successfully cast to `Output` are included in the returned array.
+  ///
+  /// - Returns: An array of all registered plugins that can be cast to the specified type `Output`.
+  public static func allPlugins<Output>() -> [Output] {
+    PluginRegistry.shared.allPlugins()
+  }
+
+  // MARK: - Internal Representation
+  /// Registers a given plugin in the registry.
+  ///
+  /// - Parameter plugin: An instance of a class conforming to `SnapshotTestingPlugin`.
+  private func registerPlugin(_ plugin: SnapshotTestingPlugin) {
     plugins[type(of: plugin).identifier] = plugin
   }
 
@@ -37,7 +66,7 @@ public class PluginRegistry {
   ///
   /// - Parameter identifier: A unique string identifier for the plugin.
   /// - Returns: The plugin instance cast to the specified type `Output` if found and castable, otherwise `nil`.
-  public func plugin<Output>(for identifier: String) -> Output? {
+  private func plugin<Output>(for identifier: String) -> Output? {
     return plugins[identifier] as? Output
   }
   
@@ -47,10 +76,10 @@ public class PluginRegistry {
   /// Only the plugins that can be successfully cast to `Output` are included in the returned array.
   ///
   /// - Returns: An array of all registered plugins that can be cast to the specified type `Output`.
-  public func allPlugins<Output>() -> [Output] {
+  private func allPlugins<Output>() -> [Output] {
     return Array(plugins.values.compactMap { $0 as? Output })
   }
-    
+
   /// Discovers and registers all classes that conform to the `SnapshotTestingPlugin` protocol.
   ///
   /// This method iterates over all classes in the Objective-C runtime, identifies those that conform to the `SnapshotTestingPlugin`
@@ -62,7 +91,7 @@ public class PluginRegistry {
   /// 3. All class references are retrieved into the allocated memory.
   /// 4. Each class reference is checked for conformance to the `SnapshotTestingPlugin` protocol.
   /// 5. If a class conforms, it is instantiated and registered as a plugin using the `registerPlugin(_:)` method.
-  func registerAllPlugins() {
+  private func automaticPluginRegistration() {
     let classCount = objc_getClassList(nil, 0)
     guard classCount > 0 else { return }
     
