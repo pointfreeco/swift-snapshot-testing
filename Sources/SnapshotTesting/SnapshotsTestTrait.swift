@@ -1,5 +1,7 @@
 #if canImport(Testing)
-  import Testing
+  // NB: We are importing only the implementation of Testing because that framework is not available
+  //     in Xcode UI test targets.
+  @_implementationOnly import Testing
 
   @_spi(Experimental)
   extension Trait where Self == _SnapshotsTestTrait {
