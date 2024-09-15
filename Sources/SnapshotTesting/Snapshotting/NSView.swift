@@ -34,8 +34,13 @@
         return view.snapshot
           ?? Async { callback in
             addImagesForRenderedViews(view).sequence().run { views in
+              let scaleFactor = NSScreen.main?.backingScaleFactor ?? 1.0
               let bitmapRep = view.bitmapImageRepForCachingDisplay(in: view.bounds)!
+              let scaledSize = CGSize(width: initialSize.width * scaleFactor, height: initialSize.height * scaleFactor)
+              bitmapRep.size = scaledSize
+
               view.cacheDisplay(in: view.bounds, to: bitmapRep)
+
               let image = NSImage(size: view.bounds.size)
               image.addRepresentation(bitmapRep)
               callback(image)
