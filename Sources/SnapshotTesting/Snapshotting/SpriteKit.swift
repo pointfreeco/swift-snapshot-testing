@@ -1,5 +1,6 @@
 #if os(iOS) || os(macOS) || os(tvOS)
   import SpriteKit
+  import ImageSerializationPlugin
   #if os(macOS)
     import Cocoa
   #elseif os(iOS) || os(tvOS)
@@ -17,10 +18,10 @@
       ///     [the precision](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e) of the
       ///     human eye.
       ///   - size: The size of the scene.
-      public static func image(precision: Float = 1, perceptualPrecision: Float = 1, size: CGSize)
+      public static func image(precision: Float = 1, perceptualPrecision: Float = 1, size: CGSize, imageFormat: ImageSerializationFormat)
         -> Snapshotting
       {
-        return .skScene(precision: precision, perceptualPrecision: perceptualPrecision, size: size)
+        return .skScene(precision: precision, perceptualPrecision: perceptualPrecision, size: size, imageFormat: imageFormat)
       }
     }
   #elseif os(iOS) || os(tvOS)
@@ -34,20 +35,20 @@
       ///     [the precision](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e) of the
       ///     human eye.
       ///   - size: The size of the scene.
-      public static func image(precision: Float = 1, perceptualPrecision: Float = 1, size: CGSize)
+      public static func image(precision: Float = 1, perceptualPrecision: Float = 1, size: CGSize, imageFormat: ImageSerializationFormat)
         -> Snapshotting
       {
-        return .skScene(precision: precision, perceptualPrecision: perceptualPrecision, size: size)
+        return .skScene(precision: precision, perceptualPrecision: perceptualPrecision, size: size, imageFormat: imageFormat)
       }
     }
   #endif
 
   extension Snapshotting where Value == SKScene, Format == Image {
-    fileprivate static func skScene(precision: Float, perceptualPrecision: Float, size: CGSize)
+    fileprivate static func skScene(precision: Float, perceptualPrecision: Float, size: CGSize, imageFormat: ImageSerializationFormat)
       -> Snapshotting
     {
       return Snapshotting<View, Image>.image(
-        precision: precision, perceptualPrecision: perceptualPrecision
+        precision: precision, perceptualPrecision: perceptualPrecision, imageFormat: imageFormat
       ).pullback { scene in
         let view = SKView(frame: .init(x: 0, y: 0, width: size.width, height: size.height))
         view.presentScene(scene)

@@ -1,10 +1,48 @@
 import XCTest
+import ImageSerializationPlugin
 
 #if canImport(Testing)
   // NB: We are importing only the implementation of Testing because that framework is not available
   //     in Xcode UI test targets.
   @_implementationOnly import Testing
 #endif
+
+/// Whether or not to change the default output image format to something else.
+@available(
+  *,
+  deprecated,
+  message:
+    "Use 'withSnapshotTesting' to customize the image output format. See the documentation for more information."
+)
+public var imageFormat: ImageSerializationFormat {
+  get {
+    _imageFormat
+  }
+  set { _imageFormat = newValue }
+}
+
+@_spi(Internals)
+public var _imageFormat: ImageSerializationFormat {
+  get {
+#if canImport(Testing)
+    if let test = Test.current {
+      for trait in test.traits.reversed() {
+        if let diffTool = (trait as? _SnapshotsTestTrait)?.configuration.imageFormat {
+          return diffTool
+        }
+      }
+    }
+#endif
+    return __imageFormat
+  }
+  set {
+    __imageFormat = newValue
+  }
+}
+
+@_spi(Internals)
+public var __imageFormat: ImageSerializationFormat = .defaultValue
+
 
 /// Enhances failure messages with a command line diff tool expression that can be copied and pasted
 /// into a terminal.

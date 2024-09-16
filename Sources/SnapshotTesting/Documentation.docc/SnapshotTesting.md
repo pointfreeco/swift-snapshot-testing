@@ -26,6 +26,7 @@ Powerfully flexible snapshot testing.
 ### Plugins
 
 - <doc:Plugins>
+- <doc:ImageSerializationPlugin>
 
 ### Deprecations
 

@@ -1,3 +1,5 @@
+import ImageSerializationPlugin
+
 /// Customizes `assertSnapshot` for the duration of an operation.
 ///
 /// Use this operation to customize how the `assertSnapshot` function behaves in a test. It is most
@@ -22,17 +24,19 @@
 /// - Parameters:
 ///   - record: The record mode to use while asserting snapshots.
 ///   - diffTool: The diff tool to use while asserting snapshots.
+///   - imageFormat: The image format used while encoding/decoding images(default: .png).
 ///   - operation: The operation to perform.
 public func withSnapshotTesting<R>(
   record: SnapshotTestingConfiguration.Record? = nil,
   diffTool: SnapshotTestingConfiguration.DiffTool? = nil,
+  imageFormat: ImageSerializationFormat? = nil,
   operation: () throws -> R
 ) rethrows -> R {
   try SnapshotTestingConfiguration.$current.withValue(
     SnapshotTestingConfiguration(
       record: record ?? SnapshotTestingConfiguration.current?.record ?? _record,
-      diffTool: diffTool ?? SnapshotTestingConfiguration.current?.diffTool
-        ?? SnapshotTesting._diffTool
+      diffTool: diffTool ?? SnapshotTestingConfiguration.current?.diffTool ?? SnapshotTesting._diffTool,
+      imageFormat: imageFormat ?? SnapshotTestingConfiguration.current?.imageFormat ?? _imageFormat
     )
   ) {
     try operation()
@@ -41,16 +45,18 @@ public func withSnapshotTesting<R>(
 
 /// Customizes `assertSnapshot` for the duration of an asynchronous operation.
 ///
-/// See ``withSnapshotTesting(record:diffTool:operation:)-2kuyr`` for more information.
+/// See ``withSnapshotTesting(record:diffTool:imageFormat:operation:)-2kuyr`` for more information.
 public func withSnapshotTesting<R>(
   record: SnapshotTestingConfiguration.Record? = nil,
   diffTool: SnapshotTestingConfiguration.DiffTool? = nil,
+  imageFormat: ImageSerializationFormat? = nil,
   operation: () async throws -> R
 ) async rethrows -> R {
   try await SnapshotTestingConfiguration.$current.withValue(
     SnapshotTestingConfiguration(
       record: record ?? SnapshotTestingConfiguration.current?.record ?? _record,
-      diffTool: diffTool ?? SnapshotTestingConfiguration.current?.diffTool ?? _diffTool
+      diffTool: diffTool ?? SnapshotTestingConfiguration.current?.diffTool ?? _diffTool,
+      imageFormat: imageFormat ?? SnapshotTestingConfiguration.current?.imageFormat ?? _imageFormat
     )
   ) {
     try await operation()
@@ -71,13 +77,18 @@ public struct SnapshotTestingConfiguration: Sendable {
   ///
   /// See ``Record-swift.struct`` for more information.
   public var record: Record?
+  
+  /// The image format to use while encoding/decoding snapshot tests.
+  public var imageFormat: ImageSerializationFormat?
 
   public init(
     record: Record?,
-    diffTool: DiffTool?
+    diffTool: DiffTool?,
+    imageFormat: ImageSerializationFormat?
   ) {
     self.diffTool = diffTool
     self.record = record
+    self.imageFormat = imageFormat
   }
 
   /// The record mode of the snapshot test.

@@ -2,6 +2,7 @@
   // NB: We are importing only the implementation of Testing because that framework is not available
   //     in Xcode UI test targets.
   @_implementationOnly import Testing
+  import ImageSerializationPlugin
 
   @_spi(Experimental)
   extension Trait where Self == _SnapshotsTestTrait {
@@ -12,12 +13,14 @@
     ///   - diffTool: The diff tool to use in failure messages.
     public static func snapshots(
       record: SnapshotTestingConfiguration.Record? = nil,
-      diffTool: SnapshotTestingConfiguration.DiffTool? = nil
+      diffTool: SnapshotTestingConfiguration.DiffTool? = nil,
+      imageFormat: ImageSerializationFormat? = nil
     ) -> Self {
       _SnapshotsTestTrait(
         configuration: SnapshotTestingConfiguration(
           record: record,
-          diffTool: diffTool
+          diffTool: diffTool,
+          imageFormat: imageFormat
         )
       )
     }

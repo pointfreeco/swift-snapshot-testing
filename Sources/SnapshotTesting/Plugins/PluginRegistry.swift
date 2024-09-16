@@ -8,7 +8,7 @@ import SnapshotTestingPlugin
 /// The `PluginRegistry` automatically discovers and registers classes conforming to the `SnapshotTestingPlugin` protocol
 /// within the Objective-C runtime. It allows retrieval of specific plugins by identifier, access to all registered plugins,
 /// and filtering of plugins that conform to the `ImageSerialization` protocol.
-public class PluginRegistry {
+class PluginRegistry {
   
   /// Shared singleton instance of `PluginRegistry`.
   private static let shared = PluginRegistry()
@@ -23,12 +23,12 @@ public class PluginRegistry {
     defer { automaticPluginRegistration() }
   }
   
-  // MARK: - Public Methods
+  // MARK: - Internal Methods
   
   /// Registers a plugin.
   ///
   /// - Parameter plugin: An instance conforming to `SnapshotTestingPlugin`.
-  public static func registerPlugin(_ plugin: SnapshotTestingPlugin) {
+  static func registerPlugin(_ plugin: any SnapshotTestingPlugin) {
     PluginRegistry.shared.registerPlugin(plugin)
   }
   
@@ -36,14 +36,14 @@ public class PluginRegistry {
   ///
   /// - Parameter identifier: The unique identifier for the plugin.
   /// - Returns: The plugin instance cast to `Output` if found and castable, otherwise `nil`.
-  public static func plugin<Output>(for identifier: String) -> Output? {
+  static func plugin<Output>(for identifier: String) -> Output? {
     PluginRegistry.shared.plugin(for: identifier)
   }
   
   /// Returns all registered plugins cast to the specified type.
   ///
   /// - Returns: An array of all registered plugins that can be cast to `Output`.
-  public static func allPlugins<Output>() -> [Output] {
+  static func allPlugins<Output>() -> [Output] {
     PluginRegistry.shared.allPlugins()
   }
   

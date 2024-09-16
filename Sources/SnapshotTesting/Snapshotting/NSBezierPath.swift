@@ -1,11 +1,12 @@
 #if os(macOS)
   import AppKit
   import Cocoa
+  import ImageSerializationPlugin
 
   extension Snapshotting where Value == NSBezierPath, Format == NSImage {
     /// A snapshot strategy for comparing bezier paths based on pixel equality.
     public static var image: Snapshotting {
-      return .image()
+      return .image(imageFormat: imageFormat)
     }
 
     /// A snapshot strategy for comparing bezier paths based on pixel equality.
@@ -24,9 +25,9 @@
     ///     match. 98-99% mimics
     ///     [the precision](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e) of the
     ///     human eye.
-    public static func image(precision: Float = 1, perceptualPrecision: Float = 1) -> Snapshotting {
+    public static func image(precision: Float = 1, perceptualPrecision: Float = 1, imageFormat: ImageSerializationFormat) -> Snapshotting {
       return SimplySnapshotting.image(
-        precision: precision, perceptualPrecision: perceptualPrecision
+        precision: precision, perceptualPrecision: perceptualPrecision, imageFormat: imageFormat
       ).pullback { path in
         // Move path info frame:
         let bounds = path.bounds
