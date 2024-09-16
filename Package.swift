@@ -16,6 +16,10 @@ let package = Package(
       targets: ["SnapshotTesting"]
     ),
     .library(
+      name: "SnapshotTestingPlugin",
+      targets: ["SnapshotTestingPlugin"]
+    ),
+    .library(
       name: "InlineSnapshotTesting",
       targets: ["InlineSnapshotTesting"]
     ),
@@ -25,8 +29,10 @@ let package = Package(
   ],
   targets: [
     .target(
-      name: "SnapshotTesting"
+      name: "SnapshotTesting",
+      dependencies: ["SnapshotTestingPlugin"]
     ),
+    .target(name: "SnapshotTestingPlugin"),
     .target(
       name: "InlineSnapshotTesting",
       dependencies: [

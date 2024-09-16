@@ -23,6 +23,10 @@ Powerfully flexible snapshot testing.
 - ``withSnapshotTesting(record:diffTool:operation:)-2kuyr``
 - ``SnapshotTestingConfiguration``
 
+### Plugins
+
+- <doc:Plugins>
+
 ### Deprecations
 
 - <doc:SnapshotTestingDeprecations>
