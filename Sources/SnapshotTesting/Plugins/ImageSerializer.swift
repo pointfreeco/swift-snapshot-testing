@@ -13,7 +13,7 @@ import AppKit
 /// The `ImageSerializer` class leverages plugins that conform to the `ImageSerialization` protocol to encode and decode images in different formats.
 /// It automatically retrieves all available image serialization plugins from the `PluginRegistry` and uses them based on the specified `ImageSerializationFormat`.
 /// If no plugin is found for the requested format, it defaults to using PNG encoding/decoding.
-class ImageSerializer {
+final class ImageSerializer {
   
   /// A collection of plugins that conform to the `ImageSerialization` protocol.
   private let plugins: [ImageSerialization]
@@ -33,11 +33,10 @@ class ImageSerializer {
   ///   - imageFormat: The format in which to encode the image.
   /// - Returns: The encoded image data, or `nil` if encoding fails.
   func encodeImage(_ image: SnapImage, imageFormat: ImageSerializationFormat = .defaultValue) -> Data? {
-    for plugin in self.plugins  {
-      if type(of: plugin).imageFormat == imageFormat {
-        return plugin.encodeImage(image)
-      }
+    if let plugin = self.plugins.first(where: { type(of: $0).imageFormat == imageFormat }) {
+      return plugin.encodeImage(image)
     }
+
     // Default to PNG
     return encodePNG(image)
   }
@@ -53,11 +52,10 @@ class ImageSerializer {
   ///   - imageFormat: The format in which the image data is encoded.
   /// - Returns: The decoded `SnapImage`, or `nil` if decoding fails.
   func decodeImage(_ data: Data, imageFormat: ImageSerializationFormat = .defaultValue) -> SnapImage? {
-    for plugin in self.plugins {
-      if type(of: plugin).imageFormat == imageFormat {
-        return plugin.decodeImage(data)
-      }
+    if let plugin = self.plugins.first(where: { type(of: $0).imageFormat == imageFormat }) {
+      return plugin.decodeImage(data)
     }
+
     // Default to PNG
     return decodePNG(data)
   }

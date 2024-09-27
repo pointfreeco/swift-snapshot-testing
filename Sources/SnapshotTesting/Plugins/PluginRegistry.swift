@@ -68,7 +68,7 @@ class PluginRegistry {
   ///
   /// - Returns: An array of all registered plugins that can be cast to `Output`.
   private func allPlugins<Output>() -> [Output] {
-    return Array(plugins.values.compactMap { $0 as? Output })
+    return plugins.values.compactMap { $0 as? Output }
   }
   
   /// Discovers and registers all classes conforming to the `SnapshotTestingPlugin` protocol.

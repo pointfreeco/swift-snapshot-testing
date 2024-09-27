@@ -72,10 +72,7 @@ public enum ImageSerializationFormat: RawRepresentable, Sendable, Equatable {
   ///
   /// - Parameter rawValue: The string representation of the image format.
   public init?(rawValue: String) {
-    switch rawValue {
-      case "png": self = .png
-      default: self = .plugins(rawValue)
-    }
+    self = rawValue == "png" ? .png : .plugins(rawValue)
   }
   
   /// The raw string value of the `ImageSerializationFormat`.
