@@ -1,5 +1,11 @@
 import XCTest
 
+#if canImport(Testing)
+  // NB: We are importing only the implementation of Testing because that framework is not available
+  //     in Xcode UI test targets.
+  @_implementationOnly import Testing
+#endif
+
 /// Enhances failure messages with a command line diff tool expression that can be copied and pasted
 /// into a terminal.
 @available(
@@ -9,7 +15,9 @@ import XCTest
     "Use 'withSnapshotTesting' to customize the diff tool. See the documentation for more information."
 )
 public var diffTool: SnapshotTestingConfiguration.DiffTool {
-  get { _diffTool }
+  get {
+    _diffTool
+  }
   set { _diffTool = newValue }
 }
 
@@ -19,7 +27,26 @@ public var diffTool: SnapshotTestingConfiguration.DiffTool {
 public var screenshotbotMode = true
 
 @_spi(Internals)
-public var _diffTool: SnapshotTestingConfiguration.DiffTool = .default
+public var _diffTool: SnapshotTestingConfiguration.DiffTool {
+  get {
+    #if canImport(Testing)
+      if let test = Test.current {
+        for trait in test.traits.reversed() {
+          if let diffTool = (trait as? _SnapshotsTestTrait)?.configuration.diffTool {
+            return diffTool
+          }
+        }
+      }
+    #endif
+    return __diffTool
+  }
+  set {
+    __diffTool = newValue
+  }
+}
+
+@_spi(Internals)
+public var __diffTool: SnapshotTestingConfiguration.DiffTool = .default
 
 /// Whether or not to record all new references.
 @available(
@@ -33,7 +60,26 @@ public var isRecording: Bool {
 }
 
 @_spi(Internals)
-public var _record: SnapshotTestingConfiguration.Record = {
+public var _record: SnapshotTestingConfiguration.Record {
+  get {
+    #if canImport(Testing)
+      if let test = Test.current {
+        for trait in test.traits.reversed() {
+          if let record = (trait as? _SnapshotsTestTrait)?.configuration.record {
+            return record
+          }
+        }
+      }
+    #endif
+    return __record
+  }
+  set {
+    __record = newValue
+  }
+}
+
+@_spi(Internals)
+public var __record: SnapshotTestingConfiguration.Record = {
   if let value = ProcessInfo.processInfo.environment["SNAPSHOT_TESTING_RECORD"],
     let record = SnapshotTestingConfiguration.Record(rawValue: value)
   {

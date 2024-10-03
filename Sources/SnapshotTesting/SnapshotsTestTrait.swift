@@ -1,5 +1,7 @@
 #if canImport(Testing)
-  @_spi(Experimental) import Testing
+  // NB: We are importing only the implementation of Testing because that framework is not available
+  //     in Xcode UI test targets.
+  @_implementationOnly import Testing
 
   @_spi(Experimental)
   extension Trait where Self == _SnapshotsTestTrait {
@@ -32,21 +34,21 @@
 
   /// A type representing the configuration of snapshot testing.
   @_spi(Experimental)
-  public struct _SnapshotsTestTrait: CustomExecutionTrait, SuiteTrait, TestTrait {
+  public struct _SnapshotsTestTrait: SuiteTrait, TestTrait {
     public let isRecursive = true
     let configuration: SnapshotTestingConfiguration
 
-    public func execute(
-      _ function: @escaping () async throws -> Void,
-      for test: Test,
-      testCase: Test.Case?
-    ) async throws {
-      try await withSnapshotTesting(
-        record: configuration.record,
-        diffTool: configuration.diffTool
-      ) {
-        try await function()
-      }
-    }
+    // public func execute(
+    //   _ function: @escaping () async throws -> Void,
+    //   for test: Test,
+    //   testCase: Test.Case?
+    // ) async throws {
+    //   try await withSnapshotTesting(
+    //     record: configuration.record,
+    //     diffTool: configuration.diffTool
+    //   ) {
+    //     try await function()
+    //   }
+    // }
   }
 #endif
