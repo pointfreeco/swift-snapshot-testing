@@ -1,14 +1,5 @@
 # Image Serialization Plugin
 
-Image Serialization Plugin is a plugin based on the PluginAPI, it provides support for encoding and decoding images. It leverages the plugin architecture to extend its support for different image formats without needing to modify the core system.
-
-Plugins that conform to the `ImageSerializationPlugin` protocol can be registered into the `PluginRegistry` and used to encode or decode images in different formats, such as PNG, JPEG, WebP, HEIC, and more.
-
-When a plugin supporting a specific image format is available, the `ImageSerializer` can dynamically choose the correct plugin based on the image format required, ensuring modularity and scalability in image handling.
-
-
-# Image Serialization Plugin
-
 The **Image Serialization Plugin** extends the functionality of the SnapshotTesting library by enabling support for multiple image formats through a plugin architecture. This PluginAPI allows image encoding and decoding to be easily extended without modifying the core logic of the system.
 
 ## Overview
@@ -38,14 +29,14 @@ The **Image Serialization Plugin** relies on the PluginAPI that is a combination
 #### Example Plugin Flow:
 
 1. **Plugin Discovery**:
-   - Plugins are automatically discovered at runtime through the Objective-C runtime, which identifies classes that conform to both the `ImageSerialization` and `SnapshotTestingPlugin` protocols.
+- On Apple platforms Plugins are automatically discovered at runtime through the Objective-C runtime, which identifies classes that conform to both the `ImageSerialization` and `SnapshotTestingPlugin` protocols.
 
 2. **Plugin Registration**:
-   - Each plugin registers itself with the `PluginRegistry`, allowing it to be retrieved when needed for image serialization.
+- Each plugin registers itself with the `PluginRegistry`, allowing it to be retrieved when needed for image serialization.
 
 3. **Image Encoding/Decoding**:
-   - When an image needs to be serialized, the `ImageSerializer` checks the available plugins for one that supports the requested format.
-   - If no plugin is found, it defaults to the built-in PNG encoding/decoding methods.
+- When an image needs to be serialized, the `ImageSerializer` checks the available plugins for one that supports the requested format.
+- If no plugin is found, it defaults to the built-in PNG encoding/decoding methods.
 
 #### Extensibility
 
@@ -82,6 +73,9 @@ For example, if you want to use JPEG XL as a new image format for your snapshots
         SnapshotTesting.imageFormat = JXLImageSerializer.imageFormat
     }
     ```
+
+> [!IMPORTANT]  
+> On **non** Apple platform you will need to call `PluginRegistry.registerPlugin(YourPlugin.init()))` to register it.
 
    Alternatively, you can specify the image format for individual assertions:
 

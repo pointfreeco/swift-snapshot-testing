@@ -1,4 +1,4 @@
-#if canImport(SwiftUI) && canImport(ObjectiveC)
+#if canImport(SwiftUI)
 import XCTest
 import SnapshotTestingPlugin
 @testable import SnapshotTesting

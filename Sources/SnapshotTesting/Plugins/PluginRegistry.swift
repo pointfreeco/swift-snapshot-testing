@@ -1,6 +1,5 @@
-#if canImport(SwiftUI) && canImport(ObjectiveC)
+#if canImport(SwiftUI)
 import Foundation
-import ObjectiveC.runtime
 import SnapshotTestingPlugin
 
 /// A singleton class responsible for managing and registering plugins conforming to the `SnapshotTestingPlugin` protocol.
@@ -8,7 +7,7 @@ import SnapshotTestingPlugin
 /// The `PluginRegistry` automatically discovers and registers classes conforming to the `SnapshotTestingPlugin` protocol
 /// within the Objective-C runtime. It allows retrieval of specific plugins by identifier, access to all registered plugins,
 /// and filtering of plugins that conform to the `ImageSerialization` protocol.
-class PluginRegistry {
+public class PluginRegistry {
   
   /// Shared singleton instance of `PluginRegistry`.
   private static let shared = PluginRegistry()
@@ -20,7 +19,11 @@ class PluginRegistry {
   ///
   /// Automatically triggers `automaticPluginRegistration()` to discover and register plugins.
   private init() {
+    #if canImport(ObjectiveC)
     defer { automaticPluginRegistration() }
+    #else
+    print("Manual plugin registration is required. Call `PluginRegistry.registerPlugin`.")
+    #endif
   }
   
   // MARK: - Internal Methods
@@ -28,7 +31,7 @@ class PluginRegistry {
   /// Registers a plugin.
   ///
   /// - Parameter plugin: An instance conforming to `SnapshotTestingPlugin`.
-  static func registerPlugin(_ plugin: any SnapshotTestingPlugin) {
+  public static func registerPlugin(_ plugin: any SnapshotTestingPlugin) {
     PluginRegistry.shared.registerPlugin(plugin)
   }
   
@@ -71,11 +74,31 @@ class PluginRegistry {
     return plugins.values.compactMap { $0 as? Output }
   }
   
+  // TEST-ONLY Reset Method
+  #if DEBUG
+  internal static func reset() {
+      shared.plugins.removeAll()
+  }
+
+  #if canImport(ObjectiveC)
+  internal static func automaticPluginRegistration() {
+    shared.automaticPluginRegistration()
+  }
+  #endif
+  #endif
+}
+#endif
+
+#if canImport(ObjectiveC)
+import ObjectiveC.runtime
+
+extension PluginRegistry {
+  
   /// Discovers and registers all classes conforming to the `SnapshotTestingPlugin` protocol.
   ///
   /// This method iterates over all Objective-C runtime classes, identifying those that conform to `SnapshotTestingPlugin`,
   /// instantiating them, and registering them as plugins.
-  private func automaticPluginRegistration() {
+  func automaticPluginRegistration() {
     let classCount = objc_getClassList(nil, 0)
     guard classCount > 0 else { return }
     
@@ -94,16 +117,5 @@ class PluginRegistry {
       self.registerPlugin(pluginType.init())
     }
   }
-  
-  // TEST-ONLY Reset Method
-  #if DEBUG
-  internal static func reset() {
-      shared.plugins.removeAll()
-  }
-
-  internal static func automaticPluginRegistration() {
-      shared.automaticPluginRegistration()
-  }
-  #endif
 }
 #endif

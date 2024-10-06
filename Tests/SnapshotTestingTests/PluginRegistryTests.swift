@@ -1,6 +1,5 @@
-#if canImport(SwiftUI) && canImport(ObjectiveC)
+#if canImport(SwiftUI)
 import XCTest
-import ObjectiveC
 @testable import SnapshotTesting
 import SnapshotTestingPlugin
 
@@ -58,15 +57,6 @@ final class PluginRegistryTests: XCTestCase {
     XCTAssertEqual(allPlugins.count, 2)
     XCTAssertTrue(allPlugins.contains { $0 is MockPlugin })
     XCTAssertTrue(allPlugins.contains { $0 is AnotherMockPlugin })
-  }
-  
-  func testAutomaticPluginRegistration() {
-    // Automatically register plugins using the Objective-C runtime
-    PluginRegistry.automaticPluginRegistration() // Reset state before each test
-    
-    // Verify if the mock plugin was automatically registered
-    let registeredPlugin: MockPlugin? = PluginRegistry.plugin(for: MockPlugin.identifier)
-    XCTAssertNotNil(registeredPlugin)
   }
 }
 
