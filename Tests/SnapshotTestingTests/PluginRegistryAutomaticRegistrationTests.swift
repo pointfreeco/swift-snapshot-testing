@@ -18,7 +18,7 @@ final class PluginRegistryAutomaticRegistrationTests: XCTestCase {
   
   func testAutomaticPluginRegistration() {
     // Automatically register plugins using the Objective-C runtime
-    PluginRegistry.automaticPluginRegistration() // Reset state before each test
+    PluginRegistry.automaticPluginRegistration()
     
     // Verify if the mock plugin was automatically registered
     let registeredPlugin: MockPlugin? = PluginRegistry.plugin(for: MockPlugin.identifier)

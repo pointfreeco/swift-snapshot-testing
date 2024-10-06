@@ -22,7 +22,7 @@ public class PluginRegistry {
     #if canImport(ObjectiveC)
     defer { automaticPluginRegistration() }
     #else
-    print("Manual plugin registration is required. Call `PluginRegistry.registerPlugin`.")
+    print("Manual plugin registration is required. Call `PluginRegistry.registerPlugin(YourPlugin.init())`.")
     #endif
   }
   
@@ -79,12 +79,13 @@ public class PluginRegistry {
   internal static func reset() {
       shared.plugins.removeAll()
   }
-
-  #if canImport(ObjectiveC)
+  #endif
+  
+  #if DEBUG && canImport(ObjectiveC)
+  // Used for test only
   internal static func automaticPluginRegistration() {
     shared.automaticPluginRegistration()
   }
-  #endif
   #endif
 }
 #endif
