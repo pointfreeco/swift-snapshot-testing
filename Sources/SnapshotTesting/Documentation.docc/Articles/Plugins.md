@@ -16,4 +16,7 @@ The primary components of the plugin system include:
 - **PluginRegistry**: Manages plugin discovery, registration, and retrieval.
 - **Objective-C Runtime Integration**: Allows automatic discovery of plugins that conform to specific protocols.
 
+> [!IMPORTANT]  
+> On **non** Apple platform you will need to call `PluginRegistry.registerPlugin(YourPlugin.init())` to register your plugin.
+
 The `PluginRegistry` is a singleton that registers plugins during its initialization. Plugins can be retrieved by their identifier or cast to specific types, allowing flexible interaction.

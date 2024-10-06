@@ -75,7 +75,7 @@ For example, if you want to use JPEG XL as a new image format for your snapshots
     ```
 
 > [!IMPORTANT]  
-> On **non** Apple platform you will need to call `PluginRegistry.registerPlugin(YourPlugin.init()))` to register it.
+> On **non** Apple platform you will need to call `PluginRegistry.registerPlugin(YourPlugin.init())` to register it.
 
    Alternatively, you can specify the image format for individual assertions:
 
