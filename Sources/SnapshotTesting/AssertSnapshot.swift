@@ -1,9 +1,7 @@
 import XCTest
 
 #if canImport(Testing)
-  // NB: We are importing only the implementation of Testing because that framework is not available
-  //     in Xcode UI test targets.
-  @_implementationOnly import Testing
+  import Testing
 #endif
 
 /// Enhances failure messages with a command line diff tool expression that can be copied and pasted
@@ -421,7 +419,10 @@ public func verifySnapshot<Value, Format>(
 
       if !attachments.isEmpty {
         #if !os(Linux) && !os(Windows)
-          if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
+          if
+            ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS"),
+            Test.current == nil
+        {
             XCTContext.runActivity(named: "Attached Failure Diff") { activity in
               attachments.forEach {
                 activity.add($0)
