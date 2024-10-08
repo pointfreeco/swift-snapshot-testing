@@ -419,10 +419,9 @@ public func verifySnapshot<Value, Format>(
 
       if !attachments.isEmpty {
         #if !os(Linux) && !os(Windows)
-          if
-            ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS"),
+          if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS"),
             !isSwiftTesting
-        {
+          {
             XCTContext.runActivity(named: "Attached Failure Diff") { activity in
               attachments.forEach {
                 activity.add($0)

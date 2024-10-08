@@ -27,7 +27,7 @@
           """
           ▿ 2 elements
             - "Hello"
-          
+
           """
         }
       } matching: { issue in
