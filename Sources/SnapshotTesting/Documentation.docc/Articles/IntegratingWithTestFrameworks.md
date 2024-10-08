@@ -67,21 +67,14 @@ class FeatureTests: XCTestCase {
 
 This will override the `diffTool` and `record` properties for each test function.
 
-Swift's new testing framework does not currently have a public API for this kind of customization.
-There is an experimental feature, called `CustomExecutionTrait`, that does gives us this ability,
-and the library provides such a trait called ``Testing/Trait/snapshots(diffTool:record:)``. It can
-be attached to any `@Test` or `@Suite` to configure snapshot testing:
+Swift's new testing framework also allows for this kind of configuration, both for a single test
+and an entire test suite. This is done via what are known as "test traits":
 
 ```swift
-@_spi(Experimental) import SnapshotTesting
+import SnapshotTesting
 
 @Suite(.snapshots(record: .all, diffTool: .ksdiff))
 struct FeatureTests {
   …
 }
 ```
-
-> Important: You must import SnapshotTesting with the `@_spi(Experimental)` attribute to get access
-to this functionality because Swift Testing's own `CustomExecutionTrait` is hidden behind the same
-SPI flag. This means this API is subject to change in the future, but hopefully Apple will 
-publicize this tool soon.
