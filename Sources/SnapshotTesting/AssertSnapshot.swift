@@ -2,9 +2,7 @@ import XCTest
 import ImageSerializationPlugin
 
 #if canImport(Testing)
-  // NB: We are importing only the implementation of Testing because that framework is not available
-  //     in Xcode UI test targets.
-  @_implementationOnly import Testing
+  import Testing
 #endif
 
 /// Whether or not to change the default output image format to something else.
@@ -453,7 +451,9 @@ public func verifySnapshot<Value, Format>(
 
       if !attachments.isEmpty {
         #if !os(Linux) && !os(Windows)
-          if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
+          if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS"),
+            !isSwiftTesting
+          {
             XCTContext.runActivity(named: "Attached Failure Diff") { activity in
               attachments.forEach {
                 activity.add($0)

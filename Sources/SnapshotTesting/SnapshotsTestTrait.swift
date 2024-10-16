@@ -1,10 +1,8 @@
 #if canImport(Testing)
-  // NB: We are importing only the implementation of Testing because that framework is not available
-  //     in Xcode UI test targets.
-  @_implementationOnly import Testing
-  import ImageSerializationPlugin
 
-  @_spi(Experimental)
+  import ImageSerializationPlugin
+  import Testing
+
   extension Trait where Self == _SnapshotsTestTrait {
     /// Configure snapshot testing in a suite or test.
     ///
@@ -36,7 +34,6 @@
   }
 
   /// A type representing the configuration of snapshot testing.
-  @_spi(Experimental)
   public struct _SnapshotsTestTrait: SuiteTrait, TestTrait {
     public let isRecursive = true
     let configuration: SnapshotTestingConfiguration
