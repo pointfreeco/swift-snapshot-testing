@@ -354,7 +354,7 @@ public func verifySnapshot<Value, Format>(
 
       func recordSnapshot() throws {
         try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)
-        #if !os(Linux) && !os(Windows)
+        #if !os(Linux) && !os(Windows) && !os(Android)
           if !isSwiftTesting,
             ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS")
           {
@@ -418,7 +418,7 @@ public func verifySnapshot<Value, Format>(
       try snapshotting.diffing.toData(diffable).write(to: failedSnapshotFileUrl)
 
       if !attachments.isEmpty {
-        #if !os(Linux) && !os(Windows)
+        #if !os(Linux) && !os(Windows) && !os(Android)
           if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS"),
             !isSwiftTesting
           {

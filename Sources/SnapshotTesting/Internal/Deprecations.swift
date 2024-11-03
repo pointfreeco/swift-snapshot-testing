@@ -136,7 +136,7 @@ public func _verifyInlineSnapshot<Value>(
 
     /// Did not successfully record, so we will fail.
     if !attachments.isEmpty {
-      #if !os(Linux) && !os(Windows)
+      #if !os(Linux) && !os(Windows) && !os(Android)
         if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
           XCTContext.runActivity(named: "Attached Failure Diff") { activity in
             attachments.forEach {
