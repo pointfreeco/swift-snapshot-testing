@@ -7,6 +7,7 @@ on:
   pull_request:
     branches:
       - "*"
+  workflow_dispatch:
 
 jobs:
   macos:
@@ -63,3 +64,47 @@ jobs:
       - uses: actions/checkout@v4
       - run: swift build
       - run: swift test
+
+  android:
+    name: Android (Swift 6.0.2)
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Install Swift
+        uses: tayloraswift/swift-install-action@master
+        with:
+          swift-prefix: swift-6.0.2-release/ubuntu2204/swift-6.0.2-RELEASE
+          swift-id: swift-6.0.2-RELEASE-ubuntu22.04
+      - name: Check Swift
+        run: swift --version
+      - name: Install Android SDK
+        run:
+          swift sdk install https://github.com/finagolfin/swift-android-sdk/releases/download/6.0.2/swift-6.0.2-RELEASE-android-24-0.1.artifactbundle.tar.gz --checksum d75615eac3e614131133c7cc2076b0b8fb4327d89dce802c25cd53e75e1881f4
+      - name: Check Android SDK
+        run:
+          swift sdk configure --show-configuration swift-6.0.2-RELEASE-android-24-0.1 x86_64-unknown-linux-android24
+      - name: Build Tests
+        run:
+          swift build --build-tests --swift-sdk x86_64-unknown-linux-android24 -Xswiftc -Xclang-linker -Xswiftc -fuse-ld=lld
+      - name: Prepare Android Emulator Test Script
+        run: |
+          mkdir pack
+          cp .build/x86_64-unknown-linux-android24/debug/swift-snapshot-testingPackageTests.xctest pack
+          
+          cp /home/runner/.config/swiftpm/swift-sdks/swift-6.0.2-RELEASE-android-24-0.1.artifactbundle/swift-6.0.2-release-android-24-sdk/android-27c-sysroot/usr/lib/x86_64-linux-android/24/lib*.so pack
+          rm pack/lib{c,dl,log,m,z}.so
+
+          set -x
+          cat > ~/test-toolchain.sh << EOF
+          adb push pack /data/local/tmp
+          adb shell /data/local/tmp/pack/swift-snapshot-testingPackageTests.xctest
+          EOF
+          
+          chmod +x ~/test-toolchain.sh
+      - name: Run Tests on Android Emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          arch: x86_64
+          script: ~/test-toolchain.sh
