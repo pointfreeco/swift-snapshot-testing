@@ -297,20 +297,16 @@ public func verifySnapshot<Value, Format>(
       let fileName = fileUrl.deletingPathExtension().lastPathComponent
 
       #if os(Android)
-        // When running tests on Android, the CI script copies the Tests/SnapshotTestingTests/__Snapshots__ up to the temporary folder
-        let snapshotDir: String? = "/data/local/tmp/android-xctest/__Snapshots__"
-        let files = try! FileManager.default.contentsOfDirectory(atPath: snapshotDir!)
-        print("### FILES in \(snapshotDir!): \(files)")
+      // When running tests on Android, the CI script copies the Tests/SnapshotTestingTests/__Snapshots__ up to the temporary folder
+      let snapshotsBaseUrl = URL(fileURLWithPath: "/data/local/tmp/android-xctest", isDirectory: true)
       #else
-        let snapshotDir = snapshotDirectory
+      let snapshotsBaseUrl = fileUrl
+        .deletingLastPathComponent()
       #endif
 
       let snapshotDirectoryUrl =
-        snapshotDir.map { URL(fileURLWithPath: $0, isDirectory: true) }
-        ?? fileUrl
-        .deletingLastPathComponent()
-        .appendingPathComponent("__Snapshots__")
-        .appendingPathComponent(fileName)
+        snapshotDirectory.map { URL(fileURLWithPath: $0, isDirectory: true) }
+        ?? snapshotsBaseUrl.appendingPathComponent("__Snapshots__").appendingPathComponent(fileName)
 
       let identifier: String
       if let name = name {
