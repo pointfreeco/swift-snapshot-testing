@@ -1,11 +1,11 @@
 import XCTest
 
-#if canImport(Testing)
+#if canImport(Testing) && !os(Android)
   import Testing
 #endif
 
 var isSwiftTesting: Bool {
-  #if canImport(Testing)
+  #if canImport(Testing) && !os(Android)
     return Test.current != nil
   #else
     return false
@@ -20,7 +20,7 @@ public func recordIssue(
   line: UInt,
   column: UInt
 ) {
-  #if canImport(Testing)
+  #if canImport(Testing) && !os(Android)
     if Test.current != nil {
       Issue.record(
         Comment(rawValue: message()),

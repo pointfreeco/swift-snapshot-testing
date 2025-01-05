@@ -1,4 +1,4 @@
-#if canImport(Testing)
+#if canImport(Testing) && !os(Android)
   import Testing
   import Foundation
   import SnapshotTesting

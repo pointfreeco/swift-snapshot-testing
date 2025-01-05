@@ -1,6 +1,6 @@
 import XCTest
 
-#if canImport(Testing)
+#if canImport(Testing) && !os(Android)
   import Testing
 #endif
 
@@ -22,7 +22,7 @@ public var diffTool: SnapshotTestingConfiguration.DiffTool {
 @_spi(Internals)
 public var _diffTool: SnapshotTestingConfiguration.DiffTool {
   get {
-    #if canImport(Testing)
+    #if canImport(Testing) && !os(Android)
       if let test = Test.current {
         for trait in test.traits.reversed() {
           if let diffTool = (trait as? _SnapshotsTestTrait)?.configuration.diffTool {
@@ -55,7 +55,7 @@ public var isRecording: Bool {
 @_spi(Internals)
 public var _record: SnapshotTestingConfiguration.Record {
   get {
-    #if canImport(Testing)
+    #if canImport(Testing) && !os(Android)
       if let test = Test.current {
         for trait in test.traits.reversed() {
           if let record = (trait as? _SnapshotsTestTrait)?.configuration.record {
@@ -277,7 +277,7 @@ public func verifySnapshot<Value, Format>(
   as snapshotting: Snapshotting<Value, Format>,
   named name: String? = nil,
   record recording: Bool? = nil,
-  snapshotDirectory: String? = nil,
+  snapshotDirectory: String? = defaultSnapshotDirectory(),
   timeout: TimeInterval = 5,
   fileID: StaticString = #fileID,
   file filePath: StaticString = #file,
@@ -354,7 +354,7 @@ public func verifySnapshot<Value, Format>(
 
       func recordSnapshot() throws {
         try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)
-        #if !os(Linux) && !os(Windows)
+        #if !os(Linux) && !os(Android) && !os(Windows)
           if !isSwiftTesting,
             ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS")
           {
@@ -418,7 +418,7 @@ public func verifySnapshot<Value, Format>(
       try snapshotting.diffing.toData(diffable).write(to: failedSnapshotFileUrl)
 
       if !attachments.isEmpty {
-        #if !os(Linux) && !os(Windows)
+        #if !os(Linux) && !os(Android) && !os(Windows)
           if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS"),
             !isSwiftTesting
           {
@@ -462,6 +462,16 @@ public func verifySnapshot<Value, Format>(
 }
 
 // MARK: - Private
+
+@usableFromInline func defaultSnapshotDirectory() -> String? {
+  #if os(Android)
+  // When running tests on Android, we cannot save the output next to the #file reference
+  // because it isn't writable, so save all snapshots to the temporary folder
+  return "/data/local/tmp/swift-snapshot-testing"
+  #else
+  return nil
+  #endif
+}
 
 private let counterQueue = DispatchQueue(label: "co.pointfree.SnapshotTesting.counter")
 private var counterMap: [URL: Int] = [:]

@@ -1,4 +1,4 @@
-#if compiler(>=6) && canImport(Testing)
+#if compiler(>=6) && canImport(Testing) && !os(Android)
   import Testing
   @_spi(Internals) import SnapshotTesting
 
