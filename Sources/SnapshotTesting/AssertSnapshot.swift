@@ -301,7 +301,7 @@ public func verifySnapshot<Value, Format>(
         let snapshotsBaseUrl = URL(
           fileURLWithPath: "/data/local/tmp/android-xctest", isDirectory: true)
       #else
-      let snapshotsBaseUrl = fileUrl.deletingLastPathComponent()
+        let snapshotsBaseUrl = fileUrl.deletingLastPathComponent()
       #endif
 
       let snapshotDirectoryUrl =
