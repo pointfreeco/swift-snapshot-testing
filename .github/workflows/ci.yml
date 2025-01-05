@@ -65,10 +65,15 @@ jobs:
       - run: swift test
 
   android:
+    strategy:
+      matrix:
+        swift:
+          - "6.0.2"
     name: Android
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: skiptools/swift-android-action@v2
         with:
-          copy-files: Tests/SnapshotTestingTests/__Snapshots__
+          swift-version: ${{ matrix.swift }}
+          copy-files: ../Tests/SnapshotTestingTests/__Snapshots__
