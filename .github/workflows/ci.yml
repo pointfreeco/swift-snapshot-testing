@@ -76,4 +76,4 @@ jobs:
       - uses: skiptools/swift-android-action@v2
         with:
           swift-version: ${{ matrix.swift }}
-          copy-files: ../Tests/SnapshotTestingTests/__Snapshots__
+          copy-files: ${GITHUB_WORKSPACE}/Tests/SnapshotTestingTests/__Snapshots__

@@ -298,7 +298,7 @@ public func verifySnapshot<Value, Format>(
 
       #if os(Android)
         // When running tests on Android, the CI script copies the Tests/SnapshotTestingTests/__Snapshots__ up to the temporary folder
-        let snapshotDir: String? = "/data/local/tmp/android-xctest"
+        let snapshotDir: String? = "/data/local/tmp/android-xctest/__Snapshots__"
       #else
         let snapshotDir = snapshotDirectory
       #endif
