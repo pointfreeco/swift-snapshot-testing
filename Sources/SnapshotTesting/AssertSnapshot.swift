@@ -1,6 +1,6 @@
 import XCTest
 
-#if canImport(Testing) && !os(Android)
+#if canImport(Testing)
   import Testing
 #endif
 
@@ -22,7 +22,7 @@ public var diffTool: SnapshotTestingConfiguration.DiffTool {
 @_spi(Internals)
 public var _diffTool: SnapshotTestingConfiguration.DiffTool {
   get {
-    #if canImport(Testing) && !os(Android)
+    #if canImport(Testing)
       if let test = Test.current {
         for trait in test.traits.reversed() {
           if let diffTool = (trait as? _SnapshotsTestTrait)?.configuration.diffTool {
@@ -55,7 +55,7 @@ public var isRecording: Bool {
 @_spi(Internals)
 public var _record: SnapshotTestingConfiguration.Record {
   get {
-    #if canImport(Testing) && !os(Android)
+    #if canImport(Testing)
       if let test = Test.current {
         for trait in test.traits.reversed() {
           if let record = (trait as? _SnapshotsTestTrait)?.configuration.record {
@@ -297,11 +297,10 @@ public func verifySnapshot<Value, Format>(
       let fileName = fileUrl.deletingPathExtension().lastPathComponent
 
       #if os(Android)
-        // When running tests on Android, the CI script copies the Tests/SnapshotTestingTests/__Snapshots__ up to the temporary folder
-        let snapshotsBaseUrl = URL(
-          fileURLWithPath: "/data/local/tmp/android-xctest", isDirectory: true)
+      // When running tests on Android, the CI script copies the Tests/SnapshotTestingTests/__Snapshots__ up to the temporary folder
+      let snapshotsBaseUrl = URL(fileURLWithPath: "/data/local/tmp/android-xctest", isDirectory: true)
       #else
-        let snapshotsBaseUrl = fileUrl.deletingLastPathComponent()
+      let snapshotsBaseUrl = fileUrl.deletingLastPathComponent()
       #endif
 
       let snapshotDirectoryUrl =

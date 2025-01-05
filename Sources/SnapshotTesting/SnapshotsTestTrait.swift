@@ -1,4 +1,4 @@
-#if canImport(Testing) && !os(Android)
+#if canImport(Testing)
   import Testing
 
   extension Trait where Self == _SnapshotsTestTrait {
