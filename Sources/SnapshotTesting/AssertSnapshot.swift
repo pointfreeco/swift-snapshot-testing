@@ -297,10 +297,11 @@ public func verifySnapshot<Value, Format>(
       let fileName = fileUrl.deletingPathExtension().lastPathComponent
 
       #if os(Android)
-      // When running tests on Android, the CI script copies the Tests/SnapshotTestingTests/__Snapshots__ up to the temporary folder
-      let snapshotsBaseUrl = URL(fileURLWithPath: "/data/local/tmp/android-xctest", isDirectory: true)
+        // When running tests on Android, the CI script copies the Tests/SnapshotTestingTests/__Snapshots__ up to the temporary folder
+        let snapshotsBaseUrl = URL(
+          fileURLWithPath: "/data/local/tmp/android-xctest", isDirectory: true)
       #else
-      let snapshotsBaseUrl = fileUrl.deletingLastPathComponent()
+        let snapshotsBaseUrl = fileUrl.deletingLastPathComponent()
       #endif
 
       let snapshotDirectoryUrl =
