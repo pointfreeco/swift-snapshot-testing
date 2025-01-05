@@ -301,9 +301,7 @@ public func verifySnapshot<Value, Format>(
         let snapshotsBaseUrl = URL(
           fileURLWithPath: "/data/local/tmp/android-xctest", isDirectory: true)
       #else
-        let snapshotsBaseUrl =
-          fileUrl
-          .deletingLastPathComponent()
+      let snapshotsBaseUrl = fileUrl.deletingLastPathComponent()
       #endif
 
       let snapshotDirectoryUrl =
@@ -323,10 +321,12 @@ public func verifySnapshot<Value, Format>(
       }
 
       let testName = sanitizePathComponent(testName)
-      let snapshotFileUrl =
+      var snapshotFileUrl =
         snapshotDirectoryUrl
         .appendingPathComponent("\(testName).\(identifier)")
-        .appendingPathExtension(snapshotting.pathExtension ?? "")
+      if let ext = snapshotting.pathExtension {
+        snapshotFileUrl = snapshotFileUrl.appendingPathExtension(ext)
+      }
       let fileManager = FileManager.default
       try fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
 
