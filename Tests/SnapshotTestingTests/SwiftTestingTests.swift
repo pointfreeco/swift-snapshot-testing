@@ -1,4 +1,4 @@
-#if compiler(>=6) && canImport(Testing) && !os(Android)
+#if compiler(>=6) && canImport(Testing)
   import Testing
   import SnapshotTesting
 
