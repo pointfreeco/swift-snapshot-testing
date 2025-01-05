@@ -163,7 +163,7 @@ class RecordTests: XCTestCase {
 
   func testRecordFailed_NoFailure() throws {
     #if os(Android)
-    throw XCTSkip("cannot save next to file on Android")
+      throw XCTSkip("cannot save next to file on Android")
     #endif
     try Data("42".utf8).write(to: snapshotURL)
     let modifiedDate =

@@ -465,11 +465,11 @@ public func verifySnapshot<Value, Format>(
 
 @usableFromInline func defaultSnapshotDirectory() -> String? {
   #if os(Android)
-  // When running tests on Android, we cannot save the output next to the #file reference
-  // because it isn't writable, so save all snapshots to the temporary folder
-  return "/data/local/tmp/swift-snapshot-testing"
+    // When running tests on Android, we cannot save the output next to the #file reference
+    // because it isn't writable, so save all snapshots to the temporary folder
+    return "/data/local/tmp/swift-snapshot-testing"
   #else
-  return nil
+    return nil
   #endif
 }
 
