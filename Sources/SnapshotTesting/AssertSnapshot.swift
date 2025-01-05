@@ -277,7 +277,7 @@ public func verifySnapshot<Value, Format>(
   as snapshotting: Snapshotting<Value, Format>,
   named name: String? = nil,
   record recording: Bool? = nil,
-  snapshotDirectory: String? = defaultSnapshotDirectory(),
+  snapshotDirectory: String? = nil,
   timeout: TimeInterval = 5,
   fileID: StaticString = #fileID,
   file filePath: StaticString = #file,
@@ -296,8 +296,15 @@ public func verifySnapshot<Value, Format>(
       let fileUrl = URL(fileURLWithPath: "\(filePath)", isDirectory: false)
       let fileName = fileUrl.deletingPathExtension().lastPathComponent
 
+      #if os(Android)
+      // When running tests on Android, the CI script copies the Tests/SnapshotTestingTests/__Snapshots__ up to the temporary folder
+      let snapshotDir: String? = "/data/local/tmp/android-xctest"
+      #else
+      let snapshotDir = snapshotDirectory
+      #endif
+
       let snapshotDirectoryUrl =
-        snapshotDirectory.map { URL(fileURLWithPath: $0, isDirectory: true) }
+        snapshotDir.map { URL(fileURLWithPath: $0, isDirectory: true) }
         ?? fileUrl
         .deletingLastPathComponent()
         .appendingPathComponent("__Snapshots__")
@@ -462,16 +469,6 @@ public func verifySnapshot<Value, Format>(
 }
 
 // MARK: - Private
-
-@usableFromInline func defaultSnapshotDirectory() -> String? {
-  #if os(Android)
-    // When running tests on Android, we cannot save the output next to the #file reference
-    // because it isn't writable, so save all snapshots to the temporary folder
-    return "/data/local/tmp/swift-snapshot-testing"
-  #else
-    return nil
-  #endif
-}
 
 private let counterQueue = DispatchQueue(label: "co.pointfree.SnapshotTesting.counter")
 private var counterMap: [URL: Int] = [:]

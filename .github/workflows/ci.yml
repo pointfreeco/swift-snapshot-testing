@@ -70,4 +70,5 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: skiptools/swift-android-action@v2
-
+        with:
+          copy-files: Tests/SnapshotTestingTests/__Snapshots__
