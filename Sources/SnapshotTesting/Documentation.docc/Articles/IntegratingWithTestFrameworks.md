@@ -1,4 +1,4 @@
-# Intergrating with test frameworks
+# Integrating with test frameworks
 
 Learn how to use snapshot testing in the two main testing frameworks: Xcode's XCTest and Swift's
 native testing framework.
