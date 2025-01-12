@@ -36,6 +36,15 @@ final class SnapshotTestingTests: XCTestCase {
     assertSnapshot(of: user, as: .dump)
   }
 
+  func testRecursion() {
+    class Father { var children: [Child]; init(_ children: [Child] = []) { self.children = children } }
+    class Child { let father: Father; init(_ father: Father) { self.father = father; father.children.append(self) } }
+    let father = Father()
+    let child = Child(father)
+    assertSnapshot(of: father, as: .dump)
+    assertSnapshot(of: child, as: .dump)
+  }
+
   @available(macOS 10.13, tvOS 11.0, *)
   func testAnyAsJson() throws {
     struct User: Encodable { let id: Int, name: String, bio: String }

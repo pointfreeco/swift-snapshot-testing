@@ -1,0 +1,4 @@
+▿ Father
+  ▿ children: 1 element
+    ▿ Child
+      ▿ father (circular reference detected)
