@@ -502,6 +502,8 @@ func sanitizePathComponent(_ string: String) -> String {
 }
 
 #if !os(Linux) && !os(Windows)
+  import CoreServices
+
   func uniformTypeIdentifier(fromExtension pathExtension: String) -> String? {
     // This can be much cleaner in macOS 11+ using UTType
     let unmanagedString = UTTypeCreatePreferredIdentifierForTag(
