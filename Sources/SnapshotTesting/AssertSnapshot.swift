@@ -370,14 +370,15 @@ public func verifySnapshot<Value, Format>(
                 activity.add(attachment)
               } else {
                 // Snapshot was not written to disk. Create attachment from data and path extension
-                let typeIdentifier = snapshotting.pathExtension.flatMap(uniformTypeIdentifier(fromExtension:))
-                
+                let typeIdentifier = snapshotting.pathExtension.flatMap(
+                  uniformTypeIdentifier(fromExtension:))
+
                 let attachment = XCTAttachment(
                   uniformTypeIdentifier: typeIdentifier,
                   name: snapshotFileUrl.lastPathComponent,
                   payload: snapshotData
                 )
-                
+
                 activity.add(attachment)
               }
             }
@@ -402,18 +403,18 @@ public func verifySnapshot<Value, Format>(
           try recordSnapshot(writeToDisk: false)
 
           return """
-          No reference was found on disk. New snapshot was not recorded because recording is disabled
-          """
+            No reference was found on disk. New snapshot was not recorded because recording is disabled
+            """
         } else {
           try recordSnapshot(writeToDisk: true)
 
           return """
-          No reference was found on disk. Automatically recorded snapshot: …
+            No reference was found on disk. Automatically recorded snapshot: …
 
-          open "\(snapshotFileUrl.absoluteString)"
+            open "\(snapshotFileUrl.absoluteString)"
 
-          Re-run "\(testName)" to assert against the newly-recorded snapshot.
-          """
+            Re-run "\(testName)" to assert against the newly-recorded snapshot.
+            """
         }
       }
 
@@ -501,16 +502,16 @@ func sanitizePathComponent(_ string: String) -> String {
 }
 
 #if !os(Linux) && !os(Windows)
-func uniformTypeIdentifier(fromExtension pathExtension: String) -> String? {
-  // This can be much cleaner in macOS 11+ using UTType
-  let unmanagedString = UTTypeCreatePreferredIdentifierForTag(
-    kUTTagClassFilenameExtension as CFString,
-    pathExtension as CFString,
-    nil
-  )
+  func uniformTypeIdentifier(fromExtension pathExtension: String) -> String? {
+    // This can be much cleaner in macOS 11+ using UTType
+    let unmanagedString = UTTypeCreatePreferredIdentifierForTag(
+      kUTTagClassFilenameExtension as CFString,
+      pathExtension as CFString,
+      nil
+    )
 
-  return unmanagedString?.takeRetainedValue() as String?
-}
+    return unmanagedString?.takeRetainedValue() as String?
+  }
 #endif
 
 // We need to clean counter between tests executions in order to support test-iterations.
