@@ -79,14 +79,6 @@ private func snap<T>(
   let bullet = count == 0 ? "-" : "▿"
   var visitedValues = visitedValues
 
-  if let valueAsObject = value as? AnyObject {
-    let objectID = ObjectIdentifier(valueAsObject)
-    if visitedValues.contains(objectID) {
-      return "\(indentation)\(bullet) \(name ?? "value") (circular reference detected)\n"
-    }
-    visitedValues.insert(objectID)
-  }
-
   let description: String
   switch (value, mirror.displayStyle) {
   case (_, .collection?):
@@ -109,7 +101,16 @@ private func snap<T>(
     return "\(indentation)- \(name.map { "\($0): " } ?? "")\(value.snapshotDescription)\n"
   case (let value as CustomStringConvertible, _):
     description = value.description
-  case (_, .class?), (_, .struct?):
+  case let (value as AnyObject, .class?):
+    let objectID = ObjectIdentifier(value)
+    if visitedValues.contains(objectID) {
+      return "\(indentation)\(bullet) \(name ?? "value") (circular reference detected)\n"
+    }
+    visitedValues.insert(objectID)
+    description = String(describing: mirror.subjectType)
+      .replacingOccurrences(of: " #\\d+", with: "", options: .regularExpression)
+    children = sort(children, visitedValues: visitedValues)
+  case (_, .struct?):
     description = String(describing: mirror.subjectType)
       .replacingOccurrences(of: " #\\d+", with: "", options: .regularExpression)
     children = sort(children, visitedValues: visitedValues)

@@ -1,4 +1,4 @@
 ▿ Child
   ▿ father: Father
-    ▿ children: 1 element
-      ▿ value (circular reference detected)
+    ▿ child: Optional<Child>
+      ▿ some (circular reference detected)
