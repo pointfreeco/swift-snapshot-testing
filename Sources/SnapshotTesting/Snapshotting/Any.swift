@@ -129,7 +129,9 @@ private func snap<T>(
   return lines.joined()
 }
 
-private func sort(_ children: Mirror.Children, visitedValues: Set<ObjectIdentifier>) -> Mirror.Children {
+private func sort(_ children: Mirror.Children, visitedValues: Set<ObjectIdentifier>)
+  -> Mirror.Children
+{
   return .init(
     children
       .map({ (child: $0, snap: snap($0, visitedValues: visitedValues)) })
