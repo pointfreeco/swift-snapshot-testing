@@ -500,6 +500,7 @@ func sanitizePathComponent(_ string: String) -> String {
     .replacingOccurrences(of: "^-|-$", with: "", options: .regularExpression)
 }
 
+#if !os(Linux) && !os(Windows)
 func uniformTypeIdentifier(fromExtension pathExtension: String) -> String? {
   // This can be much cleaner in macOS 11+ using UTType
   let unmanagedString = UTTypeCreatePreferredIdentifierForTag(
@@ -510,6 +511,7 @@ func uniformTypeIdentifier(fromExtension pathExtension: String) -> String? {
 
   return unmanagedString?.takeRetainedValue() as String?
 }
+#endif
 
 // We need to clean counter between tests executions in order to support test-iterations.
 private class CleanCounterBetweenTestCases: NSObject, XCTestObservation {
