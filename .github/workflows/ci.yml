@@ -15,7 +15,7 @@ jobs:
       matrix:
         xcode:
           - 15.4
-          - '16.0'
+          - '16.1'
 
     name: macOS
     runs-on: macos-14
