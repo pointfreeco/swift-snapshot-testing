@@ -1,10 +1,11 @@
 #if os(iOS) || os(tvOS)
   import UIKit
+  import ImageSerializationPlugin
 
   extension Snapshotting where Value == UIBezierPath, Format == UIImage {
     /// A snapshot strategy for comparing bezier paths based on pixel equality.
     public static var image: Snapshotting {
-      return .image()
+      return .image(imageFormat: imageFormat)
     }
 
     /// A snapshot strategy for comparing bezier paths based on pixel equality.
@@ -17,10 +18,10 @@
     ///     human eye.
     ///   - scale: The scale to use when loading the reference image from disk.
     public static func image(
-      precision: Float = 1, perceptualPrecision: Float = 1, scale: CGFloat = 1
+      precision: Float = 1, perceptualPrecision: Float = 1, scale: CGFloat = 1, imageFormat: ImageSerializationFormat
     ) -> Snapshotting {
       return SimplySnapshotting.image(
-        precision: precision, perceptualPrecision: perceptualPrecision, scale: scale
+        precision: precision, perceptualPrecision: perceptualPrecision, scale: scale, imageFormat: imageFormat
       ).pullback { path in
         let bounds = path.bounds
         let format: UIGraphicsImageRendererFormat

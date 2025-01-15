@@ -1,10 +1,11 @@
 #if os(macOS)
   import Cocoa
   import XCTest
+  import ImageSerializationPlugin
 
   extension Diffing where Value == NSImage {
     /// A pixel-diffing strategy for NSImage's which requires a 100% match.
-    public static let image = Diffing.image()
+    public static let image = Diffing.image(imageFormat: imageFormat)
 
     /// A pixel-diffing strategy for NSImage that allows customizing how precise the matching must be.
     ///
@@ -15,14 +16,15 @@
     ///     [the precision](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e) of the
     ///     human eye.
     /// - Returns: A new diffing strategy.
-    public static func image(precision: Float = 1, perceptualPrecision: Float = 1) -> Diffing {
+    public static func image(precision: Float = 1, perceptualPrecision: Float = 1, imageFormat: ImageSerializationFormat = imageFormat) -> Diffing {
+      let imageSerializer = ImageSerializer()
       return .init(
-        toData: { NSImagePNGRepresentation($0)! },
-        fromData: { NSImage(data: $0)! }
+        toData: {  imageSerializer.encodeImage($0, imageFormat: imageFormat)! },
+        fromData: { imageSerializer.decodeImage($0, imageFormat: imageFormat)! }
       ) { old, new in
         guard
           let message = compare(
-            old, new, precision: precision, perceptualPrecision: perceptualPrecision)
+            old, new, precision: precision, perceptualPrecision: perceptualPrecision, imageFormat: imageFormat)
         else { return nil }
         let difference = SnapshotTesting.diff(old, new)
         let oldAttachment = XCTAttachment(image: old)
@@ -42,7 +44,7 @@
   extension Snapshotting where Value == NSImage, Format == NSImage {
     /// A snapshot strategy for comparing images based on pixel equality.
     public static var image: Snapshotting {
-      return .image()
+      return .image(imageFormat: imageFormat)
     }
 
     /// A snapshot strategy for comparing images based on pixel equality.
@@ -53,24 +55,15 @@
     ///     match. 98-99% mimics
     ///     [the precision](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e) of the
     ///     human eye.
-    public static func image(precision: Float = 1, perceptualPrecision: Float = 1) -> Snapshotting {
+    public static func image(precision: Float = 1, perceptualPrecision: Float = 1, imageFormat: ImageSerializationFormat = imageFormat) -> Snapshotting {
       return .init(
-        pathExtension: "png",
-        diffing: .image(precision: precision, perceptualPrecision: perceptualPrecision)
+        pathExtension: imageFormat.rawValue,
+        diffing: .image(precision: precision, perceptualPrecision: perceptualPrecision, imageFormat: imageFormat)
       )
     }
   }
 
-  private func NSImagePNGRepresentation(_ image: NSImage) -> Data? {
-    guard let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
-      return nil
-    }
-    let rep = NSBitmapImageRep(cgImage: cgImage)
-    rep.size = image.size
-    return rep.representation(using: .png, properties: [:])
-  }
-
-  private func compare(_ old: NSImage, _ new: NSImage, precision: Float, perceptualPrecision: Float)
+  private func compare(_ old: NSImage, _ new: NSImage, precision: Float, perceptualPrecision: Float, imageFormat: ImageSerializationFormat)
     -> String?
   {
     guard let oldCgImage = old.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
@@ -93,9 +86,10 @@
     }
     let byteCount = oldContext.height * oldContext.bytesPerRow
     if memcmp(oldData, newData, byteCount) == 0 { return nil }
+    let imageSerializer = ImageSerializer()
     guard
-      let pngData = NSImagePNGRepresentation(new),
-      let newerCgImage = NSImage(data: pngData)?.cgImage(
+      let imageData = imageSerializer.encodeImage(new, imageFormat: imageFormat),
+      let newerCgImage = imageSerializer.decodeImage(imageData, imageFormat: imageFormat)?.cgImage(
         forProposedRect: nil, context: nil, hints: nil),
       let newerContext = context(for: newerCgImage),
       let newerData = newerContext.data

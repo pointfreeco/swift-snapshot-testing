@@ -1,10 +1,11 @@
 #if os(iOS) || os(tvOS)
   import UIKit
   import XCTest
+  import ImageSerializationPlugin
 
   extension Diffing where Value == UIImage {
     /// A pixel-diffing strategy for UIImage's which requires a 100% match.
-    public static let image = Diffing.image()
+    public static let image = Diffing.image(imageFormat: imageFormat)
 
     /// A pixel-diffing strategy for UIImage that allows customizing how precise the matching must be.
     ///
@@ -18,7 +19,7 @@
     ///     `UITraitCollection`s default value of `0.0`, the screens scale is used.
     /// - Returns: A new diffing strategy.
     public static func image(
-      precision: Float = 1, perceptualPrecision: Float = 1, scale: CGFloat? = nil
+      precision: Float = 1, perceptualPrecision: Float = 1, scale: CGFloat? = nil, imageFormat: ImageSerializationFormat = imageFormat
     ) -> Diffing {
       let imageScale: CGFloat
       if let scale = scale, scale != 0.0 {
@@ -26,14 +27,14 @@
       } else {
         imageScale = UIScreen.main.scale
       }
-
+      let imageSerializer = ImageSerializer()
       return Diffing(
-        toData: { $0.pngData() ?? emptyImage().pngData()! },
-        fromData: { UIImage(data: $0, scale: imageScale)! }
+        toData: { imageSerializer.encodeImage($0, imageFormat: imageFormat) ?? emptyImage().pngData()! }, // this seems inconsistant with macOS implementation
+        fromData: { imageSerializer.decodeImage($0, imageFormat: imageFormat)! } // missing imageScale here
       ) { old, new in
         guard
           let message = compare(
-            old, new, precision: precision, perceptualPrecision: perceptualPrecision)
+            old, new, precision: precision, perceptualPrecision: perceptualPrecision, imageFormat: imageFormat)
         else { return nil }
         let difference = SnapshotTesting.diff(old, new)
         let oldAttachment = XCTAttachment(image: old)
@@ -65,7 +66,7 @@
   extension Snapshotting where Value == UIImage, Format == UIImage {
     /// A snapshot strategy for comparing images based on pixel equality.
     public static var image: Snapshotting {
-      return .image()
+      return .image(imageFormat: imageFormat)
     }
 
     /// A snapshot strategy for comparing images based on pixel equality.
@@ -78,12 +79,12 @@
     ///     human eye.
     ///   - scale: The scale of the reference image stored on disk.
     public static func image(
-      precision: Float = 1, perceptualPrecision: Float = 1, scale: CGFloat? = nil
+      precision: Float = 1, perceptualPrecision: Float = 1, scale: CGFloat? = nil, imageFormat: ImageSerializationFormat = imageFormat
     ) -> Snapshotting {
       return .init(
-        pathExtension: "png",
+        pathExtension: imageFormat.rawValue,
         diffing: .image(
-          precision: precision, perceptualPrecision: perceptualPrecision, scale: scale)
+          precision: precision, perceptualPrecision: perceptualPrecision, scale: scale, imageFormat: imageFormat)
       )
     }
   }
@@ -93,7 +94,7 @@
   private let imageContextBitsPerComponent = 8
   private let imageContextBytesPerPixel = 4
 
-  private func compare(_ old: UIImage, _ new: UIImage, precision: Float, perceptualPrecision: Float)
+  private func compare(_ old: UIImage, _ new: UIImage, precision: Float, perceptualPrecision: Float, imageFormat: ImageSerializationFormat)
     -> String?
   {
     guard let oldCgImage = old.cgImage else {
@@ -118,9 +119,10 @@
       if memcmp(oldData, newData, byteCount) == 0 { return nil }
     }
     var newerBytes = [UInt8](repeating: 0, count: byteCount)
+    let imageSerializer = ImageSerializer()
     guard
-      let pngData = new.pngData(),
-      let newerCgImage = UIImage(data: pngData)?.cgImage,
+      let imageData = imageSerializer.encodeImage(new, imageFormat: imageFormat),
+      let newerCgImage = imageSerializer.decodeImage(imageData, imageFormat: imageFormat)?.cgImage,
       let newerContext = context(for: newerCgImage, data: &newerBytes),
       let newerData = newerContext.data
     else {
