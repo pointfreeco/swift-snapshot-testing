@@ -889,10 +889,10 @@
               var subscription: NSKeyValueObservation?
               subscription = wkWebView.observe(\.isLoading, options: [.initial, .new]) {
                 (webview, change) in
-                subscription?.invalidate()
-                subscription = nil
                 if change.newValue == false {
                   work()
+                  subscription?.invalidate()
+                  subscription = nil
                 }
               }
             } else {
