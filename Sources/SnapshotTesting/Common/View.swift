@@ -840,6 +840,9 @@
           window.contentView = NSView()
           window.contentView?.addSubview(self)
           window.makeKey()
+        #elseif os(iOS)
+          let window = UIWindow()
+          window.addSubview(self)
         #endif
         return perform()
       }
