@@ -523,24 +523,30 @@ func sanitizePathComponent(_ string: String) -> String {
   }
 #endif
 
+extension DispatchQueue {
+  private static let key = DispatchSpecificKey<UInt8>()
+  private static let value: UInt8 = 0
+
+  fileprivate static func mainSync<R>(execute block: () -> R) -> R {
+    Self.main.setSpecific(key: key, value: value)
+    if getSpecific(key: key) == value {
+      return block()
+    } else {
+      return main.sync(execute: block)
+    }
+  }
+}
+
 // We need to clean counter between tests executions in order to support test-iterations.
 private class CleanCounterBetweenTestCases: NSObject, XCTestObservation {
   private static var registered = false
 
   static func registerIfNeeded() {
-    if Thread.isMainThread {
-      doRegisterIfNeeded()
-    } else {
-      DispatchQueue.main.sync {
-        doRegisterIfNeeded()
+    DispatchQueue.mainSync {
+      if !registered {
+       registered = true
+       XCTestObservationCenter.shared.addTestObserver(CleanCounterBetweenTestCases())
       }
-    }
-  }
-
-  private static func doRegisterIfNeeded() {
-    if !registered {
-      registered = true
-      XCTestObservationCenter.shared.addTestObserver(CleanCounterBetweenTestCases())
     }
   }
 
