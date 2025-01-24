@@ -41,6 +41,11 @@ extension Snapshotting where Format == String {
   ///   - id: 1
   ///   - name: "Blobby"
   /// ```
+  @available(
+    *,
+    deprecated,
+    message: "Use '.customDump' from the 'SnapshotTestingCustomDump' module, instead."
+  )
   public static var dump: Snapshotting {
     return SimplySnapshotting.lines.pullback { snap($0) }
   }
