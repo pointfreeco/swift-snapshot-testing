@@ -366,7 +366,7 @@ public func verifySnapshot<Value, Format>(
           try snapshotData.write(to: snapshotFileUrl)
         }
 
-        #if !os(Linux) && !os(Android) && !os(Windows)
+        #if !os(Android) && !os(Linux) && !os(Windows)
           if !isSwiftTesting,
             ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS")
           {
@@ -508,7 +508,7 @@ func sanitizePathComponent(_ string: String) -> String {
     .replacingOccurrences(of: "^-|-$", with: "", options: .regularExpression)
 }
 
-#if !os(Linux) && !os(Windows)
+#if !os(Android) && !os(Linux) && !os(Windows)
   import CoreServices
 
   func uniformTypeIdentifier(fromExtension pathExtension: String) -> String? {
