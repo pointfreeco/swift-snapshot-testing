@@ -36,7 +36,7 @@
 
         let body: [String]
         do {
-          if pretty, #available(iOS 11.0, macOS 10.13, tvOS 11.0, watchOS 4.0, *) {
+          if pretty, #available(iOS 11.0, macOS 10.13, tvOS 11.0, watchOS 4.0, visionOS 1.0, *) {
             body =
               try request.httpBody
               .map { try JSONSerialization.jsonObject(with: $0, options: []) }
