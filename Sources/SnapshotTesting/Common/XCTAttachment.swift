@@ -1,4 +1,4 @@
-#if os(Linux) || os(Windows)
+#if os(Linux) || os(Android) || os(Windows)
   import Foundation
 
   public struct XCTAttachment {
