@@ -544,8 +544,8 @@ private class CleanCounterBetweenTestCases: NSObject, XCTestObservation {
   static func registerIfNeeded() {
     DispatchQueue.mainSync {
       if !registered {
-       registered = true
-       XCTestObservationCenter.shared.addTestObserver(CleanCounterBetweenTestCases())
+        registered = true
+        XCTestObservationCenter.shared.addTestObserver(CleanCounterBetweenTestCases())
       }
     }
   }
