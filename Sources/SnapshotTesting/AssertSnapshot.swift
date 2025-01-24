@@ -359,42 +359,70 @@ public func verifySnapshot<Value, Format>(
         return "Couldn't snapshot value"
       }
 
-      func recordSnapshot() throws {
-        try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)
+      func recordSnapshot(writeToDisk: Bool) throws {
+        let snapshotData = snapshotting.diffing.toData(diffable)
+
+        if writeToDisk {
+          try snapshotData.write(to: snapshotFileUrl)
+        }
+
         #if !os(Linux) && !os(Android) && !os(Windows)
           if !isSwiftTesting,
             ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS")
           {
             XCTContext.runActivity(named: "Attached Recorded Snapshot") { activity in
-              let attachment = XCTAttachment(contentsOfFile: snapshotFileUrl)
-              activity.add(attachment)
+              if writeToDisk {
+                // Snapshot was written to disk. Create attachment from file
+                let attachment = XCTAttachment(contentsOfFile: snapshotFileUrl)
+                activity.add(attachment)
+              } else {
+                // Snapshot was not written to disk. Create attachment from data and path extension
+                let typeIdentifier = snapshotting.pathExtension.flatMap(
+                  uniformTypeIdentifier(fromExtension:))
+
+                let attachment = XCTAttachment(
+                  uniformTypeIdentifier: typeIdentifier,
+                  name: snapshotFileUrl.lastPathComponent,
+                  payload: snapshotData
+                )
+
+                activity.add(attachment)
+              }
             }
           }
         #endif
       }
 
-      guard
-        record != .all,
-        (record != .missing && record != .failed)
-          || fileManager.fileExists(atPath: snapshotFileUrl.path)
-      else {
-        try recordSnapshot()
+      if record == .all {
+        try recordSnapshot(writeToDisk: true)
 
-        return SnapshotTestingConfiguration.current?.record == .all
-          ? """
+        return """
           Record mode is on. Automatically recorded snapshot: …
 
           open "\(snapshotFileUrl.absoluteString)"
 
           Turn record mode off and re-run "\(testName)" to assert against the newly-recorded snapshot
           """
-          : """
-          No reference was found on disk. Automatically recorded snapshot: …
+      }
 
-          open "\(snapshotFileUrl.absoluteString)"
+      guard fileManager.fileExists(atPath: snapshotFileUrl.path) else {
+        if record == .never {
+          try recordSnapshot(writeToDisk: false)
 
-          Re-run "\(testName)" to assert against the newly-recorded snapshot.
-          """
+          return """
+            No reference was found on disk. New snapshot was not recorded because recording is disabled
+            """
+        } else {
+          try recordSnapshot(writeToDisk: true)
+
+          return """
+            No reference was found on disk. Automatically recorded snapshot: …
+
+            open "\(snapshotFileUrl.absoluteString)"
+
+            Re-run "\(testName)" to assert against the newly-recorded snapshot.
+            """
+        }
       }
 
       let data = try Data(contentsOf: snapshotFileUrl)
@@ -451,7 +479,7 @@ public func verifySnapshot<Value, Format>(
       }
 
       if record == .failed {
-        try recordSnapshot()
+        try recordSnapshot(writeToDisk: true)
         failureMessage += " A new snapshot was automatically recorded."
       }
 
@@ -479,6 +507,21 @@ func sanitizePathComponent(_ string: String) -> String {
     .replacingOccurrences(of: "\\W+", with: "-", options: .regularExpression)
     .replacingOccurrences(of: "^-|-$", with: "", options: .regularExpression)
 }
+
+#if !os(Linux) && !os(Windows)
+  import CoreServices
+
+  func uniformTypeIdentifier(fromExtension pathExtension: String) -> String? {
+    // This can be much cleaner in macOS 11+ using UTType
+    let unmanagedString = UTTypeCreatePreferredIdentifierForTag(
+      kUTTagClassFilenameExtension as CFString,
+      pathExtension as CFString,
+      nil
+    )
+
+    return unmanagedString?.takeRetainedValue() as String?
+  }
+#endif
 
 // We need to clean counter between tests executions in order to support test-iterations.
 private class CleanCounterBetweenTestCases: NSObject, XCTestObservation {
