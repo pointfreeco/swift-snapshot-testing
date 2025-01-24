@@ -13,9 +13,10 @@ jobs:
     strategy:
       matrix:
         xcode:
-          - "15.3"
+          - 15.4
+          - '16.1'
 
-    name: macOS 14 (Xcode ${{ matrix.xcode }})
+    name: macOS
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v3

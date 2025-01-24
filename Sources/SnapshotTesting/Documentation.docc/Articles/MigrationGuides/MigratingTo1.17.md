@@ -151,16 +151,12 @@ in an XCTest context or a Swift Testing context, and will determine if it should
 `Issue.record` to trigger a test failure.
 
 For the most part you can write tests for Swift Testing exactly as you would for XCTest. However,
-there is one major difference. Swift Testing does not (yet) have a substitute for `invokeTest`,
-which we used alongside `withSnapshotTesting` to customize snapshotting for a full test class.
-
-There is an experimental version of this tool in Swift Testing, called `CustomExecutionTrait`, and
-this library provides such a trait called ``Testing/Trait/snapshots(diffTool:record:)``. It allows 
-you to customize snapshots for a `@Test` or `@Suite`, but to get access to it you must perform an
-`@_spi(Experimental)` import of snapshot testing:
+there is one major difference. In order to override a snapshot's 
+[configuration](<doc:SnapshotTestingConfiguration>) for a particular test or an entire suite you
+must use what are known as "test traits":
 
 ```swift
-@_spi(Experimental) import SnapshotTesting
+import SnapshotTesting
 
 @Suite(.snapshots(record: .all, diffTool: .ksdiff))
 struct FeatureTests {
@@ -169,7 +165,4 @@ struct FeatureTests {
 ```
 
 That will override the `diffTool` and `record` options for the entire `FeatureTests` suite.
-
-> Important: As evident by the usage of `@_spi(Experimental)` this API is subject to change. As
-soon as the Swift Testing library finalizes its API for `CustomExecutionTrait` we will update
-the library accordingly and remove the `@_spi` annotation.
+These traits can also be used on individual `@Test`s too.

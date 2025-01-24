@@ -1,6 +1,6 @@
 #if compiler(>=6) && canImport(Testing)
   import Testing
-  @_spi(Experimental) @_spi(Internals) import SnapshotTesting
+  @_spi(Internals) import SnapshotTesting
 
   struct SnapshotsTraitTests {
     @Test(.snapshots(diffTool: "ksdiff"))

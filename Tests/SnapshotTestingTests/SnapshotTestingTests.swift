@@ -14,7 +14,7 @@ import XCTest
   import SwiftUI
 #endif
 #if canImport(WebKit)
-  import WebKit
+  @preconcurrency import WebKit
 #endif
 #if canImport(UIKit)
   import UIKit.UIView
@@ -34,6 +34,26 @@ final class SnapshotTestingTests: XCTestCase {
     struct User { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
     assertSnapshot(of: user, as: .dump)
+  }
+
+  func testRecursion() {
+    withSnapshotTesting {
+      class Father {
+        var child: Child?
+        init(_ child: Child? = nil) { self.child = child }
+      }
+      class Child {
+        let father: Father
+        init(_ father: Father) {
+          self.father = father
+          father.child = self
+        }
+      }
+      let father = Father()
+      let child = Child(father)
+      assertSnapshot(of: father, as: .dump)
+      assertSnapshot(of: child, as: .dump)
+    }
   }
 
   @available(macOS 10.13, tvOS 11.0, visionOS 1.0, *)

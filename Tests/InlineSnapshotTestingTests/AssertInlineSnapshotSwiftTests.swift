@@ -2,7 +2,7 @@
   import Testing
   import Foundation
   import InlineSnapshotTesting
-  @_spi(Experimental) import SnapshotTesting
+  import SnapshotTesting
 
   @Suite(
     .snapshots(
@@ -18,6 +18,28 @@
           - "World"
 
         """
+      }
+    }
+
+    @Test func inlineSnapshotFailure() {
+      withKnownIssue {
+        assertInlineSnapshot(of: ["Hello", "World"], as: .dump) {
+          """
+          ▿ 2 elements
+            - "Hello"
+
+          """
+        }
+      } matching: { issue in
+        issue.description == """
+          Issue recorded: Snapshot did not match. Difference: …
+
+            @@ −1,3 +1,4 @@
+             ▿ 2 elements
+               - "Hello"
+            +  - "World"
+             
+          """
       }
     }
 

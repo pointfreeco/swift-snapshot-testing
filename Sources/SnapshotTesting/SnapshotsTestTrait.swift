@@ -1,7 +1,6 @@
 #if canImport(Testing)
   import Testing
 
-  @_spi(Experimental)
   extension Trait where Self == _SnapshotsTestTrait {
     /// Configure snapshot testing in a suite or test.
     ///
@@ -31,7 +30,6 @@
   }
 
   /// A type representing the configuration of snapshot testing.
-  @_spi(Experimental)
   public struct _SnapshotsTestTrait: SuiteTrait, TestTrait {
     public let isRecursive = true
     let configuration: SnapshotTestingConfiguration

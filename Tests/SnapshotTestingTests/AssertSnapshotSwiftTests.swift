@@ -1,8 +1,7 @@
 #if canImport(Testing)
   import Testing
   import Foundation
-  import InlineSnapshotTesting
-  @_spi(Experimental) import SnapshotTesting
+  import SnapshotTesting
 
   @Suite(
     .snapshots(
