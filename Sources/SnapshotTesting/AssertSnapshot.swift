@@ -296,12 +296,17 @@ public func verifySnapshot<Value, Format>(
       let fileUrl = URL(fileURLWithPath: "\(filePath)", isDirectory: false)
       let fileName = fileUrl.deletingPathExtension().lastPathComponent
 
+      #if os(Android)
+        // When running tests on Android, the CI script copies the Tests/SnapshotTestingTests/__Snapshots__ up to the temporary folder
+        let snapshotsBaseUrl = URL(
+          fileURLWithPath: "/data/local/tmp/android-xctest", isDirectory: true)
+      #else
+        let snapshotsBaseUrl = fileUrl.deletingLastPathComponent()
+      #endif
+
       let snapshotDirectoryUrl =
         snapshotDirectory.map { URL(fileURLWithPath: $0, isDirectory: true) }
-        ?? fileUrl
-        .deletingLastPathComponent()
-        .appendingPathComponent("__Snapshots__")
-        .appendingPathComponent(fileName)
+        ?? snapshotsBaseUrl.appendingPathComponent("__Snapshots__").appendingPathComponent(fileName)
 
       let identifier: String
       if let name = name {
@@ -316,10 +321,12 @@ public func verifySnapshot<Value, Format>(
       }
 
       let testName = sanitizePathComponent(testName)
-      let snapshotFileUrl =
+      var snapshotFileUrl =
         snapshotDirectoryUrl
         .appendingPathComponent("\(testName).\(identifier)")
-        .appendingPathExtension(snapshotting.pathExtension ?? "")
+      if let ext = snapshotting.pathExtension {
+        snapshotFileUrl = snapshotFileUrl.appendingPathExtension(ext)
+      }
       let fileManager = FileManager.default
       try fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
 
@@ -359,7 +366,7 @@ public func verifySnapshot<Value, Format>(
           try snapshotData.write(to: snapshotFileUrl)
         }
 
-        #if !os(Linux) && !os(Windows)
+        #if !os(Android) && !os(Linux) && !os(Windows)
           if !isSwiftTesting,
             ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS")
           {
@@ -446,7 +453,7 @@ public func verifySnapshot<Value, Format>(
       try snapshotting.diffing.toData(diffable).write(to: failedSnapshotFileUrl)
 
       if !attachments.isEmpty {
-        #if !os(Linux) && !os(Windows)
+        #if !os(Linux) && !os(Android) && !os(Windows)
           if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS"),
             !isSwiftTesting
           {
@@ -501,7 +508,7 @@ func sanitizePathComponent(_ string: String) -> String {
     .replacingOccurrences(of: "^-|-$", with: "", options: .regularExpression)
 }
 
-#if !os(Linux) && !os(Windows)
+#if !os(Android) && !os(Linux) && !os(Windows)
   import CoreServices
 
   func uniformTypeIdentifier(fromExtension pathExtension: String) -> String? {
@@ -516,24 +523,30 @@ func sanitizePathComponent(_ string: String) -> String {
   }
 #endif
 
+extension DispatchQueue {
+  private static let key = DispatchSpecificKey<UInt8>()
+  private static let value: UInt8 = 0
+
+  fileprivate static func mainSync<R>(execute block: () -> R) -> R {
+    Self.main.setSpecific(key: key, value: value)
+    if getSpecific(key: key) == value {
+      return block()
+    } else {
+      return main.sync(execute: block)
+    }
+  }
+}
+
 // We need to clean counter between tests executions in order to support test-iterations.
 private class CleanCounterBetweenTestCases: NSObject, XCTestObservation {
   private static var registered = false
 
   static func registerIfNeeded() {
-    if Thread.isMainThread {
-      doRegisterIfNeeded()
-    } else {
-      DispatchQueue.main.sync {
-        doRegisterIfNeeded()
+    DispatchQueue.mainSync {
+      if !registered {
+        registered = true
+        XCTestObservationCenter.shared.addTestObserver(CleanCounterBetweenTestCases())
       }
-    }
-  }
-
-  private static func doRegisterIfNeeded() {
-    if !registered {
-      registered = true
-      XCTestObservationCenter.shared.addTestObserver(CleanCounterBetweenTestCases())
     }
   }
 

@@ -37,7 +37,7 @@ import Foundation
     of value: @autoclosure () throws -> Value?,
     as snapshotting: Snapshotting<Value, String>,
     message: @autoclosure () -> String = "",
-    record isRecording: Bool? = nil,
+    record: SnapshotTestingConfiguration.Record? = nil,
     timeout: TimeInterval = 5,
     syntaxDescriptor: InlineSnapshotSyntaxDescriptor = InlineSnapshotSyntaxDescriptor(),
     matches expected: (() -> String)? = nil,
@@ -47,10 +47,7 @@ import Foundation
     line: UInt = #line,
     column: UInt = #column
   ) {
-    let record =
-      (isRecording == true ? .all : isRecording == false ? .missing : nil)
-      ?? SnapshotTestingConfiguration.current?.record
-      ?? _record
+    let record = record ?? SnapshotTestingConfiguration.current?.record ?? _record
     withSnapshotTesting(record: record) {
       let _: Void = installTestObserver
       do {
