@@ -29,15 +29,13 @@ jobs:
     strategy:
       matrix:
         swift:
-          - "5.7"
+          - '5.9'
 
-    name: Ubuntu (Swift ${{ matrix.swift }})
-    runs-on: ubuntu-20.04
+    container: swift:${{ matrix.swift }}
+    name: Linux (Swift ${{ matrix.swift }})
+    runs-on: ubuntu-latest
     steps:
-      - uses: swift-actions/setup-swift@v1
-        with:
-          swift-version: ${{ matrix.swift }}
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: swift test
 
   windows:

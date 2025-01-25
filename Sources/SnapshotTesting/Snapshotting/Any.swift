@@ -41,6 +41,26 @@ extension Snapshotting where Format == String {
   ///   - id: 1
   ///   - name: "Blobby"
   /// ```
+  @available(
+    iOS,
+    deprecated: 9999,
+    message: "Use '.customDump' from the 'SnapshotTestingCustomDump' module, instead."
+  )
+  @available(
+    macOS,
+    deprecated: 9999,
+    message: "Use '.customDump' from the 'SnapshotTestingCustomDump' module, instead."
+  )
+  @available(
+    tvOS,
+    deprecated: 9999,
+    message: "Use '.customDump' from the 'SnapshotTestingCustomDump' module, instead."
+  )
+  @available(
+    watchOS,
+    deprecated: 9999,
+    message: "Use '.customDump' from the 'SnapshotTestingCustomDump' module, instead."
+  )
   public static var dump: Snapshotting {
     return SimplySnapshotting.lines.pullback { snap($0) }
   }
