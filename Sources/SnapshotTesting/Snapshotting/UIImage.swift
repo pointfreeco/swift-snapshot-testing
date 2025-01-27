@@ -45,7 +45,8 @@
         differenceAttachment.name = "difference"
         return (
           message,
-          [oldAttachment, newAttachment, differenceAttachment]
+          [oldAttachment, newAttachment, differenceAttachment],
+          difference
         )
       }
     }
