@@ -14,28 +14,46 @@ import XCTest
   import SwiftUI
 #endif
 #if canImport(WebKit)
-  import WebKit
+  @preconcurrency import WebKit
 #endif
 #if canImport(UIKit)
   import UIKit.UIView
 #endif
 
 final class SnapshotTestingTests: XCTestCase {
-  override func setUp() {
-    super.setUp()
-    diffTool = "ksdiff"
-    // isRecording = true
-  }
-
-  override func tearDown() {
-    isRecording = false
-    super.tearDown()
+  override func invokeTest() {
+    withSnapshotTesting(
+      record: .missing,
+      diffTool: .ksdiff
+    ) {
+      super.invokeTest()
+    }
   }
 
   func testAny() {
     struct User { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
     assertSnapshot(of: user, as: .dump)
+  }
+
+  func testRecursion() {
+    withSnapshotTesting {
+      class Father {
+        var child: Child?
+        init(_ child: Child? = nil) { self.child = child }
+      }
+      class Child {
+        let father: Father
+        init(_ father: Father) {
+          self.father = father
+          father.child = self
+        }
+      }
+      let father = Father()
+      let child = Child(father)
+      assertSnapshot(of: father, as: .dump)
+      assertSnapshot(of: child, as: .dump)
+    }
   }
 
   @available(macOS 10.13, tvOS 11.0, *)
@@ -1316,15 +1334,6 @@ final class SnapshotTestingTests: XCTestCase {
       assertSnapshot(of: view, as: .image(layout: .device(config: .tv)), named: "device")
     }
   #endif
-
-  @available(*, deprecated)
-  func testIsRecordingProxy() {
-    SnapshotTesting.record = true
-    XCTAssertEqual(isRecording, true)
-
-    SnapshotTesting.record = false
-    XCTAssertEqual(isRecording, false)
-  }
 }
 
 #if os(iOS)
@@ -1343,31 +1352,4 @@ final class SnapshotTestingTests: XCTestCase {
       "accessibility-extra-extra-large": .accessibilityExtraExtraLarge,
       "accessibility-extra-extra-extra-large": .accessibilityExtraExtraExtraLarge,
     ]
-#endif
-
-#if os(Linux) || os(Windows)
-  extension SnapshotTestingTests {
-    static var allTests: [(String, (SnapshotTestingTests) -> () throws -> Void)] {
-      return [
-        ("testAny", testAny),
-        ("testAnySnapshotStringConvertible", testAnySnapshotStringConvertible),
-        ("testAutolayout", testAutolayout),
-        ("testDeterministicDictionaryAndSetSnapshots", testDeterministicDictionaryAndSetSnapshots),
-        ("testEncodable", testEncodable),
-        ("testMixedViews", testMixedViews),
-        ("testMultipleSnapshots", testMultipleSnapshots),
-        ("testNamedAssertion", testNamedAssertion),
-        ("testPrecision", testPrecision),
-        ("testSCNView", testSCNView),
-        ("testSKView", testSKView),
-        ("testTableViewController", testTableViewController),
-        ("testTraits", testTraits),
-        ("testTraitsEmbeddedInTabNavigation", testTraitsEmbeddedInTabNavigation),
-        ("testTraitsWithView", testTraitsWithView),
-        ("testUIView", testUIView),
-        ("testURLRequest", testURLRequest),
-        ("testWebView", testWebView),
-      ]
-    }
-  }
 #endif

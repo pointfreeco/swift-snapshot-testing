@@ -1,0 +1,4 @@
+▿ Child
+  ▿ father: Father
+    ▿ child: Optional<Child>
+      ▿ some (circular reference detected)
