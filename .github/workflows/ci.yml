@@ -13,10 +13,11 @@ jobs:
     strategy:
       matrix:
         xcode:
-          - "14.3.1"
+          - 15.4
+          - '16.1'
 
-    name: macOS 13 (Xcode ${{ matrix.xcode }})
-    runs-on: macos-13
+    name: macOS
+    runs-on: macos-14
     steps:
       - uses: actions/checkout@v3
       - name: Select Xcode ${{ matrix.xcode }}
@@ -28,25 +29,23 @@ jobs:
     strategy:
       matrix:
         swift:
-          - "5.7"
+          - '5.9'
 
-    name: Ubuntu (Swift ${{ matrix.swift }})
-    runs-on: ubuntu-20.04
+    container: swift:${{ matrix.swift }}
+    name: Linux (Swift ${{ matrix.swift }})
+    runs-on: ubuntu-latest
     steps:
-      - uses: swift-actions/setup-swift@v1
-        with:
-          swift-version: ${{ matrix.swift }}
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: swift test
 
   windows:
     strategy:
       matrix:
         swift:
-          - "5.8"
+          - "5.9.1"
 
     name: Windows (Swift ${{ matrix.swift }})
-    runs-on: windows-2019
+    runs-on: windows-latest
 
     steps:
       - uses: compnerd/gha-setup-swift@main
@@ -59,6 +58,20 @@ jobs:
           git config --global core.autocrlf false
           git config --global core.eol lf
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: swift build
       - run: swift test
+
+  android:
+    strategy:
+      matrix:
+        swift:
+          - "6.0.2"
+    name: Android
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: skiptools/swift-android-action@v2
+        with:
+          swift-version: ${{ matrix.swift }}
+          copy-files: ${GITHUB_WORKSPACE}/Tests/SnapshotTestingTests/__Snapshots__
