@@ -1,4 +1,6 @@
 #if canImport(Testing)
+
+  import ImageSerializationPlugin
   import Testing
 
   extension Trait where Self == _SnapshotsTestTrait {
@@ -9,12 +11,14 @@
     ///   - diffTool: The diff tool to use in failure messages.
     public static func snapshots(
       record: SnapshotTestingConfiguration.Record? = nil,
-      diffTool: SnapshotTestingConfiguration.DiffTool? = nil
+      diffTool: SnapshotTestingConfiguration.DiffTool? = nil,
+      imageFormat: ImageSerializationFormat? = nil
     ) -> Self {
       _SnapshotsTestTrait(
         configuration: SnapshotTestingConfiguration(
           record: record,
-          diffTool: diffTool
+          diffTool: diffTool,
+          imageFormat: imageFormat
         )
       )
     }

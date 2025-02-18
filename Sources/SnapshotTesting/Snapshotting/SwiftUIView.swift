@@ -1,6 +1,7 @@
 #if canImport(SwiftUI)
   import Foundation
   import SwiftUI
+  import ImageSerializationPlugin
 
   /// The size constraint for a snapshot (similar to `PreviewLayout`).
   public enum SwiftUISnapshotLayout {
@@ -20,7 +21,7 @@
 
       /// A snapshot strategy for comparing SwiftUI Views based on pixel equality.
       public static var image: Snapshotting {
-        return .image()
+        return .image(imageFormat: imageFormat)
       }
 
       /// A snapshot strategy for comparing SwiftUI Views based on pixel equality.
@@ -41,7 +42,8 @@
         precision: Float = 1,
         perceptualPrecision: Float = 1,
         layout: SwiftUISnapshotLayout = .sizeThatFits,
-        traits: UITraitCollection = .init()
+        traits: UITraitCollection = .init(),
+        imageFormat: ImageSerializationFormat = imageFormat
       )
         -> Snapshotting
       {
@@ -60,7 +62,7 @@
         }
 
         return SimplySnapshotting.image(
-          precision: precision, perceptualPrecision: perceptualPrecision, scale: traits.displayScale
+          precision: precision, perceptualPrecision: perceptualPrecision, scale: traits.displayScale, imageFormat: imageFormat
         ).asyncPullback { view in
           var config = config
 

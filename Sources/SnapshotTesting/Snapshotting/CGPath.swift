@@ -1,4 +1,6 @@
+import ImageSerializationPlugin
 #if os(macOS)
+
   import AppKit
   import Cocoa
   import CoreGraphics
@@ -6,7 +8,7 @@
   extension Snapshotting where Value == CGPath, Format == NSImage {
     /// A snapshot strategy for comparing bezier paths based on pixel equality.
     public static var image: Snapshotting {
-      return .image()
+      return .image(imageFormat: imageFormat)
     }
 
     /// A snapshot strategy for comparing bezier paths based on pixel equality.
@@ -29,10 +31,11 @@
     public static func image(
       precision: Float = 1,
       perceptualPrecision: Float = 1,
-      drawingMode: CGPathDrawingMode = .eoFill
+      drawingMode: CGPathDrawingMode = .eoFill,
+      imageFormat: ImageSerializationFormat
     ) -> Snapshotting {
       return SimplySnapshotting.image(
-        precision: precision, perceptualPrecision: perceptualPrecision
+        precision: precision, perceptualPrecision: perceptualPrecision, imageFormat: imageFormat
       ).pullback { path in
         let bounds = path.boundingBoxOfPath
         var transform = CGAffineTransform(translationX: -bounds.origin.x, y: -bounds.origin.y)
@@ -52,10 +55,11 @@
 #elseif os(iOS) || os(tvOS)
   import UIKit
 
+
   extension Snapshotting where Value == CGPath, Format == UIImage {
     /// A snapshot strategy for comparing bezier paths based on pixel equality.
     public static var image: Snapshotting {
-      return .image()
+      return .image(imageFormat: imageFormat)
     }
 
     /// A snapshot strategy for comparing bezier paths based on pixel equality.
@@ -68,10 +72,10 @@
     ///     human eye.
     public static func image(
       precision: Float = 1, perceptualPrecision: Float = 1, scale: CGFloat = 1,
-      drawingMode: CGPathDrawingMode = .eoFill
+      drawingMode: CGPathDrawingMode = .eoFill, imageFormat: ImageSerializationFormat
     ) -> Snapshotting {
       return SimplySnapshotting.image(
-        precision: precision, perceptualPrecision: perceptualPrecision, scale: scale
+        precision: precision, perceptualPrecision: perceptualPrecision, scale: scale, imageFormat: imageFormat
       ).pullback { path in
         let bounds = path.boundingBoxOfPath
         let format: UIGraphicsImageRendererFormat

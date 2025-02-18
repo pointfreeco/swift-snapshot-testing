@@ -16,6 +16,14 @@ let package = Package(
       targets: ["SnapshotTesting"]
     ),
     .library(
+      name: "SnapshotTestingPlugin",
+      targets: ["SnapshotTestingPlugin"]
+    ),
+    .library(
+      name: "ImageSerializationPlugin",
+      targets: ["ImageSerializationPlugin"]
+    ),
+    .library(
       name: "InlineSnapshotTesting",
       targets: ["InlineSnapshotTesting"]
     ),
@@ -30,7 +38,16 @@ let package = Package(
   ],
   targets: [
     .target(
-      name: "SnapshotTesting"
+      name: "SnapshotTesting",
+      dependencies: [
+        "ImageSerializationPlugin",
+        "SnapshotTestingPlugin"
+      ]
+    ),
+    .target(name: "SnapshotTestingPlugin"),
+    .target(
+      name: "ImageSerializationPlugin",
+      dependencies: ["SnapshotTestingPlugin"]
     ),
     .testTarget(
       name: "SnapshotTestingTests",

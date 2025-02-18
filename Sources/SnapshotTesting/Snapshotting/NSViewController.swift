@@ -1,11 +1,12 @@
 #if os(macOS)
   import AppKit
   import Cocoa
+  import ImageSerializationPlugin
 
   extension Snapshotting where Value == NSViewController, Format == NSImage {
     /// A snapshot strategy for comparing view controller views based on pixel equality.
     public static var image: Snapshotting {
-      return .image()
+      return .image(imageFormat: imageFormat)
     }
 
     /// A snapshot strategy for comparing view controller views based on pixel equality.
@@ -18,10 +19,10 @@
     ///     human eye.
     ///   - size: A view size override.
     public static func image(
-      precision: Float = 1, perceptualPrecision: Float = 1, size: CGSize? = nil
+      precision: Float = 1, perceptualPrecision: Float = 1, size: CGSize? = nil, imageFormat: ImageSerializationFormat
     ) -> Snapshotting {
       return Snapshotting<NSView, NSImage>.image(
-        precision: precision, perceptualPrecision: perceptualPrecision, size: size
+        precision: precision, perceptualPrecision: perceptualPrecision, size: size, imageFormat: imageFormat
       ).pullback { $0.view }
     }
   }
