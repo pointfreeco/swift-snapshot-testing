@@ -285,7 +285,13 @@ public func verifySnapshot<Value, Format>(
   line: UInt = #line,
   column: UInt = #column
 ) -> String? {
-  CleanCounterBetweenTestCases.registerIfNeeded()
+  #if canImport(Testing)
+    if Test.current == nil {
+      CleanCounterBetweenTestCases.registerIfNeeded()
+    }
+  #else
+    CleanCounterBetweenTestCases.registerIfNeeded()
+  #endif
 
   let record =
     (recording == true ? .all : recording == false ? .missing : nil)
@@ -523,28 +529,17 @@ func sanitizePathComponent(_ string: String) -> String {
   }
 #endif
 
-extension DispatchQueue {
-  private static let key = DispatchSpecificKey<UInt8>()
-  private static let value: UInt8 = 0
-
-  fileprivate static func mainSync<R>(execute block: () -> R) -> R {
-    Self.main.setSpecific(key: key, value: value)
-    if getSpecific(key: key) == value {
-      return block()
-    } else {
-      return main.sync(execute: block)
-    }
-  }
-}
-
 // We need to clean counter between tests executions in order to support test-iterations.
 private class CleanCounterBetweenTestCases: NSObject, XCTestObservation {
   private static var registered = false
 
   static func registerIfNeeded() {
-    DispatchQueue.mainSync {
-      if !registered {
-        registered = true
+    guard !registered else { return }
+    defer { registered = true }
+    if Thread.isMainThread {
+      XCTestObservationCenter.shared.addTestObserver(CleanCounterBetweenTestCases())
+    } else {
+      DispatchQueue.main.sync {
         XCTestObservationCenter.shared.addTestObserver(CleanCounterBetweenTestCases())
       }
     }
