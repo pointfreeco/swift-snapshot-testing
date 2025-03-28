@@ -230,7 +230,7 @@ targets: [
 [available-strategies]: https://swiftpackageindex.com/pointfreeco/swift-snapshot-testing/main/documentation/snapshottesting/snapshotting
 [defining-strategies]: https://swiftpackageindex.com/pointfreeco/swift-snapshot-testing/main/documentation/snapshottesting/customstrategies
 
-## Plug-ins
+## Strategies / Plug-ins
 
   - [AccessibilitySnapshot](https://github.com/cashapp/AccessibilitySnapshot) adds easy regression
     testing for iOS accessibility.
@@ -272,6 +272,18 @@ targets: [
 
   - [SnapshotVision](https://github.com/gregersson/swift-snapshot-testing-vision) adds snapshot
     strategy for text recognition on views and images. Uses Apples Vision framework.
+
+  - [Image Serialization Plugin - HEIC](https://github.com/mackoj/swift-snapshot-testing-plugin-heic) allow all the 
+    strategy that create image as output to store them in `.heic` storage format which reduces file sizes 
+    in comparison to PNG.
+
+  - [Image Serialization Plugin - WEBP](https://github.com/mackoj/swift-snapshot-testing-plugin-heic) allow all the 
+    strategy that create image as output to store them in `.webp` storage format which reduces file sizes 
+    in comparison to PNG.
+
+  - [Image Serialization Plugin - JXL](https://github.com/mackoj/swift-snapshot-testing-plugin-heic) allow all the 
+    strategy that create image as output to store them in `.jxl` storage format which reduces file sizes 
+    in comparison to PNG.
 
 Have you written your own SnapshotTesting plug-in?
 [Add it here](https://github.com/pointfreeco/swift-snapshot-testing/edit/master/README.md) and

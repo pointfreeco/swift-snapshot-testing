@@ -1,3 +1,4 @@
+import ImageSerializationPlugin
 #if os(macOS)
   import AppKit
   import Cocoa
@@ -14,7 +15,7 @@
     /// assertSnapshot(of: layer, as: .image(precision: 0.99))
     /// ```
     public static var image: Snapshotting {
-      return .image(precision: 1)
+      return .image(precision: 1, imageFormat: imageFormat)
     }
 
     /// A snapshot strategy for comparing layers based on pixel equality.
@@ -25,9 +26,9 @@
     ///     match. 98-99% mimics
     ///     [the precision](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e) of the
     ///     human eye.
-    public static func image(precision: Float, perceptualPrecision: Float = 1) -> Snapshotting {
+    public static func image(precision: Float, perceptualPrecision: Float = 1, imageFormat: ImageSerializationFormat) -> Snapshotting {
       return SimplySnapshotting.image(
-        precision: precision, perceptualPrecision: perceptualPrecision
+        precision: precision, perceptualPrecision: perceptualPrecision, imageFormat: imageFormat
       ).pullback { layer in
         let image = NSImage(size: layer.bounds.size)
         image.lockFocus()
@@ -46,7 +47,7 @@
   extension Snapshotting where Value == CALayer, Format == UIImage {
     /// A snapshot strategy for comparing layers based on pixel equality.
     public static var image: Snapshotting {
-      return .image()
+      return .image(imageFormat: imageFormat)
     }
 
     /// A snapshot strategy for comparing layers based on pixel equality.
@@ -59,12 +60,12 @@
     ///     human eye.
     ///   - traits: A trait collection override.
     public static func image(
-      precision: Float = 1, perceptualPrecision: Float = 1, traits: UITraitCollection = .init()
+      precision: Float = 1, perceptualPrecision: Float = 1, traits: UITraitCollection = .init(), imageFormat: ImageSerializationFormat
     )
       -> Snapshotting
     {
       return SimplySnapshotting.image(
-        precision: precision, perceptualPrecision: perceptualPrecision, scale: traits.displayScale
+        precision: precision, perceptualPrecision: perceptualPrecision, scale: traits.displayScale, imageFormat: imageFormat
       ).pullback { layer in
         renderer(bounds: layer.bounds, for: traits).image { ctx in
           layer.setNeedsLayout()

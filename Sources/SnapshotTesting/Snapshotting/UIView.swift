@@ -1,10 +1,11 @@
 #if os(iOS) || os(tvOS)
   import UIKit
+  import ImageSerializationPlugin
 
   extension Snapshotting where Value == UIView, Format == UIImage {
     /// A snapshot strategy for comparing views based on pixel equality.
     public static var image: Snapshotting {
-      return .image()
+      return .image(imageFormat: imageFormat)
     }
 
     /// A snapshot strategy for comparing views based on pixel equality.
@@ -25,13 +26,14 @@
       precision: Float = 1,
       perceptualPrecision: Float = 1,
       size: CGSize? = nil,
-      traits: UITraitCollection = .init()
+      traits: UITraitCollection = .init(),
+      imageFormat: ImageSerializationFormat = imageFormat
     )
       -> Snapshotting
     {
 
       return SimplySnapshotting.image(
-        precision: precision, perceptualPrecision: perceptualPrecision, scale: traits.displayScale
+        precision: precision, perceptualPrecision: perceptualPrecision, scale: traits.displayScale, imageFormat: imageFormat
       ).asyncPullback { view in
         snapshotView(
           config: .init(safeArea: .zero, size: size ?? view.frame.size, traits: .init()),
