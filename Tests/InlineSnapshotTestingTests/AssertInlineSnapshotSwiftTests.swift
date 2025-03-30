@@ -18,13 +18,13 @@ extension BaseSuite {
       }
     }
     
-    @Test func inlineSnapshotFailure() {
+    @Test(.snapshots(record: .missing)) func inlineSnapshotFailure() {
       withKnownIssue {
         assertInlineSnapshot(of: ["Hello", "World"], as: .dump) {
           """
           ▿ 2 elements
             - "Hello"
-          
+
           """
         }
       } matching: { issue in
