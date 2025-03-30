@@ -20,10 +20,10 @@ import XCTest
   import UIKit.UIView
 #endif
 
-final class SnapshotTestingTests: XCTestCase {
+final class SnapshotTestingTests: BaseTestCase {
   override func invokeTest() {
     withSnapshotTesting(
-      record: .missing,
+      record: .failed,
       diffTool: .ksdiff
     ) {
       super.invokeTest()

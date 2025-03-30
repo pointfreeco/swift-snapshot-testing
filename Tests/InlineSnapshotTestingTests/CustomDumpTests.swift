@@ -3,11 +3,7 @@
   import InlineSnapshotTesting
   import SnapshotTestingCustomDump
 
-  @Suite(
-    .snapshots(
-      record: .missing
-    )
-  )
+extension BaseSuite {
   struct CustomDumpSnapshotTests {
     @Test func basics() {
       struct User { let id: Int, name: String, bio: String }
@@ -23,4 +19,5 @@
       }
     }
   }
+}
 #endif

@@ -3,7 +3,7 @@ import Foundation
 import SnapshotTesting
 import XCTest
 
-final class InlineSnapshotTestingTests: XCTestCase {
+final class InlineSnapshotTestingTests: BaseTestCase {
   override func invokeTest() {
     withSnapshotTesting(record: .missing, diffTool: .ksdiff) {
       super.invokeTest()

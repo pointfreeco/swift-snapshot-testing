@@ -4,11 +4,8 @@
   import InlineSnapshotTesting
   import SnapshotTesting
 
-  @Suite(
-    .snapshots(
-      record: .missing
-    )
-  )
+extension BaseSuite {
+  @Suite
   struct AssertInlineSnapshotTests {
     @Test func inlineSnapshot() {
       assertInlineSnapshot(of: ["Hello", "World"], as: .dump) {
@@ -16,24 +13,24 @@
         ▿ 2 elements
           - "Hello"
           - "World"
-
+        
         """
       }
     }
-
+    
     @Test func inlineSnapshotFailure() {
       withKnownIssue {
         assertInlineSnapshot(of: ["Hello", "World"], as: .dump) {
           """
           ▿ 2 elements
             - "Hello"
-
+          
           """
         }
       } matching: { issue in
         issue.description == """
           Issue recorded: Snapshot did not match. Difference: …
-
+          
             @@ −1,3 +1,4 @@
              ▿ 2 elements
                - "Hello"
@@ -42,7 +39,7 @@
           """
       }
     }
-
+    
     @Test func inlineSnapshot_NamedTrailingClosure() {
       assertInlineSnapshot(
         of: ["Hello", "World"], as: .dump,
@@ -51,11 +48,11 @@
           ▿ 2 elements
             - "Hello"
             - "World"
-
+          
           """
         })
     }
-
+    
     @Test func inlineSnapshot_Escaping() {
       assertInlineSnapshot(of: "Hello\"\"\"#, world", as: .lines) {
         ##"""
@@ -63,18 +60,18 @@
         """##
       }
     }
-
+    
     @Test func customInlineSnapshot() {
       assertCustomInlineSnapshot {
         "Hello"
       } is: {
         """
         - "Hello"
-
+        
         """
       }
     }
-
+    
     @Test func customInlineSnapshot_Multiline() {
       assertCustomInlineSnapshot {
         """
@@ -84,43 +81,43 @@
       } is: {
         #"""
         - "\"Hello\"\n\"World\""
-
+        
         """#
       }
     }
-
+    
     @Test func customInlineSnapshot_SingleTrailingClosure() {
       assertCustomInlineSnapshot(of: { "Hello" }) {
         """
         - "Hello"
-
+        
         """
       }
     }
-
+    
     @Test func customInlineSnapshot_MultilineSingleTrailingClosure() {
       assertCustomInlineSnapshot(
         of: { "Hello" }
       ) {
         """
         - "Hello"
-
+        
         """
       }
     }
-
+    
     @Test func customInlineSnapshot_NoTrailingClosure() {
       assertCustomInlineSnapshot(
         of: { "Hello" },
         is: {
           """
           - "Hello"
-
+          
           """
         }
       )
     }
-
+    
     @Test func argumentlessInlineSnapshot() {
       func assertArgumentlessInlineSnapshot(
         expected: (() -> String)? = nil,
@@ -145,15 +142,15 @@
           column: column
         )
       }
-
+      
       assertArgumentlessInlineSnapshot {
         """
         - "Hello"
-
+        
         """
       }
     }
-
+    
     @Test func multipleInlineSnapshots() {
       func assertResponse(
         of url: () -> String,
@@ -211,7 +208,7 @@
           column: column
         )
       }
-
+      
       assertResponse {
         """
         https://www.pointfree.co/
@@ -237,7 +234,7 @@
         """
       }
     }
-
+    
     @Test func asyncThrowing() async throws {
       func assertAsyncThrowingInlineSnapshot(
         of value: () -> String,
@@ -263,52 +260,53 @@
           column: column
         )
       }
-
+      
       try await assertAsyncThrowingInlineSnapshot {
         "Hello"
       } is: {
         """
         - "Hello"
-
+        
         """
       }
     }
-
+    
     @Test func nestedInClosureFunction() {
       func withDependencies(operation: () -> Void) {
         operation()
       }
-
+      
       withDependencies {
         assertInlineSnapshot(of: "Hello", as: .dump) {
           """
           - "Hello"
-
+          
           """
         }
       }
     }
-
+    
     @Test func carriageReturnInlineSnapshot() {
       assertInlineSnapshot(of: "This is a line\r\nAnd this is a line\r\n", as: .lines) {
         """
         This is a line\r
         And this is a line\r
-
+        
         """
       }
     }
-
+    
     @Test func carriageReturnRawInlineSnapshot() {
       assertInlineSnapshot(of: "\"\"\"#This is a line\r\nAnd this is a line\r\n", as: .lines) {
         ##"""
         """#This is a line\##r
         And this is a line\##r
-
+        
         """##
       }
     }
   }
+}
 
   private func assertCustomInlineSnapshot(
     of value: () -> String,
