@@ -1,5 +1,5 @@
-import XCTest
 import SnapshotTesting
+import XCTest
 
 class BaseTestCase: XCTestCase {
   override func invokeTest() {
