@@ -318,12 +318,7 @@ public func verifySnapshot<Value, Format>(
       if let name = name {
         identifier = sanitizePathComponent(name)
       } else {
-        let counter = counterQueue.sync { () -> Int in
-          let key = snapshotDirectoryUrl.appendingPathComponent(testName)
-          counterMap[key, default: 0] += 1
-          return counterMap[key]!
-        }
-        identifier = String(counter)
+        identifier = String(counter.next())
       }
 
       let testName = sanitizePathComponent(testName)
@@ -504,8 +499,19 @@ public func verifySnapshot<Value, Format>(
 
 // MARK: - Private
 
-private let counterQueue = DispatchQueue(label: "co.pointfree.SnapshotTesting.counter")
-private var counterMap: [URL: Int] = [:]
+private var counter: File.Counter {
+  #if canImport(Testing)
+    if Test.current != nil {
+      return File.counter
+    } else {
+      return _counter
+    }
+  #else
+    return _counter
+  #endif
+}
+
+private let _counter = File.Counter()
 
 func sanitizePathComponent(_ string: String) -> String {
   return
@@ -546,8 +552,30 @@ private class CleanCounterBetweenTestCases: NSObject, XCTestObservation {
   }
 
   func testCaseDidFinish(_ testCase: XCTestCase) {
-    counterQueue.sync {
-      counterMap = [:]
+    _counter.reset()
+  }
+}
+
+enum File {
+  @TaskLocal static var counter = Counter()
+
+  final class Counter: @unchecked Sendable {
+    private var count = 0
+    private let lock = NSLock()
+
+    init() {}
+
+    func next() -> Int {
+      lock.lock()
+      defer { lock.unlock() }
+      count += 1
+      return count
+    }
+
+    func reset() {
+      lock.lock()
+      defer { lock.unlock() }
+      count = 0
     }
   }
 }

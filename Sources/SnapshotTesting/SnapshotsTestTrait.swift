@@ -46,7 +46,9 @@
           record: configuration.record,
           diffTool: configuration.diffTool
         ) {
-          try await function()
+          try await File.$counter.withValue(File.Counter()) {
+            try await function()
+          }
         }
       }
     }
