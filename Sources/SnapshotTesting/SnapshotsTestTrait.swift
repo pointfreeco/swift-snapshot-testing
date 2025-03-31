@@ -9,6 +9,11 @@
 
   extension Trait where Self == _SnapshotsTestTrait {
     /// Configure snapshot testing in a suite or test.
+    public static var snapshots: Self {
+      snapshots()
+    }
+
+    /// Configure snapshot testing in a suite or test.
     ///
     /// - Parameters:
     ///   - record: The record mode of the test.

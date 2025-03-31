@@ -318,7 +318,9 @@ public func verifySnapshot<Value, Format>(
       if let name = name {
         identifier = sanitizePathComponent(name)
       } else {
-        identifier = String(counter.next())
+        identifier = String(
+          counter.next(for: snapshotDirectoryUrl.appendingPathComponent(testName).absoluteString)
+        )
       }
 
       let testName = sanitizePathComponent(testName)
@@ -560,22 +562,22 @@ enum File {
   @TaskLocal static var counter = Counter()
 
   final class Counter: @unchecked Sendable {
-    private var count = 0
+    private var counts: [String: Int] = [:]
     private let lock = NSLock()
 
     init() {}
 
-    func next() -> Int {
+    func next(for key: String) -> Int {
       lock.lock()
       defer { lock.unlock() }
-      count += 1
-      return count
+      counts[key, default: 0] += 1
+      return counts[key]!
     }
 
     func reset() {
       lock.lock()
       defer { lock.unlock() }
-      count = 0
+      counts.removeAll()
     }
   }
 }
