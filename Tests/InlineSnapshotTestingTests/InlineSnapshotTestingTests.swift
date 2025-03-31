@@ -4,12 +4,6 @@ import SnapshotTesting
 import XCTest
 
 final class InlineSnapshotTestingTests: BaseTestCase {
-  override func invokeTest() {
-    withSnapshotTesting(record: .missing, diffTool: .ksdiff) {
-      super.invokeTest()
-    }
-  }
-
   func testInlineSnapshot() {
     assertInlineSnapshot(of: ["Hello", "World"], as: .dump) {
       """

@@ -21,15 +21,6 @@ import XCTest
 #endif
 
 final class SnapshotTestingTests: BaseTestCase {
-  override func invokeTest() {
-    withSnapshotTesting(
-      record: .failed,
-      diffTool: .ksdiff
-    ) {
-      super.invokeTest()
-    }
-  }
-
   func testAny() {
     struct User { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
