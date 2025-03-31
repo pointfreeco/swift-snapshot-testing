@@ -1,7 +1,7 @@
 import SnapshotTesting
 import XCTest
 
-class RecordTests: XCTestCase {
+class RecordTests: BaseTestCase {
   var snapshotURL: URL!
 
   override func setUp() {

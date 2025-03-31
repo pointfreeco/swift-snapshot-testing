@@ -3,18 +3,14 @@
   import InlineSnapshotTesting
   import SnapshotTestingCustomDump
 
-  @Suite(
-    .snapshots(
-      record: .missing
-    )
-  )
+extension BaseSuite {
   struct CustomDumpSnapshotTests {
     @Test func basics() {
       struct User { let id: Int, name: String, bio: String }
       let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
       assertInlineSnapshot(of: user, as: .customDump) {
         """
-        CustomDumpSnapshotTests.User(
+        BaseSuite.CustomDumpSnapshotTests.User(
           id: 1,
           name: "Blobby",
           bio: "Blobbed around the world."
@@ -23,4 +19,5 @@
       }
     }
   }
+}
 #endif
