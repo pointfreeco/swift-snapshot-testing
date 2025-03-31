@@ -57,10 +57,10 @@ withSnapshotTesting(record: .all) {
 @Suite(.snapshots(record: .failed))
 struct FeatureTests {}
 
-// Record all snapshot failures in an XCTestCase subclass:
+// Record all snapshot failures in an 'XCTestCase' subclass:
 class FeatureTests: XCTestCase {
   override func invokeTest() {
-    withSnapshotTesting(record: .all) {
+    withSnapshotTesting(record: .failed) {
       super.invokeTest()
     }
   }
