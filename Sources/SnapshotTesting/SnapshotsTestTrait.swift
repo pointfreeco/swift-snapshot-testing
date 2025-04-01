@@ -38,17 +38,20 @@
     public let isRecursive = true
     let configuration: SnapshotTestingConfiguration
 
-    // public func execute(
-    //   _ function: @escaping () async throws -> Void,
-    //   for test: Test,
-    //   testCase: Test.Case?
-    // ) async throws {
-    //   try await withSnapshotTesting(
-    //     record: configuration.record,
-    //     diffTool: configuration.diffTool
-    //   ) {
-    //     try await function()
-    //   }
-    // }
+    #if compiler(>=6.1)
+    public func scopeProvider(for test: Test, testCase: Test.Case?) -> TestScopeProvider? {
+      nil
+    }
+      @_spi(Experimental)
+      public enum TestScopeProvider: TestScoping {
+        public func provideScope(
+          for test: Test,
+          testCase: Test.Case?,
+          performing function: @Sendable () async throws -> Void
+        ) async throws {
+          fatalError()
+        }
+      }
+    #endif
   }
 #endif
