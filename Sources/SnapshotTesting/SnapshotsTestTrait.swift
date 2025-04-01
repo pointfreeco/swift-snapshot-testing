@@ -39,9 +39,9 @@
     let configuration: SnapshotTestingConfiguration
 
     #if compiler(>=6.1)
-    public func scopeProvider(for test: Test, testCase: Test.Case?) -> TestScopeProvider? {
-      nil
-    }
+      public func scopeProvider(for test: Test, testCase: Test.Case?) -> TestScopeProvider? {
+        nil
+      }
       @_spi(Experimental)
       public enum TestScopeProvider: TestScoping {
         public func provideScope(
