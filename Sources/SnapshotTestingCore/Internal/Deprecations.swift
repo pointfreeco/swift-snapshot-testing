@@ -1,4 +1,5 @@
 import Foundation
+import IssueReporting
 import XCTest
 
 // Deprecated after 1.12.0:
@@ -20,7 +21,6 @@ public func _assertInlineSnapshot<Value>(
   line: UInt = #line,
   column: UInt = #column
 ) {
-
   let failure = _verifyInlineSnapshot(
     matching: try value(),
     as: snapshotting,
@@ -34,7 +34,7 @@ public func _assertInlineSnapshot<Value>(
     column: column
   )
   guard let message = failure else { return }
-  recordIssue(message, fileID: fileID, filePath: filePath, line: line, column: column)
+  reportIssue(message, fileID: fileID, filePath: filePath, line: line, column: column)
 }
 
 @available(
