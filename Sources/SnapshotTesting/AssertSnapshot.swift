@@ -261,6 +261,7 @@ public func assertSnapshots<Value, Format>(
 ///   - snapshotting: A strategy for serializing, deserializing, and comparing values.
 ///   - name: An optional description of the snapshot.
 ///   - recording: Whether or not to record a new reference.
+///   - diffTool: The diff tool to use while asserting snapshots.
 ///   - snapshotDirectory: Optional directory to save snapshots. By default snapshots will be saved
 ///     in a directory with the same name as the test file, and that directory will sit inside a
 ///     directory `__Snapshots__` that sits next to your test file.
@@ -277,6 +278,7 @@ public func verifySnapshot<Value, Format>(
   as snapshotting: Snapshotting<Value, Format>,
   named name: String? = nil,
   record recording: Bool? = nil,
+  diffTool: SnapshotTestingConfiguration.DiffTool? = nil,
   snapshotDirectory: String? = nil,
   timeout: TimeInterval = 5,
   fileID: StaticString = #fileID,
@@ -297,7 +299,7 @@ public func verifySnapshot<Value, Format>(
     (recording == true ? .all : recording == false ? .missing : nil)
     ?? SnapshotTestingConfiguration.current?.record
     ?? _record
-  return withSnapshotTesting(record: record) { () -> String? in
+  return withSnapshotTesting(record: record, diffTool: diffTool) { () -> String? in
     do {
       let fileUrl = URL(fileURLWithPath: "\(filePath)", isDirectory: false)
       let fileName = fileUrl.deletingPathExtension().lastPathComponent
