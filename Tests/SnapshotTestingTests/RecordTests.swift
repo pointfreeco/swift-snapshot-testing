@@ -44,7 +44,7 @@ class RecordTests: XCTestCase {
         }
       } issueMatcher: {
         $0.compactDescription == """
-          failed - The file “testRecordNever.1.json” couldn’t be opened because there is no such file.
+          failed - No reference was found on disk. New snapshot was not recorded because recording is disabled
           """
       }
 
@@ -162,6 +162,9 @@ class RecordTests: XCTestCase {
   #endif
 
   func testRecordFailed_NoFailure() throws {
+    #if os(Android)
+      throw XCTSkip("cannot save next to file on Android")
+    #endif
     try Data("42".utf8).write(to: snapshotURL)
     let modifiedDate =
       try FileManager.default

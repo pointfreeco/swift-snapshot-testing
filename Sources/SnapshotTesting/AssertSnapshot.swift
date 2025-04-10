@@ -1,9 +1,7 @@
 import XCTest
 
 #if canImport(Testing)
-  // NB: We are importing only the implementation of Testing because that framework is not available
-  //     in Xcode UI test targets.
-  @_implementationOnly import Testing
+  import Testing
 #endif
 
 /// Enhances failure messages with a command line diff tool expression that can be copied and pasted
@@ -310,12 +308,17 @@ public func verifySnapshot<Value, Format>(
       let fileUrl = URL(fileURLWithPath: "\(filePath)", isDirectory: false)
       let fileName = fileUrl.deletingPathExtension().lastPathComponent
 
+      #if os(Android)
+        // When running tests on Android, the CI script copies the Tests/SnapshotTestingTests/__Snapshots__ up to the temporary folder
+        let snapshotsBaseUrl = URL(
+          fileURLWithPath: "/data/local/tmp/android-xctest", isDirectory: true)
+      #else
+        let snapshotsBaseUrl = fileUrl.deletingLastPathComponent()
+      #endif
+
       let snapshotDirectoryUrl =
         snapshotDirectory.map { URL(fileURLWithPath: $0, isDirectory: true) }
-        ?? fileUrl
-        .deletingLastPathComponent()
-        .appendingPathComponent("__Snapshots__")
-        .appendingPathComponent(fileName)
+        ?? snapshotsBaseUrl.appendingPathComponent("__Snapshots__").appendingPathComponent(fileName)
 
       let identifier: String
       if let name = name {
@@ -330,10 +333,12 @@ public func verifySnapshot<Value, Format>(
       }
 
       let testName = sanitizePathComponent(testName)
-      let snapshotFileUrl =
+      var snapshotFileUrl =
         snapshotDirectoryUrl
         .appendingPathComponent("\(testName).\(identifier)")
-        .appendingPathExtension(snapshotting.pathExtension ?? "")
+      if let ext = snapshotting.pathExtension {
+        snapshotFileUrl = snapshotFileUrl.appendingPathExtension(ext)
+      }
       let fileManager = FileManager.default
       try fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
 
@@ -366,42 +371,70 @@ public func verifySnapshot<Value, Format>(
         return "Couldn't snapshot value"
       }
 
-      func recordSnapshot() throws {
-        try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)
-        #if !os(Linux) && !os(Windows)
+      func recordSnapshot(writeToDisk: Bool) throws {
+        let snapshotData = snapshotting.diffing.toData(diffable)
+
+        if writeToDisk {
+          try snapshotData.write(to: snapshotFileUrl)
+        }
+
+        #if !os(Android) && !os(Linux) && !os(Windows)
           if !isSwiftTesting,
             ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS")
           {
             XCTContext.runActivity(named: "Attached Recorded Snapshot") { activity in
-              let attachment = XCTAttachment(contentsOfFile: snapshotFileUrl)
-              activity.add(attachment)
+              if writeToDisk {
+                // Snapshot was written to disk. Create attachment from file
+                let attachment = XCTAttachment(contentsOfFile: snapshotFileUrl)
+                activity.add(attachment)
+              } else {
+                // Snapshot was not written to disk. Create attachment from data and path extension
+                let typeIdentifier = snapshotting.pathExtension.flatMap(
+                  uniformTypeIdentifier(fromExtension:))
+
+                let attachment = XCTAttachment(
+                  uniformTypeIdentifier: typeIdentifier,
+                  name: snapshotFileUrl.lastPathComponent,
+                  payload: snapshotData
+                )
+
+                activity.add(attachment)
+              }
             }
           }
         #endif
       }
 
-      guard
-        record != .all,
-        (record != .missing && record != .failed)
-          || fileManager.fileExists(atPath: snapshotFileUrl.path)
-      else {
-        try recordSnapshot()
+      if record == .all {
+        try recordSnapshot(writeToDisk: true)
 
-        return SnapshotTestingConfiguration.current?.record == .all
-          ? """
+        return """
           Record mode is on. Automatically recorded snapshot: …
 
           open "\(snapshotFileUrl.absoluteString)"
 
           Turn record mode off and re-run "\(testName)" to assert against the newly-recorded snapshot
           """
-          : """
-          No reference was found on disk. Automatically recorded snapshot: …
+      }
 
-          open "\(snapshotFileUrl.absoluteString)"
+      guard fileManager.fileExists(atPath: snapshotFileUrl.path) else {
+        if record == .never {
+          try recordSnapshot(writeToDisk: false)
 
-          Re-run "\(testName)" to assert against the newly-recorded snapshot.
-          """
+          return """
+            No reference was found on disk. New snapshot was not recorded because recording is disabled
+            """
+        } else {
+          try recordSnapshot(writeToDisk: true)
+
+          return """
+            No reference was found on disk. Automatically recorded snapshot: …
+
+            open "\(snapshotFileUrl.absoluteString)"
+
+            Re-run "\(testName)" to assert against the newly-recorded snapshot.
+            """
+        }
       }
 
       let data = try Data(contentsOf: snapshotFileUrl)
@@ -432,8 +465,10 @@ public func verifySnapshot<Value, Format>(
       try snapshotting.diffing.toData(diffable).write(to: failedSnapshotFileUrl)
 
       if !attachments.isEmpty {
-        #if !os(Linux) && !os(Windows)
-          if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
+        #if !os(Linux) && !os(Android) && !os(Windows)
+          if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS"),
+            !isSwiftTesting
+          {
             XCTContext.runActivity(named: "Attached Failure Diff") { activity in
               attachments.forEach {
                 activity.add($0)
@@ -456,7 +491,7 @@ public func verifySnapshot<Value, Format>(
       }
 
       if record == .failed {
-        try recordSnapshot()
+        try recordSnapshot(writeToDisk: true)
         failureMessage += " A new snapshot was automatically recorded."
       }
 
@@ -490,24 +525,45 @@ func sanitizePathComponent(_ string: String) -> String {
     .replacingOccurrences(of: "^-|-$", with: "", options: .regularExpression)
 }
 
+#if !os(Android) && !os(Linux) && !os(Windows)
+  import CoreServices
+
+  func uniformTypeIdentifier(fromExtension pathExtension: String) -> String? {
+    // This can be much cleaner in macOS 11+ using UTType
+    let unmanagedString = UTTypeCreatePreferredIdentifierForTag(
+      kUTTagClassFilenameExtension as CFString,
+      pathExtension as CFString,
+      nil
+    )
+
+    return unmanagedString?.takeRetainedValue() as String?
+  }
+#endif
+
+extension DispatchQueue {
+  private static let key = DispatchSpecificKey<UInt8>()
+  private static let value: UInt8 = 0
+
+  fileprivate static func mainSync<R>(execute block: () -> R) -> R {
+    Self.main.setSpecific(key: key, value: value)
+    if getSpecific(key: key) == value {
+      return block()
+    } else {
+      return main.sync(execute: block)
+    }
+  }
+}
+
 // We need to clean counter between tests executions in order to support test-iterations.
 private class CleanCounterBetweenTestCases: NSObject, XCTestObservation {
   private static var registered = false
 
   static func registerIfNeeded() {
-    if Thread.isMainThread {
-      doRegisterIfNeeded()
-    } else {
-      DispatchQueue.main.sync {
-        doRegisterIfNeeded()
+    DispatchQueue.mainSync {
+      if !registered {
+        registered = true
+        XCTestObservationCenter.shared.addTestObserver(CleanCounterBetweenTestCases())
       }
-    }
-  }
-
-  private static func doRegisterIfNeeded() {
-    if !registered {
-      registered = true
-      XCTestObservationCenter.shared.addTestObserver(CleanCounterBetweenTestCases())
     }
   }
 
