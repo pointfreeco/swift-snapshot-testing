@@ -293,7 +293,13 @@ public func verifySnapshot<Value, Format>(
   line: UInt = #line,
   column: UInt = #column
 ) -> String? {
-  CleanCounterBetweenTestCases.registerIfNeeded()
+  #if canImport(Testing)
+    if Test.current == nil {
+      CleanCounterBetweenTestCases.registerIfNeeded()
+    }
+  #else
+    CleanCounterBetweenTestCases.registerIfNeeded()
+  #endif
 
   let record =
     (recording == true
@@ -324,12 +330,9 @@ public func verifySnapshot<Value, Format>(
       if let name = name {
         identifier = sanitizePathComponent(name)
       } else {
-        let counter = counterQueue.sync { () -> Int in
-          let key = snapshotDirectoryUrl.appendingPathComponent(testName)
-          counterMap[key, default: 0] += 1
-          return counterMap[key]!
-        }
-        identifier = String(counter)
+        identifier = String(
+          counter.next(for: snapshotDirectoryUrl.appendingPathComponent(testName).absoluteString)
+        )
       }
 
       let testName = sanitizePathComponent(testName)
@@ -510,8 +513,19 @@ public func verifySnapshot<Value, Format>(
 
 // MARK: - Private
 
-private let counterQueue = DispatchQueue(label: "co.pointfree.SnapshotTesting.counter")
-private var counterMap: [URL: Int] = [:]
+private var counter: File.Counter {
+  #if canImport(Testing)
+    if Test.current != nil {
+      return File.counter
+    } else {
+      return _counter
+    }
+  #else
+    return _counter
+  #endif
+}
+
+private let _counter = File.Counter()
 
 func isPng<Value, Format>(snapshotting: Snapshotting<Value, Format>) -> Bool {
   let ext = snapshotting.pathExtension ?? ""
@@ -540,36 +554,47 @@ func sanitizePathComponent(_ string: String) -> String {
   }
 #endif
 
-extension DispatchQueue {
-  private static let key = DispatchSpecificKey<UInt8>()
-  private static let value: UInt8 = 0
-
-  fileprivate static func mainSync<R>(execute block: () -> R) -> R {
-    Self.main.setSpecific(key: key, value: value)
-    if getSpecific(key: key) == value {
-      return block()
-    } else {
-      return main.sync(execute: block)
-    }
-  }
-}
-
 // We need to clean counter between tests executions in order to support test-iterations.
 private class CleanCounterBetweenTestCases: NSObject, XCTestObservation {
   private static var registered = false
 
   static func registerIfNeeded() {
-    DispatchQueue.mainSync {
-      if !registered {
-        registered = true
+    guard !registered else { return }
+    defer { registered = true }
+    if Thread.isMainThread {
+      XCTestObservationCenter.shared.addTestObserver(CleanCounterBetweenTestCases())
+    } else {
+      DispatchQueue.main.sync {
         XCTestObservationCenter.shared.addTestObserver(CleanCounterBetweenTestCases())
       }
     }
   }
 
   func testCaseDidFinish(_ testCase: XCTestCase) {
-    counterQueue.sync {
-      counterMap = [:]
+    _counter.reset()
+  }
+}
+
+enum File {
+  @TaskLocal static var counter = Counter()
+
+  final class Counter: @unchecked Sendable {
+    private var counts: [String: Int] = [:]
+    private let lock = NSLock()
+
+    init() {}
+
+    func next(for key: String) -> Int {
+      lock.lock()
+      defer { lock.unlock() }
+      counts[key, default: 0] += 1
+      return counts[key]!
+    }
+
+    func reset() {
+      lock.lock()
+      defer { lock.unlock() }
+      counts.removeAll()
     }
   }
 }

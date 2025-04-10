@@ -2,7 +2,7 @@ import XCTest
 
 @testable import SnapshotTesting
 
-class WaitTests: XCTestCase {
+class WaitTests: BaseTestCase {
   func testWait() {
     var value = "Hello"
     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {

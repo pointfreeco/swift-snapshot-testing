@@ -20,16 +20,7 @@ import XCTest
   import UIKit.UIView
 #endif
 
-final class SnapshotTestingTests: XCTestCase {
-  override func invokeTest() {
-    withSnapshotTesting(
-      record: .missing,
-      diffTool: .ksdiff
-    ) {
-      super.invokeTest()
-    }
-  }
-
+final class SnapshotTestingTests: BaseTestCase {
   func testAny() {
     struct User { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")

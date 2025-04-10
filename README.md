@@ -14,10 +14,11 @@ Once [installed](#installation), _no additional configuration is required_. You 
 
 ``` swift
 import SnapshotTesting
-import XCTest
+import Testing
 
-class MyViewControllerTests: XCTestCase {
-  func testMyViewController() {
+@MainActor
+struct MyViewControllerTests {
+  @Test func myViewController() {
     let vc = MyViewController()
 
     assertSnapshot(of: vc, as: .image)
@@ -52,10 +53,14 @@ withSnapshotTesting(record: .all) {
   assertSnapshot(of: vc3, as: .image)
 }
 
-// Record all snapshots in an XCTestCase subclass:
+// Record all snapshot failures in a Swift Testing suite:
+@Suite(.snapshots(record: .failed))
+struct FeatureTests {}
+
+// Record all snapshot failures in an 'XCTestCase' subclass:
 class FeatureTests: XCTestCase {
   override func invokeTest() {
-    withSnapshotTesting(record: .all) {
+    withSnapshotTesting(record: .failed) {
       super.invokeTest()
     }
   }
