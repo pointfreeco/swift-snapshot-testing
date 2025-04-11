@@ -17,11 +17,18 @@
     ///     [the precision](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e) of the
     ///     human eye.
     ///   - size: A view size override.
+    ///   - delay: The time interval (in seconds) to delay before taking the snapshot. `nil` indicates no delay.   
     public static func image(
-      precision: Float = 1, perceptualPrecision: Float = 1, size: CGSize? = nil
+      precision: Float = 1,
+      perceptualPrecision: Float = 1,
+      size: CGSize? = nil,
+      delay: Double? = nil
     ) -> Snapshotting {
       return Snapshotting<NSView, NSImage>.image(
-        precision: precision, perceptualPrecision: perceptualPrecision, size: size
+        precision: precision,
+        perceptualPrecision: perceptualPrecision,
+        size: size,
+        delay: delay
       ).pullback { $0.view }
     }
   }

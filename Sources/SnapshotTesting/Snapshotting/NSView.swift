@@ -20,8 +20,9 @@
     ///     [the precision](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e) of the
     ///     human eye.
     ///   - size: A view size override.
+    ///   - delay: The time interval (in seconds) to delay before taking the snapshot. `nil` indicates no delay.
     public static func image(
-      precision: Float = 1, perceptualPrecision: Float = 1, size: CGSize? = nil
+      precision: Float = 1, perceptualPrecision: Float = 1, size: CGSize? = nil, delay: Double? = nil
     ) -> Snapshotting {
       return SimplySnapshotting.image(
         precision: precision, perceptualPrecision: perceptualPrecision
@@ -31,9 +32,9 @@
         guard view.frame.width > 0, view.frame.height > 0 else {
           fatalError("View not renderable to image at size \(view.frame.size)")
         }
-        return view.snapshot
+        return view.snapshot(delay: delay)
           ?? Async { callback in
-            addImagesForRenderedViews(view).sequence().run { views in
+            addImagesForRenderedViews(view, delay: delay).sequence(delay: delay).run { views in
               let bitmapRep = view.bitmapImageRepForCachingDisplay(in: view.bounds)!
               view.cacheDisplay(in: view.bounds, to: bitmapRep)
               let image = NSImage(size: view.bounds.size)

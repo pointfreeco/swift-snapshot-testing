@@ -1,3 +1,5 @@
+import Foundation
+
 /// A wrapper around an asynchronous operation.
 ///
 /// Snapshot strategies may utilize this type to create snapshots in an asynchronous fashion.
@@ -37,6 +39,29 @@ public struct Async<Value> {
   public func map<NewValue>(_ transform: @escaping (Value) -> NewValue) -> Async<NewValue> {
     .init { callback in
       self.run { value in callback(transform(value)) }
+    }
+  }
+
+  /// Delays the completion of this asynchronous operation by a specified time interval.
+  ///
+  /// This method returns a new `Async<Value>` that, when executed, waits for the original asynchronous operation to complete,
+  /// then delays the delivery of its result by the specified interval before invoking the callback. If the `timeInterval` is `nil`,
+  /// the original `Async<Value>` is returned without any delay.
+  ///
+  /// - Parameter timeInterval: The time interval (in seconds) to delay the result delivery after the original operation completes.
+  /// A `nil` value skips the delay.
+  /// - Returns: A new `Async<Value>` instance with the delayed result delivery.
+  func delay(by timeInterval: Double?) -> Async<Value> {
+    guard let timeInterval = timeInterval else {
+      return self
+    }
+
+    return .init { callback in
+      self.run { value in
+        DispatchQueue.main.asyncAfter(deadline: .now() + timeInterval) {
+          callback(value)
+        }
+      }
     }
   }
 }

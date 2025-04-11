@@ -36,12 +36,14 @@
       ///     human eye.
       ///   - layout: A view layout override.
       ///   - traits: A trait collection override.
+      ///   - delay: The time interval (in seconds) to delay before taking the snapshot. `nil` indicates no delay.
       public static func image(
         drawHierarchyInKeyWindow: Bool = false,
         precision: Float = 1,
         perceptualPrecision: Float = 1,
         layout: SwiftUISnapshotLayout = .sizeThatFits,
-        traits: UITraitCollection = .init()
+        traits: UITraitCollection = .init(),
+        delay: Double? = nil
       )
         -> Snapshotting
       {
@@ -84,7 +86,8 @@
             drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
             traits: traits,
             view: controller.view,
-            viewController: controller
+            viewController: controller,
+            delay: delay
           )
         }
       }

@@ -808,8 +808,8 @@
     }
   #endif
 
-  func addImagesForRenderedViews(_ view: View) -> [Async<View>] {
-    return view.snapshot
+  func addImagesForRenderedViews(_ view: View, delay: Double?) -> [Async<View>] {
+    return view.snapshot(delay: delay)
       .map { async in
         [
           Async { callback in
@@ -827,12 +827,12 @@
           }
         ]
       }
-      ?? view.subviews.flatMap(addImagesForRenderedViews)
+      ?? view.subviews.flatMap { addImagesForRenderedViews($0, delay: delay) }
   }
 
   extension View {
-    var snapshot: Async<Image>? {
-      func inWindow<T>(_ perform: () -> T) -> T {
+    func snapshot(delay: Double?) -> Async<Image>? {
+      func inWindow() {
         #if os(macOS)
           let superview = self.superview
           defer { superview?.addSubview(self) }
@@ -841,40 +841,62 @@
           window.contentView?.addSubview(self)
           window.makeKey()
         #endif
-        return perform()
       }
+
       if let scnView = self as? SCNView {
-        return Async(value: inWindow { scnView.snapshot() })
+        inWindow()
+        return Async(value: scnView).delay(by: delay).map { $0.snapshot() }
       } else if let skView = self as? SKView {
         if #available(macOS 10.11, *) {
-          let cgImage = inWindow { skView.texture(from: skView.scene!)!.cgImage() }
-          #if os(macOS)
-            let image = Image(cgImage: cgImage, size: skView.bounds.size)
-          #elseif os(iOS) || os(tvOS)
-            let image = Image(cgImage: cgImage)
-          #endif
-          return Async(value: image)
+          inWindow()
+          return Async(value: skView)
+            .delay(by: delay)
+            .map {
+              let cgImage = $0.texture(from: $0.scene!)!.cgImage()
+              #if os(macOS)
+                let image = Image(cgImage: cgImage, size: skView.bounds.size)
+              #elseif os(iOS) || os(tvOS)
+                let image = Image(cgImage: cgImage)
+              #endif
+
+              return image
+            }
         } else {
           fatalError("Taking SKView snapshots requires macOS 10.11 or greater")
         }
       }
       #if os(iOS) || os(macOS)
         if let wkWebView = self as? WKWebView {
-          return Async<Image> { callback in
-            let work = {
+          return Async<Image> { work in
+            Async<WKWebView> { callback in
+              inWindow()
+              if wkWebView.isLoading {
+                var subscription: NSKeyValueObservation?
+                subscription = wkWebView.observe(\.isLoading, options: [.initial, .new]) {
+                  (webview, change) in
+                  subscription?.invalidate()
+                  subscription = nil
+                  if change.newValue == false {
+                    callback(wkWebView)
+                  }
+                }
+              } else {
+                callback(wkWebView)
+              }
+            }
+            .delay(by: delay)
+            .run { wkWebView in
               if #available(iOS 11.0, macOS 10.13, *) {
-                inWindow {
-                  guard wkWebView.frame.width != 0, wkWebView.frame.height != 0 else {
-                    callback(Image())
-                    return
-                  }
-                  let configuration = WKSnapshotConfiguration()
-                  if #available(iOS 13, macOS 10.15, *) {
-                    configuration.afterScreenUpdates = false
-                  }
-                  wkWebView.takeSnapshot(with: configuration) { image, _ in
-                    callback(image!)
-                  }
+                guard wkWebView.frame.width != 0, wkWebView.frame.height != 0 else {
+                  work(Image())
+                  return
+                }
+                let configuration = WKSnapshotConfiguration()
+                if #available(iOS 13, macOS 10.15, *) {
+                  configuration.afterScreenUpdates = false
+                }
+                wkWebView.takeSnapshot(with: configuration) { image, _ in
+                  work(image!)
                 }
               } else {
                 #if os(iOS)
@@ -883,20 +905,6 @@
                   fatalError("Taking WKWebView snapshots requires macOS 10.13 or greater")
                 #endif
               }
-            }
-
-            if wkWebView.isLoading {
-              var subscription: NSKeyValueObservation?
-              subscription = wkWebView.observe(\.isLoading, options: [.initial, .new]) {
-                (webview, change) in
-                subscription?.invalidate()
-                subscription = nil
-                if change.newValue == false {
-                  work()
-                }
-              }
-            } else {
-              work()
             }
           }
         }
@@ -970,7 +978,8 @@
       drawHierarchyInKeyWindow: Bool,
       traits: UITraitCollection,
       view: UIView,
-      viewController: UIViewController
+      viewController: UIViewController,
+      delay: Double?
     )
       -> Async<UIImage>
     {
@@ -986,9 +995,9 @@
       if config.safeArea == .zero { view.frame.origin = .init(x: offscreen, y: offscreen) }
 
       return
-        (view.snapshot
+        (view.snapshot(delay: delay)
         ?? Async { callback in
-          addImagesForRenderedViews(view).sequence().run { views in
+          addImagesForRenderedViews(view, delay: delay).sequence(delay: delay).run { views in
             callback(
               renderer(bounds: view.bounds, for: traits).image { ctx in
                 if drawHierarchyInKeyWindow {
@@ -1137,8 +1146,8 @@
 #endif
 
 extension Array {
-  func sequence<A>() -> Async<[A]> where Element == Async<A> {
-    guard !self.isEmpty else { return Async(value: []) }
+  func sequence<A>(delay: Double? = nil) -> Async<[A]> where Element == Async<A> {
+    guard !self.isEmpty else { return Async(value: []).delay(by: delay) }
     return Async<[A]> { callback in
       var result = [A?](repeating: nil, count: self.count)
       result.reserveCapacity(self.count)
