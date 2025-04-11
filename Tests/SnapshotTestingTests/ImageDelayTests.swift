@@ -40,12 +40,12 @@ class ImageDelayTests: BaseTestCase {
     if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
       assertSnapshot(
         of: LabelValueView(),
-        as: .image(size: .init(width: 200, height: 100)),
+        as: .image(size: .init(width: 1000, height: 400)),
         named: platform + "-0"
       )
       assertSnapshot(
         of: LabelValueView(),
-        as: .image(size: .init(width: 200, height: 100), delay: 4),
+        as: .image(size: .init(width: 1000, height: 400), delay: 4),
         named: platform + "-1"
       )
     }
@@ -79,12 +79,12 @@ class ImageDelayTests: BaseTestCase {
     }
     assertSnapshot(
       of: ValueViewController(),
-      as: .image(size: .init(width: 200.0, height: 100.0)),
+      as: .image(size: .init(width: 1000, height: 400)),
       named: platform + "-0"
     )
     assertSnapshot(
       of: ValueViewController(),
-      as: .image(size: .init(width: 200.0, height: 100.0), delay: 4),
+      as: .image(size: .init(width: 1000, height: 400), delay: 4),
       named: platform + "-1"
     )
     #endif
@@ -106,12 +106,12 @@ class ImageDelayTests: BaseTestCase {
     }
     assertSnapshot(
       of: LabelValue(),
-      as: .image(layout: .fixed(width: 200.0, height: 100.0)),
+      as: .image(layout: .fixed(width: 1000, height: 400)),
       named: platform + "-0"
     )
     assertSnapshot(
       of: LabelValue(),
-      as: .image(layout: .fixed(width: 200.0, height: 100.0), delay: 4),
+      as: .image(layout: .fixed(width: 1000, height: 400), delay: 4),
       named: platform + "-1"
     )
     #endif
