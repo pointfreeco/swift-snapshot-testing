@@ -2,6 +2,7 @@ import Foundation
 
 #if canImport(SwiftSyntax509)
   @_spi(Internals) import SnapshotTesting
+  import IssueReporting
   import SwiftParser
   import SwiftSyntax
   import SwiftSyntaxBuilder
@@ -49,7 +50,7 @@ import Foundation
   ) {
     let record = record ?? SnapshotTestingConfiguration.current?.record ?? _record
     withSnapshotTesting(record: record) {
-      let _: Void = installTestObserver
+      let _: Void = installAtExitHook
       do {
         var actual: String?
         let expectation = XCTestExpectation()
@@ -62,7 +63,7 @@ import Foundation
           case .completed:
             break
           case .timedOut:
-            recordIssue(
+            reportIssue(
               """
               Exceeded timeout of \(timeout) seconds waiting for snapshot.
 
@@ -77,7 +78,7 @@ import Foundation
             )
             return
           case .incorrectOrder, .interrupted, .invertedFulfillment:
-            recordIssue(
+            reportIssue(
               "Couldn't snapshot value",
               fileID: fileID,
               filePath: filePath,
@@ -86,7 +87,7 @@ import Foundation
             )
             return
           @unknown default:
-            recordIssue(
+            reportIssue(
               "Couldn't snapshot value",
               fileID: fileID,
               filePath: filePath,
@@ -130,7 +131,7 @@ import Foundation
           if let difference = snapshotting.diffing.diff(expected ?? "", actual ?? "")?.0 {
             failure += " Difference: …\n\n\(difference.indenting(by: 2))"
           }
-          recordIssue(
+          reportIssue(
             """
             \(failure)
 
@@ -146,7 +147,7 @@ import Foundation
 
         guard let expected
         else {
-          recordIssue(
+          reportIssue(
             """
             No expected value to assert against.
             """,
@@ -181,7 +182,7 @@ import Foundation
           column: column
         )
       } catch {
-        recordIssue(
+        reportIssue(
           "Threw error: \(error)",
           fileID: fileID,
           filePath: filePath,
@@ -305,7 +306,7 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
         visitor.walk(testSource.sourceFile)
         trailingClosureLine = visitor.trailingClosureLine
       }
-      recordIssue(
+      reportIssue(
         message(),
         fileID: fileID,
         filePath: filePath,
@@ -334,30 +335,11 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
 // MARK: - Private
 
 #if canImport(SwiftSyntax509)
-  private let installTestObserver: Void = {
-    final class InlineSnapshotObserver: NSObject, XCTestObservation {
-      func testBundleDidFinish(_ testBundle: Bundle) {
-        writeInlineSnapshots()
-      }
-    }
-    DispatchQueue.mainSync {
-      XCTestObservationCenter.shared.addTestObserver(InlineSnapshotObserver())
+  private let installAtExitHook: Void = {
+    atexit {
+      writeInlineSnapshots()
     }
   }()
-
-  extension DispatchQueue {
-    private static let key = DispatchSpecificKey<UInt8>()
-    private static let value: UInt8 = 0
-
-    fileprivate static func mainSync<R>(execute block: () -> R) -> R {
-      Self.main.setSpecific(key: key, value: value)
-      if getSpecific(key: key) == value {
-        return block()
-      } else {
-        return main.sync(execute: block)
-      }
-    }
-  }
 
   @_spi(Internals) public struct File: Hashable {
     public let path: StaticString
@@ -488,7 +470,8 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
             .prefix(while: { $0 == " " || $0 == "\t" })
         )
         let delimiter = String(
-          repeating: "#", count: (snapshot.actual ?? "").hashCount(isMultiline: true)
+          repeating: "#",
+          count: (snapshot.actual ?? "").hashCount(isMultiline: true)
         )
         let leadingIndent = leadingTrivia + self.indent
         let snapshotLabel = TokenSyntax(
@@ -575,7 +558,8 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
               MultipleTrailingClosureElementSyntax(
                 label: snapshotLabel,
                 closure: snapshotClosure.with(
-                  \.leadingTrivia, snapshotClosure.leadingTrivia + .space
+                  \.leadingTrivia,
+                  snapshotClosure.leadingTrivia + .space
                 )
               )
             }
