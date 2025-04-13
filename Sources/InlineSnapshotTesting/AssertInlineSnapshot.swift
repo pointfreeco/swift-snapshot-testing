@@ -549,7 +549,7 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
               functionCallExpr.trailingClosure = nil
             }
           } else {
-            fatalError()
+            fatalError("Inline snapshot visitor visited unexpected node")
           }
 
         case 1...:
@@ -608,11 +608,11 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
             }
             functionCallExpr.additionalTrailingClosures.append(newElement)
           } else {
-            fatalError()
+            fatalError("Inline snapshot visitor visited unexpected node")
           }
 
         default:
-          fatalError()
+          fatalError("Inline snapshot visitor visited unexpected node")
         }
       }
 
