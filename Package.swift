@@ -35,7 +35,11 @@ let package = Package(
   ],
   targets: [
     .target(
-      name: "SnapshotTestingCore"
+      name: "SnapshotTestingCore",
+      dependencies: [
+        .product(name: "IssueReporting", package: "xctest-dynamic-overlay"),
+        .product(name: "IssueReportingTestSupport", package: "xctest-dynamic-overlay"),
+      ]
     ),
     .target(
       name: "SnapshotTesting",
@@ -58,6 +62,8 @@ let package = Package(
       dependencies: [
         "SnapshotTesting",
         "SnapshotTestingCustomDump",
+        .product(name: "IssueReporting", package: "xctest-dynamic-overlay"),
+        .product(name: "IssueReportingTestSupport", package: "xctest-dynamic-overlay"),
         .product(name: "SwiftParser", package: "swift-syntax"),
         .product(name: "SwiftSyntax", package: "swift-syntax"),
         .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
