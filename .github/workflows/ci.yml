@@ -13,13 +13,12 @@ jobs:
     strategy:
       matrix:
         xcode:
-          - 15.4
-          - '16.1'
+          - '16.2'
 
     name: macOS
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Select Xcode ${{ matrix.xcode }}
         run: sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode }}.app
       - name: Run tests
@@ -42,7 +41,7 @@ jobs:
   #   strategy:
   #     matrix:
   #       swift:
-  #         - "5.9.1"
+  #         - "6.1"
 
   #   name: Windows (Swift ${{ matrix.swift }})
   #   runs-on: windows-latest
