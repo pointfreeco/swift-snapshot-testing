@@ -202,7 +202,7 @@ extension NSObject: AnySnapshotStringConvertible {
       return purgePointers(self.debugDescription)
     }
   #else
-    open var snapshotDescription: String {
+    public var snapshotDescription: String {
       return purgePointers(self.debugDescription)
     }
   #endif

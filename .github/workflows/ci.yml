@@ -29,7 +29,7 @@ jobs:
     strategy:
       matrix:
         swift:
-          - '5.9'
+          - '6.1'
 
     container: swift:${{ matrix.swift }}
     name: Linux (Swift ${{ matrix.swift }})
