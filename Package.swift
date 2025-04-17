@@ -85,7 +85,7 @@ let package = Package(
     .target(
       name: "SnapshotUITesting",
       dependencies: [
-        "SnapshotTesting",
+        "SnapshotTestingCore",
       ]
     ),
   ]
