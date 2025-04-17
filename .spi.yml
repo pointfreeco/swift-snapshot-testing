@@ -8,7 +8,9 @@ builder:
   configs:
     - documentation_targets:
       # First item in the list is the "landing" (default) target
+      - SnapshotTestingCore
       - SnapshotTesting
       - InlineSnapshotTesting
+      #- SnapshotUITesting
     - platform: watchos
       scheme: InlineSnapshotTesting

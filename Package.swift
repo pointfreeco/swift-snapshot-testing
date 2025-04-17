@@ -16,6 +16,10 @@ let package = Package(
       targets: ["SnapshotTesting"]
     ),
     .library(
+      name: "SnapshotTestingCore",
+      targets: ["SnapshotTestingCore"]
+    ),
+    .library(
       name: "InlineSnapshotTesting",
       targets: ["InlineSnapshotTesting"]
     ),
