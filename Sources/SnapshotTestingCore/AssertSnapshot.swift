@@ -1,8 +1,5 @@
 import XCTest
-
-#if canImport(Testing)
-  import Testing
-#endif
+import IssueReporting
 
 /// Enhances failure messages with a command line diff tool expression that can be copied and pasted
 /// into a terminal.
@@ -22,15 +19,13 @@ public var diffTool: SnapshotTestingConfiguration.DiffTool {
 @_spi(Internals)
 public var _diffTool: SnapshotTestingConfiguration.DiffTool {
   get {
-    #if canImport(Testing)
-      if let test = Test.current {
-        for trait in test.traits.reversed() {
-          if let diffTool = (trait as? _SnapshotsTestTrait)?.configuration.diffTool {
-            return diffTool
-          }
+    if case let .swiftTesting(testing) = TestContext.current, let test = testing?.test {
+      for trait in test.traits.reversed() {
+        if let diffTool = (trait as? _SnapshotsTestTrait)?.configuration.diffTool {
+          return diffTool
         }
       }
-    #endif
+    }
     return __diffTool
   }
   set {
@@ -55,15 +50,13 @@ public var isRecording: Bool {
 @_spi(Internals)
 public var _record: SnapshotTestingConfiguration.Record {
   get {
-    #if canImport(Testing)
-      if let test = Test.current {
-        for trait in test.traits.reversed() {
-          if let record = (trait as? _SnapshotsTestTrait)?.configuration.record {
-            return record
-          }
+    if case let .swiftTesting(testing) = TestContext.current, let test = testing?.test {
+      for trait in test.traits.reversed() {
+        if let record = (trait as? _SnapshotsTestTrait)?.configuration.record {
+          return record
         }
       }
-    #endif
+    }
     return __record
   }
   set {
@@ -124,7 +117,7 @@ public func assertSnapshot<Value, Format>(
     column: column
   )
   guard let message = failure else { return }
-  recordIssue(
+  reportIssue(
     message,
     fileID: fileID,
     filePath: filePath,
@@ -285,13 +278,9 @@ public func verifySnapshot<Value, Format>(
   line: UInt = #line,
   column: UInt = #column
 ) -> String? {
-  #if canImport(Testing)
-    if Test.current == nil {
-      CleanCounterBetweenTestCases.registerIfNeeded()
-    }
-  #else
+  if TestContext.current?.isSwiftTesting != true {
     CleanCounterBetweenTestCases.registerIfNeeded()
-  #endif
+  }
 
   let record =
     (recording == true ? .all : recording == false ? .missing : nil)
@@ -370,7 +359,7 @@ public func verifySnapshot<Value, Format>(
         }
 
         #if !os(Android) && !os(Linux) && !os(Windows)
-          if !isSwiftTesting,
+          if TestContext.current?.isSwiftTesting != true,
             ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS")
           {
             XCTContext.runActivity(named: "Attached Recorded Snapshot") { activity in
@@ -457,8 +446,8 @@ public func verifySnapshot<Value, Format>(
 
       if !attachments.isEmpty {
         #if !os(Linux) && !os(Android) && !os(Windows)
-          if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS"),
-            !isSwiftTesting
+          if TestContext.current?.isSwiftTesting != true,
+            ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS")
           {
             XCTContext.runActivity(named: "Attached Failure Diff") { activity in
               attachments.forEach {
@@ -502,15 +491,11 @@ public func verifySnapshot<Value, Format>(
 // MARK: - Private
 
 private var counter: File.Counter {
-  #if canImport(Testing)
-    if Test.current != nil {
-      return File.counter
-    } else {
-      return _counter
-    }
-  #else
+  if TestContext.current?.isSwiftTesting == true {
+    return File.counter
+  } else {
     return _counter
-  #endif
+  }
 }
 
 private let _counter = File.Counter()
@@ -558,14 +543,14 @@ private class CleanCounterBetweenTestCases: NSObject, XCTestObservation {
   }
 }
 
-enum File {
-  @TaskLocal static var counter = Counter()
+package enum File {
+  @TaskLocal package static var counter = Counter()
 
-  final class Counter: @unchecked Sendable {
+  package final class Counter: @unchecked Sendable {
     private var counts: [String: Int] = [:]
     private let lock = NSLock()
 
-    init() {}
+    package init() {}
 
     func next(for key: String) -> Int {
       lock.lock()

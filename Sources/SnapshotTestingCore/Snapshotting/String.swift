@@ -14,7 +14,7 @@ extension Diffing where Value == String {
   ) { old, new in
     guard old != new else { return nil }
     let hunks = chunk(
-      diff: SnapshotTesting.diff(
+      diff: SnapshotTestingCore.diff(
         old.split(separator: "\n", omittingEmptySubsequences: false).map(String.init),
         new.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
       ))

@@ -16,8 +16,16 @@ let package = Package(
       targets: ["SnapshotTesting"]
     ),
     .library(
+      name: "SnapshotTestingCore",
+      targets: ["SnapshotTestingCore"]
+    ),
+    .library(
       name: "InlineSnapshotTesting",
       targets: ["InlineSnapshotTesting"]
+    ),
+    .library(
+      name: "SnapshotUITesting",
+      targets: ["SnapshotUITesting"]
     ),
     .library(
       name: "SnapshotTestingCustomDump",
@@ -26,11 +34,22 @@ let package = Package(
   ],
   dependencies: [
     .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "1.3.3"),
+    .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", branch: "test-traits"),
     .package(url: "https://github.com/swiftlang/swift-syntax", "509.0.0"..<"602.0.0"),
   ],
   targets: [
     .target(
-      name: "SnapshotTesting"
+      name: "SnapshotTestingCore",
+      dependencies: [
+        .product(name: "IssueReporting", package: "xctest-dynamic-overlay"),
+        .product(name: "IssueReportingTestSupport", package: "xctest-dynamic-overlay"),
+      ]
+    ),
+    .target(
+      name: "SnapshotTesting",
+      dependencies: [
+        "SnapshotTestingCore",
+      ]
     ),
     .testTarget(
       name: "SnapshotTestingTests",
@@ -47,6 +66,8 @@ let package = Package(
       dependencies: [
         "SnapshotTesting",
         "SnapshotTestingCustomDump",
+        .product(name: "IssueReporting", package: "xctest-dynamic-overlay"),
+        .product(name: "IssueReportingTestSupport", package: "xctest-dynamic-overlay"),
         .product(name: "SwiftParser", package: "swift-syntax"),
         .product(name: "SwiftSyntax", package: "swift-syntax"),
         .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
@@ -63,6 +84,12 @@ let package = Package(
       dependencies: [
         "SnapshotTesting",
         .product(name: "CustomDump", package: "swift-custom-dump"),
+      ]
+    ),
+    .target(
+      name: "SnapshotUITesting",
+      dependencies: [
+        "SnapshotTestingCore",
       ]
     ),
   ]

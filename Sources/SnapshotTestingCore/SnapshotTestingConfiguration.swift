@@ -31,8 +31,7 @@ public func withSnapshotTesting<R>(
   try SnapshotTestingConfiguration.$current.withValue(
     SnapshotTestingConfiguration(
       record: record ?? SnapshotTestingConfiguration.current?.record ?? _record,
-      diffTool: diffTool ?? SnapshotTestingConfiguration.current?.diffTool
-        ?? SnapshotTesting._diffTool
+      diffTool: diffTool ?? SnapshotTestingConfiguration.current?.diffTool ?? _diffTool
     )
   ) {
     try operation()
