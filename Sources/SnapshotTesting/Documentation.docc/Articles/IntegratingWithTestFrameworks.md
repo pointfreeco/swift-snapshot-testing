@@ -79,10 +79,10 @@ This will override the `diffTool` and `record` properties for each test function
 
 ### UI Testing
 
-Xcode's UI testing tools are currently incompatbile with Swift Testing. Simply adding
-`import Testing` to any UI testing file will cause a compilation error saying that "Testing"
-cannot be found. This complicates using SnapshotTesting in UI testing targets because it needs
-to import Testing in order to provide the test helpers mentioned above.
+Xcode's UI testing tools are currently incompatible with Swift Testing. Simply adding
+`import Testing` to any UI test target file will cause a compilation error saying that "Testing"
+cannot be found. This complicates using SnapshotTesting in UI test targets because it needs to
+import Testing in order to provide the test helpers mentioned above.
 
 The way in which Xcode disallows importing Testing in UI test targets is via the presence of a 
 special Swift flag:
@@ -92,11 +92,12 @@ special Swift flag:
 ```
 
 This is done so that people do not expect `#expect` and other Testing tools to work in UI test 
-targets. We recommend that you remove this flag:
+targets. If you want to use SnapshotTesting in a UI test target, we recommend that you remove
+this flag:
 
-* Open your project's settings and navigate to the settings for your UI testing target.
-* Search for "Other Swift flags" in the "Build Settings" tab.
-* Delete the `$(inherited)` flag.
+  * Open your project's settings and navigate to the settings for your UI testing target.
+  * Search for "Other Swift flags" in the "Build Settings" tab.
+  * Delete the `$(inherited)` flag.
 
 Now you can `import SnapshotTesting` in UI test targets _and_ make use of `assertSnapshot`. But
 do remember that you _cannot_ use `#expect` or any of the other tools from Swift Testing.
