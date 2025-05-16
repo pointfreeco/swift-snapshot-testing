@@ -23,15 +23,15 @@ subclass _or_ `@Test`, and it will dynamically detect what context it is running
 the correct test failure:
 
 ```swift
+@Test 
+func testFeature() {
+  assertSnapshot(of: MyView(), as: .image)  // ✅
+}
+
 class FeatureTests: XCTestCase {
   func testFeature() {
     assertSnapshot(of: MyView(), as: .image)  // ✅
   }
-}
-
-@Test 
-func testFeature() {
-  assertSnapshot(of: MyView(), as: .image)  // ✅
 }
 ```
 
@@ -48,17 +48,27 @@ message that allows you to quickly open a diff of two files, such as
 assertion so that new snapshots are generated and saved to disk.
 
 These properties can be overridden for a scope of an operation using the
-``withSnapshotTesting(record:diffTool:operation:)-2kuyr`` function. In an XCTest context the 
-simplest way to do this is to override the `invokeTest` method on `XCTestCase` and wrap it in
-`withSnapshotTesting`:
+``withSnapshotTesting(record:diffTool:operation:)-2kuyr`` function. In a Swift Testing context 
+you can apply the ``Testing/Trait/snapshots`` trait to either a single test or an entire suite: 
+
+```swift
+import SnapshotTesting
+
+@Suite(.snapshots(record: .failed, diffTool: .ksdiff))
+struct FeatureTests {
+  …
+}
+```
+
+This will override the `diffTool` and `record` properties for each test in the suite.
+
+In an XCTest context, the simplest way to do this is to override the `invokeTest` method on 
+`XCTestCase` and wrap it in `withSnapshotTesting`:
 
 ```swift
 class FeatureTests: XCTestCase {
   override func invokeTest() {
-    withSnapshotTesting(
-      record: .missing,
-      diffTool: .ksdiff 
-    ) {
+    withSnapshotTesting(record: .failed, diffTool: .ksdiff) {
       super.invokeTest()
     }
   }
@@ -67,14 +77,27 @@ class FeatureTests: XCTestCase {
 
 This will override the `diffTool` and `record` properties for each test function.
 
-Swift's new testing framework also allows for this kind of configuration, both for a single test
-and an entire test suite. This is done via what are known as "test traits":
+### UI Testing
 
-```swift
-import SnapshotTesting
+Xcode's UI testing tools are currently incompatible with Swift Testing. Simply adding
+`import Testing` to any UI test target file will cause a compilation error saying that "Testing"
+cannot be found. This complicates using SnapshotTesting in UI test targets because it needs to
+import Testing in order to provide the test helpers mentioned above.
 
-@Suite(.snapshots(record: .all, diffTool: .ksdiff))
-struct FeatureTests {
-  …
-}
+The way in which Xcode disallows importing Testing in UI test targets is via the presence of a 
+special Swift flag:
+
 ```
+-module_alias Testing=_Testing_Unavailable
+```
+
+This is done so that people do not expect `#expect` and other Testing tools to work in UI test 
+targets. If you want to use SnapshotTesting in a UI test target, we recommend that you remove
+this flag:
+
+  * Open your project's settings and navigate to the settings for your UI testing target.
+  * Search for "Other Swift flags" in the "Build Settings" tab.
+  * Delete the `$(inherited)` flag.
+
+Now you can `import SnapshotTesting` in UI test targets _and_ make use of `assertSnapshot`. But
+do remember that you _cannot_ use `#expect` or any of the other tools from Swift Testing.
