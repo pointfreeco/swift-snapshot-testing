@@ -168,7 +168,7 @@ public struct SnapshotTestingConfiguration: Sendable {
 
     /// The [Kaleidoscope](http://kaleidoscope.app) diff tool.
     public static let ksdiff = Self {
-      "ksdiff \($0) \($1)"
+      "ksdiff \"\($0)\" \"\($1)\""
     }
 
     /// The default diff tool.
