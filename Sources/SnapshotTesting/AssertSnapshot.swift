@@ -441,7 +441,7 @@ public func verifySnapshot<Value, Format>(
         }
       #endif
 
-      guard let (failure, attachments) = snapshotting.diffing.diff(reference, diffable) else {
+      guard let (failure, attachments, diffValue) = snapshotting.diffing.diff(reference, diffable) else {
         return nil
       }
 
@@ -451,9 +451,24 @@ public func verifySnapshot<Value, Format>(
       )
       let artifactsSubUrl = artifactsUrl.appendingPathComponent(fileName)
       try fileManager.createDirectory(at: artifactsSubUrl, withIntermediateDirectories: true)
-      let failedSnapshotFileUrl = artifactsSubUrl.appendingPathComponent(
-        snapshotFileUrl.lastPathComponent)
+
+      func artifactFileURL(for artifactType: ArtifactType) -> String {
+        let baseFileName = "\(testName).\(identifier)"
+        let artifactFileName = "\(baseFileName)\(artifactType.suffix)"
+        let result = URL(fileURLWithPath: artifactFileName, isDirectory: false)
+        return result.appendingPathExtension(snapshotting.pathExtension ?? "").path
+      }
+
+      let failedSnapshotFileUrl = artifactsSubUrl.appendingPathComponent(artifactFileURL(for: .failure))
       try snapshotting.diffing.toData(diffable).write(to: failedSnapshotFileUrl)
+      let referenceSnapshotFileURL = artifactsSubUrl.appendingPathComponent(artifactFileURL(for: .reference))
+      try snapshotting.diffing.toData(reference).write(to: referenceSnapshotFileURL)
+
+      if let diffValue {
+        let diffFileURL = artifactsSubUrl.appendingPathComponent(artifactFileURL(for: .diff))
+        try snapshotting.diffing.toData(diffValue).write(to: diffFileURL)
+      }
+
 
       if !attachments.isEmpty {
         #if !os(Linux) && !os(Android) && !os(Windows)
@@ -578,6 +593,23 @@ enum File {
       lock.lock()
       defer { lock.unlock() }
       counts.removeAll()
+    }
+  }
+}
+
+private enum ArtifactType {
+  case failure
+  case reference
+  case diff
+
+  var suffix: String {
+    switch self {
+    case .failure:
+      return "_failure"
+    case .reference:
+      return "_reference"
+    case .diff:
+      return "_diff"
     }
   }
 }
