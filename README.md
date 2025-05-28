@@ -170,7 +170,7 @@ The latest documentation is available
 
  1. From the **File** menu, navigate through **Swift Packages** and select
     **Add Package Dependency…**.
- 2. Enter package repository URL: `https://github.com/pointfreeco/swift-snapshot-testing`.
+ 2. Enter package repository URL: `https://github.com/pointfreeco/swift-snapshot-testing.git`.
  3. Confirm the version and let Xcode resolve the package.
  4. On the final dialog, update SnapshotTesting's **Add to Target** column to a test target that
     will contain snapshot tests (if you have more than one test target, you can later add
@@ -184,7 +184,7 @@ If you want to use SnapshotTesting in any other project that uses
 ```swift
 dependencies: [
   .package(
-    url: "https://github.com/pointfreeco/swift-snapshot-testing",
+    url: "https://github.com/pointfreeco/swift-snapshot-testing.git",
     from: "1.12.0"
   ),
 ]
