@@ -13,6 +13,8 @@ public struct Diffing<Value> {
   /// describing the failure.
   public var diff: (Value, Value) -> (String, [XCTAttachment])?
 
+  public var _diff: ((Value, Value) -> (String, () -> Void)?)
+
   /// Creates a new `Diffing` on `Value`.
   ///
   /// - Parameters:
@@ -27,5 +29,66 @@ public struct Diffing<Value> {
     self.toData = toData
     self.fromData = fromData
     self.diff = diff
+    self._diff = { lhs, rhs in
+      guard let (message, attachments) = diff(lhs, rhs)
+      else {
+        return nil
+      }
+      return (
+        message,
+        {
+          if !attachments.isEmpty {
+            #if !os(Linux) && !os(Android) && !os(Windows)
+              if ProcessInfo.processInfo.environment.keys.contains(
+                "__XCODE_BUILT_PRODUCTS_DIR_PATHS"
+              ),
+                !isSwiftTesting
+              {
+                XCTContext.runActivity(named: "Attached Failure Diff") { activity in
+                  attachments.forEach {
+                    activity.add($0)
+                  }
+                }
+              }
+            #endif
+          }
+        }
+      )
+    }
   }
+
+#if compiler(>=6.2)
+  public init(
+    toData: @escaping (_ value: Value) -> Data,
+    fromData: @escaping (_ data: Data) -> Value,
+    diff: @escaping (_ lhs: Value, _ rhs: Value) -> (String, [any Attachable])?
+  ) {
+    self.toData = toData
+    self.fromData = fromData
+    self.diff = { _, _ in nil }
+    self._diff = { lhs, rhs in
+      guard let (message, attachments) = diff(lhs, rhs)
+      else {
+        return nil
+      }
+      return (
+        message,
+        {
+          if !attachments.isEmpty {
+            for attachment in attachments {
+              func open(_ attachment: some Attachable) {
+                Attachment.record(attachment)
+              }
+              open(attachment)
+            }
+          }
+        }
+      )
+    }
+  }
+#endif
 }
+
+#if canImport(Testing)
+import Testing
+#endif

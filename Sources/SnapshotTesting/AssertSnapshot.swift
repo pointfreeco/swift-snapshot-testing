@@ -441,7 +441,7 @@ public func verifySnapshot<Value, Format>(
         }
       #endif
 
-      guard let (failure, attachments) = snapshotting.diffing.diff(reference, diffable) else {
+      guard let (failure, attachments) = snapshotting.diffing._diff?(reference, diffable) else {
         return nil
       }
 
@@ -455,19 +455,20 @@ public func verifySnapshot<Value, Format>(
         snapshotFileUrl.lastPathComponent)
       try snapshotting.diffing.toData(diffable).write(to: failedSnapshotFileUrl)
 
-      if !attachments.isEmpty {
-        #if !os(Linux) && !os(Android) && !os(Windows)
-          if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS"),
-            !isSwiftTesting
-          {
-            XCTContext.runActivity(named: "Attached Failure Diff") { activity in
-              attachments.forEach {
-                activity.add($0)
-              }
-            }
-          }
-        #endif
-      }
+      attachments()
+//      if !attachments.isEmpty {
+//        #if !os(Linux) && !os(Android) && !os(Windows)
+//          if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS"),
+//            !isSwiftTesting
+//          {
+//            XCTContext.runActivity(named: "Attached Failure Diff") { activity in
+//              attachments.forEach {
+//                activity.add($0)
+//              }
+//            }
+//          }
+//        #endif
+//      }
 
       let diffMessage = (SnapshotTestingConfiguration.current?.diffTool ?? _diffTool)(
         currentFilePath: snapshotFileUrl.path,
