@@ -3,7 +3,7 @@ import XCTest
 
 class BaseTestCase: XCTestCase {
   override func invokeTest() {
-    withSnapshotTesting(
+    withTestingEnvironment(
       record: .failed,
       diffTool: .ksdiff
     ) {

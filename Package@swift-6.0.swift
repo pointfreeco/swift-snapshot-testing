@@ -8,20 +8,24 @@ let package = Package(
     .iOS(.v13),
     .macOS(.v10_15),
     .tvOS(.v13),
-    .watchOS(.v6),
+    .watchOS(.v7),
   ],
   products: [
+    .library(
+      name: "XCTSnapshot",
+      targets: ["XCTSnapshot"]
+    ),
     .library(
       name: "SnapshotTesting",
       targets: ["SnapshotTesting"]
     ),
     .library(
-      name: "InlineSnapshotTesting",
-      targets: ["InlineSnapshotTesting"]
-    ),
-    .library(
       name: "SnapshotTestingCustomDump",
       targets: ["SnapshotTestingCustomDump"]
+    ),
+    .library(
+      name: "InlineSnapshotTesting",
+      targets: ["InlineSnapshotTesting"]
     ),
   ],
   dependencies: [
@@ -29,17 +33,48 @@ let package = Package(
     .package(url: "https://github.com/swiftlang/swift-syntax", "509.0.0"..<"602.0.0"),
   ],
   targets: [
+    /* DEPRECATED TARGETS */
     .target(
-      name: "SnapshotTesting"
+      name: "_SnapshotTesting",
+      path: "Sources/Deprecated/SnapshotTesting",
+      swiftSettings: [.swiftLanguageMode(.v5)]
     ),
-    .testTarget(
-      name: "SnapshotTestingTests",
+    .target(
+      name: "_SnapshotTestingCustomDump",
       dependencies: [
-        "SnapshotTesting"
+        "_SnapshotTesting",
+        .product(name: "CustomDump", package: "swift-custom-dump"),
       ],
-      exclude: [
-        "__Fixtures__",
-        "__Snapshots__",
+      path: "Sources/Deprecated/SnapshotTestingCustomDump",
+      swiftSettings: [.swiftLanguageMode(.v5)]
+    ),
+    .target(
+      name: "_InlineSnapshotTesting",
+      dependencies: [
+        "_SnapshotTesting",
+        "_SnapshotTestingCustomDump",
+        .product(name: "SwiftParser", package: "swift-syntax"),
+        .product(name: "SwiftSyntax", package: "swift-syntax"),
+        .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
+      ],
+      path: "Sources/Deprecated/InlineSnapshotTesting",
+      swiftSettings: [.swiftLanguageMode(.v5)]
+    ),
+    /* TARGETS */
+    .target(
+      name: "XCTSnapshot",
+      dependencies: ["_SnapshotTesting"]
+    ),
+    .target(
+      name: "SnapshotTesting",
+      dependencies: ["XCTSnapshot"]
+    ),
+    .target(
+      name: "SnapshotTestingCustomDump",
+      dependencies: [
+        "XCTSnapshot",
+        .product(name: "CustomDump", package: "swift-custom-dump"),
+        "_SnapshotTestingCustomDump",
       ]
     ),
     .target(
@@ -50,6 +85,44 @@ let package = Package(
         .product(name: "SwiftParser", package: "swift-syntax"),
         .product(name: "SwiftSyntax", package: "swift-syntax"),
         .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
+        "_InlineSnapshotTesting",
+      ]
+    ),
+    /* DEPRECATED TESTS */
+    .testTarget(
+      name: "_SnapshotTestingTests",
+      dependencies: ["XCTSnapshot", "SnapshotTesting"],
+      path: "Tests/Deprecated/SnapshotTestingTests",
+      exclude: [
+        "__Fixtures__",
+        "__Snapshots__",
+      ],
+      swiftSettings: [.swiftLanguageMode(.v5)]
+    ),
+    .testTarget(
+      name: "_InlineSnapshotTestingTests",
+      dependencies: ["InlineSnapshotTesting"],
+      path: "Tests/Deprecated/InlineSnapshotTestingTests",
+      swiftSettings: [.swiftLanguageMode(.v5)]
+    ),
+    /* TESTS */
+    .testTarget(
+      name: "XCTSnapshotTests",
+      dependencies: ["XCTSnapshot"],
+      exclude: [
+        "__Fixtures__",
+        "__Snapshots__",
+      ]
+    ),
+    .testTarget(
+      name: "SnapshotTestingTests",
+      dependencies: ["SnapshotTesting"],
+      exclude: ["__Snapshots__"]
+    ),
+    .testTarget(
+      name: "SnapshotTestingCustomDumpTests",
+      dependencies: [
+        "SnapshotTestingCustomDump"
       ]
     ),
     .testTarget(
@@ -58,13 +131,5 @@ let package = Package(
         "InlineSnapshotTesting"
       ]
     ),
-    .target(
-      name: "SnapshotTestingCustomDump",
-      dependencies: [
-        "SnapshotTesting",
-        .product(name: "CustomDump", package: "swift-custom-dump"),
-      ]
-    ),
-  ],
-  swiftLanguageModes: [.v5]
+  ]
 )

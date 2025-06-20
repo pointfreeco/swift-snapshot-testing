@@ -69,7 +69,7 @@ extension Snapshotting where Value == WKWebView, Format == UIImage {
 
 #### Async initialization
 
-`Snapshotting` defines an alternate initializer to describe snapshotting values in an asynchronous
+`Snapshotting` defines an alternate initializer to describe snapshot values in an asynchronous
 fashion.
 
 For example, were we to define a strategy for `WKWebView` _without_

@@ -232,7 +232,7 @@ targets: [
     SnapshotTesting.diffToolCommand = { "ksdiff \($0) \($1)" }
     ```
 
-[available-strategies]: https://swiftpackageindex.com/pointfreeco/swift-snapshot-testing/main/documentation/snapshottesting/snapshotting
+[available-strategies]: https://swiftpackageindex.com/pointfreeco/swift-snapshot-testing/main/documentation/snapshottesting/snapshot
 [defining-strategies]: https://swiftpackageindex.com/pointfreeco/swift-snapshot-testing/main/documentation/snapshottesting/customstrategies
 
 ## Plug-ins

@@ -29,14 +29,14 @@ snapshot sit next to each other in the assertion. One can `import InlineSnapshot
 the above assertion as:
 
 ```swift
-assertInlineSnapshot(of: value, as: .json)
+assertInline(of: value, as: .json)
 ```
 
 And when the test is run, it will automatically insert the snapshot as a trailing closure to be used
 by future test runs, and fail:
 
 ```swift
-assertInlineSnapshot(of: value, as: .json) {  // ❌
+assertInline(of: value, as: .json) {  // ❌
   """
   {
     "id": 42,
@@ -68,8 +68,8 @@ Re-run "testMySnapshot" to test against the newly-recorded snapshot.
 
 ### Essentials
 
-- ``assertInlineSnapshot(of:as:message:record:timeout:syntaxDescriptor:matches:file:function:line:column:)``
+- ``assertInline(of:as:message:record:timeout:closureDescriptor:matches:file:function:line:column:)``
 
 ### Writing a custom helper
 
-- ``InlineSnapshotSyntaxDescriptor``
+- ``SnapshotClosureDescriptor``

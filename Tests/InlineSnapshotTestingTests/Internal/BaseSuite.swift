@@ -1,8 +1,7 @@
 #if canImport(Testing)
-  import Testing
-  import SnapshotTesting
+import Testing
+import SnapshotTesting
 
-  @Suite(.snapshots(record: .failed, diffTool: .ksdiff))
-  struct BaseSuite {
-  }
+@Suite(.record(.failed), .diffTool(.ksdiff), .finalizeSnapshots)
+struct BaseSuite {}
 #endif

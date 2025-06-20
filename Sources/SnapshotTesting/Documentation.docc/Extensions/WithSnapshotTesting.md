@@ -1,7 +1,7 @@
-# ``SnapshotTesting/withSnapshotTesting(record:diffTool:operation:)-2kuyr``
+# ``SnapshotTesting/withTestingEnvironment(record:diffTool:operation:)-2kuyr``
 
 ## Topics
 
 ### Overloads
 
-- ``withSnapshotTesting(record:diffTool:operation:)-6bsqw``
+- ``withTestingEnvironment(record:diffTool:operation:)-6bsqw``

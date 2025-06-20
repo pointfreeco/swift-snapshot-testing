@@ -1,7 +1,11 @@
 import CustomDump
-import SnapshotTesting
+import XCTSnapshot
+#if !os(visionOS)
+@_exported import _SnapshotTestingCustomDump
+#endif
 
-extension Snapshotting where Format == String {
+extension SyncSnapshot where Output == StringBytes {
+
   /// A snapshot strategy for comparing any structure based on a
   /// [custom dump](https://github.com/pointfreeco/swift-custom-dump).
   ///
@@ -18,7 +22,9 @@ extension Snapshotting where Format == String {
   ///   name: "Blobby"
   /// )
   /// ```
-  public static var customDump: Snapshotting {
-    SimplySnapshotting.lines.pullback(String.init(customDumping:))
+  public static var customDump: SyncSnapshot<Input, Output> {
+    IdentitySyncSnapshot<StringBytes>.lines.pullback {
+      StringBytes(rawValue: String(customDumping: $0))
+    }
   }
 }
