@@ -1,6 +1,6 @@
 import Foundation
 
-#if canImport(SwiftSyntax509)
+#if canImport(SwiftSyntax601)
   @_spi(Internals) import _SnapshotTesting
   import SwiftParser
   import SwiftSyntax
@@ -272,7 +272,7 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
     self.trailingClosureOffset = trailingClosureOffset
   }
 
-  #if canImport(SwiftSyntax509)
+  #if canImport(SwiftSyntax601)
     /// Generates a test failure immediately and unconditionally at the described trailing closure.
     ///
     /// This method will attempt to locate the line of the trailing closure described by this type
@@ -335,7 +335,7 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
 
 // MARK: - Private
 
-#if canImport(SwiftSyntax509)
+#if canImport(SwiftSyntax601)
   @available(*, deprecated)
   private let installTestObserver: Void = {
     final class InlineSnapshotObserver: NSObject, XCTestObservation {

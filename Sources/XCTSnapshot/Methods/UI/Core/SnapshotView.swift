@@ -9,17 +9,26 @@ class SnapshotView: SDKView {
 
   let configuration: LayoutConfiguration
 
-  private var sizableViews: [ObjectIdentifier: (UIView, SizeListener)] = [:]
+  private var sizableViews: [ObjectIdentifier: (SDKView, SizeListener)] = [:]
 
   init(configuration: LayoutConfiguration) {
     self.configuration = configuration
     super.init(frame: .zero)
+    #if os(macOS)
+    wantsLayer = true
+    #endif
   }
 
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 
+  #if os(macOS)
+  override func layout() {
+    super.layout()
+    self.updateTransformations()
+  }
+  #else
   override func safeAreaInsetsDidChange() {
     super.safeAreaInsetsDidChange()
     self.updateTransformations()
@@ -29,6 +38,7 @@ class SnapshotView: SDKView {
     super.layoutSubviews()
     self.updateTransformations()
   }
+  #endif
 
   func dispose() {
     defer { sizableViews = [:] }
@@ -39,10 +49,10 @@ class SnapshotView: SDKView {
     }
   }
 
-  func add(_ view: UIView, with sizeListener: SizeListener) {
+  func add(_ view: SDKView, with sizeListener: SizeListener) {
     defer { sizeListener.delegate = self }
     
-    let transformableView = UIView()
+    let transformableView = SDKView()
     view.translatesAutoresizingMaskIntoConstraints = false
     transformableView.translatesAutoresizingMaskIntoConstraints = false
     transformableView.addSubview(view)
@@ -97,11 +107,19 @@ class SnapshotView: SDKView {
     }
   }
 
-  private func downscale(_ transformableView: UIView, with size: CGSize) {
+  private func downscale(_ transformableView: SDKView, with size: CGSize) {
     let scale = scale(for: size)
+    #if os(macOS)
+    self.layer?.contentsScale = scale
+    #else
     transformableView.transform = CGAffineTransform(scaleX: scale, y: scale)
+    #endif
     transformableView.recursiveNeedsLayout()
+    #if os(macOS)
+    needsLayout = true
+    #else
     transformableView.layoutIfNeeded()
+    #endif
   }
 
   private func scale(for size: CGSize) -> CGFloat {
@@ -115,14 +133,18 @@ class SnapshotView: SDKView {
       height: size.height + safeArea.top + safeArea.bottom
     )
 
-    let proposedSize = CGSize(
-      width: frame.size.width - (safeAreaInsets.left + safeAreaInsets.right),
-      height: frame.size.height - (safeAreaInsets.top + safeAreaInsets.bottom)
-    )
+    let proposedSize: CGSize
+
+    if #available(macOS 11, *) {
+      proposedSize = CGSize(
+        width: frame.size.width - (safeAreaInsets.left + safeAreaInsets.right),
+        height: frame.size.height - (safeAreaInsets.top + safeAreaInsets.bottom)
+      )
+    } else {
+      proposedSize = frame.size
+    }
 
     return proposedSize.scaleThatFits(calculatedSize)
-//    let scale = proposedSize.scaleThatFits(calculatedSize)
-//    return CGFloat(Int((scale * 100).rounded(.down))) * 0.01
   }
 }
 
@@ -137,25 +159,6 @@ extension SnapshotView: SizeListenerDelegate {
   }
 }
 
-private class SizeNotifierView: SDKView {
-
-  private let layoutHandler: (CGSize) -> Void
-
-  init(_ layoutHandler: @escaping (CGSize) -> Void) {
-    self.layoutHandler = layoutHandler
-    super.init(frame: .zero)
-  }
-
-  required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
-  }
-
-  override func layoutSubviews() {
-    super.layoutSubviews()
-    layoutHandler(frame.size)
-  }
-}
-
 extension SDKView {
 
   func recursiveNeedsLayout() {
@@ -164,12 +167,20 @@ extension SDKView {
     }
 
     invalidateIntrinsicContentSize()
+    #if os(macOS)
+    needsUpdateConstraints = true
+    needsLayout = true
+    #else
     setNeedsUpdateConstraints()
     setNeedsLayout()
+    #endif
 
     switch self {
+    #if os(macOS)
+    #else
     case is UITableView, is UICollectionView:
       break
+    #endif
     default:
       for view in subviews {
         view.recursiveNeedsLayout()

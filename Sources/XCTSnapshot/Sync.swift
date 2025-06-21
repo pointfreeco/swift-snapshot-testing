@@ -104,7 +104,9 @@ extension Sync {
   ) -> Sync<NewInput, Output> {
     .init { newInput, continuation in
       do {
-        try self(block(newInput), callback: continuation.resume(with:))
+        try self(block(newInput)) {
+          continuation.resume(with: $0)
+        }
       } catch {
         continuation.resume(throwing: error)
       }
@@ -118,7 +120,9 @@ extension Sync {
       block(newInput, .init {
         switch $0 {
         case .success(let input):
-          self(input, callback: continuation.resume(with:))
+          self(input) {
+            continuation.resume(with: $0)
+          }
         case .failure(let error):
           continuation.resume(throwing: error)
         }

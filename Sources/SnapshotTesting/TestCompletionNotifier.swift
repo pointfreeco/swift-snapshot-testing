@@ -6,12 +6,14 @@ public struct FinalizeSnapshotsSuiteTrait: SuiteTrait {
   
   public let isRecursive = false
 
+  #if compiler(>=6.1)
   public func scopeProvider(
     for test: Test,
     testCase: Test.Case?
   ) -> TestScopeProvider? {
     TestScopeProvider()
   }
+  #endif
 }
 
 extension Trait where Self == FinalizeSnapshotsSuiteTrait {

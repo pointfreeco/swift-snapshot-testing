@@ -87,12 +87,21 @@ extension SDKView {
     #else
     insertSubview(view, at: .zero)
     #endif
-    NSLayoutConstraint.activate([
-      view.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
-      view.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
-      view.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
-      view.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor)
-    ])
+    if #available(macOS 11, *) {
+      NSLayoutConstraint.activate([
+        view.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
+        view.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
+        view.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
+        view.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor)
+      ])
+    } else {
+      NSLayoutConstraint.activate([
+        view.topAnchor.constraint(equalTo: topAnchor),
+        view.bottomAnchor.constraint(equalTo: bottomAnchor),
+        view.leadingAnchor.constraint(equalTo: leadingAnchor),
+        view.trailingAnchor.constraint(equalTo: trailingAnchor)
+      ])
+    }
   }
 }
 

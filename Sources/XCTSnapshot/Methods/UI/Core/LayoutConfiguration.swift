@@ -533,7 +533,7 @@ extension LayoutConfiguration {
   public static let iPhoneSE: LayoutConfiguration = .iPhoneSE(.portrait)
 
   public static func iPhoneSE(
-    _ orientation: DeviceOrientation,
+    _ orientation: DeviceOrientation
   ) -> LayoutConfiguration {
     iPhone(
       size: .screen4_7,

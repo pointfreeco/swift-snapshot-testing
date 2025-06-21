@@ -226,6 +226,7 @@ final class SnapshotTestingTests: BaseTestCase {
 #endif
   }
 
+#if compiler(>=6.1)
   func testSCNView() async throws {
 #if os(iOS) || os(macOS) || os(tvOS)
     // NB: CircleCI crashes while trying to instantiate SCNView.
@@ -264,7 +265,9 @@ final class SnapshotTestingTests: BaseTestCase {
     }
 #endif
   }
+  #endif
 
+#if compiler(>=6.1)
   func testSKView() async throws {
 #if os(iOS) || os(macOS) || os(tvOS)
     @MainActor
@@ -285,6 +288,7 @@ final class SnapshotTestingTests: BaseTestCase {
     }
 #endif
   }
+  #endif
 
   @MainActor
   func testTableViewController() async throws {

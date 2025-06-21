@@ -336,7 +336,7 @@ struct ViewTests {
     let viewModel = ViewModel()
 
     try await assert(
-      of: UINavigationController(
+      of: await UINavigationController(
         rootViewController: UIHostingController(
           rootView: TestingView(
             viewModel: viewModel

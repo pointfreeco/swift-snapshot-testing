@@ -1,9 +1,9 @@
 import Foundation
 
 @_spi(Internals)
-public struct SnapshotFailContext {
+public struct SnapshotFailContext: Sendable {
 
-  public enum Reason {
+  public enum Reason: Sendable {
     case missing
     case doesNotMatch
     case allRecordMode

@@ -23,7 +23,7 @@ private struct PlatformEnvironmentKey: SnapshotEnvironmentKey {
     return "windows"
     #elseif os(Linux)
     return "linux"
-    #elseif os(wasm)
+    #elseif os(WASI)
     return "wasm"
     #else
     return "unknown"

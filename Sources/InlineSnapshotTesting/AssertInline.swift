@@ -2,7 +2,7 @@ import Foundation
 @preconcurrency import XCTest
 @_spi(Internals) import XCTSnapshot
 
-#if canImport(SwiftSyntax509)
+#if canImport(SwiftSyntax601)
 @_spi(Internals) import XCTSnapshot
 import SwiftParser
 import SwiftSyntax

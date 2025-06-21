@@ -57,7 +57,9 @@ extension SyncSnapshot where Input: CaseIterable & Sendable, Output == StringByt
             .joined(separator: "\n")
           )
         }
-        .callAsFunction(f, callback: continuation.resume(with:))
+        .callAsFunction(f) {
+          continuation.resume(with: $0)
+        }
       }
     }
 

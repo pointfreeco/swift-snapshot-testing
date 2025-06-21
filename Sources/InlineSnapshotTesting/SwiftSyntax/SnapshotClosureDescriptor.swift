@@ -60,7 +60,7 @@ public struct SnapshotClosureDescriptor: Sendable, Hashable {
     self.trailingClosureOffset = trailingClosureOffset
   }
 
-  #if canImport(SwiftSyntax509)
+  #if canImport(SwiftSyntax601)
   /// Generates a test failure immediately and unconditionally at the described trailing closure.
   ///
   /// This method will attempt to locate the line of the trailing closure described by this type

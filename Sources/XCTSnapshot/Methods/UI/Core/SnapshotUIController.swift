@@ -335,10 +335,8 @@ class SnapshotUIController: SDKViewController {
   }
 
   #if os(macOS)
-  private func snapshot(
-    _ view: SDKView,
-    in bounds: CGRect
-  ) throws -> SDKImage {
+  private func snapshot(_ view: SDKView) throws -> SDKImage {
+    let bounds = snapshotView.calculateContentFrame()
     guard let rep = view.bitmapImageRepForCachingDisplay(in: bounds) else {
       throw RenderingError()
     }

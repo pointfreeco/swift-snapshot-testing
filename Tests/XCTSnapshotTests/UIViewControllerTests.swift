@@ -20,7 +20,7 @@ class UIViewControllerTests: XCTestCase {
       }
     }
 
-    try await assert(of: TestingViewController(), as: .image)
+    try await assert(of: await TestingViewController(), as: .image)
   }
 
   func testScrollView() async throws {
@@ -55,7 +55,7 @@ class UIViewControllerTests: XCTestCase {
     }
 
     try await assert(
-      of: TestingViewController(),
+      of: await TestingViewController(),
       as: .image(layout: .fixed(width: 400, height: 400))
     )
   }
@@ -81,7 +81,7 @@ class UIViewControllerTests: XCTestCase {
     }
 
     try await assert(
-      of: TestingViewController(),
+      of: await TestingViewController(),
       as: .image(delay: 4)
     )
   }
@@ -103,7 +103,7 @@ class UIViewControllerTests: XCTestCase {
     }
 
     try await assert(
-      of: TestingViewController(),
+      of: await TestingViewController(),
       as: .image
     )
   }
@@ -138,7 +138,7 @@ class UIViewControllerTests: XCTestCase {
     }
 
     try await assert(
-      of: TestingViewController(),
+      of: await TestingViewController(),
       as: .image(delay: 6)
     )
   }
@@ -165,7 +165,7 @@ class UIViewControllerTests: XCTestCase {
     }
 
     try await assert(
-      of: TestingViewController(),
+      of: await TestingViewController(),
       as: .image(
         layout: .device(.iPhone16Pro)
       )
@@ -182,7 +182,7 @@ class UIViewControllerTests: XCTestCase {
     }
 
     try await assert(
-      of: TestingViewController(),
+      of: await TestingViewController(),
       as: .image(
         drawHierarchyInKeyWindow: true,
         layout: .device(.iPhone16Pro)
@@ -214,7 +214,7 @@ class UIViewControllerTests: XCTestCase {
     }
 
     try await assert(
-      of: TestingViewController(),
+      of: await TestingViewController(),
       as: .image(
         drawHierarchyInKeyWindow: true,
         layout: .device(.iPhone16Pro)
@@ -232,7 +232,7 @@ class UIViewControllerTests: XCTestCase {
     }
 
     try await assert(
-      of: TestingViewController(),
+      of: await TestingViewController(),
       as: .image(
         drawHierarchyInKeyWindow: true,
         layout: .fixed(width: 300, height: 150)
@@ -255,7 +255,7 @@ class UIViewControllerTests: XCTestCase {
     }
 
     try await assert(
-      of: TestingViewController(),
+      of: await TestingViewController(),
       as: .image
     )
   }
@@ -270,7 +270,7 @@ class UIViewControllerTests: XCTestCase {
     }
 
     try await assert(
-      of: TestingViewController(),
+      of: await TestingViewController(),
       as: .image(
         layout: .device(.iPhone16Pro),
         traits: .init(userInterfaceStyle: .light)
@@ -279,7 +279,7 @@ class UIViewControllerTests: XCTestCase {
     )
 
     try await assert(
-      of: TestingViewController(),
+      of: await TestingViewController(),
       as: .image(
         layout: .device(.iPhone16Pro),
         traits: .init(userInterfaceStyle: .dark)
@@ -302,19 +302,19 @@ class UIViewControllerTests: XCTestCase {
     }
 
     try await assert(
-      of: TestingViewController(),
+      of: await TestingViewController(),
       as: .image(traits: .init(preferredContentSizeCategory: .extraSmall)),
       named: "extraSmall"
     )
 
     try await assert(
-      of: TestingViewController(),
+      of: await TestingViewController(),
       as: .image(traits: .init(preferredContentSizeCategory: .large)),
       named: "large"
     )
 
     try await assert(
-      of: TestingViewController(),
+      of: await TestingViewController(),
       as: .image(traits: .init(preferredContentSizeCategory: .accessibilityExtraExtraExtraLarge)),
       named: "accessibilityExtraExtraExtraLarge"
     )
@@ -421,7 +421,7 @@ class UIViewControllerTests: XCTestCase {
     }
 
     try await assert(
-      of: TestingViewController(),
+      of: await TestingViewController(),
       as: .image(
         drawHierarchyInKeyWindow: true,
         layout: .device(.iPhone16Pro)
@@ -430,7 +430,7 @@ class UIViewControllerTests: XCTestCase {
     )
 
     try await assert(
-      of: TestingViewController(),
+      of: await TestingViewController(),
       as: .image(layout: .device(.iPhone16Pro)),
       named: "iPhone16Pro"
     )

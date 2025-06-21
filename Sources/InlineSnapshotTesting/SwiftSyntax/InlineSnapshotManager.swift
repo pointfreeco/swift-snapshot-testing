@@ -1,4 +1,4 @@
-#if canImport(SwiftSyntax509)
+#if canImport(SwiftSyntax601)
 import Foundation
 import SwiftSyntax
 import SwiftParser

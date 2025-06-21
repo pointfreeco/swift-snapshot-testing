@@ -23,7 +23,7 @@ import XCTest
 ///   try await assert(of: myView, as: .image(layout: .iPhone15ProMax), named: "dark_mode")
 ///   ```
 public func assert<Input: Sendable, Output: BytesRepresentable> (
-  of input: sending @autoclosure () async throws -> Input,
+  of input: @Sendable @autoclosure () async throws -> Input,
   as snapshot: AsyncSnapshot<Input, Output>,
   serialization: DataSerialization = DataSerialization(),
   named name: String? = nil,
@@ -90,7 +90,7 @@ public func assert<Input: Sendable, Output: BytesRepresentable> (
 ///   try await assertSnapshots(myView, as: strategies)
 ///   ```
 public func assert<Input: Sendable, Output: BytesRepresentable>(
-  of input: sending @autoclosure () async throws -> Input,
+  of input: @Sendable @autoclosure () async throws -> Input,
   as strategies: [String: AsyncSnapshot<Input, Output>],
   serialization: DataSerialization = DataSerialization(),
   record recording: RecordMode? = nil,
@@ -148,7 +148,7 @@ public func assert<Input: Sendable, Output: BytesRepresentable>(
 ///   try await assertSnapshots(myView, as: strategies)
 ///   ```
 public func assert<Input: Sendable, Output: BytesRepresentable>(
-  of input: sending @autoclosure () async throws -> Input,
+  of input: @Sendable @autoclosure () async throws -> Input,
   as strategies: [AsyncSnapshot<Input, Output>],
   serialization: DataSerialization = DataSerialization(),
   record recording: RecordMode? = nil,
@@ -292,7 +292,7 @@ public func assert<Input, Output: BytesRepresentable>(
 }
 
 public func verify<Input: Sendable, Output: BytesRepresentable> (
-  of input: sending @autoclosure () async throws -> Input,
+  of input: @Sendable @autoclosure () async throws -> Input,
   as snapshot: AsyncSnapshot<Input, Output>,
   serialization: DataSerialization = DataSerialization(),
   named name: String? = nil,
