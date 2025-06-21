@@ -1,6 +1,7 @@
 @_spi(Internals) @testable import SnapshotTesting
 import XCTest
 
+@available(*, deprecated)
 class WithSnapshotTestingTests: XCTestCase {
   func testNesting() {
     withSnapshotTesting(record: .all) {

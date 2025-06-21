@@ -20,6 +20,7 @@ import XCTest
   import UIKit.UIView
 #endif
 
+@available(*, deprecated)
 final class SnapshotTestingTests: BaseTestCase {
   func testAny() {
     struct User { let id: Int, name: String, bio: String }

@@ -2,6 +2,7 @@ import XCTest
 
 @testable import SnapshotTesting
 
+@available(*, deprecated)
 class WaitTests: BaseTestCase {
   func testWait() {
     var value = "Hello"

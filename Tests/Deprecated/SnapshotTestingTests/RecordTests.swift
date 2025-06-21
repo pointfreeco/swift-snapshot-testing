@@ -1,6 +1,7 @@
 import SnapshotTesting
 import XCTest
 
+@available(*, deprecated)
 class RecordTests: BaseTestCase {
   var snapshotURL: URL!
 

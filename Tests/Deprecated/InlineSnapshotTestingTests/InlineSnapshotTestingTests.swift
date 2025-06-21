@@ -3,6 +3,7 @@ import Foundation
 import SnapshotTesting
 import XCTest
 
+@available(*, deprecated)
 final class InlineSnapshotTestingTests: BaseTestCase {
   func testInlineSnapshot() {
     assertInlineSnapshot(of: ["Hello", "World"], as: .dump) {

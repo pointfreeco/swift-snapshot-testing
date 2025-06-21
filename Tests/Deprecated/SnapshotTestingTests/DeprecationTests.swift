@@ -1,6 +1,7 @@
 import SnapshotTesting
 import XCTest
 
+@available(*, deprecated)
 final class DeprecationTests: XCTestCase {
   @available(*, deprecated)
   func testIsRecordingProxy() {
