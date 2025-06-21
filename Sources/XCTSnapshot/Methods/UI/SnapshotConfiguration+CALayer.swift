@@ -69,8 +69,7 @@ extension SyncSnapshot where Input: CALayer, Output == ImageBytes {
   ) -> SyncSnapshot<Input, Output> {
     return IdentitySyncSnapshot.image(
       precision: precision,
-      perceptualPrecision: perceptualPrecision,
-      scale: traits.displayScale
+      perceptualPrecision: perceptualPrecision
     ).pullback { layer in
       let renderer = UIGraphicsImageRenderer(bounds: layer.bounds, format: .init(for: traits))
       return .init(rawValue: renderer.image { ctx in

@@ -1,3 +1,4 @@
+@testable import XCTSnapshot
 import SnapshotTesting
 import Testing
 #if os(iOS) || os(tvOS) || os(watchOS)
@@ -202,17 +203,21 @@ struct UIViewTests {
     let view = UIView()
     view.backgroundColor = .systemBackground
 
-    try await assert(
-      of: view,
-      as: .image(traits: .init(userInterfaceStyle: .light)),
-      named: "lightMode"
-    )
-
-    try await assert(
-      of: view,
-      as: .image(traits: .init(userInterfaceStyle: .dark)),
-      named: "darkMode"
-    )
+    try await withTestingEnvironment {
+      $0.disableInconsistentTraitsChecker = true
+    } operation: {
+      try await assert(
+        of: view,
+        as: .image(traits: .init(userInterfaceStyle: .light)),
+        named: "lightMode"
+      )
+      
+      try await assert(
+        of: view,
+        as: .image(traits: .init(userInterfaceStyle: .dark)),
+        named: "darkMode"
+      )
+    }
   }
 
   @Test
@@ -224,23 +229,27 @@ struct UIViewTests {
     label.font = UIFont.preferredFont(forTextStyle: .body)
     label.adjustsFontForContentSizeCategory = true
 
-    try await assert(
-      of: label,
-      as: .image(traits: .init(preferredContentSizeCategory: .extraSmall)),
-      named: "extraSmall"
-    )
+    try await withTestingEnvironment {
+      $0.disableInconsistentTraitsChecker = true
+    } operation: {
+      try await assert(
+        of: label,
+        as: .image(traits: .init(preferredContentSizeCategory: .extraSmall)),
+        named: "extraSmall"
+      )
 
-    try await assert(
-      of: label,
-      as: .image(traits: .init(preferredContentSizeCategory: .large)),
-      named: "large"
-    )
+      try await assert(
+        of: label,
+        as: .image(traits: .init(preferredContentSizeCategory: .large)),
+        named: "large"
+      )
 
-    try await assert(
-      of: label,
-      as: .image(traits: .init(preferredContentSizeCategory: .accessibilityExtraExtraExtraLarge)),
-      named: "accessibilityExtraExtraExtraLarge"
-    )
+      try await assert(
+        of: label,
+        as: .image(traits: .init(preferredContentSizeCategory: .accessibilityExtraExtraExtraLarge)),
+        named: "accessibilityExtraExtraExtraLarge"
+      )
+    }
   }
 
   @Test

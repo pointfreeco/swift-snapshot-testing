@@ -33,15 +33,14 @@ extension Snapshot where Input: UIKit.UIApplication, Output == ImageBytes {
   public static func image(
     precision: Float = 1,
     perceptualPrecision: Float = 1,
-    traits: UITraitCollection = .init(),
-    delay: Double = .zero
+    delay: Double = .zero,
+    scene role: UISceneSession.Role = .windowApplication
   ) -> AsyncSnapshot<Input, Output> {
     return IdentitySyncSnapshot.image(
       precision: precision,
-      perceptualPrecision: perceptualPrecision,
-      scale: traits.displayScale
+      perceptualPrecision: perceptualPrecision
     )
-    .withApplication { configuration, executor in
+    .withApplication(scene: role) { configuration, executor in
       Async(Input.self) { _ in
         configuration.window
       }

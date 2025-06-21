@@ -5,12 +5,13 @@ import UIKit
 #endif
 
 #if os(iOS) || os(tvOS) || os(watchOS) || os(visionOS)
-public enum InterfaceSizeClass: Sendable {
+public enum InterfaceSizeClass: Sendable, Hashable {
+  case unspecified
   case regular
   case compact
 }
 
-public struct DeviceInterfaceSizeClass: Sendable {
+public struct DeviceInterfaceSizeClass: Sendable, Hashable {
 
   public let horizontal: InterfaceSizeClass
   public let vertical: InterfaceSizeClass
@@ -198,48 +199,66 @@ public extension DeviceDynamicInterfaceSizeClass {
   )
 }
 
-#if os(iOS) || os(tvOS)
-extension Traits {
+#if os(iOS) || os(tvOS) || os(visionOS)
+private struct DeviceInterfaceSizeClassTraitKey: TraitKey {
 
-  public convenience init(deviceInterfaceSizeClass: DeviceInterfaceSizeClass) {
-    let verticalSizeClass = Self.userInterfaceSizeClass(deviceInterfaceSizeClass.vertical)
-    let horizontalSizeClass = Self.userInterfaceSizeClass(deviceInterfaceSizeClass.horizontal)
+  static let defaultValue = DeviceInterfaceSizeClass(
+    horizontal: .unspecified,
+    vertical: .unspecified
+  )
 
-    self.init(traitsFrom: [
-      UITraitCollection(verticalSizeClass: verticalSizeClass),
-      UITraitCollection(horizontalSizeClass: horizontalSizeClass)
-    ])
+  @available(iOS 17, tvOS 17, *)
+  static func apply(_ value: Value, to traitsOverrides: inout UITraitOverrides) {
+    traitsOverrides.verticalSizeClass = .init(value.vertical)
+    traitsOverrides.horizontalSizeClass = .init(value.horizontal)
+  }
+
+  static func apply(_ value: Value, to traitCollection: inout UITraitCollection) {
+    #if os(visionOS)
+    traitCollection = traitCollection.modifyingTraits {
+      $0.verticalSizeClass = .init(value.vertical)
+      $0.horizontalSizeClass = .init(value.horizontal)
+    }
+    #else
+    if #available(iOS 17, tvOS 17, *) {
+      traitCollection = traitCollection.modifyingTraits {
+        $0.verticalSizeClass = .init(value.vertical)
+        $0.horizontalSizeClass = .init(value.horizontal)
+      }
+    } else {
+      traitCollection = .init(traitsFrom: [
+        .init(verticalSizeClass: .init(value.vertical)),
+        .init(horizontalSizeClass: .init(value.horizontal))
+      ])
+    }
+    #endif
   }
 }
-#endif
 
-#if os(visionOS)
+extension UIUserInterfaceSizeClass {
+
+  fileprivate init(_ interfaceSizeClass: InterfaceSizeClass) {
+    switch interfaceSizeClass {
+    case .unspecified:
+      self = .unspecified
+    case .regular:
+      self = .regular
+    case .compact:
+      self = .compact
+    }
+  }
+}
+
 extension Traits {
+
+  public var deviceInterfaceSizeClass: DeviceInterfaceSizeClass {
+    get { self[DeviceInterfaceSizeClassTraitKey.self] }
+    set { self[DeviceInterfaceSizeClassTraitKey.self] = newValue }
+  }
 
   public init(deviceInterfaceSizeClass: DeviceInterfaceSizeClass) {
-    let verticalSizeClass = Self.userInterfaceSizeClass(deviceInterfaceSizeClass.vertical)
-    let horizontalSizeClass = Self.userInterfaceSizeClass(deviceInterfaceSizeClass.horizontal)
-
-    self.init {
-      $0.verticalSizeClass = verticalSizeClass
-      $0.horizontalSizeClass = horizontalSizeClass
-    }
-  }
-}
-#endif
-
-#if os(iOS) || os(tvOS) || os(visionOS)
-extension Traits {
-
-  fileprivate static func userInterfaceSizeClass(
-    _ interfaceSizeClass: InterfaceSizeClass
-  ) -> UIUserInterfaceSizeClass {
-    switch interfaceSizeClass {
-    case .compact:
-      return .compact
-    case .regular:
-      return .regular
-    }
+    self.init()
+    self.deviceInterfaceSizeClass = deviceInterfaceSizeClass
   }
 }
 #endif

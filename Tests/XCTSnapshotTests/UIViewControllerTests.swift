@@ -339,9 +339,7 @@ class UIViewControllerTests: XCTestCase {
 
     try await assert(
       of: navigationController,
-      as: .image(
-        layout: .device(.iPhone16Pro)
-      )
+      as: .image(layout: .device(.iPhone16Pro))
     )
   }
 
@@ -356,9 +354,7 @@ class UIViewControllerTests: XCTestCase {
 
     try await assert(
       of: tabBarController,
-      as: .image(
-        layout: .device(.iPhone16Pro)
-      )
+      as: .image(layout: .device(.iPhone16Pro))
     )
   }
 
@@ -391,9 +387,7 @@ class UIViewControllerTests: XCTestCase {
 
     try await assert(
       of: tabBarController,
-      as: .image(
-        layout: .device(.iPhone16Pro)
-      )
+      as: .image(layout: .device(.iPhone16Pro))
     )
   }
 

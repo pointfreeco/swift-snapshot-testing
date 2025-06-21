@@ -229,7 +229,7 @@ extension BaseSuite.RecordTests {
     )
 
     var snapshotURL = fileURL
-    let platform = SnapshotEnvironment.platform
+    let platform = SnapshotEnvironment.current.platform
 
     if !platform.isEmpty {
       snapshotURL.appendPathComponent(platform)

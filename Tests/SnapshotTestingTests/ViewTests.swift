@@ -305,7 +305,6 @@ struct ViewTests {
     )
   }
 
-  // Relacionado a um bug envolvendo UIWindow -> UINavigationController -> View
   @Test
   func complexSateManagementUpdateWithNavigationController() async throws {
     struct TestingView: View {

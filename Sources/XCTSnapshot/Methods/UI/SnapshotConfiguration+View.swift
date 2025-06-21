@@ -41,8 +41,7 @@ extension AsyncSnapshot where Input: SwiftUI.View & Sendable, Output == ImageByt
 
     return IdentitySyncSnapshot.image(
       precision: precision,
-      perceptualPrecision: perceptualPrecision,
-      scale: 1.0
+      perceptualPrecision: perceptualPrecision
     )
     .withWindow(
       drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
@@ -54,7 +53,7 @@ extension AsyncSnapshot where Input: SwiftUI.View & Sendable, Output == ImageByt
         .connectToWindow(windowConfiguration)
         .layoutIfNeeded()
         .sleep(nanoseconds: UInt64(delay * 1_000_000_000))
-        .waitLoadingStateIfNeeded(tolerance: SnapshotEnvironment.webViewTolerance)
+        .waitLoadingStateIfNeeded(tolerance: SnapshotEnvironment.current.webViewTolerance)
         .snapshot(executor)
       }
     )
@@ -101,13 +100,12 @@ extension Snapshot where Input: SwiftUI.View & Sendable, Output == ImageBytes {
   ) -> AsyncSnapshot<Input, Output> {
     let config = LayoutConfiguration.resolve(
       layout,
-      with: SnapshotEnvironment.traits.merging(traits)
+      with: SnapshotEnvironment.current.traits.merging(traits)
     )
 
     return IdentitySyncSnapshot.image(
       precision: precision,
-      perceptualPrecision: perceptualPrecision,
-      scale: config.traits().displayScale
+      perceptualPrecision: perceptualPrecision
     )
     .withWindow(
       drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
@@ -120,7 +118,7 @@ extension Snapshot where Input: SwiftUI.View & Sendable, Output == ImageBytes {
         .layoutIfNeeded()
         .sleep(nanoseconds: UInt64(delay * 1_000_000_000))
         #if !os(tvOS)
-        .waitLoadingStateIfNeeded(tolerance: SnapshotEnvironment.webViewTolerance)
+        .waitLoadingStateIfNeeded(tolerance: SnapshotEnvironment.current.webViewTolerance)
         #endif
         .snapshot(executor)
       }
@@ -143,8 +141,7 @@ extension Snapshot where Input: SwiftUI.View & Sendable, Output == ImageBytes {
     let config = LayoutConfiguration.resolve(layout)
 
     return IdentitySyncSnapshot<ImageBytes>.image(
-      precision: precision,
-      scale: scale
+      precision: precision
     ).map { executor in
       Async(Input.self) { @MainActor view in
         let renderer = ImageRenderer(content: view)

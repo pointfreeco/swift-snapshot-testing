@@ -44,10 +44,11 @@ extension AsyncSnapshot where Input: NSView & Sendable, Output == ImageBytes {
         .connectToWindow(windowConfiguration)
         .layoutIfNeeded()
         .sleep(nanoseconds: UInt64(delay * 1_000_000_000))
-        .waitLoadingStateIfNeeded(tolerance: SnapshotEnvironment.webViewTolerance)
+        .waitLoadingStateIfNeeded(tolerance: SnapshotEnvironment.current.webViewTolerance)
         .snapshot(executor)
       }
     )
+    .inconsistentTraitsChecker(config.traits)
     .withLock()
   }
 }
@@ -98,7 +99,7 @@ extension AsyncSnapshot where Input: NSView, Output == StringBytes {
           .connectToWindow(windowConfiguration)
           .layoutIfNeeded()
           .sleep(nanoseconds: UInt64(delay * 1_000_000_000))
-          .waitLoadingStateIfNeeded(tolerance: SnapshotEnvironment.webViewTolerance)
+          .waitLoadingStateIfNeeded(tolerance: SnapshotEnvironment.current.webViewTolerance)
           .descriptor(executor, method: .subtreeDescription)
         }
       )

@@ -45,13 +45,12 @@ extension AsyncSnapshot where Input: UIKit.UIView, Output == ImageBytes {
   ) -> AsyncSnapshot<Input, Output> {
     let config = LayoutConfiguration.resolve(
       layout,
-      with: SnapshotEnvironment.traits.merging(traits)
+      with: SnapshotEnvironment.current.traits.merging(traits)
     )
 
     return IdentitySyncSnapshot.image(
       precision: precision,
-      perceptualPrecision: perceptualPrecision,
-      scale: config.traits().displayScale
+      perceptualPrecision: perceptualPrecision
     )
     .withWindow(
       drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
@@ -64,11 +63,12 @@ extension AsyncSnapshot where Input: UIKit.UIView, Output == ImageBytes {
         .layoutIfNeeded()
         .sleep(nanoseconds: UInt64(delay * 1_000_000_000))
         #if !os(tvOS)
-        .waitLoadingStateIfNeeded(tolerance: SnapshotEnvironment.webViewTolerance)
+        .waitLoadingStateIfNeeded(tolerance: SnapshotEnvironment.current.webViewTolerance)
         #endif
         .snapshot(executor)
       }
     )
+    .inconsistentTraitsChecker(config.traits)
     .withLock()
   }
 }
@@ -109,7 +109,7 @@ extension AsyncSnapshot where Input: UIKit.UIView, Output == StringBytes {
   ) -> AsyncSnapshot<Input, Output> {
     let config = LayoutConfiguration.resolve(
       layout,
-      with: SnapshotEnvironment.traits.merging(traits)
+      with: SnapshotEnvironment.current.traits.merging(traits)
     )
 
     return IdentitySyncSnapshot.lines
@@ -124,7 +124,7 @@ extension AsyncSnapshot where Input: UIKit.UIView, Output == StringBytes {
           .layoutIfNeeded()
           .sleep(nanoseconds: UInt64(delay * 1_000_000_000))
           #if !os(tvOS)
-          .waitLoadingStateIfNeeded(tolerance: SnapshotEnvironment.webViewTolerance)
+          .waitLoadingStateIfNeeded(tolerance: SnapshotEnvironment.current.webViewTolerance)
           #endif
           .descriptor(executor, method: .recursiveDescription)
         }

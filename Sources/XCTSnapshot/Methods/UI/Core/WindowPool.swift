@@ -42,9 +42,10 @@ final class WindowPool {
 
   func acquire(
     isKeyWindow: Bool,
-    maxConcurrentTests: Int
+    maxConcurrentTests: Int,
+    scene role: UISceneSession.Role = .windowApplication
   ) async throws -> SDKWindow {
-    if isKeyWindow, let window = try await acquireKey() {
+    if isKeyWindow, let window = try await acquireKey(scene: role) {
       return window
     } else {
       return try await acquireRegular(maxConcurrentTests: maxConcurrentTests)
@@ -62,7 +63,9 @@ final class WindowPool {
   // MARK: - Private methods
 
   #if os(macOS)
-  private func acquireKey() async throws -> SDKWindow? {
+  private func acquireKey(
+    scene role: UISceneSession.Role
+  ) async throws -> SDKWindow? {
     if let keyUnit {
       try await keyUnit.lock()
       return keyUnit.window
@@ -89,13 +92,15 @@ final class WindowPool {
     return window
   }
   #else
-  private func acquireKey() async throws -> UIWindow? {
+  private func acquireKey(
+    scene role: UISceneSession.Role
+  ) async throws -> UIWindow? {
     if let keyUnit {
       try await keyUnit.lock()
       return keyUnit.window
     }
 
-    let windowScenes = application?.windowScenes
+    let windowScenes = application?.windowScenes(for: role)
 
     if let keyWindow = windowScenes?.keyWindows.last {
       let unit = PooledWindow(window: keyWindow)
@@ -126,7 +131,7 @@ final class WindowPool {
     #else
     let window: UIWindow
 
-    if let windowScene = application?.windowScenes.first ?? restoreWindowScene {
+    if let windowScene = application?.windowScenes(for: .windowApplication).first ?? restoreWindowScene {
       window = UIWindow(windowScene: windowScene)
     } else {
       window = UIWindow()
@@ -229,7 +234,7 @@ extension Snapshot {
 
         let window = try await windowPool.acquire(
           isKeyWindow: drawHierarchyInKeyWindow,
-          maxConcurrentTests: SnapshotEnvironment.maxConcurrentTests
+          maxConcurrentTests: SnapshotEnvironment.current.maxConcurrentTests
         )
 
         let configuration = SnapshotWindowConfiguration(
@@ -255,6 +260,7 @@ extension Snapshot {
 extension Snapshot {
 
   func withApplication<NewInput: SDKApplication>(
+    scene role: UISceneSession.Role,
     operation: @escaping @Sendable (SnapshotWindowConfiguration<SDKWindow>, Executor) async throws -> Async<NewInput, Output>
   ) -> Snapshot<Async<NewInput, Output>> {
     map { executor in
@@ -263,7 +269,8 @@ extension Snapshot {
 
         let window = try await windowPool.acquire(
           isKeyWindow: true,
-          maxConcurrentTests: 1
+          maxConcurrentTests: 1,
+          scene: role
         )
 
         let configuration = SnapshotWindowConfiguration(
@@ -315,6 +322,14 @@ extension Async where Output == SnapshotUIController {
         input: $0
       )
     }
+  }
+}
+#endif
+
+#if os(macOS)
+enum UISceneSession {
+  enum Role {
+    case windowApplication
   }
 }
 #endif

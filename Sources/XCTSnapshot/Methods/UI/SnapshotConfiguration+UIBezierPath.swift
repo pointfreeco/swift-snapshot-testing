@@ -23,8 +23,7 @@ extension SyncSnapshot where Input: UIBezierPath, Output == ImageBytes {
   ) -> SyncSnapshot<Input, Output> {
     return IdentitySyncSnapshot.image(
       precision: precision,
-      perceptualPrecision: perceptualPrecision,
-      scale: scale
+      perceptualPrecision: perceptualPrecision
     ).pullback { path in
       let bounds = path.bounds
       let format: UIGraphicsImageRendererFormat

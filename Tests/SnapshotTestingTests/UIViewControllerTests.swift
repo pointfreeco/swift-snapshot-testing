@@ -352,9 +352,7 @@ struct UIViewControllerTests {
 
     try await assert(
       of: navigationController,
-      as: .image(
-        layout: .device(.iPhone16Pro)
-      )
+      as: .image(layout: .device(.iPhone16Pro))
     )
   }
 
@@ -370,9 +368,7 @@ struct UIViewControllerTests {
 
     try await assert(
       of: tabBarController,
-      as: .image(
-        layout: .device(.iPhone16Pro)
-      )
+      as: .image(layout: .device(.iPhone16Pro))
     )
   }
 
@@ -406,9 +402,7 @@ struct UIViewControllerTests {
 
     try await assert(
       of: tabBarController,
-      as: .image(
-        layout: .device(.iPhone16Pro)
-      )
+      as: .image(layout: .device(.iPhone16Pro))
     )
   }
 

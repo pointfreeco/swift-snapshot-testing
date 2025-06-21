@@ -7,7 +7,7 @@ extension BaseSuite {
     @Test(.diffTool("ksdiff"))
     func testDiffTool() {
       #expect(
-        SnapshotEnvironment.diffTool(currentFilePath: "old.png", failedFilePath: "new.png")
+        SnapshotEnvironment.current.diffTool(currentFilePath: "old.png", failedFilePath: "new.png")
         == "ksdiff old.png new.png"
       )
     }
@@ -17,7 +17,7 @@ extension BaseSuite {
       @Test(.diffTool("difftool"))
       func testDiffToolOverride() {
         #expect(
-          SnapshotEnvironment.diffTool(currentFilePath: "old.png", failedFilePath: "new.png")
+          SnapshotEnvironment.current.diffTool(currentFilePath: "old.png", failedFilePath: "new.png")
           == "difftool old.png new.png"
         )
       }
@@ -27,10 +27,10 @@ extension BaseSuite {
         @Test
         func config() {
           #expect(
-            SnapshotEnvironment.diffTool(currentFilePath: "old.png", failedFilePath: "new.png")
+            SnapshotEnvironment.current.diffTool(currentFilePath: "old.png", failedFilePath: "new.png")
             == "ksdiff old.png new.png"
           )
-          #expect(SnapshotEnvironment.recordMode == .all)
+          #expect(SnapshotEnvironment.current.recordMode == .all)
         }
 
         @Suite(.record(.failed), .diffTool("diff"))
@@ -38,10 +38,10 @@ extension BaseSuite {
           @Test
           func config() {
             #expect(
-              SnapshotEnvironment.diffTool(currentFilePath: "old.png", failedFilePath: "new.png")
+              SnapshotEnvironment.current.diffTool(currentFilePath: "old.png", failedFilePath: "new.png")
               == "diff old.png new.png"
             )
-            #expect(SnapshotEnvironment.recordMode == .failed)
+            #expect(SnapshotEnvironment.current.recordMode == .failed)
           }
         }
       }

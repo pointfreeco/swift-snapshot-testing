@@ -113,29 +113,25 @@ extension IdentitySyncSnapshot<ImageBytes> {
   ///   ```
   public static func image(
     precision: Float = 1,
-    perceptualPrecision: Float = 1,
-    scale: CGFloat? = nil
+    perceptualPrecision: Float = 1
   ) -> Self {
     return .init(
       pathExtension: "png",
       attachmentGenerator: ImageDiffAttachmentGenerator(
         precision: precision,
-        perceptualPrecision: perceptualPrecision,
-        scale: scale
+        perceptualPrecision: perceptualPrecision
       )
     )
   }
   #else
   public static func image(
-    precision: Float = 1,
-    scale: CGFloat? = nil
+    precision: Float = 1
   ) -> Self {
     return .init(
       pathExtension: "png",
       attachmentGenerator: ImageDiffAttachmentGenerator(
         precision: precision,
-        perceptualPrecision: 1,
-        scale: scale
+        perceptualPrecision: 1
       )
     )
   }
@@ -145,7 +141,6 @@ extension IdentitySyncSnapshot<ImageBytes> {
 // MARK: - IdentitySyncSnapshot
 
 #if os(macOS)
-
 extension SyncSnapshot where Input: NSImage, Output == ImageBytes {
 
   /// Default configuration for image snapshots.
@@ -173,17 +168,14 @@ extension SyncSnapshot where Input: NSImage, Output == ImageBytes {
   ///   ```
   public static func image(
     precision: Float = 1,
-    perceptualPrecision: Float = 1,
-    scale: CGFloat? = nil
+    perceptualPrecision: Float = 1
   ) -> SyncSnapshot<Input, Output> {
     IdentitySyncSnapshot.image(
       precision: precision,
-      perceptualPrecision: perceptualPrecision,
-      scale: scale
+      perceptualPrecision: perceptualPrecision
     ).pullback { ImageBytes(rawValue: $0) }
   }
 }
-
 #else
 extension SyncSnapshot where Input: UIImage, Output == ImageBytes {
 
@@ -213,23 +205,19 @@ extension SyncSnapshot where Input: UIImage, Output == ImageBytes {
   ///   ```
   public static func image(
     precision: Float = 1,
-    perceptualPrecision: Float = 1,
-    scale: CGFloat? = nil
+    perceptualPrecision: Float = 1
   ) -> SyncSnapshot<Input, Output> {
     IdentitySyncSnapshot.image(
       precision: precision,
-      perceptualPrecision: perceptualPrecision,
-      scale: scale
+      perceptualPrecision: perceptualPrecision
     ).pullback { ImageBytes(rawValue: $0) }
   }
   #else
   public static func image(
-    precision: Float = 1,
-    scale: CGFloat? = nil
+    precision: Float = 1
   ) -> SyncSnapshot<Input, Output> {
     IdentitySyncSnapshot.image(
-      precision: precision,
-      scale: scale
+      precision: precision
     ).pullback { ImageBytes(rawValue: $0) }
   }
   #endif

@@ -19,8 +19,10 @@ extension SDKApplication {
   }
 
   #if os(iOS) || os(tvOS) || os(visionOS)
-  var windowScenes: [UIWindowScene] {
-    connectedScenes.compactMap { $0 as? UIWindowScene }
+  func windowScenes(for role: UISceneSession.Role) -> [UIWindowScene] {
+    connectedScenes.lazy
+      .filter { $0.session.role == role }
+      .compactMap { $0 as? UIWindowScene }
   }
   #endif
 }

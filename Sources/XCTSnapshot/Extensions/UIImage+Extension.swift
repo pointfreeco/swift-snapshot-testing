@@ -68,7 +68,7 @@ extension SDKImage {
   }
 
   @MainActor
-  func substract(_ image: SDKImage, scale: CGFloat?) -> SDKImage {
+  func substract(_ image: SDKImage) -> SDKImage {
     #if os(macOS)
     guard let lhsImage = cgImage, let rhsImage = image.cgImage else {
       return SDKImage()

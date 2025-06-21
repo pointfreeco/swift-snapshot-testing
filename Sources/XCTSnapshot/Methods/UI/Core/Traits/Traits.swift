@@ -4,63 +4,204 @@ import UIKit
 @preconcurrency import AppKit
 #endif
 
-#if os(visionOS)
-public struct Traits: Sendable {
+#if os(iOS) || os(tvOS) || os(visionOS)
 
-  private let mutating: @Sendable (inout any UIMutableTraits) -> Void
+protocol TraitKey: Sendable, Hashable {
 
-  public init(_ mutating: @escaping @Sendable (inout any UIMutableTraits) -> Void) {
-    self.mutating = mutating
+  associatedtype Value: Hashable & Sendable
+
+  static var defaultValue: Value { get }
+
+  @available(iOS 17, tvOS 17, *)
+  @MainActor
+  static func apply(_ value: Value, to traitsOverrides: inout UITraitOverrides)
+
+  @MainActor
+  static func apply(_ value: Value, to traitCollection: inout UITraitCollection)
+}
+
+public struct Traits: Sendable, Hashable {
+
+  private var traits = [ObjectIdentifier: Storage]()
+
+  public init() {}
+
+  public init(traitsFrom traitCollection: [Traits]) {
+    self.init(traitCollection.lazy.map(\.traits).reduce([:]) {
+      $0.merging($1, uniquingKeysWith: { $1 })
+    })
   }
 
-  public init() {
-    self.mutating = { _ in }
+  private init(_ traits: [ObjectIdentifier: Storage]) {
+    self.traits = traits
+  }
+
+  subscript<Key: TraitKey>(_ key: Key.Type) -> Key.Value {
+    get {
+      let id = ObjectIdentifier(key)
+
+      guard let storage = traits[id] else {
+        return key.defaultValue
+      }
+
+      return storage.value as! Key.Value
+    }
+    set {
+      let id = ObjectIdentifier(key)
+      traits[id, default: .init(key)].value = newValue
+    }
   }
 
   public func merging(_ traits: Traits) -> Traits {
-    .init {
-      mutating(&$0)
-      traits.mutating(&$0)
-    }
+    .init(traitsFrom: [self, traits])
   }
 
   public func callAsFunction() -> UITraitCollection {
-    return UITraitCollection(mutations: mutating)
-  }
-
-  @MainActor
-  func commit(in viewController: UIViewController) {
-    var traits = viewController.traitOverrides as (any UIMutableTraits)
-    mutating(&traits)
-    viewController.traitOverrides = traits as! UITraitOverrides
-  }
-}
-#elseif os(tvOS) || os(iOS)
-extension UITraitCollection {
-
-  func callAsFunction() -> UITraitCollection {
-    self
-  }
-
-  @MainActor
-  func commit(in viewController: UIViewController) {
-    for childViewController in viewController.children {
-      viewController.setOverrideTraitCollection(
-        self,
-        forChild: childViewController
-      )
+    performOnMainThread {
+      traits.reduce(into: UITraitCollection()) {
+        $1.value.apply(to: &$0)
+      }
     }
   }
 
-  func merging(_ traits: UITraitCollection) -> UITraitCollection {
-    .init(traitsFrom: [self, traits])
+  @MainActor
+  func commit(in viewController: UIViewController) {
+    #if !os(visionOS)
+    var pendingTraitCollection: UITraitCollection?
+    #endif
+
+    for (_, trait) in traits {
+      #if os(visionOS)
+      trait.apply(to: &viewController.traitOverrides)
+      #else
+      if #available(iOS 17, tvOS 17, *) {
+        trait.apply(to: &viewController.traitOverrides)
+      } else {
+        var traitCollection = pendingTraitCollection ?? UITraitCollection()
+        trait.apply(to: &traitCollection)
+        pendingTraitCollection = traitCollection
+      }
+      #endif
+    }
+
+    #if !os(visionOS)
+    guard let pendingTraitCollection else {
+      return
+    }
+
+    for childViewController in viewController.children {
+      viewController.setOverrideTraitCollection(
+        pendingTraitCollection,
+        forChild: childViewController
+      )
+    }
+    #endif
   }
 }
 
-public typealias Traits = UITraitCollection
-#endif
+private struct Storage: Sendable, Hashable {
 
-#if os(iOS) || os(tvOS) || os(visionOS)
+  var value: any Hashable & Sendable
+
+  private let mutating: @MainActor (Self, inout Any) -> Void
+  private let asserting: @Sendable (Self, Self) -> Bool
+  private let hashing: @Sendable (Self, inout Hasher) -> Void
+
+  init<Key: TraitKey>(_ key: Key.Type) {
+    value = Key.defaultValue
+    mutating = {
+      #if os(visionOS)
+      if var traitsOverrides = $1 as? UITraitOverrides {
+        key.apply($0.value as! Key.Value, to: &traitsOverrides)
+        $1 = traitsOverrides
+      } else {
+        var traitCollection = $1 as! UITraitCollection
+        key.apply($0.value as! Key.Value, to: &traitCollection)
+        $1 = traitCollection
+      }
+      #else
+      if #available(iOS 17, tvOS 17, *), var traitsOverrides = $1 as? UITraitOverrides {
+        key.apply($0.value as! Key.Value, to: &traitsOverrides)
+        $1 = traitsOverrides
+      } else {
+        var traitCollection = $1 as! UITraitCollection
+        key.apply($0.value as! Key.Value, to: &traitCollection)
+        $1 = traitCollection
+      }
+      #endif
+    }
+    asserting = {
+      if let lhs = $0.value as? Key.Value, let rhs = $1.value as? Key.Value {
+        return lhs == rhs
+      } else {
+        return false
+      }
+    }
+    hashing = {
+      let value = $0.value as! Key.Value
+      value.hash(into: &$1)
+    }
+  }
+
+  static func == (_ lhs: Self, _ rhs: Self) -> Bool {
+    lhs.asserting(lhs, rhs)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hashing(self, &hasher)
+  }
+
+  @available(iOS 17, tvOS 17, *)
+  @MainActor
+  func apply(to traitsOverrides: inout UITraitOverrides) {
+    var reference = traitsOverrides as Any
+    mutating(self, &reference)
+    traitsOverrides = reference as! UITraitOverrides
+  }
+
+  @MainActor
+  func apply(to traitCollection: inout UITraitCollection) {
+    var reference = traitCollection as Any
+    mutating(self, &reference)
+    traitCollection = reference as! UITraitCollection
+  }
+}
+
+extension Traits {
+
+  func inconsistentTraitsChecker<Object>(_ object: Object, to otherTraits: Traits) {
+    if self != otherTraits {
+      guard !SnapshotEnvironment.current.disableInconsistentTraitsChecker else {
+        print("[DISABLED] ⚠️ Inconsistent Traits Detected - Snapshot Integrity Risk")
+        return
+      }
+
+      print(
+        """
+        ⚠️ Inconsistent Traits Detected - Snapshot Integrity Risk
+        
+        The same instance of \(type(of: object)) is being reused with a different \(Traits.self) \
+        configuration.
+        
+        This may cause:
+        - Unreliable snapshot comparisons
+        - State contamination between test runs
+        - Non-deterministic test failures
+        
+        🛠️ Recommended approach for reliable snapshot testing:
+        
+          try await assert(
+            of: await \(type(of: object))(), // Always use a clean instance
+            as: ...
+          )
+        
+        ℹ️ Tip: Create fresh input instances for each test scenario to ensure consistent results.
+        """
+      )
+    }
+  }
+}
+
 extension Traits {
 
   static func iOS(
@@ -122,25 +263,14 @@ extension Traits {
     size: CGSize,
     deviceInterfaceSizeClass: DeviceDynamicInterfaceSizeClass
   ) -> Traits {
-    let deviceInterfaceSizeClassTrait = Traits(
+    var traits = Traits(
       deviceInterfaceSizeClass: deviceInterfaceSizeClass(size)
     )
 
-    let traits: Traits
+    traits.userInterfaceIdiom = userInterfaceIdiom
+    traits.displayScale = displayScale
 
-    #if os(visionOS)
-    traits = Traits {
-      $0.userInterfaceIdiom = userInterfaceIdiom
-      $0.displayScale = displayScale
-    }
-    #else
-    traits = Traits(traitsFrom: [
-      .init(userInterfaceIdiom: userInterfaceIdiom),
-      .init(displayScale: displayScale)
-    ])
-    #endif
-
-    return traits.merging(deviceInterfaceSizeClassTrait)
+    return traits
   }
 }
 #endif

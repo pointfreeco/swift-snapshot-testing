@@ -271,7 +271,6 @@ class ViewTests: XCTestCase {
     )
   }
 
-  // Relacionado a um bug envolvendo UIWindow -> UINavigationController -> View
   func testComplexSateManagementUpdateWithNavigationController() async throws {
     struct TestingView: View {
       @ObservedObject var viewModel: ViewModel

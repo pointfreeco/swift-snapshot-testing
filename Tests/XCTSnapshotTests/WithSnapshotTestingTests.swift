@@ -5,7 +5,7 @@ class WithSnapshotTestingTests: XCTestCase {
   func testNesting() {
     withTestingEnvironment(record: .all) {
       XCTAssertEqual(
-        SnapshotEnvironment.diffTool(
+        SnapshotEnvironment.current.diffTool(
           currentFilePath: "file://old.png",
           failedFilePath: "file://new.png"
         ),
@@ -22,17 +22,17 @@ class WithSnapshotTestingTests: XCTestCase {
             }
         """
       )
-      XCTAssertEqual(SnapshotEnvironment.recordMode, .all)
+      XCTAssertEqual(SnapshotEnvironment.current.recordMode, .all)
 
       withTestingEnvironment(diffTool: "ksdiff") {
         XCTAssertEqual(
-          SnapshotEnvironment.diffTool(
+          SnapshotEnvironment.current.diffTool(
             currentFilePath: "old.png",
             failedFilePath: "new.png"
           ),
           "ksdiff old.png new.png"
         )
-        XCTAssertEqual(SnapshotEnvironment.recordMode, .all)
+        XCTAssertEqual(SnapshotEnvironment.current.recordMode, .all)
       }
     }
   }

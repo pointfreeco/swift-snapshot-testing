@@ -104,3 +104,42 @@ extension Snapshot {
   }
 }
 #endif
+
+#if os(iOS) || os(tvOS) || os(visionOS)
+@MainActor
+private var kUIViewTraits = 0
+
+extension SDKView {
+
+  private var traits: Traits? {
+    get { objc_getAssociatedObject(self, &kUIViewTraits) as? Traits }
+    set {
+      objc_setAssociatedObject(
+        self,
+        &kUIViewTraits,
+        newValue,
+        .OBJC_ASSOCIATION_RETAIN
+      )
+    }
+  }
+
+  func inconsistentTraitsChecker(for traits: Traits) {
+    defer { self.traits = traits }
+    self.traits?.inconsistentTraitsChecker(self, to: traits)
+  }
+}
+
+extension Snapshot {
+
+  func inconsistentTraitsChecker<Input: SDKView, Output: BytesRepresentable>(
+    _ traits: Traits
+  ) -> AsyncSnapshot<Input, Output> where Executor == Async<Input, Output> {
+    map { executor in
+      Async(Input.self) { @MainActor in
+        $0.inconsistentTraitsChecker(for: traits)
+        return try await executor($0)
+      }
+    }
+  }
+}
+#endif

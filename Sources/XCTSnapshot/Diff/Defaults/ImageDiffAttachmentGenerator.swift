@@ -14,7 +14,6 @@ public struct ImageDiffAttachmentGenerator: DiffAttachmentGenerator {
 
   private let precision: Float
   private let perceptualPrecision: Float
-  private let scale: CGFloat?
 
   /// Initializes the generator with precision and scaling parameters.
   ///
@@ -23,12 +22,10 @@ public struct ImageDiffAttachmentGenerator: DiffAttachmentGenerator {
   /// - Parameter scale: Scaling factor applied during image comparison (e.g., `2.0` for high-resolution images).
   public init(
     precision: Float,
-    perceptualPrecision: Float,
-    scale: CGFloat?
+    perceptualPrecision: Float
   ) {
     self.precision = precision
     self.perceptualPrecision = perceptualPrecision
-    self.scale = scale
   }
 
   /// Compares two images and generates a descriptive message or visual attachments highlighting differences.
@@ -47,7 +44,7 @@ public struct ImageDiffAttachmentGenerator: DiffAttachmentGenerator {
         perceptualPrecision: perceptualPrecision
       ) else { return nil }
       
-      let difference = reference.rawValue.substract(diffable.rawValue, scale: scale)
+      let difference = reference.rawValue.substract(diffable.rawValue)
       let oldAttachment = XCTAttachment(unsafeImage: reference.rawValue)
       oldAttachment?.name = "reference"
       let isEmptyImage = diffable.rawValue.size == .zero

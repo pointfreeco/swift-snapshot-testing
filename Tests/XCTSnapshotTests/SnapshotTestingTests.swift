@@ -310,8 +310,10 @@ final class SnapshotTestingTests: BaseTestCase {
         return cell
       }
     }
-    let tableViewController = TableViewController()
-    try await assert(of: tableViewController, as: .image(layout: .device(.iPhoneSE)))
+    try await assert(
+      of: await TableViewController(),
+      as: .image(layout: .device(.iPhoneSE))
+    )
 #endif
   }
 
@@ -346,16 +348,15 @@ final class SnapshotTestingTests: BaseTestCase {
       }
     }
 
-    let tableViewController = TableViewController() // { () -> UIViewController in TableViewController() }
     try await assert(
-      of: tableViewController,
+      of: await TableViewController(),
       as: [
         "iPad-image": .image(layout: .device(.iPadMini8_3)),
         "iPhoneSe-image": .image(layout: .device(.iPhoneSE)),
       ]
     )
     try await assert(
-      of: tableViewController,
+      of: await TableViewController(),
       as: [.image(layout: .device(.iPhoneX)), .image(layout: .device(.iPhoneXSMax))]
     )
 #endif
@@ -433,374 +434,372 @@ final class SnapshotTestingTests: BaseTestCase {
         }
       }
 
-      let viewController = MyViewController()
-
 #if os(iOS)
-      try await assert(of: viewController, as: .image(layout: .device(.iPhoneSE)), named: "iphone-se")
-      try await assert(of: viewController, as: .image(layout: .device(.iPhone8)), named: "iphone-8")
-      try await assert(of: viewController, as: .image(layout: .device(.iPhone8Plus)), named: "iphone-8-plus")
-      try await assert(of: viewController, as: .image(layout: .device(.iPhoneX)), named: "iphone-x")
-      try await assert(of: viewController, as: .image(layout: .device(.iPhoneXR)), named: "iphone-xr")
-      try await assert(of: viewController, as: .image(layout: .device(.iPhoneXSMax)), named: "iphone-xs-max")
-      try await assert(of: viewController, as: .image(layout: .device(.iPadMini8_3)), named: "ipad-mini")
-      try await assert(of: viewController, as: .image(layout: .device(.iPad9_7)), named: "ipad-9-7")
-      try await assert(of: viewController, as: .image(layout: .device(.iPad10_2)), named: "ipad-10-2")
-      try await assert(of: viewController, as: .image(layout: .device(.iPadPro10_5)), named: "ipad-pro-10-5")
-      try await assert(of: viewController, as: .image(layout: .device(.iPadPro11)), named: "ipad-pro-11")
-      try await assert(of: viewController, as: .image(layout: .device(.iPadPro12_9)), named: "ipad-pro-12-9")
+      try await assert(of: await MyViewController(), as: .image(layout: .device(.iPhoneSE)), named: "iphone-se")
+      try await assert(of: await MyViewController(), as: .image(layout: .device(.iPhone8)), named: "iphone-8")
+      try await assert(of: await MyViewController(), as: .image(layout: .device(.iPhone8Plus)), named: "iphone-8-plus")
+      try await assert(of: await MyViewController(), as: .image(layout: .device(.iPhoneX)), named: "iphone-x")
+      try await assert(of: await MyViewController(), as: .image(layout: .device(.iPhoneXR)), named: "iphone-xr")
+      try await assert(of: await MyViewController(), as: .image(layout: .device(.iPhoneXSMax)), named: "iphone-xs-max")
+      try await assert(of: await MyViewController(), as: .image(layout: .device(.iPadMini8_3)), named: "ipad-mini")
+      try await assert(of: await MyViewController(), as: .image(layout: .device(.iPad9_7)), named: "ipad-9-7")
+      try await assert(of: await MyViewController(), as: .image(layout: .device(.iPad10_2)), named: "ipad-10-2")
+      try await assert(of: await MyViewController(), as: .image(layout: .device(.iPadPro10_5)), named: "ipad-pro-10-5")
+      try await assert(of: await MyViewController(), as: .image(layout: .device(.iPadPro11)), named: "ipad-pro-11")
+      try await assert(of: await MyViewController(), as: .image(layout: .device(.iPadPro12_9)), named: "ipad-pro-12-9")
 
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .recursiveDescription(layout: .device(.iPhoneSE)),
         named: "iphone-se"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .recursiveDescription(layout: .device(.iPhone8)),
         named: "iphone-8"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .recursiveDescription(layout: .device(.iPhone8Plus)),
         named: "iphone-8-plus"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .recursiveDescription(layout: .device(.iPhoneX)),
         named: "iphone-x"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .recursiveDescription(layout: .device(.iPhoneXR)),
         named: "iphone-xr"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .recursiveDescription(layout: .device(.iPhoneXSMax)),
         named: "iphone-xs-max"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .recursiveDescription(layout: .device(.iPadMini8_3)),
         named: "ipad-mini"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .recursiveDescription(layout: .device(.iPad9_7)),
         named: "ipad-9-7"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .recursiveDescription(layout: .device(.iPad10_2)),
         named: "ipad-10-2"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .recursiveDescription(layout: .device(.iPadPro10_5)),
         named: "ipad-pro-10-5"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .recursiveDescription(layout: .device(.iPadPro11)),
         named: "ipad-pro-11"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .recursiveDescription(layout: .device(.iPadPro12_9)),
         named: "ipad-pro-12-9"
       )
 
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPhoneSE(.portrait))),
         named: "iphone-se"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPhone8(.portrait))),
         named: "iphone-8"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPhone8Plus(.portrait))),
         named: "iphone-8-plus"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPhoneX(.portrait))),
         named: "iphone-x"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPhoneXR(.portrait))),
         named: "iphone-xr"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPhoneXSMax(.portrait))),
         named: "iphone-xs-max"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPadMini8_3(.landscape))),
         named: "ipad-mini"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPad9_7(.landscape))),
         named: "ipad-9-7"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPad10_2(.landscape))),
         named: "ipad-10-2"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPadPro10_5(.landscape))),
         named: "ipad-pro-10-5"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPadPro11(.landscape))),
         named: "ipad-pro-11"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPadPro12_9(.landscape))),
         named: "ipad-pro-12-9"
       )
 
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPadMini8_3(.landscape(.compact)))),
         named: "ipad-mini-33-split-landscape"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPadMini8_3(.landscape(.medium)))),
         named: "ipad-mini-50-split-landscape"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPadMini8_3(.landscape(.regular)))),
         named: "ipad-mini-66-split-landscape"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPadMini8_3(.portrait(.compact)))),
         named: "ipad-mini-33-split-portrait"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPadMini8_3(.portrait(.regular)))),
         named: "ipad-mini-66-split-portrait"
       )
 
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPad9_7(.landscape(.compact)))),
         named: "ipad-9-7-33-split-landscape"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPad9_7(.landscape(.medium)))),
         named: "ipad-9-7-50-split-landscape"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPad9_7(.landscape(.regular)))),
         named: "ipad-9-7-66-split-landscape"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPad9_7(.portrait(.compact)))),
         named: "ipad-9-7-33-split-portrait"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPad9_7(.portrait(.regular)))),
         named: "ipad-9-7-66-split-portrait"
       )
 
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPad10_2(.landscape(.compact)))),
         named: "ipad-10-2-split-landscape"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPad10_2(.landscape(.medium)))),
         named: "ipad-10-2-50-split-landscape"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPad10_2(.landscape(.regular)))),
         named: "ipad-10-2-66-split-landscape"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPad10_2(.portrait(.compact)))),
         named: "ipad-10-2-33-split-portrait"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPad10_2(.portrait(.regular)))),
         named: "ipad-10-2-66-split-portrait"
       )
 
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPadPro10_5(.landscape(.compact)))),
         named: "ipad-pro-10inch-33-split-landscape"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPadPro10_5(.landscape(.medium)))),
         named: "ipad-pro-10inch-50-split-landscape"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPadPro10_5(.landscape(.regular)))),
         named: "ipad-pro-10inch-66-split-landscape"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPadPro10_5(.portrait(.compact)))),
         named: "ipad-pro-10inch-33-split-portrait"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPadPro10_5(.portrait(.regular)))),
         named: "ipad-pro-10inch-66-split-portrait"
       )
 
       try await assert(
-        of: viewController, as: .image(layout: .device(.iPadPro11(.landscape(.compact)))),
+        of: await MyViewController(), as: .image(layout: .device(.iPadPro11(.landscape(.compact)))),
         named: "ipad-pro-11inch-33-split-landscape")
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPadPro11(.landscape(.medium)))),
         named: "ipad-pro-11inch-50-split-landscape"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPadPro11(.landscape(.regular)))),
         named: "ipad-pro-11inch-66-split-landscape"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPadPro11(.portrait(.compact)))),
         named: "ipad-pro-11inch-33-split-portrait"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPadPro11(.portrait(.regular)))),
         named: "ipad-pro-11inch-66-split-portrait"
       )
 
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPadPro12_9(.landscape(.compact)))),
         named: "ipad-pro-12inch-33-split-landscape"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPadPro12_9(.landscape(.medium)))),
         named: "ipad-pro-12inch-50-split-landscape"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPadPro12_9(.landscape(.regular)))),
         named: "ipad-pro-12inch-66-split-landscape"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPadPro12_9(.portrait(.compact)))),
         named: "ipad-pro-12inch-33-split-portrait"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPadPro12_9(.portrait(.regular)))),
         named: "ipad-pro-12inch-66-split-portrait"
       )
 
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPhoneSE(.landscape))),
         named: "iphone-se-alternative"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPhone8(.landscape))),
         named: "iphone-8-alternative"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPhone8Plus(.landscape))),
         named: "iphone-8-plus-alternative"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPhoneX(.landscape))),
         named: "iphone-x-alternative"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPhoneXR(.landscape))),
         named: "iphone-xr-alternative"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPhoneXSMax(.landscape))),
         named: "iphone-xs-max-alternative"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPadMini8_3(.portrait))),
         named: "ipad-mini-alternative"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPad9_7(.portrait))),
         named: "ipad-9-7-alternative"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPad10_2(.portrait))),
         named: "ipad-10-2-alternative"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPadPro10_5(.portrait))),
         named: "ipad-pro-10-5-alternative"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPadPro11(.portrait))),
         named: "ipad-pro-11-alternative"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.iPadPro12_9(.portrait))),
         named: "ipad-pro-12-9-alternative"
       )
 
       for (name, contentSize) in allContentSizes {
         try await assert(
-          of: viewController,
+          of: await MyViewController(),
           as: .image(layout: .device(.iPhoneSE), traits: .init(preferredContentSizeCategory: contentSize)),
           named: "iphone-se-\(name)"
         )
       }
 #elseif os(tvOS)
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.tv)),
         named: "tv"
       )
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .image(layout: .device(.tv4K)),
         named: "tv4k"
       )
@@ -888,93 +887,100 @@ final class SnapshotTestingTests: BaseTestCase {
           }
         }
 
-        let myViewController = MyViewController()
-        let navController = UINavigationController(rootViewController: myViewController)
-        let tabViewController = UITabBarController()
-        tabViewController.setViewControllers([navController], animated: false)
+        class NoRecycleViewController: UIViewController {
 
-        let viewController = UIViewController()
-        viewController.addChild(tabViewController)
-        tabViewController.view.translatesAutoresizingMaskIntoConstraints = false
-        viewController.view.addSubview(tabViewController.view)
-        tabViewController.didMove(toParent: viewController)
+          override func viewDidLoad() {
+            super.viewDidLoad()
 
-        NSLayoutConstraint.activate([
-          tabViewController.view.topAnchor.constraint(equalTo: viewController.view.topAnchor),
-          tabViewController.view.leadingAnchor.constraint(equalTo: viewController.view.leadingAnchor),
-          tabViewController.view.trailingAnchor.constraint(equalTo: viewController.view.trailingAnchor),
-          tabViewController.view.bottomAnchor.constraint(equalTo: viewController.view.bottomAnchor),
-        ])
+            let myViewController = MyViewController()
+            let navController = UINavigationController(rootViewController: myViewController)
+            let tabViewController = UITabBarController()
+            tabViewController.setViewControllers([navController], animated: false)
 
-        navController.navigationBar.isTranslucent = false
-        navController.navigationBar.tintColor = .red
-        navController.navigationBar.backgroundColor = .red
-        navController.navigationBar.barTintColor = .red
-        navController.view.backgroundColor = .blue
+            let viewController = self
+            viewController.addChild(tabViewController)
+            tabViewController.view.translatesAutoresizingMaskIntoConstraints = false
+            viewController.view.addSubview(tabViewController.view)
+            tabViewController.didMove(toParent: viewController)
 
-        try await assert(of: viewController, as: .image(layout: .device(.iPhoneSE)), named: "iphone-se")
-        try await assert(of: viewController, as: .image(layout: .device(.iPhone8)), named: "iphone-8")
-        try await assert(of: viewController, as: .image(layout: .device(.iPhone8Plus)), named: "iphone-8-plus")
-        try await assert(of: viewController, as: .image(layout: .device(.iPhoneX)), named: "iphone-x")
-        try await assert(of: viewController, as: .image(layout: .device(.iPhoneXR)), named: "iphone-xr")
-        try await assert(of: viewController, as: .image(layout: .device(.iPhoneXSMax)), named: "iphone-xs-max")
-        try await assert(of: viewController, as: .image(layout: .device(.iPadMini8_3)), named: "ipad-mini")
-        try await assert(of: viewController, as: .image(layout: .device(.iPad9_7)), named: "ipad-9-7")
-        try await assert(of: viewController, as: .image(layout: .device(.iPad10_2)), named: "ipad-10-2")
-        try await assert(of: viewController, as: .image(layout: .device(.iPadPro10_5)), named: "ipad-pro-10-5")
-        try await assert(of: viewController, as: .image(layout: .device(.iPadPro11)), named: "ipad-pro-11")
-        try await assert(of: viewController, as: .image(layout: .device(.iPadPro12_9)), named: "ipad-pro-12-9")
+            NSLayoutConstraint.activate([
+              tabViewController.view.topAnchor.constraint(equalTo: viewController.view.topAnchor),
+              tabViewController.view.leadingAnchor.constraint(equalTo: viewController.view.leadingAnchor),
+              tabViewController.view.trailingAnchor.constraint(equalTo: viewController.view.trailingAnchor),
+              tabViewController.view.bottomAnchor.constraint(equalTo: viewController.view.bottomAnchor),
+            ])
+
+            navController.navigationBar.isTranslucent = false
+            navController.navigationBar.tintColor = .red
+            navController.navigationBar.backgroundColor = .red
+            navController.navigationBar.barTintColor = .red
+            navController.view.backgroundColor = .blue
+          }
+        }
+
+        try await assert(of: await NoRecycleViewController(), as: .image(layout: .device(.iPhoneSE)), named: "iphone-se")
+        try await assert(of: await NoRecycleViewController(), as: .image(layout: .device(.iPhone8)), named: "iphone-8")
+        try await assert(of: await NoRecycleViewController(), as: .image(layout: .device(.iPhone8Plus)), named: "iphone-8-plus")
+        try await assert(of: await NoRecycleViewController(), as: .image(layout: .device(.iPhoneX)), named: "iphone-x")
+        try await assert(of: await NoRecycleViewController(), as: .image(layout: .device(.iPhoneXR)), named: "iphone-xr")
+        try await assert(of: await NoRecycleViewController(), as: .image(layout: .device(.iPhoneXSMax)), named: "iphone-xs-max")
+        try await assert(of: await NoRecycleViewController(), as: .image(layout: .device(.iPadMini8_3)), named: "ipad-mini")
+        try await assert(of: await NoRecycleViewController(), as: .image(layout: .device(.iPad9_7)), named: "ipad-9-7")
+        try await assert(of: await NoRecycleViewController(), as: .image(layout: .device(.iPad10_2)), named: "ipad-10-2")
+        try await assert(of: await NoRecycleViewController(), as: .image(layout: .device(.iPadPro10_5)), named: "ipad-pro-10-5")
+        try await assert(of: await NoRecycleViewController(), as: .image(layout: .device(.iPadPro11)), named: "ipad-pro-11")
+        try await assert(of: await NoRecycleViewController(), as: .image(layout: .device(.iPadPro12_9)), named: "ipad-pro-12-9")
 
         try await withTestingEnvironment(record: .never) {
-          try await assert(of: viewController, as: .image(layout: .device(.iPhoneSE(.portrait))), named: "iphone-se")
-          try await assert(of: viewController, as: .image(layout: .device(.iPhone8(.portrait))), named: "iphone-8")
+          try await assert(of: await NoRecycleViewController(), as: .image(layout: .device(.iPhoneSE(.portrait))), named: "iphone-se")
+          try await assert(of: await NoRecycleViewController(), as: .image(layout: .device(.iPhone8(.portrait))), named: "iphone-8")
           try await assert(
-            of: viewController, as: .image(layout: .device(.iPhone8Plus(.portrait))), named: "iphone-8-plus")
-          try await assert(of: viewController, as: .image(layout: .device(.iPhoneX(.portrait))), named: "iphone-x")
-          try await assert(of: viewController, as: .image(layout: .device(.iPhoneXR(.portrait))), named: "iphone-xr")
+            of: await NoRecycleViewController(), as: .image(layout: .device(.iPhone8Plus(.portrait))), named: "iphone-8-plus")
+          try await assert(of: await NoRecycleViewController(), as: .image(layout: .device(.iPhoneX(.portrait))), named: "iphone-x")
+          try await assert(of: await NoRecycleViewController(), as: .image(layout: .device(.iPhoneXR(.portrait))), named: "iphone-xr")
           try await assert(
-            of: viewController, as: .image(layout: .device(.iPhoneXSMax(.portrait))), named: "iphone-xs-max")
+            of: await NoRecycleViewController(), as: .image(layout: .device(.iPhoneXSMax(.portrait))), named: "iphone-xs-max")
           try await assert(
-            of: viewController, as: .image(layout: .device(.iPadMini8_3(.landscape))), named: "ipad-mini")
-          try await assert(of: viewController, as: .image(layout: .device(.iPad9_7(.landscape))), named: "ipad-9-7")
+            of: await NoRecycleViewController(), as: .image(layout: .device(.iPadMini8_3(.landscape))), named: "ipad-mini")
+          try await assert(of: await NoRecycleViewController(), as: .image(layout: .device(.iPad9_7(.landscape))), named: "ipad-9-7")
           try await assert(
-            of: viewController, as: .image(layout: .device(.iPad10_2(.landscape))), named: "ipad-10-2")
+            of: await NoRecycleViewController(), as: .image(layout: .device(.iPad10_2(.landscape))), named: "ipad-10-2")
           try await assert(
-            of: viewController, as: .image(layout: .device(.iPadPro10_5(.landscape))), named: "ipad-pro-10-5")
+            of: await NoRecycleViewController(), as: .image(layout: .device(.iPadPro10_5(.landscape))), named: "ipad-pro-10-5")
           try await assert(
-            of: viewController, as: .image(layout: .device(.iPadPro11(.landscape))), named: "ipad-pro-11")
+            of: await NoRecycleViewController(), as: .image(layout: .device(.iPadPro11(.landscape))), named: "ipad-pro-11")
           try await assert(
-            of: viewController, as: .image(layout: .device(.iPadPro12_9(.landscape))), named: "ipad-pro-12-9")
+            of: await NoRecycleViewController(), as: .image(layout: .device(.iPadPro12_9(.landscape))), named: "ipad-pro-12-9")
         }
 
         try await assert(
-          of: viewController, as: .image(layout: .device(.iPhoneSE(.landscape))), named: "iphone-se-alternative")
+          of: await NoRecycleViewController(), as: .image(layout: .device(.iPhoneSE(.landscape))), named: "iphone-se-alternative")
         try await assert(
-          of: viewController, as: .image(layout: .device(.iPhone8(.landscape))), named: "iphone-8-alternative")
+          of: await NoRecycleViewController(), as: .image(layout: .device(.iPhone8(.landscape))), named: "iphone-8-alternative")
         try await assert(
-          of: viewController, as: .image(layout: .device(.iPhone8Plus(.landscape))),
+          of: await NoRecycleViewController(), as: .image(layout: .device(.iPhone8Plus(.landscape))),
           named: "iphone-8-plus-alternative")
         try await assert(
-          of: viewController, as: .image(layout: .device(.iPhoneX(.landscape))), named: "iphone-x-alternative")
+          of: await NoRecycleViewController(), as: .image(layout: .device(.iPhoneX(.landscape))), named: "iphone-x-alternative")
         try await assert(
-          of: viewController, as: .image(layout: .device(.iPhoneXR(.landscape))), named: "iphone-xr-alternative")
+          of: await NoRecycleViewController(), as: .image(layout: .device(.iPhoneXR(.landscape))), named: "iphone-xr-alternative")
         try await assert(
-          of: viewController, as: .image(layout: .device(.iPhoneXSMax(.landscape))),
+          of: await NoRecycleViewController(), as: .image(layout: .device(.iPhoneXSMax(.landscape))),
           named: "iphone-xs-max-alternative")
         try await assert(
-          of: viewController, as: .image(layout: .device(.iPadMini8_3(.portrait))), named: "ipad-mini-alternative")
+          of: await NoRecycleViewController(), as: .image(layout: .device(.iPadMini8_3(.portrait))), named: "ipad-mini-alternative")
         try await assert(
-          of: viewController, as: .image(layout: .device(.iPad9_7(.portrait))), named: "ipad-9-7-alternative")
+          of: await NoRecycleViewController(), as: .image(layout: .device(.iPad9_7(.portrait))), named: "ipad-9-7-alternative")
         try await assert(
-          of: viewController, as: .image(layout: .device(.iPad10_2(.portrait))), named: "ipad-10-2-alternative")
+          of: await NoRecycleViewController(), as: .image(layout: .device(.iPad10_2(.portrait))), named: "ipad-10-2-alternative")
         try await assert(
-          of: viewController, as: .image(layout: .device(.iPadPro10_5(.portrait))),
+          of: await NoRecycleViewController(), as: .image(layout: .device(.iPadPro10_5(.portrait))),
           named: "ipad-pro-10-5-alternative")
         try await assert(
-          of: viewController, as: .image(layout: .device(.iPadPro11(.portrait))),
+          of: await NoRecycleViewController(), as: .image(layout: .device(.iPadPro11(.portrait))),
           named: "ipad-pro-11-alternative")
         try await assert(
-          of: viewController, as: .image(layout: .device(.iPadPro12_9(.portrait))),
+          of: await NoRecycleViewController(), as: .image(layout: .device(.iPadPro12_9(.portrait))),
           named: "ipad-pro-12-9-alternative")
       }
 #endif
@@ -1055,62 +1061,70 @@ final class SnapshotTestingTests: BaseTestCase {
       }
     }
 
-    let viewController = CollectionViewController()
-
     try await assert(
-      of: viewController,
+      of: await CollectionViewController(),
       as: [
         "ipad": .image(layout: .device(.iPadPro12_9)),
         "iphoneSe": .image(layout: .device(.iPhoneSE)),
         "iphone8": .image(layout: .device(.iPhone8)),
         "iphoneMax": .image(layout: .device(.iPhoneXSMax)),
-      ])
+      ]
+    )
 #endif
   }
 
   @MainActor
   func testTraitsWithView() async throws {
-#if os(iOS)
-    if #available(iOS 11.0, *) {
-      let label = UILabel()
-      label.font = .preferredFont(forTextStyle: .title1)
-      label.adjustsFontForContentSizeCategory = true
-      label.text = "What's the point?"
 
-      for (name, contentSize) in allContentSizes {
-        try await assert(
-          of: label,
-          as: .image(traits: .init(preferredContentSizeCategory: contentSize)),
-          named: "label-\(name)"
-        )
+    var label: UILabel {
+      get async {
+        await MainActor.run {
+          let label = UILabel()
+          label.font = .preferredFont(forTextStyle: .title1)
+          label.adjustsFontForContentSizeCategory = true
+          label.text = "What's the point?"
+          return label
+        }
       }
     }
-#endif
+
+    for (name, contentSize) in allContentSizes {
+      try await assert(
+        of: await label,
+        as: .image(traits: .init(preferredContentSizeCategory: contentSize)),
+        named: "label-\(name)"
+      )
+    }
   }
 
   @MainActor
   func testTraitsWithViewController() async throws {
 #if os(iOS)
-    let label = UILabel()
-    label.font = .preferredFont(forTextStyle: .title1)
-    label.adjustsFontForContentSizeCategory = true
-    label.text = "What's the point?"
+    class MyViewController: UIViewController {
 
-    let viewController = UIViewController()
-    viewController.view.addSubview(label)
+      override func viewDidLoad() {
+        super.viewDidLoad()
+        let label = UILabel()
+        label.font = .preferredFont(forTextStyle: .title1)
+        label.adjustsFontForContentSizeCategory = true
+        label.text = "What's the point?"
 
-    label.translatesAutoresizingMaskIntoConstraints = false
-    NSLayoutConstraint.activate([
-      label.leadingAnchor.constraint(
-        equalTo: viewController.view.layoutMarginsGuide.leadingAnchor),
-      label.topAnchor.constraint(equalTo: viewController.view.layoutMarginsGuide.topAnchor),
-      label.trailingAnchor.constraint(
-        equalTo: viewController.view.layoutMarginsGuide.trailingAnchor),
-    ])
+        view.addSubview(label)
+
+        label.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+          label.leadingAnchor.constraint(
+            equalTo: view.layoutMarginsGuide.leadingAnchor),
+          label.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
+          label.trailingAnchor.constraint(
+            equalTo: view.layoutMarginsGuide.trailingAnchor),
+        ])
+      }
+    }
 
     for (name, contentSize) in allContentSizes {
       try await assert(
-        of: viewController,
+        of: await MyViewController(),
         as: .recursiveDescription(
           layout: .device(.iPhoneSE),
           traits: .init(preferredContentSizeCategory: contentSize)
@@ -1473,9 +1487,7 @@ final class SnapshotTestingTests: BaseTestCase {
     let view = MyView()
 
     try await withTestingEnvironment {
-      $0.traits = .init(traitsFrom: [
-        .init(userInterfaceStyle: .light)
-      ])
+      $0.traits = .init(userInterfaceStyle: .light)
     } operation: {
       try await assert(
         of: view,

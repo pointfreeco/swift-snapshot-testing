@@ -38,8 +38,8 @@ public struct SnapshotTester<Engine: SnapshotEngine>: Sendable {
     }
 
     self.engine = engine
-    self.record = record ?? SnapshotEnvironment.recordMode
-    self.platform = SnapshotEnvironment.platform
+    self.record = record ?? SnapshotEnvironment.current.recordMode
+    self.platform = SnapshotEnvironment.current.platform
     self.timeout = timeout
     self.name = name
     self.serialization = serialization
@@ -218,7 +218,7 @@ private extension SnapshotTester {
       reason: .doesNotMatch,
       snapshotURL: snapshotURL,
       diff: failedURL.map {
-        SnapshotEnvironment.diffTool(
+        SnapshotEnvironment.current.diffTool(
           currentFilePath: snapshotURL.absoluteString,
           failedFilePath: $0.absoluteString
         )
