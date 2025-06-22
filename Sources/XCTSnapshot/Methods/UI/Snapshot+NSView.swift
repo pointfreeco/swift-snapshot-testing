@@ -2,13 +2,16 @@
   import AppKit
   import Cocoa
 
-  extension AsyncSnapshot where Input: NSViewController & Sendable, Output == ImageBytes {
-    /// A snapshot strategy for comparing view controller views based on pixel equality.
+  extension AsyncSnapshot where Input: NSView & Sendable, Output == ImageBytes {
+    /// A snapshot strategy for comparing views based on pixel equality.
     public static var image: AsyncSnapshot<Input, Output> {
       return .image()
     }
 
-    /// A snapshot strategy for comparing view controller views based on pixel equality.
+    /// A snapshot strategy for comparing views based on pixel equality.
+    ///
+    /// > Note: Snapshots must be compared on the same OS as the device that originally took the
+    /// > reference to avoid discrepancies between images.
     ///
     /// - Parameters:
     ///   - precision: The percentage of pixels that must match.
@@ -18,7 +21,6 @@
     ///     human eye.
     ///   - size: A view size override.
     public static func image(
-      drawHierarchyInKeyWindow: Bool = false,
       precision: Float = 1,
       perceptualPrecision: Float = 1,
       layout: SnapshotLayout = .sizeThatFits,
@@ -32,7 +34,7 @@
         perceptualPrecision: perceptualPrecision
       )
       .withWindow(
-        drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+        sessionRole: .windowApplication,
         application: application,
         operation: { windowConfiguration, executor in
           Async(Input.self) { @MainActor in
@@ -45,24 +47,26 @@
           .snapshot(executor)
         }
       )
-      .inconsistentTraitsChecker(config.traits)
+      #if !os(macOS)
+        .inconsistentTraitsChecker(config.traits)
+      #endif
       .withLock()
     }
   }
 
-  extension Snapshot where Input: NSViewController, Output == StringBytes {
-    /// A snapshot strategy for comparing viewControllers based on a recursive description of their properties
+  extension AsyncSnapshot where Input: NSView, Output == StringBytes {
+    /// A snapshot strategy for comparing views based on a recursive description of their properties
     /// and hierarchies.
     ///
     /// ``` swift
     /// s// Layout on the current device.
-    /// assert(of: viewController, as: .recursiveDescription)
+    /// assert(of: view, as: .recursiveDescription)
     ///
     /// // Layout with a certain size.
-    /// assert(of: viewController, as: .recursiveDescription(size: .init(width: 22, height: 22)))
+    /// assert(of: view, as: .recursiveDescription(size: .init(width: 22, height: 22)))
     ///
     /// // Layout with a certain trait collection.
-    /// assert(of: viewController, as: .recursiveDescription(traits: .init(horizontalSizeClass: .regular)))
+    /// assert(of: view, as: .recursiveDescription(traits: .init(horizontalSizeClass: .regular)))
     /// ```
     ///
     /// Records:
@@ -72,13 +76,12 @@
     ///    | <UIImageView; frame = (0 0; 22 22); clipsToBounds = YES; opaque = NO; userInteractionEnabled = NO; layer = <CALayer>>
     /// ```
     public static var recursiveDescription: AsyncSnapshot<Input, Output> {
-      return .recursiveDescription()
+      .recursiveDescription()
     }
 
     /// A snapshot strategy for comparing views based on a recursive description of their properties
     /// and hierarchies.
     public static func recursiveDescription(
-      drawHierarchyInKeyWindow: Bool = false,
       layout: SnapshotLayout = .sizeThatFits,
       delay: Double = .zero,
       application: NSApplication? = nil
@@ -87,7 +90,7 @@
 
       return IdentitySyncSnapshot.lines
         .withWindow(
-          drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+          sessionRole: .windowApplication,
           application: application,
           operation: { windowConfiguration, executor in
             Async(Input.self) { @MainActor in
@@ -100,6 +103,9 @@
             .descriptor(executor, method: .subtreeDescription)
           }
         )
+        #if !os(macOS)
+          .inconsistentTraitsChecker(config.traits)
+        #endif
         .withLock()
     }
   }

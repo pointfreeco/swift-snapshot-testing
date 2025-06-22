@@ -36,16 +36,24 @@
         perceptualPrecision: perceptualPrecision
       ).pullback { path in
         let bounds = path.boundingBoxOfPath
-        var transform = CGAffineTransform(translationX: -bounds.origin.x, y: -bounds.origin.y)
+        var transform = CGAffineTransform(
+          translationX: -bounds.origin.x,
+          y: -bounds.origin.y
+        )
+
         let path = path.copy(using: &transform)!
 
-        let image = NSImage(size: bounds.size)
-        image.lockFocus()
-        let context = NSGraphicsContext.current!.cgContext
+        let image = NSImage(size: bounds.size, flipped: false) { destRect in
+          guard let context = NSGraphicsContext.current else {
+            return false
+          }
 
-        context.addPath(path)
-        context.drawPath(using: drawingMode)
-        image.unlockFocus()
+          context.imageInterpolation = .high
+          context.cgContext.addPath(path)
+          context.cgContext.drawPath(using: drawingMode)
+          return true
+        }
+
         return .init(rawValue: image)
       }
     }
@@ -91,7 +99,8 @@
             let cgContext = ctx.cgContext
             cgContext.addPath(path)
             cgContext.drawPath(using: drawingMode)
-          })
+          }
+        )
       }
     }
   }

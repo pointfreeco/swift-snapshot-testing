@@ -125,7 +125,7 @@ private func snap<T>(
     return "\(indentation)- \(name.map { "\($0): " } ?? "")\(value.snapshotDescription)\n"
   case (let value as CustomStringConvertible, _):
     description = value.description
-  case let (value as AnyObject, .class?):
+  case (let value as AnyObject, .class?):
     let objectID = ObjectIdentifier(value)
     if visitedValues.contains(objectID) {
       return "\(indentation)\(bullet) \(name ?? "value") (circular reference detected)\n"

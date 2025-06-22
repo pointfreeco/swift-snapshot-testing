@@ -124,7 +124,7 @@ import XCTest
         try await assert(
           of: TestingView(),
           as: .image(
-            drawHierarchyInKeyWindow: true,
+            sessionRole: .windowApplication,
             layout: .device(.iPhone16Pro)
           )
         )
@@ -140,7 +140,6 @@ import XCTest
 
               Rectangle()
                 .fill(.blue)
-
             }
           }
         }
@@ -148,29 +147,34 @@ import XCTest
         try await assert(
           of: TestingView(),
           as: .image(
-            drawHierarchyInKeyWindow: true,
+            sessionRole: .windowApplication,
             layout: .device(.iPhone16Pro)
           )
         )
       }
-    #endif
 
-    func testViewInKeyWindowWithFixedSize() async throws {
-      struct TestingView: View {
-        var body: some View {
-          Rectangle()
-            .fill(.yellow)
+      func testViewInKeyWindowWithFixedSize() async throws {
+        struct TestingView: View {
+          var body: some View {
+            Rectangle()
+              .fill(.yellow)
+          }
+        }
+
+        do {
+          try await assert(
+            of: TestingView(),
+            as: .image(
+              sessionRole: .windowApplication,
+              layout: .fixed(width: 300, height: 150)
+            )
+          )
+        } catch {
+          print(error)
+          throw error
         }
       }
-
-      try await assert(
-        of: TestingView(),
-        as: .image(
-          drawHierarchyInKeyWindow: true,
-          layout: .fixed(width: 300, height: 150)
-        )
-      )
-    }
+    #endif
 
     func testViewWithSizeTooBig() async throws {
       struct TestingView: View {
@@ -259,7 +263,7 @@ import XCTest
         try await assert(
           of: TestingView(),
           as: .image(
-            drawHierarchyInKeyWindow: true,
+            sessionRole: .windowApplication,
             layout: .device(.iPhone16Pro)
           ),
           named: "iPhone16Pro"

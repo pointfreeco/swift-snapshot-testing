@@ -194,7 +194,7 @@ import Testing
       try await assert(
         of: await TestingViewController(),
         as: .image(
-          drawHierarchyInKeyWindow: true,
+          sessionRole: .windowApplication,
           layout: .device(.iPhone16Pro)
         )
       )
@@ -227,7 +227,7 @@ import Testing
       try await assert(
         of: await TestingViewController(),
         as: .image(
-          drawHierarchyInKeyWindow: true,
+          sessionRole: .windowApplication,
           layout: .device(.iPhone16Pro)
         )
       )
@@ -246,7 +246,7 @@ import Testing
       try await assert(
         of: await TestingViewController(),
         as: .image(
-          drawHierarchyInKeyWindow: true,
+          sessionRole: .windowApplication,
           layout: .fixed(width: 300, height: 150)
         )
       )
@@ -436,7 +436,7 @@ import Testing
       try await assert(
         of: await TestingViewController(),
         as: .image(
-          drawHierarchyInKeyWindow: true,
+          sessionRole: .windowApplication,
           layout: .device(.iPhone16Pro)
         ),
         named: "iPhone16Pro"

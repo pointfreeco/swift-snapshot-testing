@@ -4,7 +4,7 @@
   @preconcurrency import AppKit
 #endif
 
-#if os(iOS) || os(tvOS)
+#if os(iOS) || os(tvOS) || os(visionOS)
   extension Snapshot where Input: UIKit.UIApplication, Output == ImageBytes {
 
     /// Default configuration for capturing `UIApplication` as image snapshots.
@@ -34,31 +34,29 @@
       precision: Float = 1,
       perceptualPrecision: Float = 1,
       delay: Double = .zero,
-      scene role: UISceneSession.Role = .windowApplication
+      sessionRole: UISceneSession.Role = .windowApplication
     ) -> AsyncSnapshot<Input, Output> {
       return IdentitySyncSnapshot.image(
         precision: precision,
         perceptualPrecision: perceptualPrecision
       )
-      .withApplication(scene: role) { configuration, executor in
-        Async(Input.self) { _ in
-          configuration.window
-        }
-        .sleep(nanoseconds: UInt64(delay * 1_000_000_000))
-        .map { @MainActor window in
-          let renderer = UIGraphicsImageRenderer(
-            bounds: window.bounds,
-            format: .init(for: window.traitCollection)
-          )
+      .withApplication(sessionRole: sessionRole) { window, executor in
+        Async(Input.self) { _ in window }
+          .sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+          .map { @MainActor window in
+            let renderer = UIGraphicsImageRenderer(
+              bounds: window.bounds,
+              format: .init(for: window.traitCollection)
+            )
 
-          let image = try await executor(
-            ImageBytes(
-              rawValue: renderer.image {
-                window.layer.render(in: $0.cgContext)
-              }))
+            let image = try await executor(
+              ImageBytes(
+                rawValue: renderer.image {
+                  window.layer.render(in: $0.cgContext)
+                }))
 
-          return image
-        }
+            return image
+          }
       }
       .withLock()
     }

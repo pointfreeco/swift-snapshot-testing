@@ -140,7 +140,7 @@ import Testing
       view.backgroundColor = .yellow
       try await assert(
         of: view,
-        as: .image(drawHierarchyInKeyWindow: true)
+        as: .image(sessionRole: .windowApplication)
       )
     }
 
@@ -165,7 +165,7 @@ import Testing
       try await assert(
         of: view,
         as: .image(
-          drawHierarchyInKeyWindow: true,
+          sessionRole: .windowApplication,
           layout: .device(.iPhone16Pro)
         )
       )
@@ -178,7 +178,7 @@ import Testing
       try await assert(
         of: view,
         as: .image(
-          drawHierarchyInKeyWindow: true,
+          sessionRole: .windowApplication,
           layout: .fixed(width: 300, height: 150)
         )
       )
@@ -277,7 +277,7 @@ import Testing
       try await assert(
         of: view,
         as: .image(
-          drawHierarchyInKeyWindow: true,
+          sessionRole: .windowApplication,
           layout: .device(.iPhone16Pro)
         ),
         named: "iPhone16Pro"

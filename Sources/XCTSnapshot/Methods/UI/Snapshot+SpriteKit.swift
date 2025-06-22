@@ -18,7 +18,6 @@
       ///     human eye.
       ///   - size: The size of the scene.
       public static func image(
-        drawHierarchyInKeyWindow: Bool = false,
         precision: Float = 1,
         perceptualPrecision: Float = 1,
         size: CGSize,
@@ -26,7 +25,7 @@
         application: NSApplication? = nil
       ) -> AsyncSnapshot<Input, Output> {
         .skScene(
-          drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+          sessionRole: .windowApplication,
           precision: precision,
           perceptualPrecision: perceptualPrecision,
           size: size,
@@ -47,7 +46,7 @@
       ///     human eye.
       ///   - size: The size of the scene.
       public static func image(
-        drawHierarchyInKeyWindow: Bool = false,
+        sessionRole: UISceneSession.Role = .windowApplication,
         precision: Float = 1,
         perceptualPrecision: Float = 1,
         size: CGSize,
@@ -55,7 +54,7 @@
         application: UIKit.UIApplication? = nil
       ) -> AsyncSnapshot<Input, Output> {
         .skScene(
-          drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+          sessionRole: sessionRole,
           precision: precision,
           perceptualPrecision: perceptualPrecision,
           size: size,
@@ -69,21 +68,32 @@
   extension AsyncSnapshot where Input: SKScene, Output == ImageBytes {
 
     fileprivate static func skScene(
-      drawHierarchyInKeyWindow: Bool,
+      sessionRole: UISceneSession.Role,
       precision: Float,
       perceptualPrecision: Float,
       size: CGSize,
       delay: Double,
       application: SDKApplication?
     ) -> AsyncSnapshot<Input, Output> {
-      AsyncSnapshot<SDKView, ImageBytes>.image(
-        drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
-        precision: precision,
-        perceptualPrecision: perceptualPrecision,
-        layout: .fixed(width: size.width, height: size.height),
-        delay: delay,
-        application: application
-      ).pullback { @MainActor scene in
+      #if os(macOS)
+        let snapshot = AsyncSnapshot<SDKView, ImageBytes>.image(
+          precision: precision,
+          perceptualPrecision: perceptualPrecision,
+          layout: .fixed(width: size.width, height: size.height),
+          delay: delay,
+          application: application
+        )
+      #else
+        let snapshot = AsyncSnapshot<SDKView, ImageBytes>.image(
+          sessionRole: sessionRole,
+          precision: precision,
+          perceptualPrecision: perceptualPrecision,
+          layout: .fixed(width: size.width, height: size.height),
+          delay: delay,
+          application: application
+        )
+      #endif
+      return snapshot.pullback { @MainActor scene in
         let view = SKView(frame: .init(origin: .zero, size: size))
         view.presentScene(scene)
         return view

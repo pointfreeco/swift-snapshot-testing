@@ -30,7 +30,6 @@
     ///   )
     ///   ```
     public static func image(
-      drawHierarchyInKeyWindow: Bool = false,
       precision: Float = 1,
       perceptualPrecision: Float = 1,
       layout: SnapshotLayout = .sizeThatFits,
@@ -44,7 +43,7 @@
         perceptualPrecision: perceptualPrecision
       )
       .withWindow(
-        drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+        sessionRole: .windowApplication,
         application: application,
         operation: { windowConfiguration, executor in
           Async(Input.self) { @MainActor in
@@ -90,7 +89,7 @@
     ///   )
     ///   ```
     public static func image(
-      drawHierarchyInKeyWindow: Bool = false,
+      sessionRole: UISceneSession.Role = .windowApplication,
       precision: Float = 1,
       perceptualPrecision: Float = 1,
       layout: SnapshotLayout = .sizeThatFits,
@@ -108,7 +107,7 @@
         perceptualPrecision: perceptualPrecision
       )
       .withWindow(
-        drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+        sessionRole: sessionRole,
         application: application,
         operation: { windowConfiguration, executor in
           Async(Input.self) { @MainActor in

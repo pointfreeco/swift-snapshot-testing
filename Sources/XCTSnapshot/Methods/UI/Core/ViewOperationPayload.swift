@@ -12,6 +12,21 @@
     let input: SnapshotUIController
   }
 
+  extension Async where Output == SnapshotUIController {
+
+    func connectToWindow(_ configuration: SnapshotWindowConfiguration<Input>) -> Async<
+      Input, ViewOperationPayload
+    > {
+      map { @MainActor in
+        ViewOperationPayload(
+          previousRootViewController: configuration.window.switchRoot($0),
+          window: configuration.window,
+          input: $0
+        )
+      }
+    }
+  }
+
   extension Async where Output == ViewOperationPayload {
 
     func waitLoadingStateIfNeeded(tolerance: TimeInterval) -> Async<Input, Output> {

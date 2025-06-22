@@ -35,13 +35,22 @@
         $0.pullback { path in
           // Move path info frame:
           let bounds = path.bounds
-          let transform = AffineTransform(translationByX: -bounds.origin.x, byY: -bounds.origin.y)
+          let transform = AffineTransform(
+            translationByX: -bounds.origin.x,
+            byY: -bounds.origin.y
+          )
           path.transform(using: transform)
 
-          let image = NSImage(size: path.bounds.size)
-          image.lockFocus()
-          path.fill()
-          image.unlockFocus()
+          let image = NSImage(size: bounds.size, flipped: false) { destRect in
+            guard let context = NSGraphicsContext.current else {
+              return false
+            }
+
+            context.imageInterpolation = .high
+            path.fill()
+            return true
+          }
+
           return .init(rawValue: image)
         }
       }

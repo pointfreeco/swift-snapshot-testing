@@ -31,17 +31,42 @@
       }
 
       var cgImage: CGImage? {
-        var imageRect = CGRect(x: 0, y: 0, width: size.width, height: size.height)
-        return cgImage(forProposedRect: &imageRect, context: nil, hints: nil)
+        guard
+          let imageData = tiffRepresentation,
+          let dataProvider = CGDataProvider(data: imageData as CFData)
+        else { return nil }
+
+        return CGImage(
+          pngDataProviderSource: dataProvider,
+          decode: nil,
+          shouldInterpolate: true,
+          intent: .defaultIntent
+        )
       }
 
       func pngData() -> Data? {
-        guard let cgImage else {
-          return nil
-        }
+        guard
+          let bitmapRep = NSBitmapImageRep(
+            bitmapDataPlanes: nil,
+            pixelsWide: Int(size.width),
+            pixelsHigh: Int(size.height),
+            bitsPerSample: 8,
+            samplesPerPixel: 4,
+            hasAlpha: true,
+            isPlanar: false,
+            colorSpaceName: .calibratedRGB,
+            bytesPerRow: 0,
+            bitsPerPixel: 0
+          ),
+          let context = NSGraphicsContext(bitmapImageRep: bitmapRep)
+        else { return nil }
 
-        let rep = NSBitmapImageRep(cgImage: cgImage)
-        return rep.representation(using: .png, properties: [:])
+        NSGraphicsContext.saveGraphicsState()
+        NSGraphicsContext.current = context
+        draw(in: NSRect(origin: .zero, size: size))
+        NSGraphicsContext.restoreGraphicsState()
+
+        return bitmapRep.representation(using: .png, properties: [:])
       }
     #endif
 

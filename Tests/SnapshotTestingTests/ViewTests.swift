@@ -150,7 +150,7 @@ struct ViewTests {
       try await assert(
         of: TestingView(),
         as: .image(
-          drawHierarchyInKeyWindow: true,
+          sessionRole: .windowApplication,
           layout: .device(.iPhone16Pro)
         )
       )
@@ -175,14 +175,14 @@ struct ViewTests {
       try await assert(
         of: TestingView(),
         as: .image(
-          drawHierarchyInKeyWindow: true,
+          sessionRole: .windowApplication,
           layout: .device(.iPhone16Pro)
         )
       )
     }
   #endif
 
-  #if !os(watchOS)
+  #if !os(watchOS) && !os(macOS)
     @Test
     func viewInKeyWindowWithFixedSize() async throws {
       struct TestingView: View {
@@ -195,7 +195,7 @@ struct ViewTests {
       try await assert(
         of: TestingView(),
         as: .image(
-          drawHierarchyInKeyWindow: true,
+          sessionRole: .windowApplication,
           layout: .fixed(width: 300, height: 150)
         )
       )
@@ -293,7 +293,7 @@ struct ViewTests {
         try await assert(
           of: TestingView(),
           as: .image(
-            drawHierarchyInKeyWindow: true,
+            sessionRole: .windowApplication,
             layout: .device(.iPhone16Pro)
           ),
           named: "iPhone16Pro"

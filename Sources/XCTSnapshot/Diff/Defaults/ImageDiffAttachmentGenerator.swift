@@ -72,7 +72,14 @@ extension XCTAttachment {
       return nil
     }
 
-    self.init(image: unsafeImage)
+    #if os(macOS)
+      guard let data = unsafeImage.pngData() else {
+        return nil
+      }
+      self.init(data: data)
+    #else
+      self.init(image: unsafeImage)
+    #endif
   }
 }
 

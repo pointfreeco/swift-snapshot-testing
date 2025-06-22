@@ -30,7 +30,7 @@
     ///   )
     ///   ```
     public static func image(
-      drawHierarchyInKeyWindow: Bool = false,
+      sessionRole: UISceneSession.Role = .windowApplication,
       precision: Float = 1,
       perceptualPrecision: Float = 1,
       layout: SnapshotLayout = .sizeThatFits,
@@ -48,7 +48,7 @@
         perceptualPrecision: perceptualPrecision
       )
       .withWindow(
-        drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+        sessionRole: sessionRole,
         application: application,
         operation: { windowConfiguration, executor in
           Async(Input.self) { @MainActor in
@@ -104,7 +104,7 @@
     }
 
     public static func hierarchy(
-      drawHierarchyInKeyWindow: Bool = false,
+      sessionRole: UISceneSession.Role = .windowApplication,
       layout: SnapshotLayout = .sizeThatFits,
       traits: Traits = .init(),
       delay: Double = .zero,
@@ -112,7 +112,7 @@
     ) -> AsyncSnapshot<Input, Output> {
       descriptor(
         method: .hierarchy,
-        drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+        sessionRole: sessionRole,
         layout: layout,
         traits: traits,
         delay: delay,
@@ -128,7 +128,7 @@
     ///   - size: A view size override.
     ///   - traits: A trait collection override.
     public static func recursiveDescription(
-      drawHierarchyInKeyWindow: Bool = false,
+      sessionRole: UISceneSession.Role = .windowApplication,
       layout: SnapshotLayout = .sizeThatFits,
       traits: Traits = .init(),
       delay: Double = .zero,
@@ -136,7 +136,7 @@
     ) -> AsyncSnapshot<Input, Output> {
       descriptor(
         method: .recursiveDescription,
-        drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+        sessionRole: sessionRole,
         layout: layout,
         traits: traits,
         delay: delay,
@@ -146,7 +146,7 @@
 
     private static func descriptor(
       method: SnapshotUIController.DescriptorMethod,
-      drawHierarchyInKeyWindow: Bool,
+      sessionRole: UISceneSession.Role,
       layout: SnapshotLayout,
       traits: Traits,
       delay: Double,
@@ -159,7 +159,7 @@
 
       return IdentitySyncSnapshot.lines
         .withWindow(
-          drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+          sessionRole: sessionRole,
           application: application,
           operation: { windowConfiguration, executor in
             Async(Input.self) { @MainActor in

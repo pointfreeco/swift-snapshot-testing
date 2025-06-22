@@ -1,3 +1,4 @@
+import RealityKit
 import XCTest
 
 @testable import XCTSnapshot
@@ -135,7 +136,7 @@ import XCTest
       view.backgroundColor = .yellow
       try await assert(
         of: view,
-        as: .image(drawHierarchyInKeyWindow: true)
+        as: .image(sessionRole: .windowApplication)
       )
     }
 
@@ -159,7 +160,7 @@ import XCTest
       try await assert(
         of: view,
         as: .image(
-          drawHierarchyInKeyWindow: true,
+          sessionRole: .windowApplication,
           layout: .device(.iPhone16Pro)
         ))
     }
@@ -170,7 +171,7 @@ import XCTest
       try await assert(
         of: view,
         as: .image(
-          drawHierarchyInKeyWindow: true,
+          sessionRole: .windowApplication,
           layout: .fixed(width: 300, height: 150)
         ))
     }
@@ -261,7 +262,7 @@ import XCTest
       try await assert(
         of: view,
         as: .image(
-          drawHierarchyInKeyWindow: true,
+          sessionRole: .windowApplication,
           layout: .device(.iPhone16Pro)
         ),
         named: "iPhone16Pro"

@@ -227,6 +227,7 @@ final class SnapshotTestingTests: BaseTestCase {
   }
 
   #if compiler(>=6.1)
+    @MainActor
     func testSCNView() async throws {
       #if os(iOS) || os(macOS) || os(tvOS)
         // NB: CircleCI crashes while trying to instantiate SCNView.
@@ -1160,29 +1161,31 @@ final class SnapshotTestingTests: BaseTestCase {
     #endif
   }
 
-  @MainActor
-  func testTraitsWithView() async throws {
+  #if !os(watchOS) && !os(macOS)
+    @MainActor
+    func testTraitsWithView() async throws {
 
-    var label: UILabel {
-      get async {
-        await MainActor.run {
-          let label = UILabel()
-          label.font = .preferredFont(forTextStyle: .title1)
-          label.adjustsFontForContentSizeCategory = true
-          label.text = "What's the point?"
-          return label
+      var label: UILabel {
+        get async {
+          await MainActor.run {
+            let label = UILabel()
+            label.font = .preferredFont(forTextStyle: .title1)
+            label.adjustsFontForContentSizeCategory = true
+            label.text = "What's the point?"
+            return label
+          }
         }
       }
-    }
 
-    for (name, contentSize) in allContentSizes {
-      try await assert(
-        of: await label,
-        as: .image(traits: .init(preferredContentSizeCategory: contentSize)),
-        named: "label-\(name)"
-      )
+      for (name, contentSize) in allContentSizes {
+        try await assert(
+          of: await label,
+          as: .image(traits: .init(preferredContentSizeCategory: contentSize)),
+          named: "label-\(name)"
+        )
+      }
     }
-  }
+  #endif
 
   @MainActor
   func testTraitsWithViewController() async throws {
@@ -1624,7 +1627,7 @@ final class SnapshotTestingTests: BaseTestCase {
   #endif
 }
 
-#if os(iOS)
+#if os(iOS) || os(tvOS) || os(visionOS)
   private let allContentSizes =
     [
       "extra-small": UIContentSizeCategory.extraSmall,

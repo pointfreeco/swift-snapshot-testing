@@ -1,5 +1,9 @@
 import Foundation
 
+#if os(iOS)
+  import UIKit
+#endif
+
 private struct PlatformEnvironmentKey: SnapshotEnvironmentKey {
 
   static var defaultValue: String {
@@ -10,7 +14,13 @@ private struct PlatformEnvironmentKey: SnapshotEnvironmentKey {
     #if os(macOS)
       return "macOS"
     #elseif os(iOS)
-      return "iOS"
+      return performOnMainThread {
+        if UIDevice.current.userInterfaceIdiom == .pad {
+          return "iPadOS"
+        } else {
+          return "iOS"
+        }
+      }
     #elseif os(tvOS)
       return "tvOS"
     #elseif os(watchOS)
@@ -24,7 +34,7 @@ private struct PlatformEnvironmentKey: SnapshotEnvironmentKey {
     #elseif os(Linux)
       return "linux"
     #elseif os(WASI)
-      return "wasm"
+      return "wasi"
     #else
       return "unknown"
     #endif
