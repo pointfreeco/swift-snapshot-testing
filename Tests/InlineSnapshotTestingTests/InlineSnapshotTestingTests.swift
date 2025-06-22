@@ -1,7 +1,8 @@
 import Foundation
-@testable import InlineSnapshotTesting
 import SnapshotTesting
 import XCTest
+
+@testable import InlineSnapshotTesting
 
 final class InlineSnapshotTestingTests: BaseTestCase {
   func testInlineSnapshot() throws {
@@ -17,7 +18,8 @@ final class InlineSnapshotTestingTests: BaseTestCase {
 
   func testInlineSnapshot_NamedTrailingClosure() throws {
     try assertInline(
-      of: ["Hello", "World"], as: .customDump,matches: {
+      of: ["Hello", "World"], as: .customDump,
+      matches: {
         """
         [
           [0]: "Hello",
@@ -82,7 +84,8 @@ final class InlineSnapshotTestingTests: BaseTestCase {
 
   func testCustomInlineSnapshot_NoTrailingClosure() throws {
     try assertCustomInlineSnapshot(
-      of: { "Hello" },is: {
+      of: { "Hello" },
+      is: {
         """
         "Hello"
         """
@@ -259,7 +262,7 @@ final class InlineSnapshotTestingTests: BaseTestCase {
       """
       This is a line\r
       And this is a line\r
-      
+
       """
     }
   }
@@ -269,54 +272,54 @@ final class InlineSnapshotTestingTests: BaseTestCase {
       ##"""
       """#This is a line\##r
       And this is a line\##r
-      
+
       """##
     }
   }
 
-#if canImport(Darwin)
-  func testRecordFailed_IncorrectExpectation() throws {
-    try XCTExpectFailure {
-      try withTestingEnvironment(record: .never) {
-        try assertInline(of: 42, as: .json) {
-          """
-          4
-          """
+  #if canImport(Darwin)
+    func testRecordFailed_IncorrectExpectation() throws {
+      try XCTExpectFailure {
+        try withTestingEnvironment(record: .never) {
+          try assertInline(of: 42, as: .json) {
+            """
+            4
+            """
+          }
         }
+      } issueMatcher: {
+        $0.compactDescription == """
+          failed - Snapshot does not match reference. Difference: …
+
+            @@ −1,1 +1,1 @@
+            −4
+            +42
+          """
       }
-    } issueMatcher: {
-      $0.compactDescription == """
-        failed - Snapshot does not match reference. Difference: …
-        
-          @@ −1,1 +1,1 @@
-          −4
-          +42
-        """
+
+      let records = InlineSnapshotManager.current.records(for: #filePath)
+
+      XCTAssertTrue(records.contains { $0.function == #function && !$0.wasRecording })
     }
+  #endif
 
-    let records = InlineSnapshotManager.current.records(for: #filePath)
-
-    XCTAssertTrue(records.contains { $0.function == #function && !$0.wasRecording })
-  }
-#endif
-
-#if canImport(Darwin)
-  func testRecordFailed_MissingExpectation() throws {
-    try XCTExpectFailure {
-      try withTestingEnvironment(record: .failed) {
-        try assertInline(of: 42, as: .json)
+  #if canImport(Darwin)
+    func testRecordFailed_MissingExpectation() throws {
+      try XCTExpectFailure {
+        try withTestingEnvironment(record: .failed) {
+          try assertInline(of: 42, as: .json)
+        }
+      } issueMatcher: {
+        $0.compactDescription == """
+          failed - No reference was found on disk. New snapshot was not recorded because recording is disabled
+          """
       }
-    } issueMatcher: {
-      $0.compactDescription == """
-        failed - No reference was found on disk. New snapshot was not recorded because recording is disabled
-        """
+
+      let records = InlineSnapshotManager.current.records(for: #filePath)
+
+      XCTAssertTrue(records.contains { $0.function == #function && !$0.wasRecording })
     }
-
-    let records = InlineSnapshotManager.current.records(for: #filePath)
-
-    XCTAssertTrue(records.contains { $0.function == #function && !$0.wasRecording })
-  }
-#endif
+  #endif
 }
 
 private func assertCustomInlineSnapshot(

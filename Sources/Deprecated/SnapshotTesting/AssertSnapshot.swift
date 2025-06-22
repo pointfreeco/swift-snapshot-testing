@@ -94,7 +94,9 @@ public var __record: SnapshotTestingConfiguration.Record = {
 ///     function was called.
 ///   - column: The column on which failure occurred. Defaults to the column on which this function
 ///     was called.
-@available(*, deprecated, renamed: "assert(of:as:named:record:timeout:fileID:file:testName:line:column:)")
+@available(
+  *, deprecated, renamed: "assert(of:as:named:record:timeout:fileID:file:testName:line:column:)"
+)
 public func assertSnapshot<Value, Format>(
   of value: @autoclosure () throws -> Value,
   as snapshotting: Snapshotting<Value, Format>,
@@ -270,7 +272,10 @@ public func assertSnapshots<Value, Format>(
 ///   - line: The line number on which failure occurred. Defaults to the line number on which this
 ///     function was called.
 /// - Returns: A failure message or, if the value matches, nil.
-@available(*, deprecated, renamed: "verify(of:as:named:record:snapshotDirectory:timeout:fileID:file:testName:line:column:)")
+@available(
+  *, deprecated,
+  renamed: "verify(of:as:named:record:snapshotDirectory:timeout:fileID:file:testName:line:column:)"
+)
 public func verifySnapshot<Value, Format>(
   of value: @autoclosure () throws -> Value,
   as snapshotting: Snapshotting<Value, Format>,

@@ -1,335 +1,342 @@
 import Foundation
+
 #if os(iOS) || os(tvOS) || os(watchOS) || os(visionOS)
-import UIKit
+  import UIKit
 #elseif os(macOS)
-@preconcurrency import AppKit
+  @preconcurrency import AppKit
 #endif
 
 #if os(iOS) || os(tvOS) || os(macOS) || os(visionOS)
-@MainActor
-final class WindowPool {
+  @MainActor
+  final class WindowPool {
 
-  // MARK: - Internal static properties
+    // MARK: - Internal static properties
 
-  static let shared = WindowPool(SDKApplication.sharedIfAvailable)
+    static let shared = WindowPool(SDKApplication.sharedIfAvailable)
 
-  // MARK: - Private properties
+    // MARK: - Private properties
 
-  private var keyUnit: PooledWindow?
-  private var units: [PooledWindow] = []
+    private var keyUnit: PooledWindow?
+    private var units: [PooledWindow] = []
 
-  private weak var application: SDKApplication?
+    private weak var application: SDKApplication?
 
-  #if !os(macOS)
-  private var restoreWindowScene: UIWindowScene? {
-    if let windowScene = keyUnit?.window.windowScene {
-      return windowScene
-    } else {
-      return units.lazy
-        .compactMap(\.window.windowScene)
-        .first
-    }
-  }
-  #endif
+    #if !os(macOS)
+      private var restoreWindowScene: UIWindowScene? {
+        if let windowScene = keyUnit?.window.windowScene {
+          return windowScene
+        } else {
+          return units.lazy
+            .compactMap(\.window.windowScene)
+            .first
+        }
+      }
+    #endif
 
-  // MARK: - Inits
+    // MARK: - Inits
 
-  init(_ application: SDKApplication?) {
-    self.application = application
-  }
-
-  // MARK: - Internal methods
-
-  func acquire(
-    isKeyWindow: Bool,
-    maxConcurrentTests: Int,
-    scene role: UISceneSession.Role = .windowApplication
-  ) async throws -> SDKWindow {
-    if isKeyWindow, let window = try await acquireKey(scene: role) {
-      return window
-    } else {
-      return try await acquireRegular(maxConcurrentTests: maxConcurrentTests)
-    }
-  }
-
-  func release(_ window: SDKWindow) async {
-    if window.isKeyWindow || keyUnit?.window === window {
-      return await releaseKey(window)
-    } else {
-      return await releaseRegular(window)
-    }
-  }
-
-  // MARK: - Private methods
-
-  #if os(macOS)
-  private func acquireKey(
-    scene role: UISceneSession.Role
-  ) async throws -> SDKWindow? {
-    if let keyUnit {
-      try await keyUnit.lock()
-      return keyUnit.window
+    init(_ application: SDKApplication?) {
+      self.application = application
     }
 
-    if let keyWindow = application?.mainWindow {
-      let unit = PooledWindow(window: keyWindow)
-      keyUnit = unit
-      try await unit.lock()
-      return keyWindow
+    // MARK: - Internal methods
+
+    func acquire(
+      isKeyWindow: Bool,
+      maxConcurrentTests: Int,
+      scene role: UISceneSession.Role = .windowApplication
+    ) async throws -> SDKWindow {
+      if isKeyWindow, let window = try await acquireKey(scene: role) {
+        return window
+      } else {
+        return try await acquireRegular(maxConcurrentTests: maxConcurrentTests)
+      }
     }
 
-    let window = SDKWindow()
-
-    if let application {
-      attach(window, in: application)
-    } else {
-      window.setIsVisible(true)
+    func release(_ window: SDKWindow) async {
+      if window.isKeyWindow || keyUnit?.window === window {
+        return await releaseKey(window)
+      } else {
+        return await releaseRegular(window)
+      }
     }
 
-    let unit = PooledWindow(window: window)
-    keyUnit = unit
-    try await unit.lock()
-    return window
-  }
-  #else
-  private func acquireKey(
-    scene role: UISceneSession.Role
-  ) async throws -> UIWindow? {
-    if let keyUnit {
-      try await keyUnit.lock()
-      return keyUnit.window
-    }
+    // MARK: - Private methods
 
-    let windowScenes = application?.windowScenes(for: role)
+    #if os(macOS)
+      private func acquireKey(
+        scene role: UISceneSession.Role
+      ) async throws -> SDKWindow? {
+        if let keyUnit {
+          try await keyUnit.lock()
+          return keyUnit.window
+        }
 
-    if let keyWindow = windowScenes?.keyWindows.last {
-      let unit = PooledWindow(window: keyWindow)
-      keyUnit = unit
-      try await unit.lock()
-      return keyWindow
-    }
+        if let keyWindow = application?.mainWindow {
+          let unit = PooledWindow(window: keyWindow)
+          keyUnit = unit
+          try await unit.lock()
+          return keyWindow
+        }
 
-    return nil
-  }
-  #endif
+        let window = SDKWindow()
 
-  private func acquireRegular(maxConcurrentTests: Int) async throws -> SDKWindow {
-    if units.count >= maxConcurrentTests {
-      let units = units[0 ..< maxConcurrentTests]
-      let unit = units.sorted(by: { $0.pendingTasks >= $1.pendingTasks }).first!
-      try await unit.lock()
+        if let application {
+          attach(window, in: application)
+        } else {
+          window.setIsVisible(true)
+        }
+
+        let unit = PooledWindow(window: window)
+        keyUnit = unit
+        try await unit.lock()
+        return window
+      }
+    #else
+      private func acquireKey(
+        scene role: UISceneSession.Role
+      ) async throws -> UIWindow? {
+        if let keyUnit {
+          try await keyUnit.lock()
+          return keyUnit.window
+        }
+
+        let windowScenes = application?.windowScenes(for: role)
+
+        if let keyWindow = windowScenes?.keyWindows.last {
+          let unit = PooledWindow(window: keyWindow)
+          keyUnit = unit
+          try await unit.lock()
+          return keyWindow
+        }
+
+        return nil
+      }
+    #endif
+
+    private func acquireRegular(maxConcurrentTests: Int) async throws -> SDKWindow {
+      if units.count >= maxConcurrentTests {
+        let units = units[0..<maxConcurrentTests]
+        let unit = units.sorted(by: { $0.pendingTasks >= $1.pendingTasks }).first!
+        try await unit.lock()
+        #if os(macOS)
+          unit.window.setIsVisible(true)
+        #else
+          unit.window.isHidden = false
+        #endif
+        return unit.window
+      }
+
       #if os(macOS)
-      unit.window.setIsVisible(true)
+        let window = SDKWindow()
       #else
-      unit.window.isHidden = false
+        let window: UIWindow
+
+        if let windowScene = application?.windowScenes(for: .windowApplication).first
+          ?? restoreWindowScene
+        {
+          window = UIWindow(windowScene: windowScene)
+        } else {
+          window = UIWindow()
+        }
       #endif
-      return unit.window
+
+      #if os(macOS)
+        window.setIsVisible(true)
+      #else
+        window.isHidden = false
+      #endif
+      let unit = PooledWindow(window: window)
+      units.append(unit)
+      try await unit.lock()
+      return window
     }
 
-    #if os(macOS)
-    let window = SDKWindow()
-    #else
-    let window: UIWindow
+    private func releaseKey(_ window: SDKWindow) async {
+      guard let keyUnit, keyUnit.window === window else {
+        fatalError("Key Window is not the one we expect")
+      }
 
-    if let windowScene = application?.windowScenes(for: .windowApplication).first ?? restoreWindowScene {
-      window = UIWindow(windowScene: windowScene)
-    } else {
-      window = UIWindow()
+      await keyUnit.unlock()
     }
-    #endif
 
-    #if os(macOS)
-    window.setIsVisible(true)
-    #else
-    window.isHidden = false
-    #endif
-    let unit = PooledWindow(window: window)
-    units.append(unit)
-    try await unit.lock()
-    return window
+    private func releaseRegular(_ window: SDKWindow) async {
+      #if os(macOS)
+        defer { window.close() }
+      #else
+        defer { window.isHidden = true }
+      #endif
+
+      guard let (index, unit) = units.enumerated().first(where: { $1.window === window }) else {
+        return
+      }
+
+      let pendingTasks = unit.pendingTasks
+      if pendingTasks == .zero {
+        units.remove(at: index)
+      }
+
+      await unit.unlock()
+    }
+
+    private func attach(_ window: SDKWindow, in application: SDKApplication) {
+      // TODO: - Improve code
+      #if os(macOS)
+        window.setIsVisible(true)
+      #else
+        window.isHidden = false
+      #endif
+    }
   }
 
-  private func releaseKey(_ window: SDKWindow) async {
-    guard let keyUnit, keyUnit.window === window else {
-      fatalError("Key Window is not the one we expect")
-    }
+  extension WindowPool {
 
-    await keyUnit.unlock()
+    @MainActor
+    class PooledWindow {
+
+      private let _lock: AsyncLock
+      let window: SDKWindow
+
+      private(set) var pendingTasks: Int = .zero
+
+      init(window: SDKWindow) {
+        _lock = .init()
+        self.window = window
+      }
+
+      func lock() async throws {
+        pendingTasks += 1
+        try await _lock.lock()
+        pendingTasks -= 1
+      }
+
+      func unlock() async {
+        await _lock.unlock()
+      }
+    }
   }
 
-  private func releaseRegular(_ window: SDKWindow) async {
-    #if os(macOS)
-    defer { window.close() }
-    #else
-    defer { window.isHidden = true }
-    #endif
-
-    guard let (index, unit) = units.enumerated().first(where: { $1.window === window }) else {
-      return
-    }
-
-    let pendingTasks = unit.pendingTasks
-    if pendingTasks == .zero {
-      units.remove(at: index)
-    }
-
-    await unit.unlock()
-  }
-
-  private func attach(_ window: SDKWindow, in application: SDKApplication) {
-    // TODO: - Improve code
-    #if os(macOS)
-    window.setIsVisible(true)
-    #else
-    window.isHidden = false
-    #endif
-  }
-}
-
-extension WindowPool {
+  // MARK: - SnapshotWindowConfiguration
 
   @MainActor
-  class PooledWindow {
-
-    private let _lock: AsyncLock
+  struct SnapshotWindowConfiguration<Input> {
     let window: SDKWindow
-
-    private(set) var pendingTasks: Int = .zero
-
-    init(window: SDKWindow) {
-      _lock = .init()
-      self.window = window
-    }
-
-    func lock() async throws {
-      pendingTasks += 1
-      try await _lock.lock()
-      pendingTasks -= 1
-    }
-
-    func unlock() async {
-      await _lock.unlock()
-    }
+    let input: Input
   }
-}
 
-// MARK: - SnapshotWindowConfiguration
+  extension Snapshot {
 
-@MainActor
-struct SnapshotWindowConfiguration<Input> {
-  let window: SDKWindow
-  let input: Input
-}
+    func withWindow<NewInput>(
+      drawHierarchyInKeyWindow: Bool,
+      application: SDKApplication?,
+      operation: @escaping @Sendable (SnapshotWindowConfiguration<NewInput>, Executor) async throws
+        -> Async<NewInput, Output>
+    ) -> AsyncSnapshot<NewInput, Output> {
+      map { executor in
+        Async(NewInput.self) { @MainActor newInput in
+          let windowPool = application?.windowPool ?? WindowPool.shared
 
-extension Snapshot {
+          let window = try await windowPool.acquire(
+            isKeyWindow: drawHierarchyInKeyWindow,
+            maxConcurrentTests: SnapshotEnvironment.current.maxConcurrentTests
+          )
 
-  func withWindow<NewInput>(
-    drawHierarchyInKeyWindow: Bool,
-    application: SDKApplication?,
-    operation: @escaping @Sendable (SnapshotWindowConfiguration<NewInput>, Executor) async throws -> Async<NewInput, Output>
-  ) -> AsyncSnapshot<NewInput, Output> {
-    map { executor in
-      Async(NewInput.self) { @MainActor newInput in
-        let windowPool = application?.windowPool ?? WindowPool.shared
+          let configuration = SnapshotWindowConfiguration(
+            window: window,
+            input: newInput
+          )
 
-        let window = try await windowPool.acquire(
-          isKeyWindow: drawHierarchyInKeyWindow,
-          maxConcurrentTests: SnapshotEnvironment.current.maxConcurrentTests
-        )
+          do {
+            let executor = try await operation(configuration, executor)
+            let output = try await executor(newInput)
 
-        let configuration = SnapshotWindowConfiguration(
-          window: window,
-          input: newInput
-        )
-
-        do {
-          let executor = try await operation(configuration, executor)
-          let output = try await executor(newInput)
-
-          await windowPool.release(window)
-          return output
-        } catch {
-          await windowPool.release(window)
-          throw error
+            await windowPool.release(window)
+            return output
+          } catch {
+            await windowPool.release(window)
+            throw error
+          }
         }
       }
     }
   }
-}
 
-extension Snapshot {
+  extension Snapshot {
 
-  func withApplication<NewInput: SDKApplication>(
-    scene role: UISceneSession.Role,
-    operation: @escaping @Sendable (SnapshotWindowConfiguration<SDKWindow>, Executor) async throws -> Async<NewInput, Output>
-  ) -> Snapshot<Async<NewInput, Output>> {
-    map { executor in
-      Async<NewInput, Output> { @MainActor newInput in
-        let windowPool = newInput.windowPool
+    func withApplication<NewInput: SDKApplication>(
+      scene role: UISceneSession.Role,
+      operation: @escaping @Sendable (SnapshotWindowConfiguration<SDKWindow>, Executor) async throws
+        -> Async<NewInput, Output>
+    ) -> Snapshot<Async<NewInput, Output>> {
+      map { executor in
+        Async<NewInput, Output> { @MainActor newInput in
+          let windowPool = newInput.windowPool
 
-        let window = try await windowPool.acquire(
-          isKeyWindow: true,
-          maxConcurrentTests: 1,
-          scene: role
-        )
+          let window = try await windowPool.acquire(
+            isKeyWindow: true,
+            maxConcurrentTests: 1,
+            scene: role
+          )
 
-        let configuration = SnapshotWindowConfiguration(
-          window: window,
-          input: window
-        )
+          let configuration = SnapshotWindowConfiguration(
+            window: window,
+            input: window
+          )
 
-        do {
-          let executor = try await operation(configuration, executor)
-          let output = try await executor(newInput)
+          do {
+            let executor = try await operation(configuration, executor)
+            let output = try await executor(newInput)
 
-          await windowPool.release(window)
-          return output
-        } catch {
-          await windowPool.release(window)
-          throw error
+            await windowPool.release(window)
+            return output
+          } catch {
+            await windowPool.release(window)
+            throw error
+          }
         }
       }
     }
   }
-}
 
-@MainActor
-private var kApplicationWindowPool = 0
+  @MainActor
+  private var kApplicationWindowPool = 0
 
-@MainActor
-private extension SDKApplication {
+  @MainActor
+  extension SDKApplication {
 
-  var windowPool: WindowPool {
-    if let windowPool = objc_getAssociatedObject(self, &kApplicationWindowPool) as? WindowPool {
+    fileprivate var windowPool: WindowPool {
+      if let windowPool = objc_getAssociatedObject(self, &kApplicationWindowPool) as? WindowPool {
+        return windowPool
+      }
+
+      let windowPool = WindowPool(self)
+      objc_setAssociatedObject(self, &kApplicationWindowPool, windowPool, .OBJC_ASSOCIATION_RETAIN)
       return windowPool
     }
-
-    let windowPool = WindowPool(self)
-    objc_setAssociatedObject(self, &kApplicationWindowPool, windowPool, .OBJC_ASSOCIATION_RETAIN)
-    return windowPool
   }
-}
 
-// MARK: - SnapshotUIController extensions
+  // MARK: - SnapshotUIController extensions
 
-extension Async where Output == SnapshotUIController {
+  extension Async where Output == SnapshotUIController {
 
-  func connectToWindow(_ configuration: SnapshotWindowConfiguration<Input>) -> Async<Input, ViewOperationPayload> {
-    map { @MainActor in
-      ViewOperationPayload(
-        previousRootViewController: configuration.window.switchRoot($0),
-        window: configuration.window,
-        input: $0
-      )
+    func connectToWindow(_ configuration: SnapshotWindowConfiguration<Input>) -> Async<
+      Input, ViewOperationPayload
+    > {
+      map { @MainActor in
+        ViewOperationPayload(
+          previousRootViewController: configuration.window.switchRoot($0),
+          window: configuration.window,
+          input: $0
+        )
+      }
     }
   }
-}
 #endif
 
 #if os(macOS)
-enum UISceneSession {
-  enum Role {
-    case windowApplication
+  enum UISceneSession {
+    enum Role {
+      case windowApplication
+    }
   }
-}
 #endif

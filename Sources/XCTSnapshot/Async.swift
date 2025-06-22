@@ -4,7 +4,10 @@ public struct Async<Input: Sendable, Output: Sendable>: SnapshotExecutor {
 
   fileprivate let block: @Sendable (Input) async throws -> Output
 
-  public init(_ inputType: Input.Type = Input.self, _ block: @escaping @Sendable (Input) async throws -> Output) {
+  public init(
+    _ inputType: Input.Type = Input.self,
+    _ block: @escaping @Sendable (Input) async throws -> Output
+  ) {
     self.block = block
   }
 
@@ -52,7 +55,7 @@ extension Async {
     until deadline: C.Instant,
     tolerance: C.Instant.Duration? = nil,
     clock: C = .continuous
-  ) -> Async<Input, Output> where C : Clock {
+  ) -> Async<Input, Output> where C: Clock {
     map {
       try await Task.sleep(
         until: deadline,
@@ -68,7 +71,7 @@ extension Async {
     for duration: C.Instant.Duration,
     tolerance: C.Instant.Duration? = nil,
     clock: C = .continuous
-  ) -> Async<Input, Output> where C : Clock {
+  ) -> Async<Input, Output> where C: Clock {
     map {
       try await Task.sleep(
         for: duration,

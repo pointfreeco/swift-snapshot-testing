@@ -18,7 +18,8 @@ public struct DataDiffAttachmentGenerator: DiffAttachmentGenerator {
       return nil
     }
 
-    let message = reference.rawValue.count == diffable.rawValue.count
+    let message =
+      reference.rawValue.count == diffable.rawValue.count
       ? "Expected data to match"
       : "Expected \(diffable.rawValue) to match \(reference.rawValue)"
 

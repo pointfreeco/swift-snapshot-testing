@@ -43,7 +43,7 @@
     }
   }
 
-@available(*, deprecated, message: "Migrate to the new SnapshotTesting API")
+  @available(*, deprecated, message: "Migrate to the new SnapshotTesting API")
   extension Snapshotting where Value == NSBezierPath, Format == String {
     /// A snapshot strategy for comparing bezier paths based on pixel equality.
     @available(macOS 11.0, *)

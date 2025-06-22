@@ -2,9 +2,9 @@ import Foundation
 import XCTest
 
 public struct StringDiffAttachmentGenerator: DiffAttachmentGenerator {
-  
+
   public init() {}
-  
+
   public func callAsFunction(
     from reference: StringBytes,
     with diffable: StringBytes
@@ -12,7 +12,7 @@ public struct StringDiffAttachmentGenerator: DiffAttachmentGenerator {
     guard reference.rawValue != diffable.rawValue else {
       return nil
     }
-    
+
     let hunks = reference.rawValue
       .split(separator: "\n", omittingEmptySubsequences: false)
       .map(String.init)
@@ -22,16 +22,17 @@ public struct StringDiffAttachmentGenerator: DiffAttachmentGenerator {
           .map(String.init)
       )
       .groupping()
-    
-    let failure = hunks
+
+    let failure =
+      hunks
       .flatMap { [$0.patchMarker] + $0.lines }
       .joined(separator: "\n")
-    
+
     let attachment = XCTAttachment(
       data: Data(failure.utf8),
       uniformTypeIdentifier: "public.patch-file"
     )
-    
+
     return DiffAttachment(
       message: failure,
       attachments: [attachment]

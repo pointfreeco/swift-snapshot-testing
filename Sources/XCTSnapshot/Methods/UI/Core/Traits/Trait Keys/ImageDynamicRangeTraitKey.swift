@@ -1,36 +1,36 @@
 #if os(iOS) || os(tvOS) || os(visionOS)
-import UIKit
+  import UIKit
 
-@available(iOS 17, tvOS 17, *)
-private struct ImageDynamicRangeTraitKey: TraitKey {
+  @available(iOS 17, tvOS 17, *)
+  private struct ImageDynamicRangeTraitKey: TraitKey {
 
-  static let defaultValue = UIImage.DynamicRange.unspecified
+    static let defaultValue = UIImage.DynamicRange.unspecified
 
-  static func apply(
-    _ value: Value,
-    to traitsOverrides: inout UITraitOverrides
-  ) {
-    traitsOverrides.imageDynamicRange = value
-  }
+    static func apply(
+      _ value: Value,
+      to traitsOverrides: inout UITraitOverrides
+    ) {
+      traitsOverrides.imageDynamicRange = value
+    }
 
-  static func apply(_ value: Value, to traitCollection: inout UITraitCollection) {
-    traitCollection = traitCollection.modifyingTraits {
-      $0.imageDynamicRange = value
+    static func apply(_ value: Value, to traitCollection: inout UITraitCollection) {
+      traitCollection = traitCollection.modifyingTraits {
+        $0.imageDynamicRange = value
+      }
     }
   }
-}
 
-@available(iOS 17, tvOS 17, *)
-extension Traits {
+  @available(iOS 17, tvOS 17, *)
+  extension Traits {
 
-  public var imageDynamicRange: UIImage.DynamicRange {
-    get { self[ImageDynamicRangeTraitKey.self] }
-    set { self[ImageDynamicRangeTraitKey.self] = newValue }
+    public var imageDynamicRange: UIImage.DynamicRange {
+      get { self[ImageDynamicRangeTraitKey.self] }
+      set { self[ImageDynamicRangeTraitKey.self] = newValue }
+    }
+
+    public init(imageDynamicRange: UIImage.DynamicRange) {
+      self.init()
+      self.imageDynamicRange = imageDynamicRange
+    }
   }
-
-  public init(imageDynamicRange: UIImage.DynamicRange) {
-    self.init()
-    self.imageDynamicRange = imageDynamicRange
-  }
-}
 #endif

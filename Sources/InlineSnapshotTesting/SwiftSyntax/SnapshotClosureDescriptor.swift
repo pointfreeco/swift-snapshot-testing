@@ -61,63 +61,63 @@ public struct SnapshotClosureDescriptor: Sendable, Hashable {
   }
 
   #if canImport(SwiftSyntax601)
-  /// Generates a test failure immediately and unconditionally at the described trailing closure.
-  ///
-  /// This method will attempt to locate the line of the trailing closure described by this type
-  /// and call `XCTFail` with it. If the trailing closure cannot be located, the failure will be
-  /// associated with the given line, instead.
-  ///
-  /// - Parameters:
-  ///   - message: An optional description of the assertion, for inclusion in test results.
-  ///   - fileID: The file ID in which failure occurred. Defaults to the file ID of the test case
-  ///     in which this function was called.
-  ///   - file: The file in which failure occurred. Defaults to the file path of the test case in
-  ///     which this function was called.
-  ///   - line: The line number on which failure occurred. Defaults to the line number on which
-  ///     this function was called.
-  ///   - column: The column on which failure occurred. Defaults to the column on which this
-  ///     function was called.
-  public func fail(
-    _ message: @autoclosure () -> String,
-    fileID: StaticString,
-    file filePath: StaticString,
-    line: UInt,
-    column: UInt
-  ) {
-    var trailingClosureLine: Int?
-    if let testSource = InlineSnapshotManager.current[SnapshotURL(path: filePath)] {
-      let visitor = SnapshotVisitor(
-        functionCallLine: Int(line),
-        functionCallColumn: Int(column),
-        sourceLocationConverter: testSource.sourceLocationConverter,
-        closureDescriptor: self
+    /// Generates a test failure immediately and unconditionally at the described trailing closure.
+    ///
+    /// This method will attempt to locate the line of the trailing closure described by this type
+    /// and call `XCTFail` with it. If the trailing closure cannot be located, the failure will be
+    /// associated with the given line, instead.
+    ///
+    /// - Parameters:
+    ///   - message: An optional description of the assertion, for inclusion in test results.
+    ///   - fileID: The file ID in which failure occurred. Defaults to the file ID of the test case
+    ///     in which this function was called.
+    ///   - file: The file in which failure occurred. Defaults to the file path of the test case in
+    ///     which this function was called.
+    ///   - line: The line number on which failure occurred. Defaults to the line number on which
+    ///     this function was called.
+    ///   - column: The column on which failure occurred. Defaults to the column on which this
+    ///     function was called.
+    public func fail(
+      _ message: @autoclosure () -> String,
+      fileID: StaticString,
+      file filePath: StaticString,
+      line: UInt,
+      column: UInt
+    ) {
+      var trailingClosureLine: Int?
+      if let testSource = InlineSnapshotManager.current[SnapshotURL(path: filePath)] {
+        let visitor = SnapshotVisitor(
+          functionCallLine: Int(line),
+          functionCallColumn: Int(column),
+          sourceLocationConverter: testSource.sourceLocationConverter,
+          closureDescriptor: self
+        )
+        visitor.walk(testSource.sourceFile)
+        trailingClosureLine = visitor.trailingClosureLine
+      }
+
+      TestingSystem.shared.record(
+        message: message(),
+        fileID: fileID,
+        filePath: filePath,
+        line: trailingClosureLine.map(UInt.init) ?? line,
+        column: column
       )
-      visitor.walk(testSource.sourceFile)
-      trailingClosureLine = visitor.trailingClosureLine
     }
 
-    TestingSystem.shared.record(
-      message: message(),
-      fileID: fileID,
-      filePath: filePath,
-      line: trailingClosureLine.map(UInt.init) ?? line,
-      column: column
-    )
-  }
-
-  func contains(_ label: String) -> Bool {
-    self.trailingClosureLabel == label || self.deprecatedTrailingClosureLabels.contains(label)
-  }
+    func contains(_ label: String) -> Bool {
+      self.trailingClosureLabel == label || self.deprecatedTrailingClosureLabels.contains(label)
+    }
   #else
-  @available(*, unavailable, message: "'assertInline' requires 'swift-syntax' >= 509.0.0")
-  public func fail(
-    _ message: @autoclosure () -> String = "",
-    fileID: StaticString,
-    file filePath: StaticString,
-    line: UInt,
-    column: UInt
-  ) {
-    fatalError()
-  }
+    @available(*, unavailable, message: "'assertInline' requires 'swift-syntax' >= 509.0.0")
+    public func fail(
+      _ message: @autoclosure () -> String = "",
+      fileID: StaticString,
+      file filePath: StaticString,
+      line: UInt,
+      column: UInt
+    ) {
+      fatalError()
+    }
   #endif
 }

@@ -6,8 +6,8 @@ struct Difference<Element> {
   /// Origin of elements in the comparison
   enum Origin {
     case first  // Element unique to the first collection
-    case second // Element unique to the second collection
-    case common // Element present in both collections
+    case second  // Element unique to the second collection
+    case common  // Element present in both collections
   }
 
   /// Elements involved in the difference
@@ -33,10 +33,10 @@ extension Array where Element: Hashable {
 
     // 2. Finds Longest Common Subsequence (LCS)
     var longestSubsequence = (
-      overlap: [Int: Int](), // Overlap table
-      firstIndex: 0,   // Start index in first collection
+      overlap: [Int: Int](),  // Overlap table
+      firstIndex: 0,  // Start index in first collection
       secondIndex: 0,  // Start index in second collection
-      length: 0        // Subsequence length
+      length: 0  // Subsequence length
     )
 
     // Iterates through second collection to find matches
@@ -62,7 +62,7 @@ extension Array where Element: Hashable {
     guard longestSubsequence.length > 0 else {
       return [
         Difference(elements: self, origin: .first),
-        Difference(elements: other, origin: .second)
+        Difference(elements: other, origin: .second),
       ].filter { !$0.elements.isEmpty }
     }
 
@@ -79,15 +79,20 @@ extension Array where Element: Hashable {
 
     // 5. Combines results from analyzed parts recursively
     return firstPart.diffing(secondPart)
-    + [Difference(
-      elements: Array(self[longestSubsequence.firstIndex ..< longestSubsequence.firstIndex + longestSubsequence.length]),
-      origin: .common
-    )]
-    + firstRemainder.diffing(secondRemainder)
+      + [
+        Difference(
+          elements: Array(
+            self[
+              longestSubsequence.firstIndex..<longestSubsequence.firstIndex
+                + longestSubsequence.length]),
+          origin: .common
+        )
+      ]
+      + firstRemainder.diffing(secondRemainder)
   }
 }
 
-extension Array<Difference<String>> {
+extension [Difference<String>] {
 
   /// Groups differences into hunks with context
   /// - Parameters:
@@ -95,23 +100,26 @@ extension Array<Difference<String>> {
   ///   - context: Number of context lines to include
   /// - Returns: Formatted list of hunks
   func groupping(context: Int = 4) -> [DiffHunk] {
-    let figureSpace = "\u{2007}" // Figure space (for alignment)
+    let figureSpace = "\u{2007}"  // Figure space (for alignment)
 
     // Processes each difference and groups into hunks
-    let (finalHunk, hunks) = reduce(into: (current: DiffHunk(), hunks: [DiffHunk]())) { state, diff in
+    let (finalHunk, hunks) = reduce(into: (current: DiffHunk(), hunks: [DiffHunk]())) {
+      state, diff in
       let count = diff.elements.count
 
       switch diff.origin {
-        // Case: Common elements with large context
+      // Case: Common elements with large context
       case .common where count > context * 2:
         let prefixLines = diff.elements.prefix(context).map(addPrefix(figureSpace))
         let suffixLines = diff.elements.suffix(context).map(addPrefix(figureSpace))
 
-        let newHunk = state.current + DiffHunk(
-          firstLength: context,
-          secondLength: context,
-          lines: prefixLines
-        )
+        let newHunk =
+          state.current
+          + DiffHunk(
+            firstLength: context,
+            secondLength: context,
+            lines: prefixLines
+          )
 
         state.current = DiffHunk(
           firstStart: state.current.firstStart + state.current.firstLength + count - context,
@@ -126,39 +134,47 @@ extension Array<Difference<String>> {
           state.hunks.append(newHunk)
         }
 
-        // Case: Common elements with empty hunk
+      // Case: Common elements with empty hunk
       case .common where state.current.lines.isEmpty:
         let suffixLines = diff.elements.suffix(context).map(addPrefix(figureSpace))
-        state.current = state.current + DiffHunk(
-          firstStart: count - suffixLines.count,
-          firstLength: suffixLines.count,
-          secondStart: count - suffixLines.count,
-          secondLength: suffixLines.count,
-          lines: suffixLines
-        )
+        state.current =
+          state.current
+          + DiffHunk(
+            firstStart: count - suffixLines.count,
+            firstLength: suffixLines.count,
+            secondStart: count - suffixLines.count,
+            secondLength: suffixLines.count,
+            lines: suffixLines
+          )
 
-        // Case: Normal common elements
+      // Case: Normal common elements
       case .common:
         let lines = diff.elements.map(addPrefix(figureSpace))
-        state.current = state.current + DiffHunk(
-          firstLength: count,
-          secondLength: count,
-          lines: lines
-        )
+        state.current =
+          state.current
+          + DiffHunk(
+            firstLength: count,
+            secondLength: count,
+            lines: lines
+          )
 
-        // Case: Removals (first collection elements)
+      // Case: Removals (first collection elements)
       case .first:
-        state.current = state.current + DiffHunk(
-          firstLength: count,
-          lines: diff.elements.map(addPrefix("−"))
-        )
+        state.current =
+          state.current
+          + DiffHunk(
+            firstLength: count,
+            lines: diff.elements.map(addPrefix("−"))
+          )
 
-        // Case: Additions (second collection elements)
+      // Case: Additions (second collection elements)
       case .second:
-        state.current = state.current + DiffHunk(
-          secondLength: count,
-          lines: diff.elements.map(addPrefix("+"))
-        )
+        state.current =
+          state.current
+          + DiffHunk(
+            secondLength: count,
+            lines: diff.elements.map(addPrefix("+"))
+          )
       }
     }
 

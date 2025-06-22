@@ -29,10 +29,12 @@ extension XCTestCase {
 }
 
 @_spi(Internals)
-public let XCTestBundleDidFinishNotification = Notification.Name("XCTestBundleDidFinishNotification")
+public let XCTestBundleDidFinishNotification = Notification.Name(
+  "XCTestBundleDidFinishNotification")
 
 @_spi(Internals)
-public let SwiftTestingDidFinishNotification = Notification.Name("SwiftTestingDidFinishNotification")
+public let SwiftTestingDidFinishNotification = Notification.Name(
+  "SwiftTestingDidFinishNotification")
 
 @_spi(Internals)
 public let kTestFileName = "kTestFileName"

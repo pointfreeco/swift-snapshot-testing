@@ -1,92 +1,94 @@
 #if os(iOS) || os(tvOS) || os(watchOS) || os(visionOS)
-import UIKit
+  import UIKit
 #elseif os(macOS)
-@preconcurrency import AppKit
+  @preconcurrency import AppKit
 #endif
 
 #if os(iOS) || os(tvOS) || os(macOS) || os(visionOS)
-@MainActor
-struct ViewOperationPayload {
-  let previousRootViewController: SDKViewController?
-  let window: SDKWindow
-  let input: SnapshotUIController
-}
-
-extension Async where Output == ViewOperationPayload {
-
-  func waitLoadingStateIfNeeded(tolerance: TimeInterval) -> Async<Input, Output> {
-    map {
-      await $0.input.view.waitLoadingStateIfNeeded(tolerance: tolerance)
-      return $0
-    }
+  @MainActor
+  struct ViewOperationPayload {
+    let previousRootViewController: SDKViewController?
+    let window: SDKWindow
+    let input: SnapshotUIController
   }
 
-  func layoutIfNeeded() -> Async<Input, Output> {
-    map { @MainActor in
-      $0.input.layoutIfNeeded()
-      return $0
-    }
-  }
+  extension Async where Output == ViewOperationPayload {
 
-  func snapshot(
-    _ executor: Sync<ImageBytes, ImageBytes>
-  ) -> Async<Input, ImageBytes> {
-    map { @MainActor payload in
-      let image = try await executor(ImageBytes(
-        rawValue: payload.input.snapshot()
-      ))
-
-      payload.window.removeRootViewController()
-
-      #if os(macOS)
-      payload.window.contentViewController = payload.previousRootViewController
-      #else
-      payload.window.rootViewController = payload.previousRootViewController
-      #endif
-
-      payload.input.detachChild()
-
-      if !payload.window.isKeyWindow {
-        #if os(macOS)
-        payload.window.close()
-        #else
-        payload.window.isHidden = true
-        #endif
+    func waitLoadingStateIfNeeded(tolerance: TimeInterval) -> Async<Input, Output> {
+      map {
+        await $0.input.view.waitLoadingStateIfNeeded(tolerance: tolerance)
+        return $0
       }
-
-      return image
     }
-  }
 
-  func descriptor(
-    _ executor: Sync<StringBytes, StringBytes>,
-    method: SnapshotUIController.DescriptorMethod
-  ) -> Async<Input, StringBytes> {
-    map { @MainActor payload in
-      let string = try await executor(StringBytes(
-        rawValue: payload.input.descriptor(method)
-      ))
-
-      payload.window.removeRootViewController()
-
-      #if os(macOS)
-      payload.window.contentViewController = payload.previousRootViewController
-      #else
-      payload.window.rootViewController = payload.previousRootViewController
-      #endif
-
-      payload.input.detachChild()
-
-      if !payload.window.isKeyWindow {
-        #if os(macOS)
-        payload.window.close()
-        #else
-        payload.window.isHidden = true
-        #endif
+    func layoutIfNeeded() -> Async<Input, Output> {
+      map { @MainActor in
+        $0.input.layoutIfNeeded()
+        return $0
       }
+    }
 
-      return string
+    func snapshot(
+      _ executor: Sync<ImageBytes, ImageBytes>
+    ) -> Async<Input, ImageBytes> {
+      map { @MainActor payload in
+        let image = try await executor(
+          ImageBytes(
+            rawValue: payload.input.snapshot()
+          ))
+
+        payload.window.removeRootViewController()
+
+        #if os(macOS)
+          payload.window.contentViewController = payload.previousRootViewController
+        #else
+          payload.window.rootViewController = payload.previousRootViewController
+        #endif
+
+        payload.input.detachChild()
+
+        if !payload.window.isKeyWindow {
+          #if os(macOS)
+            payload.window.close()
+          #else
+            payload.window.isHidden = true
+          #endif
+        }
+
+        return image
+      }
+    }
+
+    func descriptor(
+      _ executor: Sync<StringBytes, StringBytes>,
+      method: SnapshotUIController.DescriptorMethod
+    ) -> Async<Input, StringBytes> {
+      map { @MainActor payload in
+        let string = try await executor(
+          StringBytes(
+            rawValue: payload.input.descriptor(method)
+          ))
+
+        payload.window.removeRootViewController()
+
+        #if os(macOS)
+          payload.window.contentViewController = payload.previousRootViewController
+        #else
+          payload.window.rootViewController = payload.previousRootViewController
+        #endif
+
+        payload.input.detachChild()
+
+        if !payload.window.isKeyWindow {
+          #if os(macOS)
+            payload.window.close()
+          #else
+            payload.window.isHidden = true
+          #endif
+        }
+
+        return string
+      }
     }
   }
-}
 #endif

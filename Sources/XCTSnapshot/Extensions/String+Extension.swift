@@ -1,8 +1,8 @@
 import Foundation
 
 #if !os(Android) && !os(Linux) && !os(Windows)
-import CoreServices
-import UniformTypeIdentifiers
+  import CoreServices
+  import UniformTypeIdentifiers
 #endif
 
 extension String {
@@ -18,33 +18,34 @@ extension String {
   func sanitizingPathComponent() -> String {
     // see for ressoning on charachrer sets https://superuser.com/a/358861
     let invalidCharacters = CharacterSet(charactersIn: "\\/:*?\"<>|")
-        .union(.newlines)
-        .union(.illegalCharacters)
-        .union(.controlCharacters)
+      .union(.newlines)
+      .union(.illegalCharacters)
+      .union(.controlCharacters)
 
-    return self
-        .components(separatedBy: invalidCharacters)
-        .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-        .joined(separator: "")
+    return
+      self
+      .components(separatedBy: invalidCharacters)
+      .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+      .joined(separator: "")
   }
 
-#if !os(Android) && !os(Linux) && !os(Windows)
-  func uniformTypeIdentifier() -> String? {
-    #if os(visionOS)
-    return UTType(filenameExtension: self)?.identifier
-    #else
-    if #available(iOS 14, macOS 11, tvOS 14, watchOS 7, *) {
-      return UTType(filenameExtension: self)?.identifier
+  #if !os(Android) && !os(Linux) && !os(Windows)
+    func uniformTypeIdentifier() -> String? {
+      #if os(visionOS)
+        return UTType(filenameExtension: self)?.identifier
+      #else
+        if #available(iOS 14, macOS 11, tvOS 14, watchOS 7, *) {
+          return UTType(filenameExtension: self)?.identifier
+        }
+
+        let unmanagedString = UTTypeCreatePreferredIdentifierForTag(
+          kUTTagClassFilenameExtension as CFString,
+          self as CFString,
+          nil
+        )
+
+        return unmanagedString?.takeRetainedValue() as String?
+      #endif
     }
-
-    let unmanagedString = UTTypeCreatePreferredIdentifierForTag(
-      kUTTagClassFilenameExtension as CFString,
-      self as CFString,
-      nil
-    )
-
-    return unmanagedString?.takeRetainedValue() as String?
-    #endif
-  }
-#endif
+  #endif
 }

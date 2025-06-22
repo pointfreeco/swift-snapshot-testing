@@ -1,191 +1,191 @@
 #if os(iOS) || os(tvOS) || os(visionOS)
-import UIKit
+  import UIKit
 #elseif os(macOS)
-import AppKit
+  import AppKit
 #endif
 
 #if os(iOS) || os(tvOS) || os(visionOS) || os(macOS)
-class SnapshotView: SDKView {
+  class SnapshotView: SDKView {
 
-  let configuration: LayoutConfiguration
+    let configuration: LayoutConfiguration
 
-  private var sizableViews: [ObjectIdentifier: (SDKView, SizeListener)] = [:]
+    private var sizableViews: [ObjectIdentifier: (SDKView, SizeListener)] = [:]
 
-  init(configuration: LayoutConfiguration) {
-    self.configuration = configuration
-    super.init(frame: .zero)
-    #if os(macOS)
-    wantsLayer = true
-    #endif
-  }
-
-  required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
-  }
-
-  #if os(macOS)
-  override func layout() {
-    super.layout()
-    self.updateTransformations()
-  }
-  #else
-  override func safeAreaInsetsDidChange() {
-    super.safeAreaInsetsDidChange()
-    self.updateTransformations()
-  }
-
-  override func layoutSubviews() {
-    super.layoutSubviews()
-    self.updateTransformations()
-  }
-  #endif
-
-  func dispose() {
-    defer { sizableViews = [:] }
-
-    for (transformableView, sizeListener) in sizableViews.values {
-      sizeListener.dispose()
-      transformableView.removeFromSuperview()
+    init(configuration: LayoutConfiguration) {
+      self.configuration = configuration
+      super.init(frame: .zero)
+      #if os(macOS)
+        wantsLayer = true
+      #endif
     }
-  }
 
-  func add(_ view: SDKView, with sizeListener: SizeListener) {
-    defer { sizeListener.delegate = self }
-    
-    let transformableView = SDKView()
-    view.translatesAutoresizingMaskIntoConstraints = false
-    transformableView.translatesAutoresizingMaskIntoConstraints = false
-    transformableView.addSubview(view)
+    required init?(coder: NSCoder) {
+      fatalError("init(coder:) has not been implemented")
+    }
 
-    super.addSubview(transformableView)
+    #if os(macOS)
+      override func layout() {
+        super.layout()
+        self.updateTransformations()
+      }
+    #else
+      override func safeAreaInsetsDidChange() {
+        super.safeAreaInsetsDidChange()
+        self.updateTransformations()
+      }
 
-    NSLayoutConstraint.activate([
-      transformableView.topAnchor.constraint(equalTo: topAnchor),
-      transformableView.leadingAnchor.constraint(equalTo: leadingAnchor),
-      transformableView.bottomAnchor.constraint(equalTo: bottomAnchor),
-      transformableView.trailingAnchor.constraint(equalTo: trailingAnchor)
-    ])
+      override func layoutSubviews() {
+        super.layoutSubviews()
+        self.updateTransformations()
+      }
+    #endif
 
-    NSLayoutConstraint.activate([
-      view.centerXAnchor.constraint(equalTo: transformableView.centerXAnchor),
-      view.centerYAnchor.constraint(equalTo: transformableView.centerYAnchor)
-    ])
+    func dispose() {
+      defer { sizableViews = [:] }
 
-    sizableViews[sizeListener.id] = (transformableView, sizeListener)
-  }
+      for (transformableView, sizeListener) in sizableViews.values {
+        sizeListener.dispose()
+        transformableView.removeFromSuperview()
+      }
+    }
 
-  func calculateContentFrame() -> CGRect {
-    let contentSize = sizableViews.values.reduce(CGSize.zero) {
-      CGSize(
-        width: max($0.width, $1.1.size.width),
-        height: max($0.height, $1.1.size.height)
+    func add(_ view: SDKView, with sizeListener: SizeListener) {
+      defer { sizeListener.delegate = self }
+
+      let transformableView = SDKView()
+      view.translatesAutoresizingMaskIntoConstraints = false
+      transformableView.translatesAutoresizingMaskIntoConstraints = false
+      transformableView.addSubview(view)
+
+      super.addSubview(transformableView)
+
+      NSLayoutConstraint.activate([
+        transformableView.topAnchor.constraint(equalTo: topAnchor),
+        transformableView.leadingAnchor.constraint(equalTo: leadingAnchor),
+        transformableView.bottomAnchor.constraint(equalTo: bottomAnchor),
+        transformableView.trailingAnchor.constraint(equalTo: trailingAnchor),
+      ])
+
+      NSLayoutConstraint.activate([
+        view.centerXAnchor.constraint(equalTo: transformableView.centerXAnchor),
+        view.centerYAnchor.constraint(equalTo: transformableView.centerYAnchor),
+      ])
+
+      sizableViews[sizeListener.id] = (transformableView, sizeListener)
+    }
+
+    func calculateContentFrame() -> CGRect {
+      let contentSize = sizableViews.values.reduce(CGSize.zero) {
+        CGSize(
+          width: max($0.width, $1.1.size.width),
+          height: max($0.height, $1.1.size.height)
+        )
+      }
+
+      let safeArea = configuration.safeArea
+      var calculatedSize = CGSize(
+        width: contentSize.width + (safeArea.left + safeArea.right),
+        height: contentSize.height + (safeArea.top + safeArea.bottom)
+      )
+
+      let scale = self.scale(for: contentSize)
+
+      calculatedSize.width *= scale
+      calculatedSize.height *= scale
+
+      return CGRect(
+        x: bounds.midX - calculatedSize.width / 2,
+        y: bounds.midY - calculatedSize.height / 2,
+        width: calculatedSize.width,
+        height: calculatedSize.height
       )
     }
 
-    let safeArea = configuration.safeArea
-    var calculatedSize = CGSize(
-      width: contentSize.width + (safeArea.left + safeArea.right),
-      height: contentSize.height + (safeArea.top + safeArea.bottom)
-    )
-
-    let scale = self.scale(for: contentSize)
-
-    calculatedSize.width *= scale
-    calculatedSize.height *= scale
-
-    return CGRect(
-      x: bounds.midX - calculatedSize.width / 2,
-      y: bounds.midY - calculatedSize.height / 2,
-      width: calculatedSize.width,
-      height: calculatedSize.height
-    )
-  }
-
-  private func updateTransformations() {
-    for (transformableView, sizeListener) in sizableViews.values {
-      downscale(transformableView, with: sizeListener.size)
-    }
-  }
-
-  private func downscale(_ transformableView: SDKView, with size: CGSize) {
-    let scale = scale(for: size)
-    #if os(macOS)
-    self.layer?.contentsScale = scale
-    #else
-    transformableView.transform = CGAffineTransform(scaleX: scale, y: scale)
-    #endif
-    transformableView.recursiveNeedsLayout()
-    #if os(macOS)
-    needsLayout = true
-    #else
-    transformableView.layoutIfNeeded()
-    #endif
-  }
-
-  private func scale(for size: CGSize) -> CGFloat {
-    guard frame.size.height > .zero && frame.size.width > .zero else {
-      return 1
+    private func updateTransformations() {
+      for (transformableView, sizeListener) in sizableViews.values {
+        downscale(transformableView, with: sizeListener.size)
+      }
     }
 
-    let safeArea = configuration.safeArea
-    let calculatedSize = CGSize(
-      width: size.width + safeArea.left + safeArea.right,
-      height: size.height + safeArea.top + safeArea.bottom
-    )
+    private func downscale(_ transformableView: SDKView, with size: CGSize) {
+      let scale = scale(for: size)
+      #if os(macOS)
+        self.layer?.contentsScale = scale
+      #else
+        transformableView.transform = CGAffineTransform(scaleX: scale, y: scale)
+      #endif
+      transformableView.recursiveNeedsLayout()
+      #if os(macOS)
+        needsLayout = true
+      #else
+        transformableView.layoutIfNeeded()
+      #endif
+    }
 
-    let proposedSize: CGSize
+    private func scale(for size: CGSize) -> CGFloat {
+      guard frame.size.height > .zero && frame.size.width > .zero else {
+        return 1
+      }
 
-    if #available(macOS 11, *) {
-      proposedSize = CGSize(
-        width: frame.size.width - (safeAreaInsets.left + safeAreaInsets.right),
-        height: frame.size.height - (safeAreaInsets.top + safeAreaInsets.bottom)
+      let safeArea = configuration.safeArea
+      let calculatedSize = CGSize(
+        width: size.width + safeArea.left + safeArea.right,
+        height: size.height + safeArea.top + safeArea.bottom
       )
-    } else {
-      proposedSize = frame.size
-    }
 
-    return proposedSize.scaleThatFits(calculatedSize)
+      let proposedSize: CGSize
+
+      if #available(macOS 11, *) {
+        proposedSize = CGSize(
+          width: frame.size.width - (safeAreaInsets.left + safeAreaInsets.right),
+          height: frame.size.height - (safeAreaInsets.top + safeAreaInsets.bottom)
+        )
+      } else {
+        proposedSize = frame.size
+      }
+
+      return proposedSize.scaleThatFits(calculatedSize)
+    }
   }
-}
 
-extension SnapshotView: SizeListenerDelegate {
+  extension SnapshotView: SizeListenerDelegate {
 
-  func viewDidUpdateSize(_ id: ObjectIdentifier, size: CGSize) {
-    guard let (transformableView, _) = sizableViews[id] else {
-      return
+    func viewDidUpdateSize(_ id: ObjectIdentifier, size: CGSize) {
+      guard let (transformableView, _) = sizableViews[id] else {
+        return
+      }
+
+      downscale(transformableView, with: size)
     }
-
-    downscale(transformableView, with: size)
   }
-}
 
-extension SDKView {
+  extension SDKView {
 
-  func recursiveNeedsLayout() {
-    guard window != nil else {
-      return
-    }
+    func recursiveNeedsLayout() {
+      guard window != nil else {
+        return
+      }
 
-    invalidateIntrinsicContentSize()
-    #if os(macOS)
-    needsUpdateConstraints = true
-    needsLayout = true
-    #else
-    setNeedsUpdateConstraints()
-    setNeedsLayout()
-    #endif
+      invalidateIntrinsicContentSize()
+      #if os(macOS)
+        needsUpdateConstraints = true
+        needsLayout = true
+      #else
+        setNeedsUpdateConstraints()
+        setNeedsLayout()
+      #endif
 
-    switch self {
-    #if os(macOS)
-    #else
-    case is UITableView, is UICollectionView:
-      break
-    #endif
-    default:
-      for view in subviews {
-        view.recursiveNeedsLayout()
+      switch self {
+      #if os(macOS)
+      #else
+        case is UITableView, is UICollectionView:
+          break
+      #endif
+      default:
+        for view in subviews {
+          view.recursiveNeedsLayout()
+        }
       }
     }
   }
-}
 #endif

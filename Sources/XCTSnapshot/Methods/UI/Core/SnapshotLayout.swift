@@ -4,16 +4,16 @@ import CoreGraphics
 public enum SnapshotLayout {
 
   #if os(iOS) || os(tvOS) || os(visionOS)
-  /// Renders the component using a specific device configuration.
-  ///
-  /// - Parameter configuration: Layout configuration defining safe area margins, size,
-  /// and UI traits (e.g., orientation).
-  ///
-  /// Example:
-  ///   ```swift
-  ///   let layout = .device(.iPhone15ProMax)
-  ///   ```
-  case device(LayoutConfiguration)
+    /// Renders the component using a specific device configuration.
+    ///
+    /// - Parameter configuration: Layout configuration defining safe area margins, size,
+    /// and UI traits (e.g., orientation).
+    ///
+    /// Example:
+    ///   ```swift
+    ///   let layout = .device(.iPhone15ProMax)
+    ///   ```
+    case device(LayoutConfiguration)
   #endif
 
   /// Renders the component with an explicit fixed size.

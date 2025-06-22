@@ -115,9 +115,9 @@ public struct SnapshotTester<Engine: SnapshotEngine>: Sendable {
   }
 }
 
-private extension SnapshotTester {
+extension SnapshotTester {
 
-  func assert(
+  fileprivate func assert(
     diffable: Executor.Output,
     pathExtension: String?,
     attachmentGenerator: any DiffAttachmentGenerator<Executor.Output>
@@ -182,10 +182,12 @@ private extension SnapshotTester {
     snapshotURL: URL,
     attachmentGenerator: any DiffAttachmentGenerator<Executor.Output>
   ) throws -> SnapshotFailure? {
-    guard let messageAttachment = attachmentGenerator(
-      from: reference,
-      with: diffable
-    ) else {
+    guard
+      let messageAttachment = attachmentGenerator(
+        from: reference,
+        with: diffable
+      )
+    else {
       try notify(diffable, to: snapshotURL)
       return nil
     }
@@ -291,9 +293,9 @@ private extension SnapshotTester {
 
 // MARK: - Source URL
 
-private extension SnapshotTester {
+extension SnapshotTester {
 
-  func snapshotURL(
+  fileprivate func snapshotURL(
     pathExtension: String?
   ) throws -> URL {
     let sourceURL = try engine.sourceURL(for: filePath, using: self)
@@ -334,35 +336,37 @@ private extension SnapshotTester {
 // MARK: - Attachments
 
 #if !os(Linux) && !os(Android) && !os(Windows)
-extension SnapshotTester {
+  extension SnapshotTester {
 
-  func add(_ named: String, attachments: @Sendable () -> [XCTAttachment]) {
-    guard !TestingSystem.shared.isSwiftTestingRunning && ProcessInfo.isXcode else {
-      return
-    }
+    func add(_ named: String, attachments: @Sendable () -> [XCTAttachment]) {
+      guard !TestingSystem.shared.isSwiftTestingRunning && ProcessInfo.isXcode else {
+        return
+      }
 
-    performOnMainThread {
-      XCTContext.runActivity(named: named) { activity in
-        for attachment in attachments() {
-          activity.add(attachment)
+      performOnMainThread {
+        XCTContext.runActivity(named: named) { activity in
+          for attachment in attachments() {
+            activity.add(attachment)
+          }
         }
       }
     }
-  }
 
-  func add(
-    _ diffable: Data,
-    for url: URL
-  ) {
-    add("Attached Recorded Snapshot") {[
-      XCTAttachment(
-        uniformTypeIdentifier: url.pathExtension.uniformTypeIdentifier(),
-        name: url.lastPathComponent,
-        payload: diffable
-      )
-    ]}
+    func add(
+      _ diffable: Data,
+      for url: URL
+    ) {
+      add("Attached Recorded Snapshot") {
+        [
+          XCTAttachment(
+            uniformTypeIdentifier: url.pathExtension.uniformTypeIdentifier(),
+            name: url.lastPathComponent,
+            payload: diffable
+          )
+        ]
+      }
+    }
   }
-}
 #endif
 
 struct XCTestExecutionError: Error {}

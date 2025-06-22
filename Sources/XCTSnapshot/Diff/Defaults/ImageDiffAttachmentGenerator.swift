@@ -1,9 +1,10 @@
-#if os(iOS) || os(tvOS) || os(watchOS)
-import UIKit
-#elseif os(macOS)
-@preconcurrency import AppKit
-#endif
 @preconcurrency import XCTest
+
+#if os(iOS) || os(tvOS) || os(watchOS)
+  import UIKit
+#elseif os(macOS)
+  @preconcurrency import AppKit
+#endif
 
 /// Generates messages and visual attachments highlighting differences between images in snapshot tests.
 ///
@@ -38,21 +39,24 @@ public struct ImageDiffAttachmentGenerator: DiffAttachmentGenerator {
     with diffable: ImageBytes
   ) -> DiffAttachment? {
     performOnMainThread {
-      guard let message = reference.rawValue.compare(
-        diffable.rawValue,
-        precision: precision,
-        perceptualPrecision: perceptualPrecision
-      ) else { return nil }
-      
+      guard
+        let message = reference.rawValue.compare(
+          diffable.rawValue,
+          precision: precision,
+          perceptualPrecision: perceptualPrecision
+        )
+      else { return nil }
+
       let difference = reference.rawValue.substract(diffable.rawValue)
       let oldAttachment = XCTAttachment(unsafeImage: reference.rawValue)
       oldAttachment?.name = "reference"
       let isEmptyImage = diffable.rawValue.size == .zero
-      let newAttachment = XCTAttachment(unsafeImage: isEmptyImage ? SDKImage.empty : diffable.rawValue)
+      let newAttachment = XCTAttachment(
+        unsafeImage: isEmptyImage ? SDKImage.empty : diffable.rawValue)
       newAttachment?.name = "failure"
       let differenceAttachment = XCTAttachment(unsafeImage: difference)
       differenceAttachment?.name = "difference"
-      
+
       return DiffAttachment(
         message: message,
         attachments: [oldAttachment, newAttachment, differenceAttachment].compactMap(\.self)

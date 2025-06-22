@@ -1,36 +1,36 @@
 #if os(iOS) || os(tvOS) || os(visionOS)
-import UIKit
+  import UIKit
 
-@available(iOS 17, tvOS 17, *)
-private struct SceneCaptureStateTraitKey: TraitKey {
+  @available(iOS 17, tvOS 17, *)
+  private struct SceneCaptureStateTraitKey: TraitKey {
 
-  static let defaultValue = UISceneCaptureState.unspecified
+    static let defaultValue = UISceneCaptureState.unspecified
 
-  static func apply(
-    _ value: Value,
-    to traitsOverrides: inout UITraitOverrides
-  ) {
-    traitsOverrides.sceneCaptureState = value
-  }
+    static func apply(
+      _ value: Value,
+      to traitsOverrides: inout UITraitOverrides
+    ) {
+      traitsOverrides.sceneCaptureState = value
+    }
 
-  static func apply(_ value: Value, to traitCollection: inout UITraitCollection) {
-    traitCollection = traitCollection.modifyingTraits {
-      $0.sceneCaptureState = value
+    static func apply(_ value: Value, to traitCollection: inout UITraitCollection) {
+      traitCollection = traitCollection.modifyingTraits {
+        $0.sceneCaptureState = value
+      }
     }
   }
-}
 
-@available(iOS 17, tvOS 17, *)
-extension Traits {
+  @available(iOS 17, tvOS 17, *)
+  extension Traits {
 
-  public var sceneCaptureState: UISceneCaptureState {
-    get { self[SceneCaptureStateTraitKey.self] }
-    set { self[SceneCaptureStateTraitKey.self] = newValue }
+    public var sceneCaptureState: UISceneCaptureState {
+      get { self[SceneCaptureStateTraitKey.self] }
+      set { self[SceneCaptureStateTraitKey.self] = newValue }
+    }
+
+    public init(sceneCaptureState: UISceneCaptureState) {
+      self.init()
+      self.sceneCaptureState = sceneCaptureState
+    }
   }
-
-  public init(sceneCaptureState: UISceneCaptureState) {
-    self.init()
-    self.sceneCaptureState = sceneCaptureState
-  }
-}
 #endif

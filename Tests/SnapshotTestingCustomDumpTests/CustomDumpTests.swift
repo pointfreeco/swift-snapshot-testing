@@ -1,6 +1,6 @@
-import XCTest
-import XCTSnapshot
 import SnapshotTestingCustomDump
+import XCTSnapshot
+import XCTest
 
 class CustomDumpTests: XCTestCase {
 

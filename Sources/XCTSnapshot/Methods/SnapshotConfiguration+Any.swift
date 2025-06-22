@@ -27,7 +27,7 @@ extension SyncSnapshot where Output == StringBytes {
     let options: JSONSerialization.WritingOptions = [
       .prettyPrinted,
       .sortedKeys,
-      .fragmentsAllowed
+      .fragmentsAllowed,
     ]
 
     let snapshot = IdentitySyncSnapshot.lines.pullback { (data: Input) in

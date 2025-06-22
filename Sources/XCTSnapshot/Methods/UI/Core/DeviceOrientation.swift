@@ -9,11 +9,13 @@ public enum DeviceOrientation: Sendable {
   case portrait(DeviceLayoutRatio)
 }
 
-public struct DeviceLayoutRatio: Sendable, RawRepresentable, ExpressibleByFloatLiteral, Hashable, Comparable {
+public struct DeviceLayoutRatio: Sendable, RawRepresentable, ExpressibleByFloatLiteral, Hashable,
+  Comparable
+{
 
-  public static let compact: Self = .init(rawValue: 1/3)
+  public static let compact: Self = .init(rawValue: 1 / 3)
   public static let medium: Self = .init(rawValue: 0.5)
-  public static let regular: Self = .init(rawValue: 2/3)
+  public static let regular: Self = .init(rawValue: 2 / 3)
   public static let extended: Self = .init(rawValue: 1)
 
   public var description: String {

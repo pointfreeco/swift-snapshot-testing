@@ -1,7 +1,8 @@
 import CustomDump
 import XCTSnapshot
+
 #if !os(visionOS)
-@_exported import _SnapshotTestingCustomDump
+  @_exported import _SnapshotTestingCustomDump
 #endif
 
 extension SyncSnapshot where Output == StringBytes {

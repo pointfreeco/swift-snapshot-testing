@@ -26,7 +26,7 @@ struct DiffHunk {
   }
 
   /// Combines two hunks into one.
-  static func +(lhs: DiffHunk, rhs: DiffHunk) -> DiffHunk {
+  static func + (lhs: DiffHunk, rhs: DiffHunk) -> DiffHunk {
     DiffHunk(
       firstStart: lhs.firstStart,
       firstLength: lhs.firstLength + rhs.firstLength,

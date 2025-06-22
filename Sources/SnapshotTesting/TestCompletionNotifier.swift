@@ -1,18 +1,18 @@
-import Testing
 import Foundation
+import Testing
 @_spi(Internals) import XCTSnapshot
 
 public struct FinalizeSnapshotsSuiteTrait: SuiteTrait {
-  
+
   public let isRecursive = false
 
   #if compiler(>=6.1)
-  public func scopeProvider(
-    for test: Test,
-    testCase: Test.Case?
-  ) -> TestScopeProvider? {
-    TestScopeProvider()
-  }
+    public func scopeProvider(
+      for test: Test,
+      testCase: Test.Case?
+    ) -> TestScopeProvider? {
+      TestScopeProvider()
+    }
   #endif
 }
 
@@ -24,22 +24,22 @@ extension Trait where Self == FinalizeSnapshotsSuiteTrait {
 }
 
 #if compiler(>=6.1)
-extension FinalizeSnapshotsSuiteTrait {
+  extension FinalizeSnapshotsSuiteTrait {
 
-  public struct TestScopeProvider: TestScoping {
-    
-    public func provideScope(
-      for test: Test,
-      testCase: Test.Case?,
-      performing function: @Sendable () async throws -> Void
-    ) async throws {
-      try await withTestCompletionTracking(
-        for: test,
-        operation: function
-      )
+    public struct TestScopeProvider: TestScoping {
+
+      public func provideScope(
+        for test: Test,
+        testCase: Test.Case?,
+        performing function: @Sendable () async throws -> Void
+      ) async throws {
+        try await withTestCompletionTracking(
+          for: test,
+          operation: function
+        )
+      }
     }
   }
-}
 #endif
 
 private func withTestCompletionTracking<R: Sendable>(

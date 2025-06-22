@@ -1,8 +1,8 @@
-@_spi(Internals) import XCTSnapshot
 import Testing
+@_spi(Internals) import XCTSnapshot
 
 extension TestingSystem: SwiftTestingSystem {
-  
+
   public var environment: TestingSystemEnvironment? {
     Test.current?.traits.mapIntoTestingEnvironment()
   }
@@ -35,10 +35,10 @@ extension TestingSystem: SwiftTestingSystem {
 }
 
 extension Array where Element == any Trait {
-  
+
   func mapIntoTestingEnvironment() -> TestingSystemEnvironment {
     var environment = TestingSystemEnvironment()
-    
+
     for trait in reversed() {
       switch trait {
       case let recordTrait as RecordTrait:
@@ -67,10 +67,10 @@ extension Array where Element == any Trait {
         environment.maxConcurrentTests != nil,
         environment.platform != nil
       else { continue }
-      
+
       break
     }
-    
+
     return environment
   }
 }

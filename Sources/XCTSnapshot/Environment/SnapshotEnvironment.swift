@@ -7,7 +7,8 @@ public struct SnapshotEnvironment: Sendable {
 
   fileprivate init() {}
 
-  public subscript<Value>(dynamicMember keyPath: KeyPath<SnapshotEnvironmentValues, Value>) -> Value {
+  public subscript<Value>(dynamicMember keyPath: KeyPath<SnapshotEnvironmentValues, Value>) -> Value
+  {
     (SnapshotEnvironmentValues.current ?? SnapshotEnvironmentValues())[keyPath: keyPath]
   }
 }

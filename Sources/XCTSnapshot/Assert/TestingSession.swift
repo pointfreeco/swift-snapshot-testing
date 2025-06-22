@@ -55,9 +55,9 @@ final class TestingSession: Sendable {
   }
 }
 
-private extension TestingSession {
+extension TestingSession {
 
-  final class TestCounter: @unchecked Sendable {
+  fileprivate final class TestCounter: @unchecked Sendable {
 
     // MARK: - Private properties
 
@@ -102,9 +102,9 @@ private extension TestingSession {
   }
 }
 
-private extension TestingSession.TestCounter {
+extension TestingSession.TestCounter {
 
-  struct TestLocation: Hashable {
+  fileprivate struct TestLocation: Hashable {
 
     private let fileID: String
     private let filePath: String
@@ -121,7 +121,7 @@ private extension TestingSession.TestCounter {
     }
   }
 
-  struct TestPosition: Hashable {
+  fileprivate struct TestPosition: Hashable {
 
     private let line: UInt
     private let column: UInt

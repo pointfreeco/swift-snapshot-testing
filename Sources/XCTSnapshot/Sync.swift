@@ -49,7 +49,9 @@ public struct Sync<Input, Output>: SnapshotExecutor {
     }
   }
 
-  public func callAsFunction(_ input: Input, callback: @escaping @Sendable (Result<Output, Error>) -> Void) {
+  public func callAsFunction(
+    _ input: Input, callback: @escaping @Sendable (Result<Output, Error>) -> Void
+  ) {
     producer(
       input,
       SyncContinuation(block: callback)
@@ -89,9 +91,10 @@ extension Sync {
       self(input) { result in
         switch result {
         case .success(let output):
-          continuation.resume(with: Result {
-            try block(output)
-          })
+          continuation.resume(
+            with: Result {
+              try block(output)
+            })
         case .failure(let error):
           continuation.resume(throwing: error)
         }
@@ -117,16 +120,18 @@ extension Sync {
     _ block: @escaping @Sendable (NewInput, SyncContinuation<Input>) -> Void
   ) -> Sync<NewInput, Output> {
     .init { newInput, continuation in
-      block(newInput, .init {
-        switch $0 {
-        case .success(let input):
-          self(input) {
-            continuation.resume(with: $0)
+      block(
+        newInput,
+        .init {
+          switch $0 {
+          case .success(let input):
+            self(input) {
+              continuation.resume(with: $0)
+            }
+          case .failure(let error):
+            continuation.resume(throwing: error)
           }
-        case .failure(let error):
-          continuation.resume(throwing: error)
-        }
-      })
+        })
     }
   }
 }
@@ -166,7 +171,7 @@ extension Sync where Input: Sendable, Output: Sendable {
     until deadline: C.Instant,
     tolerance: C.Instant.Duration? = nil,
     clock: C = .continuous
-  ) -> Async<Input, Output> where C : Clock {
+  ) -> Async<Input, Output> where C: Clock {
     map {
       try await Task.sleep(
         until: deadline,
@@ -182,7 +187,7 @@ extension Sync where Input: Sendable, Output: Sendable {
     for duration: C.Instant.Duration,
     tolerance: C.Instant.Duration? = nil,
     clock: C = .continuous
-  ) -> Async<Input, Output> where C : Clock {
+  ) -> Async<Input, Output> where C: Clock {
     map {
       try await Task.sleep(
         for: duration,
@@ -194,7 +199,9 @@ extension Sync where Input: Sendable, Output: Sendable {
   }
 }
 
-@_spi(Internals) public func performOnMainThread<R: Sendable>(_ block: @MainActor () throws -> R) rethrows -> R {
+@_spi(Internals) public func performOnMainThread<R: Sendable>(_ block: @MainActor () throws -> R)
+  rethrows -> R
+{
   if Thread.isMainThread {
     try MainActor.assumeIsolated(block)
   } else {

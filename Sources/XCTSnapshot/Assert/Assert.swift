@@ -22,7 +22,7 @@ import XCTest
 ///   ```swift
 ///   try await assert(of: myView, as: .image(layout: .iPhone15ProMax), named: "dark_mode")
 ///   ```
-public func assert<Input: Sendable, Output: BytesRepresentable> (
+public func assert<Input: Sendable, Output: BytesRepresentable>(
   of input: @Sendable @autoclosure () async throws -> Input,
   as snapshot: AsyncSnapshot<Input, Output>,
   serialization: DataSerialization = DataSerialization(),
@@ -190,7 +190,7 @@ public func assert<Input: Sendable, Output: BytesRepresentable>(
 
 // MARK: - Sync snapshot
 
-public func assert<Input, Output: BytesRepresentable> (
+public func assert<Input, Output: BytesRepresentable>(
   of input: @autoclosure () throws -> Input,
   as snapshot: SyncSnapshot<Input, Output>,
   serialization: DataSerialization = DataSerialization(),
@@ -291,7 +291,7 @@ public func assert<Input, Output: BytesRepresentable>(
   }
 }
 
-public func verify<Input: Sendable, Output: BytesRepresentable> (
+public func verify<Input: Sendable, Output: BytesRepresentable>(
   of input: @Sendable @autoclosure () async throws -> Input,
   as snapshot: AsyncSnapshot<Input, Output>,
   serialization: DataSerialization = DataSerialization(),
@@ -328,7 +328,7 @@ public func verify<Input: Sendable, Output: BytesRepresentable> (
   return try await tester(input(), for: snapshot)?.message
 }
 
-public func verify<Input, Output: BytesRepresentable> (
+public func verify<Input, Output: BytesRepresentable>(
   of input: @autoclosure () throws -> Input,
   as snapshot: SyncSnapshot<Input, Output>,
   serialization: DataSerialization = DataSerialization(),

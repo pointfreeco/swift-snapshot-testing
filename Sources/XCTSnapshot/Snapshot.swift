@@ -7,7 +7,9 @@ public protocol SnapshotExecutor<Output>: Sendable {
 
 public typealias SyncSnapshot<Input, Output: BytesRepresentable> = Snapshot<Sync<Input, Output>>
 
-public typealias AsyncSnapshot<Input: Sendable, Output: BytesRepresentable> = Snapshot<Async<Input, Output>>
+public typealias AsyncSnapshot<Input: Sendable, Output: BytesRepresentable> = Snapshot<
+  Async<Input, Output>
+>
 
 public typealias IdentitySyncSnapshot<Output: BytesRepresentable> = SyncSnapshot<Output, Output>
 
@@ -21,7 +23,8 @@ public typealias IdentityAsyncSnapshot<Output: BytesRepresentable> = AsyncSnapsh
 /// - File extension for saved snapshots
 ///
 /// - NOTE: The `Output` type must implement `BytesRepresentable` for serialization/deserialization
-public struct Snapshot<Executor: SnapshotExecutor>: Sendable where Executor.Output: BytesRepresentable {
+public struct Snapshot<Executor: SnapshotExecutor>: Sendable
+where Executor.Output: BytesRepresentable {
 
   public typealias Input = Executor.Input
   public typealias Output = Executor.Output

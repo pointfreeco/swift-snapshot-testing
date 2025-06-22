@@ -1,9 +1,10 @@
-import Foundation
-@preconcurrency import XCTest
-import UniformTypeIdentifiers
 import CoreServices
+import Foundation
+import UniformTypeIdentifiers
+@preconcurrency import XCTest
 
-struct FileSnapshotEngine<Executor: SnapshotExecutor>: SnapshotEngine where Executor.Output: BytesRepresentable {
+struct FileSnapshotEngine<Executor: SnapshotExecutor>: SnapshotEngine
+where Executor.Output: BytesRepresentable {
 
   let sourceURL: URL?
 
@@ -16,18 +17,21 @@ struct FileSnapshotEngine<Executor: SnapshotExecutor>: SnapshotEngine where Exec
       isDirectory: false
     )
 
-    let sourceURL = (sourceURL ?? {
-      let folderURL = fileURL.deletingLastPathComponent()
+    let sourceURL =
+      (sourceURL
+      ?? {
+        let folderURL = fileURL.deletingLastPathComponent()
 
-      let snapshotsURL = folderURL
-        .appendingPathComponent("__Snapshots__")
+        let snapshotsURL =
+          folderURL
+          .appendingPathComponent("__Snapshots__")
 
-      if tester.platform.isEmpty {
-        return snapshotsURL
-      } else {
-        return snapshotsURL.appendingPathComponent(tester.platform)
-      }
-    }()).appendingPathComponent(fileURL.deletingPathExtension().lastPathComponent)
+        if tester.platform.isEmpty {
+          return snapshotsURL
+        } else {
+          return snapshotsURL.appendingPathComponent(tester.platform)
+        }
+      }()).appendingPathComponent(fileURL.deletingPathExtension().lastPathComponent)
 
     try FileManager.default.createDirectory(
       at: sourceURL,
@@ -107,35 +111,36 @@ struct FileSnapshotEngine<Executor: SnapshotExecutor>: SnapshotEngine where Exec
   }
 }
 
-private extension FileSnapshotEngine {
+extension FileSnapshotEngine {
 
-  func missing(_ context: SnapshotFailContext) -> String {
+  fileprivate func missing(_ context: SnapshotFailContext) -> String {
     let name = String(describing: context.function)
 
     if context.didWriteNewSnapshot {
       return """
         No reference was found on disk. Automatically recorded snapshot: …
-        
+
         open "\(context.url.absoluteString)"
-        
+
         Re-run "\(name)" to assert against the newly-recorded snapshot.
         """
     } else {
-      return "No reference was found on disk. New snapshot was not recorded because recording is disabled"
+      return
+        "No reference was found on disk. New snapshot was not recorded because recording is disabled"
     }
   }
 
-  func doesNotMatch(_ context: SnapshotFailContext) -> String {
+  fileprivate func doesNotMatch(_ context: SnapshotFailContext) -> String {
     let name = String(describing: context.function)
 
     var message = "Snapshot \"\(name)\" does not match reference."
 
     if context.didWriteNewSnapshot {
       message += """
-       A new snapshot was automatically recorded.
-      
-      open "\(context.url.absoluteString)"
-      """
+         A new snapshot was automatically recorded.
+
+        open "\(context.url.absoluteString)"
+        """
     }
 
     if let diff = context.diff {
@@ -149,19 +154,19 @@ private extension FileSnapshotEngine {
     return message
   }
 
-  func allRecordMode(_ context: SnapshotFailContext) -> String {
+  fileprivate func allRecordMode(_ context: SnapshotFailContext) -> String {
     let name = String(describing: context.function)
 
     return """
       Record mode is on. Automatically recorded snapshot: …
-      
+
       open "\(context.url.absoluteString)"
-      
+
       Turn record mode off and re-run "\(name)" to assert against the newly-recorded snapshot
       """
   }
 
-  func timeout(_ context: SnapshotFailContext, timeout: TimeInterval) -> String {
+  fileprivate func timeout(_ context: SnapshotFailContext, timeout: TimeInterval) -> String {
     """
     Exceeded timeout of \(timeout) seconds waiting for snapshot.
 

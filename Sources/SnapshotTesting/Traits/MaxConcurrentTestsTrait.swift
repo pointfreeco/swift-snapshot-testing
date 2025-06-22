@@ -1,5 +1,5 @@
-import Testing
 import Foundation
+import Testing
 @_spi(Internals) import XCTSnapshot
 
 public struct MaxConcurrentTestsTrait: SuiteTrait, TestTrait {

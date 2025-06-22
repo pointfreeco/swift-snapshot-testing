@@ -49,7 +49,7 @@ public final class TestingSystem: Sendable {
   }
 
   public var isSwiftTestingCompletionAttached: Bool {
-      (self as? SwiftTestingSystem)?.isTestCompletionAttached ?? false
+    (self as? SwiftTestingSystem)?.isTestCompletionAttached ?? false
   }
 
   var environment: TestingSystemEnvironment? {
@@ -59,7 +59,7 @@ public final class TestingSystem: Sendable {
       return nil
     }
   }
-  
+
   public func record(
     message: String,
     fileID: StaticString,

@@ -10,164 +10,165 @@ extension BaseSuite {
       let fileURL = URL(fileURLWithPath: #filePath)
         .deletingPathExtension()
 
-      return fileURL
+      return
+        fileURL
         .deletingLastPathComponent()
         .appendingPathComponent("__Snapshots__")
         .appendingPathComponent(fileURL.lastPathComponent)
     }()
 
     #if canImport(Darwin)
-    func recordNever() async throws {
-      try withKnownSnapshotURL { snapshotURL in
-        try withKnownIssue {
-          try withTestingEnvironment(record: .never) {
-            try assert(of: 42, as: .json)
+      func recordNever() async throws {
+        try withKnownSnapshotURL { snapshotURL in
+          try withKnownIssue {
+            try withTestingEnvironment(record: .never) {
+              try assert(of: 42, as: .json)
+            }
+          } matching: {
+            $0.comments.first?.rawValue ?? "" == """
+              No reference was found on disk. New snapshot was not recorded because recording is disabled
+              """
           }
-        } matching: {
-          $0.comments.first?.rawValue ?? "" == """
-          No reference was found on disk. New snapshot was not recorded because recording is disabled
-          """
-        }
 
-        #expect(!FileManager.default.fileExists(atPath: snapshotURL.path))
+          #expect(!FileManager.default.fileExists(atPath: snapshotURL.path))
+        }
       }
-    }
     #endif
 
     #if canImport(Darwin)
-    @Test
-    func recordMissing() async throws {
-      try withKnownSnapshotURL { snapshotURL in
-        try withKnownIssue {
-          try withTestingEnvironment(record: .missing) {
-            try assert(of: 42, as: .json)
-          }
-        } matching: {
-          ($0.comments.first?.rawValue ?? "").hasPrefix(
-            """
-            No reference was found on disk. Automatically recorded snapshot: …
-            
-            open "\(snapshotURL.absoluteString)"
-            
-            Re-run "\(#function)" to assert against the newly-recorded snapshot.
-            """
-          )
-        }
+      @Test
+      func recordMissing() async throws {
+        try withKnownSnapshotURL { snapshotURL in
+          try withKnownIssue {
+            try withTestingEnvironment(record: .missing) {
+              try assert(of: 42, as: .json)
+            }
+          } matching: {
+            ($0.comments.first?.rawValue ?? "").hasPrefix(
+              """
+              No reference was found on disk. Automatically recorded snapshot: …
 
-        try #expect(String(decoding: Data(contentsOf: snapshotURL), as: UTF8.self) == "42")
+              open "\(snapshotURL.absoluteString)"
+
+              Re-run "\(#function)" to assert against the newly-recorded snapshot.
+              """
+            )
+          }
+
+          try #expect(String(decoding: Data(contentsOf: snapshotURL), as: UTF8.self) == "42")
+        }
       }
-    }
     #endif
 
     #if canImport(Darwin)
-    @Test
-    func recordMissing_ExistingFile() async throws {
-      try withKnownSnapshotURL { snapshotURL in
-        try Data("999".utf8).write(to: snapshotURL)
+      @Test
+      func recordMissing_ExistingFile() async throws {
+        try withKnownSnapshotURL { snapshotURL in
+          try Data("999".utf8).write(to: snapshotURL)
 
-        try withKnownIssue {
-          try withTestingEnvironment(record: .missing) {
-            try assert(of: 42, as: .json)
+          try withKnownIssue {
+            try withTestingEnvironment(record: .missing) {
+              try assert(of: 42, as: .json)
+            }
+          } matching: {
+            ($0.comments.first?.rawValue ?? "").hasPrefix(
+              """
+              Snapshot "\(#function)" does not match reference.
+
+              ksdiff "\(snapshotURL.absoluteString)"
+              """
+            )
           }
-        } matching: {
-          ($0.comments.first?.rawValue ?? "").hasPrefix(
-            """
-            Snapshot "\(#function)" does not match reference.
-            
-            ksdiff "\(snapshotURL.absoluteString)"
-            """
-          )
-        }
 
-        try #expect(String(decoding: Data(contentsOf: snapshotURL), as: UTF8.self) == "999")
+          try #expect(String(decoding: Data(contentsOf: snapshotURL), as: UTF8.self) == "999")
+        }
       }
-    }
     #endif
 
     #if canImport(Darwin)
-    @Test
-    func recordAll_Fresh() async throws {
-      try withKnownSnapshotURL { snapshotURL in
-        try withKnownIssue {
-          try withTestingEnvironment(record: .all) {
-            try assert(of: 42, as: .json)
-          }
-        } matching: {
-          ($0.comments.first?.rawValue ?? "").hasPrefix(
-            """
-            Record mode is on. Automatically recorded snapshot: …
-            
-            open "\(snapshotURL.absoluteString)"
-            """
-          )
-        }
+      @Test
+      func recordAll_Fresh() async throws {
+        try withKnownSnapshotURL { snapshotURL in
+          try withKnownIssue {
+            try withTestingEnvironment(record: .all) {
+              try assert(of: 42, as: .json)
+            }
+          } matching: {
+            ($0.comments.first?.rawValue ?? "").hasPrefix(
+              """
+              Record mode is on. Automatically recorded snapshot: …
 
-        try #expect(String(decoding: Data(contentsOf: snapshotURL), as: UTF8.self) == "42")
+              open "\(snapshotURL.absoluteString)"
+              """
+            )
+          }
+
+          try #expect(String(decoding: Data(contentsOf: snapshotURL), as: UTF8.self) == "42")
+        }
       }
-    }
     #endif
 
     #if canImport(Darwin)
-    @Test
-    func recordAll_Overwrite() async throws {
-      try withKnownSnapshotURL { snapshotURL in
-        try Data("999".utf8).write(to: snapshotURL)
+      @Test
+      func recordAll_Overwrite() async throws {
+        try withKnownSnapshotURL { snapshotURL in
+          try Data("999".utf8).write(to: snapshotURL)
 
-        try withKnownIssue {
-          try withTestingEnvironment(record: .all) {
-            try assert(of: 42, as: .json)
+          try withKnownIssue {
+            try withTestingEnvironment(record: .all) {
+              try assert(of: 42, as: .json)
+            }
+          } matching: {
+            ($0.comments.first?.rawValue ?? "").hasPrefix(
+              """
+              Record mode is on. Automatically recorded snapshot: …
+
+              open "\(snapshotURL.absoluteString)"
+              """
+            )
           }
-        } matching: {
-          ($0.comments.first?.rawValue ?? "").hasPrefix(
-            """
-            Record mode is on. Automatically recorded snapshot: …
-            
-            open "\(snapshotURL.absoluteString)"
-            """
-          )
-        }
 
-        try #expect(String(decoding: Data(contentsOf: snapshotURL), as: UTF8.self) == "42")
+          try #expect(String(decoding: Data(contentsOf: snapshotURL), as: UTF8.self) == "42")
+        }
       }
-    }
     #endif
 
     #if canImport(Darwin)
-    @Test
-    func recordFailed_WhenFailure() async throws {
-      try withKnownSnapshotURL { snapshotURL in
-        try Data("999".utf8).write(to: snapshotURL)
+      @Test
+      func recordFailed_WhenFailure() async throws {
+        try withKnownSnapshotURL { snapshotURL in
+          try Data("999".utf8).write(to: snapshotURL)
 
-        try withKnownIssue {
-          try withTestingEnvironment(record: .failed) {
-            try assert(of: 42, as: .json)
+          try withKnownIssue {
+            try withTestingEnvironment(record: .failed) {
+              try assert(of: 42, as: .json)
+            }
+          } matching: {
+            ($0.comments.first?.rawValue ?? "").hasPrefix(
+              """
+              Snapshot "\(#function)" does not match reference. A new snapshot was automatically recorded.
+
+              open "\(snapshotURL.absoluteString)"
+              """
+            )
           }
-        } matching: {
-          ($0.comments.first?.rawValue ?? "").hasPrefix(
-            """
-            Snapshot "\(#function)" does not match reference. A new snapshot was automatically recorded.
-            
-            open "\(snapshotURL.absoluteString)"
-            """
-          )
-        }
 
-        try #expect(String(decoding: Data(contentsOf: snapshotURL), as: UTF8.self) == "42")
+          try #expect(String(decoding: Data(contentsOf: snapshotURL), as: UTF8.self) == "42")
+        }
       }
-    }
     #endif
 
     @Test
     func recordFailed_NoFailure() async throws {
       try withKnownSnapshotURL { snapshotURL in
         #if os(Android)
-        throw XCTSkip("cannot save next to file on Android")
+          throw XCTSkip("cannot save next to file on Android")
         #endif
         try Data("42".utf8).write(to: snapshotURL)
         let modifiedDate =
-        try FileManager.default.attributesOfItem(
-          atPath: snapshotURL.path
-        )[FileAttributeKey.modificationDate] as! Date
+          try FileManager.default.attributesOfItem(
+            atPath: snapshotURL.path
+          )[FileAttributeKey.modificationDate] as! Date
 
         try withTestingEnvironment(record: .missing) {
           try assert(of: 42, as: .json)
@@ -175,33 +176,34 @@ extension BaseSuite {
 
         try #expect(String(decoding: Data(contentsOf: snapshotURL), as: UTF8.self) == "42")
 
-        try #expect(FileManager.default.attributesOfItem(
-          atPath: snapshotURL.path
-        )[FileAttributeKey.modificationDate] as! Date == modifiedDate)
+        try #expect(
+          FileManager.default.attributesOfItem(
+            atPath: snapshotURL.path
+          )[FileAttributeKey.modificationDate] as! Date == modifiedDate)
       }
     }
 
     #if canImport(Darwin)
-    @Test
-    func recordFailed_MissingFile() async throws {
-      try withKnownSnapshotURL { snapshotURL in
-        try withKnownIssue {
-          try withTestingEnvironment(record: .missing) {
-            try assert(of: 42, as: .json)
-          }
-        } matching: {
-          ($0.comments.first?.rawValue ?? "").hasPrefix(
-            """
-            No reference was found on disk. Automatically recorded snapshot: …
-            
-            open "\(snapshotURL.absoluteString)"
-            """
-          )
-        }
+      @Test
+      func recordFailed_MissingFile() async throws {
+        try withKnownSnapshotURL { snapshotURL in
+          try withKnownIssue {
+            try withTestingEnvironment(record: .missing) {
+              try assert(of: 42, as: .json)
+            }
+          } matching: {
+            ($0.comments.first?.rawValue ?? "").hasPrefix(
+              """
+              No reference was found on disk. Automatically recorded snapshot: …
 
-        try #expect(String(decoding: Data(contentsOf: snapshotURL), as: UTF8.self) == "42")
+              open "\(snapshotURL.absoluteString)"
+              """
+            )
+          }
+
+          try #expect(String(decoding: Data(contentsOf: snapshotURL), as: UTF8.self) == "42")
+        }
       }
-    }
     #endif
   }
 }
@@ -252,13 +254,14 @@ extension BaseSuite.RecordTests {
 
   private func sanitizePathComponent(_ path: String) -> String {
     let invalidCharacters = CharacterSet(charactersIn: "\\/:*?\"<>|")
-        .union(.newlines)
-        .union(.illegalCharacters)
-        .union(.controlCharacters)
+      .union(.newlines)
+      .union(.illegalCharacters)
+      .union(.controlCharacters)
 
-    return path
-        .components(separatedBy: invalidCharacters)
-        .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-        .joined(separator: "")
+    return
+      path
+      .components(separatedBy: invalidCharacters)
+      .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+      .joined(separator: "")
   }
 }

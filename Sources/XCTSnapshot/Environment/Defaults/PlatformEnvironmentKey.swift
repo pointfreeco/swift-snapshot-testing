@@ -8,25 +8,25 @@ private struct PlatformEnvironmentKey: SnapshotEnvironmentKey {
 
   private static func operatingSystemName() -> String {
     #if os(macOS)
-    return "macOS"
+      return "macOS"
     #elseif os(iOS)
-    return "iOS"
+      return "iOS"
     #elseif os(tvOS)
-    return "tvOS"
+      return "tvOS"
     #elseif os(watchOS)
-    return "watchOS"
+      return "watchOS"
     #elseif os(visionOS)
-    return "visionOS"
+      return "visionOS"
     #elseif os(Android)
-    return "android"
+      return "android"
     #elseif os(Windows)
-    return "windows"
+      return "windows"
     #elseif os(Linux)
-    return "linux"
+      return "linux"
     #elseif os(WASI)
-    return "wasm"
+      return "wasm"
     #else
-    return "unknown"
+      return "unknown"
     #endif
   }
 }
