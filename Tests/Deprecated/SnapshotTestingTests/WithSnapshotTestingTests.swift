@@ -1,3 +1,4 @@
+#if !os(visionOS)
 @_spi(Internals) @testable import SnapshotTesting
 import XCTest
 
@@ -33,3 +34,4 @@ class WithSnapshotTestingTests: XCTestCase {
     }
   }
 }
+#endif

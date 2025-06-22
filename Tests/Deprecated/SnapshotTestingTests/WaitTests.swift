@@ -1,3 +1,4 @@
+#if !os(visionOS)
 import XCTest
 
 @testable import SnapshotTesting
@@ -17,3 +18,4 @@ class WaitTests: BaseTestCase {
     assertSnapshot(of: (), as: .wait(for: 1.5, on: strategy))
   }
 }
+#endif

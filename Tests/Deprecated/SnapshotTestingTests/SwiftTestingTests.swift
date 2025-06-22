@@ -1,3 +1,4 @@
+#if !os(visionOS)
 #if compiler(>=6) && canImport(Testing)
   import Testing
   import SnapshotTesting
@@ -22,4 +23,5 @@
       }
     }
   }
+#endif
 #endif

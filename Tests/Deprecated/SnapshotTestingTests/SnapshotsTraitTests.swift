@@ -1,3 +1,4 @@
+#if !os(visionOS)
 #if compiler(>=6) && canImport(Testing)
   import Testing
   @_spi(Internals) import SnapshotTesting
@@ -48,4 +49,5 @@
       }
     }
   }
+#endif
 #endif

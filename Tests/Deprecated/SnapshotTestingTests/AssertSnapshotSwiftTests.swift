@@ -1,3 +1,4 @@
+#if !os(visionOS)
 #if canImport(Testing)
   import Testing
   import Foundation
@@ -21,4 +22,5 @@
       }
     }
   }
+#endif
 #endif

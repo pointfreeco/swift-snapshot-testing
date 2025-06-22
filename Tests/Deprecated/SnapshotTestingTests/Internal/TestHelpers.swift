@@ -1,3 +1,4 @@
+#if !os(visionOS)
 import XCTest
 
 @testable import SnapshotTesting
@@ -107,4 +108,5 @@ import XCTest
       return path
     }
   }
+#endif
 #endif

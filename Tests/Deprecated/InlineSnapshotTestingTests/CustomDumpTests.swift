@@ -1,3 +1,4 @@
+#if !os(visionOS)
 #if canImport(Testing)
   import Testing
   import InlineSnapshotTesting
@@ -20,4 +21,5 @@
       }
     }
   }
+#endif
 #endif

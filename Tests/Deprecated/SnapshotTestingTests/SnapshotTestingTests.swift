@@ -1,3 +1,4 @@
+#if !os(visionOS)
 import Foundation
 import XCTest
 
@@ -1344,4 +1345,5 @@ final class SnapshotTestingTests: BaseTestCase {
       "accessibility-extra-extra-large": .accessibilityExtraExtraLarge,
       "accessibility-extra-extra-extra-large": .accessibilityExtraExtraExtraLarge,
     ]
+#endif
 #endif

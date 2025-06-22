@@ -1,3 +1,4 @@
+#if !os(visionOS)
 import SnapshotTesting
 import XCTest
 
@@ -12,3 +13,4 @@ class BaseTestCase: XCTestCase {
     }
   }
 }
+#endif

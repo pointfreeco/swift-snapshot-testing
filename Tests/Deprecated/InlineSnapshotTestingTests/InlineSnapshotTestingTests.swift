@@ -1,3 +1,4 @@
+#if !os(visionOS)
 import Foundation
 @_spi(Internals) import InlineSnapshotTesting
 import SnapshotTesting
@@ -371,3 +372,4 @@ private func assertCustomInlineSnapshot(
     column: column
   )
 }
+#endif

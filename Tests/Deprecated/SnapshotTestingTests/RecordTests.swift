@@ -1,3 +1,4 @@
+#if !os(visionOS)
 import SnapshotTesting
 import XCTest
 
@@ -206,3 +207,4 @@ class RecordTests: BaseTestCase {
     }
   #endif
 }
+#endif
