@@ -7,9 +7,13 @@ class BaseTestCase: XCTestCase {
         ""
     }
 
+    var record: RecordMode {
+        .failed
+    }
+
     override func invokeTest() {
         withTestingEnvironment(
-            record: .failed,
+            record: record,
             diffTool: .ksdiff,
             platform: platform
         ) {

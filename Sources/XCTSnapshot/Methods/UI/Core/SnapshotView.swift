@@ -87,7 +87,7 @@ class SnapshotView: SDKView {
     }
 
     func calculateContentFrame() -> CGRect {
-        let contentSize = sizableViews.values.reduce(CGSize.zero) {
+        var contentSize = sizableViews.values.reduce(CGSize.zero) {
             CGSize(
                 width: max($0.width, $1.1.size.width),
                 height: max($0.height, $1.1.size.height)
@@ -95,21 +95,20 @@ class SnapshotView: SDKView {
         }
 
         let safeArea = configuration.safeArea
-        var calculatedSize = CGSize(
-            width: contentSize.width + (safeArea.left + safeArea.right),
-            height: contentSize.height + (safeArea.top + safeArea.bottom)
-        )
+
+        contentSize.width += safeArea.left + safeArea.right
+        contentSize.height += safeArea.top + safeArea.bottom
 
         let scale = self.scale(for: contentSize)
 
-        calculatedSize.width *= scale
-        calculatedSize.height *= scale
+        contentSize.width *= scale
+        contentSize.height *= scale
 
         return CGRect(
-            x: bounds.midX - calculatedSize.width / 2,
-            y: bounds.midY - calculatedSize.height / 2,
-            width: calculatedSize.width,
-            height: calculatedSize.height
+            x: bounds.midX - contentSize.width / 2,
+            y: bounds.midY - contentSize.height / 2,
+            width: contentSize.width,
+            height: contentSize.height
         )
     }
 
@@ -120,7 +119,11 @@ class SnapshotView: SDKView {
     }
 
     private func downscale(_ transformableView: SDKView, with size: CGSize) {
-        let scale = scale(for: size)
+        let safeArea = configuration.safeArea
+        let scale = scale(for: CGSize(
+            width: size.width + safeArea.left + safeArea.right,
+            height: size.height + safeArea.top + safeArea.bottom
+        ))
         #if os(macOS)
         self.layer?.contentsScale = scale
         #else
@@ -139,12 +142,6 @@ class SnapshotView: SDKView {
             return 1
         }
 
-        let safeArea = configuration.safeArea
-        let calculatedSize = CGSize(
-            width: size.width + safeArea.left + safeArea.right,
-            height: size.height + safeArea.top + safeArea.bottom
-        )
-
         let proposedSize: CGSize
 
         if #available(macOS 11, *) {
@@ -156,7 +153,7 @@ class SnapshotView: SDKView {
             proposedSize = frame.size
         }
 
-        return proposedSize.scaleThatFits(calculatedSize)
+        return proposedSize.scaleThatFits(size)
     }
 }
 
@@ -168,36 +165,6 @@ extension SnapshotView: SizeListenerDelegate {
         }
 
         downscale(transformableView, with: size)
-    }
-}
-
-extension SDKView {
-
-    func recursiveNeedsLayout() {
-        guard window != nil else {
-            return
-        }
-
-        invalidateIntrinsicContentSize()
-        #if os(macOS)
-        needsUpdateConstraints = true
-        needsLayout = true
-        #else
-        setNeedsUpdateConstraints()
-        setNeedsLayout()
-        #endif
-
-        switch self {
-        #if os(macOS)
-        #else
-        case is UITableView, is UICollectionView:
-            break
-        #endif
-        default:
-            for view in subviews {
-                view.recursiveNeedsLayout()
-            }
-        }
     }
 }
 #endif

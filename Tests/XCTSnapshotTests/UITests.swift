@@ -50,12 +50,15 @@ final class UITests: BaseTestCase {
             override func tableView(
                 _ tableView: UITableView,
                 cellForRowAt indexPath: IndexPath
-            )
-                -> UITableViewCell
-            {
+            ) -> UITableViewCell {
                 let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
                 cell.textLabel?.text = "\(indexPath.row)"
                 return cell
+            }
+
+            override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+                super.traitCollectionDidChange(previousTraitCollection)
+                tableView.reloadData()
             }
         }
         try await assert(
@@ -134,15 +137,22 @@ final class UITests: BaseTestCase {
                 self.trailingLabel.text = "point"
                 self.bottomLabel.text = "?"
 
-                self.topLabel.translatesAutoresizingMaskIntoConstraints = false
-                self.leadingLabel.translatesAutoresizingMaskIntoConstraints = false
-                self.trailingLabel.translatesAutoresizingMaskIntoConstraints = false
-                self.bottomLabel.translatesAutoresizingMaskIntoConstraints = false
+                topLabel.font = .preferredFont(forTextStyle: .headline)
+                leadingLabel.font = .preferredFont(forTextStyle: .body)
+                trailingLabel.font = .preferredFont(forTextStyle: .body)
+                bottomLabel.font = .preferredFont(forTextStyle: .subheadline)
 
-                self.view.addSubview(self.topLabel)
-                self.view.addSubview(self.leadingLabel)
-                self.view.addSubview(self.trailingLabel)
-                self.view.addSubview(self.bottomLabel)
+                [topLabel, leadingLabel, trailingLabel, bottomLabel].forEach {
+                    $0.translatesAutoresizingMaskIntoConstraints = false
+                    $0.adjustsFontForContentSizeCategory = true
+
+                    self.view.addSubview($0)
+
+                    $0.setContentHuggingPriority(.required, for: .vertical)
+                    $0.setContentHuggingPriority(.required, for: .horizontal)
+                    $0.setContentCompressionResistancePriority(.required, for: .vertical)
+                    $0.setContentCompressionResistancePriority(.required, for: .horizontal)
+                }
 
                 NSLayoutConstraint.activate([
                     self.topLabel.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor),
@@ -155,7 +165,6 @@ final class UITests: BaseTestCase {
                     self.leadingLabel.trailingAnchor.constraint(
                         lessThanOrEqualTo: self.view.safeAreaLayoutGuide.centerXAnchor
                     ),
-                    //            self.leadingLabel.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.centerXAnchor),
                     self.leadingLabel.centerYAnchor.constraint(
                         equalTo: self.view.safeAreaLayoutGuide.centerYAnchor
                     ),
@@ -175,28 +184,6 @@ final class UITests: BaseTestCase {
                         equalTo: self.view.safeAreaLayoutGuide.centerXAnchor
                     ),
                 ])
-            }
-
-            override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-                super.traitCollectionDidChange(previousTraitCollection)
-                self.topLabel.font = .preferredFont(
-                    forTextStyle: .headline,
-                    compatibleWith: self.traitCollection
-                )
-                self.leadingLabel.font = .preferredFont(
-                    forTextStyle: .body,
-                    compatibleWith: self.traitCollection
-                )
-                self.trailingLabel.font = .preferredFont(
-                    forTextStyle: .body,
-                    compatibleWith: self.traitCollection
-                )
-                self.bottomLabel.font = .preferredFont(
-                    forTextStyle: .subheadline,
-                    compatibleWith: self.traitCollection
-                )
-                self.view.setNeedsUpdateConstraints()
-                self.view.updateConstraintsIfNeeded()
             }
         }
 
@@ -1068,14 +1055,19 @@ final class UITests: BaseTestCase {
 
             override func viewDidLoad() {
                 super.viewDidLoad()
+
                 let label = UILabel()
                 label.font = .preferredFont(forTextStyle: .title1)
                 label.adjustsFontForContentSizeCategory = true
                 label.text = "What's the point?"
 
+                label.translatesAutoresizingMaskIntoConstraints = false
                 view.addSubview(label)
 
-                label.translatesAutoresizingMaskIntoConstraints = false
+                label.setContentHuggingPriority(.required, for: .vertical)
+                label.setContentCompressionResistancePriority(.required, for: .vertical)
+                label.setContentCompressionResistancePriority(.required, for: .horizontal)
+
                 NSLayoutConstraint.activate([
                     label.leadingAnchor.constraint(
                         equalTo: view.layoutMarginsGuide.leadingAnchor

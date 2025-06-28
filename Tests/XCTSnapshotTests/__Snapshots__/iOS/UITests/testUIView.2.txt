@@ -1,0 +1,3 @@
+<UIButton; frame = (0 0; 25.6667 25.6667); opaque = NO; gestureRecognizers = <NSArray>; layer = <CALayer>>
+   | <_TtC11XCTSnapshotP33_CD07B10D49DF51CB5D5D85C591EE4D9618UIViewSizeListener; frame = (0 0; 25.6667 25.6667); layer = <CALayer>>
+   | <UIImageView; frame = (0 0; 25.6667 25.6667); clipsToBounds = YES; opaque = NO; userInteractionEnabled = NO; image = <UIImage symbol "plus.circle"; (26 26)@3{2}>; layer = <CALayer>>

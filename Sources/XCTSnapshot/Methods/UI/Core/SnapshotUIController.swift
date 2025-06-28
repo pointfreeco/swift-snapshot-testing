@@ -58,11 +58,23 @@ class SnapshotUIController: SDKViewController {
     }
 
     init<Content: View>(_ content: Content, with configuration: LayoutConfiguration) {
+        func size(_ keyPath: KeyPath<CGSize, CGFloat>) -> CGFloat? {
+            guard let size = configuration.size else {
+                return nil
+            }
+
+            let value = size[keyPath: keyPath]
+            return value == .zero ? nil : value
+        }
+
         let sizeListener = SizeListener()
+        let rootView = content
+            .frame(width: size(\.width), height: size(\.height))
+            .sizeListener(sizeListener)
         #if os(macOS)
-        let viewController = NSHostingController(rootView: content.sizeListener(sizeListener))
+        let viewController = NSHostingController(rootView: rootView)
         #else
-        let viewController = UIHostingController(rootView: content.sizeListener(sizeListener))
+        let viewController = UIHostingController(rootView: rootView)
         #endif
         self.childController = viewController
         self.childSizeListener = sizeListener
@@ -84,6 +96,9 @@ class SnapshotUIController: SDKViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         attachChild()
+        #if !os(macOS)
+        configuration.traits.commit(in: self)
+        #endif
     }
 
     #if os(macOS)
@@ -118,11 +133,6 @@ class SnapshotUIController: SDKViewController {
         }
     }
     #else
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        configuration.traits.commit(in: self)
-    }
-
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
 
@@ -381,9 +391,17 @@ class SnapshotUIController: SDKViewController {
         _ view: SDKView,
         with traits: Traits
     ) throws -> SDKImage {
+        let bounds = snapshotView.calculateContentFrame()
+
+        let format = UIGraphicsImageRendererFormat(
+            for: traits()
+        )
+
+        format.scale = view.window?.screen.scale ?? traits.displayScale
+
         let renderer = UIGraphicsImageRenderer(
-            bounds: snapshotView.calculateContentFrame(),
-            format: .init(for: traits())
+            bounds: bounds,
+            format: format
         )
 
         return renderer.image {

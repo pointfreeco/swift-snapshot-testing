@@ -49,6 +49,33 @@ extension SDKView {
         }
         #endif
     }
+
+    func recursiveNeedsLayout() {
+        guard window != nil else {
+            return
+        }
+
+        invalidateIntrinsicContentSize()
+        #if os(macOS)
+        needsUpdateConstraints = true
+        needsLayout = true
+        #else
+        setNeedsUpdateConstraints()
+        setNeedsLayout()
+        #endif
+
+        switch self {
+        #if os(macOS)
+        #else
+        case is UITableView, is UICollectionView:
+            break
+        #endif
+        default:
+            for view in subviews {
+                view.recursiveNeedsLayout()
+            }
+        }
+    }
 }
 
 @MainActor

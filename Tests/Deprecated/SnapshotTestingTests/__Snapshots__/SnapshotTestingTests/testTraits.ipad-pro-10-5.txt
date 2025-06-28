@@ -1,5 +1,5 @@
 <UIView; frame = (0 0; 1112 834); autoresize = W+H; layer = <CALayer>>
-   | <UILabel; frame = (528.333 20; 55.6667 20.3333); text = 'What's'; userInteractionEnabled = NO; layer = <_UILabelLayer>>
-   | <UILabel; frame = (0 417; 25 20.3333); text = 'the'; userInteractionEnabled = NO; layer = <_UILabelLayer>>
-   | <UILabel; frame = (1073 417; 39 20.3333); text = 'point'; userInteractionEnabled = NO; layer = <_UILabelLayer>>
+   | <UILabel; frame = (528 20; 56.3333 20.3333); text = 'What's'; userInteractionEnabled = NO; layer = <_UILabelLayer>>
+   | <UILabel; frame = (0 417; 24.6667 20.3333); text = 'the'; userInteractionEnabled = NO; layer = <_UILabelLayer>>
+   | <UILabel; frame = (1073.33 417; 38.6667 20.3333); text = 'point'; userInteractionEnabled = NO; layer = <_UILabelLayer>>
    | <UILabel; frame = (552.333 816; 7.66667 18); text = '?'; userInteractionEnabled = NO; layer = <_UILabelLayer>>
