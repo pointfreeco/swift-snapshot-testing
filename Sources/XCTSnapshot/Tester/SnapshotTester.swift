@@ -359,7 +359,7 @@ extension SnapshotTester {
             payload: diffable
         )
         #else
-        let attachment =  SnapshotAttachment(
+        let attachment = SnapshotAttachment(
             uniformTypeIdentifier: "public.\(url.pathExtension)",
             name: url.lastPathComponent,
             payload: diffable

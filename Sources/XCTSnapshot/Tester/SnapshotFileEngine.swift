@@ -1,9 +1,10 @@
+import Foundation
+@preconcurrency import XCTest
+
 #if os(iOS) || os(macOS) || os(tvOS) || os(watchOS) || os(visionOS)
 import CoreServices
 import UniformTypeIdentifiers
 #endif
-import Foundation
-@preconcurrency import XCTest
 
 struct SnapshotFileEngine<Executor: SnapshotExecutor>: SnapshotEngine
 where Executor.Output: BytesRepresentable {
