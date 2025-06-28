@@ -21,7 +21,7 @@ import Foundation
 /// ```swift
 /// let attachment = DiffAttachment(
 ///     message: "Found color shift in bottom-right quadrant",
-///     attachments: [XCTAttachment(image: diffImage)]
+///     attachments: [SnapshotAttachment(image: diffImage)]
 /// )
 /// ```
 public struct DiffAttachment: Sendable {
@@ -41,7 +41,7 @@ public struct DiffAttachment: Sendable {
 
     /// Collection of visual attachments illustrating the differences.
     ///
-    /// This array contains instances of `XCTAttachment` that visually represent the discrepancies
+    /// This array contains instances of `SnapshotAttachment` that visually represent the discrepancies
     /// between the reference and test values. Typical attachments may include images highlighting
     /// regions that differ, diff overlays, annotated screenshots, or other files that provide
     /// additional context for the detected changes.
@@ -49,15 +49,15 @@ public struct DiffAttachment: Sendable {
     /// Attachments support richer test reporting by enabling quick visual inspection of what
     /// changed, helping developers understand and investigate snapshot test failures more efficiently.
     ///
-    /// Example: `[XCTAttachment(image: diffImage), XCTAttachment(image: croppedFailureRegion)]`
-    public let attachments: [XCTAttachment]
+    /// Example: `[SnapshotAttachment(image: diffImage), SnapshotAttachment(image: croppedFailureRegion)]`
+    public let attachments: [SnapshotAttachment]
 
     /// Initializes a new `DiffAttachment` with a descriptive message and a collection of visual attachments.
     ///
     /// - Parameters:
     ///   - message: A concise, human-readable description summarizing the key differences found during the comparison. This message should help developers quickly understand the nature or extent of the discrepancies.
-    ///   - attachments: An array of `XCTAttachment` instances that visually represent the detected differences (such as diff images, overlays, or annotated screenshots). These attachments provide additional context to aid investigation of test failures.
-    public init(message: String, attachments: [XCTAttachment]) {
+    ///   - attachments: An array of `SnapshotAttachment` instances that visually represent the detected differences (such as diff images, overlays, or annotated screenshots). These attachments provide additional context to aid investigation of test failures.
+    public init(message: String, attachments: [SnapshotAttachment]) {
         self.message = message
         self.attachments = attachments
     }

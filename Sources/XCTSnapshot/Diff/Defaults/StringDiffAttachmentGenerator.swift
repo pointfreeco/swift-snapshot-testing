@@ -1,8 +1,9 @@
 import Foundation
 import XCTest
 
-/// A diff attachment generator that compares two UTF-8 strings line-by-line and produces
-/// a patch-style text diff as an `XCTAttachment`. Calculates differences between collections using the Longest Common Subsequence (LCS) algorithm.
+/// A diff attachment generator that compares two UTF-8 strings line-by-line and produces a patch-style text diff
+/// as an `SnapshotAttachment`. Calculates differences between collections using the Longest Common
+/// Subsequence (LCS) algorithm.
 ///
 /// `StringDiffAttachmentGenerator` implements the `DiffAttachmentGenerator` protocol, generating
 /// a unified diff between a reference and a diffable string, each represented as a `StringBytes` value.
@@ -59,7 +60,7 @@ public struct StringDiffAttachmentGenerator: DiffAttachmentGenerator {
             .flatMap { [$0.patchMarker] + $0.lines }
             .joined(separator: "\n")
 
-        let attachment = XCTAttachment(
+        let attachment = SnapshotAttachment(
             data: Data(failure.utf8),
             uniformTypeIdentifier: "public.patch-file"
         )

@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 @_spi(Internals) import XCTSnapshot
 
@@ -13,6 +14,41 @@ extension TestingSystem: SwiftTestingSystem {
 
     public var isTestCompletionAttached: Bool {
         isRunning && TestCompletionNotifier.current != nil
+    }
+
+    public func add(
+        _ name: String,
+        attachments: [SnapshotAttachment],
+        fileID: StaticString,
+        filePath: StaticString,
+        line: UInt,
+        column: UInt
+    ) {
+        #if swift(>=6.2)
+        for attachment in attachments {
+            guard let payload = attachment.payload else {
+                continue
+            }
+
+            let attachmentName: String
+            if let name = attachment.name, !name.isEmpty {
+                attachmentName = name
+            } else {
+                attachmentName = attachment.uniformTypeIdentifier
+            }
+
+            Attachment.record(
+                payload,
+                named: attachmentName,
+                sourceLocation: SourceLocation(
+                    fileID: String(describing: fileID),
+                    filePath: String(describing: filePath),
+                    line: Int(line),
+                    column: Int(column)
+                )
+            )
+        }
+        #endif
     }
 
     public func record(

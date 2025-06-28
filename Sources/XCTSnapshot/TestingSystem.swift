@@ -1,4 +1,4 @@
-import XCTest
+@preconcurrency import XCTest
 
 @_spi(Internals)
 public struct TestingSystemEnvironment {
@@ -30,6 +30,15 @@ public protocol SwiftTestingSystem {
 
     var isTestCompletionAttached: Bool { get }
 
+    func add(
+        _ name: String,
+        attachments: [SnapshotAttachment],
+        fileID: StaticString,
+        filePath: StaticString,
+        line: UInt,
+        column: UInt
+    )
+
     func record(
         message: String,
         fileID: StaticString,
@@ -57,6 +66,42 @@ public final class TestingSystem: Sendable {
             return swiftTestingFramework.environment
         } else {
             return nil
+        }
+    }
+
+    public func add(
+        _ name: String,
+        attachments: [SnapshotAttachment],
+        fileID: StaticString,
+        filePath: StaticString,
+        line: UInt,
+        column: UInt
+    ) {
+        if let swiftTestingSystem = self as? SwiftTestingSystem, swiftTestingSystem.isRunning {
+            swiftTestingSystem.add(
+                name,
+                attachments: attachments,
+                fileID: fileID,
+                filePath: filePath,
+                line: line,
+                column: column
+            )
+        } else {
+            #if !os(Linux) && !os(Android) && !os(Windows)
+            performOnMainThread {
+                XCTContext.runActivity(named: name) { activity in
+                    for attachment in attachments {
+                        activity.add(
+                            XCTAttachment.init(
+                                uniformTypeIdentifier: attachment.uniformTypeIdentifier,
+                                name: attachment.name,
+                                payload: attachment.payload
+                            )
+                        )
+                    }
+                }
+            }
+            #endif
         }
     }
 

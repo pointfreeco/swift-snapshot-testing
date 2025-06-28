@@ -6,7 +6,7 @@ import XCTest
 
 /// Enhances failure messages with a command line diff tool expression that can be copied and pasted
 /// into a terminal.
-@available(*, deprecated, renamed: "TestingSession.shared.diffTool")
+@available(*, deprecated, renamed: "withTestingEnvironment(diffTool:operation:)")
 public var diffTool: SnapshotTestingConfiguration.DiffTool {
   get {
     _diffTool
@@ -14,7 +14,7 @@ public var diffTool: SnapshotTestingConfiguration.DiffTool {
   set { _diffTool = newValue }
 }
 
-@available(*, deprecated, renamed: "TestingSession.shared.diffTool")
+@available(*, deprecated, renamed: "withTestingEnvironment(diffTool:operation:)")
 @_spi(Internals)
 public var _diffTool: SnapshotTestingConfiguration.DiffTool {
   get {
@@ -34,18 +34,18 @@ public var _diffTool: SnapshotTestingConfiguration.DiffTool {
   }
 }
 
-@available(*, deprecated, renamed: "TestingSession.shared.diffTool")
+@available(*, deprecated, renamed: "withTestingEnvironment(diffTool:operation:)")
 @_spi(Internals)
 public var __diffTool: SnapshotTestingConfiguration.DiffTool = .default
 
 /// Whether or not to record all new references.
-@available(*, deprecated, renamed: "TestingSession.shared.record")
+@available(*, deprecated, renamed: "withTestingEnvironment(record:operation:)")
 public var isRecording: Bool {
   get { SnapshotTestingConfiguration.current?.record ?? _record == .all }
   set { _record = newValue ? .all : .missing }
 }
 
-@available(*, deprecated, renamed: "TestingSession.shared.record")
+@available(*, deprecated, renamed: "withTestingEnvironment(record:operation:)")
 @_spi(Internals)
 public var _record: SnapshotTestingConfiguration.Record {
   get {
@@ -65,7 +65,7 @@ public var _record: SnapshotTestingConfiguration.Record {
   }
 }
 
-@available(*, deprecated, renamed: "TestingSession.shared.record")
+@available(*, deprecated, renamed: "withTestingEnvironment(record:operation:)")
 @_spi(Internals)
 public var __record: SnapshotTestingConfiguration.Record = {
   if let value = ProcessInfo.processInfo.environment["SNAPSHOT_TESTING_RECORD"],

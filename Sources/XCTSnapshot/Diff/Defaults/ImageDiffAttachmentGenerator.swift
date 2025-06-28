@@ -82,14 +82,14 @@ public struct ImageDiffAttachmentGenerator: DiffAttachmentGenerator {
             else { return nil }
 
             let difference = reference.rawValue.substract(diffable.rawValue)
-            let oldAttachment = XCTAttachment(unsafeImage: reference.rawValue)
+            var oldAttachment = SnapshotAttachment(image: reference.rawValue)
             oldAttachment?.name = "reference"
             let isEmptyImage = diffable.rawValue.size == .zero
-            let newAttachment = XCTAttachment(
-                unsafeImage: isEmptyImage ? SDKImage.empty : diffable.rawValue
+            var newAttachment = SnapshotAttachment(
+                image: isEmptyImage ? SDKImage.empty : diffable.rawValue
             )
             newAttachment?.name = "failure"
-            let differenceAttachment = XCTAttachment(unsafeImage: difference)
+            var differenceAttachment = SnapshotAttachment(image: difference)
             differenceAttachment?.name = "difference"
 
             return DiffAttachment(
@@ -97,27 +97,5 @@ public struct ImageDiffAttachmentGenerator: DiffAttachmentGenerator {
                 attachments: [oldAttachment, newAttachment, differenceAttachment].compactMap(\.self)
             )
         }
-    }
-}
-
-extension XCTAttachment {
-
-    fileprivate convenience init?(unsafeImage: SDKImage) {
-        if unsafeImage.size == .zero {
-            return nil
-        }
-
-        self.init(image: unsafeImage)
-    }
-}
-
-extension XCTAttachment {
-
-    struct Isolated: Sendable {
-        let attachment: XCTAttachment
-    }
-
-    func isolated() -> Isolated {
-        .init(attachment: self)
     }
 }

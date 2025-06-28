@@ -250,7 +250,7 @@ extension SnapshotTester {
         _ diffable: Executor.Output,
         url: URL,
         write: Bool,
-        attachments: [XCTAttachment]?
+        attachments: [SnapshotAttachment]?
     ) throws {
         let diffableData = try serialization.serialize(diffable)
 
@@ -262,9 +262,7 @@ extension SnapshotTester {
         )
 
         if let attachments {
-            add("Attached Failure Diff") {
-                attachments
-            }
+            add("Attached Failure Diff", attachments: attachments)
         } else {
             add(diffableData, for: url)
         }
@@ -340,33 +338,35 @@ extension SnapshotTester {
 #if !os(Linux) && !os(Android) && !os(Windows)
 extension SnapshotTester {
 
-    func add(_ named: String, attachments: @Sendable () -> [XCTAttachment]) {
-        guard !TestingSystem.shared.isSwiftTestingRunning && ProcessInfo.isXcode else {
-            return
-        }
-
-        performOnMainThread {
-            XCTContext.runActivity(named: named) { activity in
-                for attachment in attachments() {
-                    activity.add(attachment)
-                }
-            }
-        }
+    func add(_ named: String, attachments: [SnapshotAttachment]) {
+        TestingSystem.shared.add(
+            named,
+            attachments: attachments,
+            fileID: fileID,
+            filePath: filePath,
+            line: line,
+            column: column
+        )
     }
 
     func add(
         _ diffable: Data,
         for url: URL
     ) {
-        add("Attached Recorded Snapshot") {
-            [
-                XCTAttachment(
+        TestingSystem.shared.add(
+            "Attached Recorded Snapshot",
+            attachments: [
+                SnapshotAttachment(
                     uniformTypeIdentifier: url.pathExtension.uniformTypeIdentifier(),
                     name: url.lastPathComponent,
                     payload: diffable
                 )
-            ]
-        }
+            ],
+            fileID: fileID,
+            filePath: filePath,
+            line: line,
+            column: column
+        )
     }
 }
 #endif
