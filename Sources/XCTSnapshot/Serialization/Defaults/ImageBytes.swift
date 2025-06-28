@@ -218,8 +218,4 @@ extension SyncSnapshot where Input: UIImage, Output == ImageBytes {
     #endif
 }
 #endif
-
-#if os(macOS)
-extension NSImage: @unchecked @retroactive Sendable {}
-#endif
 #endif

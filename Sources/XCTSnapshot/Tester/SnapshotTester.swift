@@ -335,7 +335,6 @@ extension SnapshotTester {
 
 // MARK: - Attachments
 
-#if !os(Linux) && !os(Android) && !os(Windows)
 extension SnapshotTester {
 
     func add(_ named: String, attachments: [SnapshotAttachment]) {
@@ -353,15 +352,23 @@ extension SnapshotTester {
         _ diffable: Data,
         for url: URL
     ) {
+        #if os(iOS) || os(tvOS) || os(watchOS) || os(visionOS) || os(macOS)
+        let attachment = SnapshotAttachment(
+            uniformTypeIdentifier: url.pathExtension.uniformTypeIdentifier(),
+            name: url.lastPathComponent,
+            payload: diffable
+        )
+        #else
+        let attachment =  SnapshotAttachment(
+            uniformTypeIdentifier: "public.\(url.pathExtension)",
+            name: url.lastPathComponent,
+            payload: diffable
+        )
+        #endif
+
         TestingSystem.shared.add(
             "Attached Recorded Snapshot",
-            attachments: [
-                SnapshotAttachment(
-                    uniformTypeIdentifier: url.pathExtension.uniformTypeIdentifier(),
-                    name: url.lastPathComponent,
-                    payload: diffable
-                )
-            ],
+            attachments: [attachment],
             fileID: fileID,
             filePath: filePath,
             line: line,
@@ -369,7 +376,6 @@ extension SnapshotTester {
         )
     }
 }
-#endif
 
 struct XCTestExecutionError: Error {}
 

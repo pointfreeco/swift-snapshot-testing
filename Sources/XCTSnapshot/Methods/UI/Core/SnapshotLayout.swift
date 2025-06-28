@@ -1,3 +1,4 @@
+#if os(macOS) || os(iOS) || os(tvOS) || os(visionOS) || os(watchOS)
 import CoreGraphics
 
 /// Defines how a UI component's layout is configured during snapshot testing.
@@ -35,3 +36,4 @@ public enum SnapshotLayout {
     /// Ideal for content-adaptive components like labels or dynamic collections.
     case sizeThatFits
 }
+#endif

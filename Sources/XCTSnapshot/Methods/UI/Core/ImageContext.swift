@@ -1,3 +1,4 @@
+#if os(macOS) || os(iOS) || os(tvOS) || os(visionOS) || os(watchOS)
 import CoreGraphics
 
 enum ImageContext {
@@ -5,3 +6,4 @@ enum ImageContext {
     static let bitsPerComponent = 8
     static let bytesPerPixel = 4
 }
+#endif

@@ -1,3 +1,4 @@
+#if canImport(SwiftUI)
 import SwiftUI
 
 #if os(iOS) || os(tvOS) || os(watchOS)
@@ -134,4 +135,5 @@ extension View {
         modifier(ViewSizeListener(listener: listener))
     }
 }
+#endif
 #endif

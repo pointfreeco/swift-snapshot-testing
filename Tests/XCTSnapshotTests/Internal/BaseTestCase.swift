@@ -1,10 +1,8 @@
 @_spi(Internals) import XCTSnapshot
-import XCTest
+@preconcurrency import XCTest
 
-@MainActor
-class BaseTestCase: XCTestCase, Sendable {
+class BaseTestCase: XCTestCase {
 
-    @MainActor
     var platform: String? {
         ""
     }
@@ -13,9 +11,7 @@ class BaseTestCase: XCTestCase, Sendable {
         withTestingEnvironment(
             record: .failed,
             diffTool: .ksdiff,
-            platform: performOnMainThread {
-                self.platform
-            }
+            platform: platform
         ) {
             super.invokeTest()
         }

@@ -1,6 +1,8 @@
+#if os(iOS) || os(macOS) || os(tvOS) || os(watchOS) || os(visionOS)
 import CoreServices
-import Foundation
 import UniformTypeIdentifiers
+#endif
+import Foundation
 @preconcurrency import XCTest
 
 struct SnapshotFileEngine<Executor: SnapshotExecutor>: SnapshotEngine

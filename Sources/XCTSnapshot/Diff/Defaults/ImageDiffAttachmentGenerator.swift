@@ -6,6 +6,7 @@ import UIKit
 @preconcurrency import AppKit
 #endif
 
+#if os(iOS) || os(macOS) || os(tvOS) || os(watchOS) || os(visionOS)
 /// `ImageDiffAttachmentGenerator` is a utility for visual snapshot testing that highlights and reports
 /// differences between two images, usually representing the expected (reference) and actual (diffable) output
 /// from a UI or graphics test.
@@ -99,3 +100,4 @@ public struct ImageDiffAttachmentGenerator: DiffAttachmentGenerator {
         }
     }
 }
+#endif

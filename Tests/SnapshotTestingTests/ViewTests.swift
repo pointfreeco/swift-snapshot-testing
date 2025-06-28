@@ -1,3 +1,4 @@
+#if os(iOS) || os(tvOS) || os(watchOS) || os(visionOS) || os(macOS)
 import SnapshotTesting
 import SwiftUI
 import Testing
@@ -288,3 +289,4 @@ struct ViewTests {
     }
     #endif
 }
+#endif

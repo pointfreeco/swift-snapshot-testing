@@ -2,7 +2,11 @@
 import AppKit
 import Cocoa
 @preconcurrency import CoreGraphics
+#elseif os(iOS) || os(tvOS) || os(visionOS)
+import UIKit
+#endif
 
+#if os(macOS)
 extension SyncSnapshot where Input: CGPath, Output == ImageBytes {
     /// A snapshot strategy for comparing bezier paths based on pixel equality.
     public static var image: SyncSnapshot<Input, Output> {
@@ -59,8 +63,6 @@ extension SyncSnapshot where Input: CGPath, Output == ImageBytes {
     }
 }
 #elseif os(iOS) || os(tvOS) || os(visionOS)
-import UIKit
-
 extension SyncSnapshot where Input: CGPath, Output == ImageBytes {
     /// A snapshot strategy for comparing bezier paths based on pixel equality.
     public static var image: SyncSnapshot<Input, Output> {

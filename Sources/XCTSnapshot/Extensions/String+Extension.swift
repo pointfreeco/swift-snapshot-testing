@@ -1,6 +1,6 @@
 import Foundation
 
-#if !os(Android) && !os(Linux) && !os(Windows)
+#if os(iOS) || os(macOS) || os(tvOS) || os(watchOS) || os(visionOS)
 import CoreServices
 import UniformTypeIdentifiers
 #endif
@@ -31,7 +31,7 @@ extension String {
             .joined(separator: "")
     }
 
-    #if !os(Android) && !os(Linux) && !os(Windows)
+    #if os(iOS) || os(macOS) || os(tvOS) || os(watchOS) || os(visionOS)
     func uniformTypeIdentifier() -> String? {
         #if os(visionOS)
         return UTType(filenameExtension: self)?.identifier

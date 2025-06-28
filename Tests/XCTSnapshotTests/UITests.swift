@@ -1,28 +1,17 @@
-@preconcurrency import Foundation
-@preconcurrency import XCTest
-
-@testable import XCTSnapshot
-
-#if canImport(FoundationNetworking)
-import FoundationNetworking
-#endif
-#if canImport(SceneKit)
+#if os(iOS) || os(tvOS) || os(watchOS) || os(visionOS) || os(macOS)
+import XCTest
+import SwiftUI
 import SceneKit
-#endif
-#if canImport(SpriteKit)
 import SpriteKit
-@preconcurrency import SwiftUI
-#endif
-#if canImport(WebKit)
+#if !os(tvOS) && !os(watchOS)
 @preconcurrency import WebKit
 #endif
-#if canImport(UIKit)
-import UIKit.UIView
-#endif
-
 #if os(macOS)
 @preconcurrency import AppKit
+#else
+import UIKit
 #endif
+@testable import XCTSnapshot
 
 @MainActor
 final class UITests: BaseTestCase {
@@ -1595,4 +1584,5 @@ private let allContentSizes =
         "accessibility-extra-extra-large": .accessibilityExtraExtraLarge,
         "accessibility-extra-extra-extra-large": .accessibilityExtraExtraExtraLarge,
     ]
+#endif
 #endif

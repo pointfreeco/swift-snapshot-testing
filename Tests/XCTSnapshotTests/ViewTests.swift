@@ -1,3 +1,4 @@
+#if os(iOS) || os(tvOS) || os(watchOS) || os(visionOS) || os(macOS)
 import SwiftUI
 import XCTSnapshot
 import XCTest
@@ -267,4 +268,5 @@ class ViewTests: XCTestCase {
     }
     #endif
 }
+#endif
 #endif

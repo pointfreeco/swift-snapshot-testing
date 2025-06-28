@@ -6,7 +6,6 @@ import XCTSnapshot
 import FoundationNetworking
 #endif
 
-@MainActor
 final class FoundationTests: BaseTestCase {
 
     @available(macOS 10.13, tvOS 11.0, *)

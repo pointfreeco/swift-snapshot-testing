@@ -1,3 +1,4 @@
+#if canImport(SwiftUI)
 @preconcurrency import SwiftUI
 
 #if os(macOS)
@@ -225,4 +226,5 @@ extension Snapshot where Input: SwiftUI.View & Sendable, Output == ImageBytes {
         }
     }
 }
+#endif
 #endif

@@ -1,11 +1,13 @@
-import SceneKit
-import SpriteKit
-import SwiftUI
-
 #if os(iOS) || os(tvOS) || os(watchOS) || os(visionOS)
 import UIKit
+import SwiftUI
+import SceneKit
+import SpriteKit
 #elseif os(macOS)
 @preconcurrency import AppKit
+import SwiftUI
+import SceneKit
+import SpriteKit
 #endif
 
 #if os(iOS) || os(tvOS) || os(macOS) || os(visionOS)
