@@ -1,9 +1,9 @@
 #if os(macOS)
-  import AppKit
-  import Cocoa
-  @preconcurrency import QuartzCore
+import AppKit
+import Cocoa
+@preconcurrency import QuartzCore
 
-  extension SyncSnapshot where Input: CALayer, Output == ImageBytes {
+extension SyncSnapshot where Input: CALayer, Output == ImageBytes {
     /// A snapshot strategy for comparing layers based on pixel equality.
     ///
     /// ``` swift
@@ -14,7 +14,7 @@
     /// assert(of: layer, as: .image(precision: 0.99))
     /// ```
     public static var image: SyncSnapshot<Input, Output> {
-      return .image(precision: 1)
+        .image(precision: 1)
     }
 
     /// A snapshot strategy for comparing layers based on pixel equality.
@@ -26,31 +26,31 @@
     ///     [the precision](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e) of the
     ///     human eye.
     public static func image(
-      precision: Float,
-      perceptualPrecision: Float = 1
+        precision: Float,
+        perceptualPrecision: Float = 1
     ) -> SyncSnapshot<Input, Output> {
-      return IdentitySyncSnapshot.image(
-        precision: precision,
-        perceptualPrecision: perceptualPrecision
-      ).pullback { layer in
-        let image = NSImage(size: layer.bounds.size)
-        image.lockFocus()
-        let context = NSGraphicsContext.current!.cgContext
-        layer.setNeedsLayout()
-        layer.layoutIfNeeded()
-        layer.render(in: context)
-        image.unlockFocus()
-        return .init(rawValue: image)
-      }
+        IdentitySyncSnapshot.image(
+            precision: precision,
+            perceptualPrecision: perceptualPrecision
+        ).pullback { layer in
+            let image = NSImage(size: layer.bounds.size)
+            image.lockFocus()
+            let context = NSGraphicsContext.current!.cgContext
+            layer.setNeedsLayout()
+            layer.layoutIfNeeded()
+            layer.render(in: context)
+            image.unlockFocus()
+            return .init(rawValue: image)
+        }
     }
-  }
+}
 #elseif os(iOS) || os(tvOS) || os(visionOS)
-  import UIKit
+import UIKit
 
-  extension SyncSnapshot where Input: CALayer, Output == ImageBytes {
+extension SyncSnapshot where Input: CALayer, Output == ImageBytes {
     /// A snapshot strategy for comparing layers based on pixel equality.
     public static var image: SyncSnapshot<Input, Output> {
-      return .image()
+        .image()
     }
 
     /// A snapshot strategy for comparing layers based on pixel equality.
@@ -63,22 +63,23 @@
     ///     human eye.
     ///   - traits: A trait collection override.
     public static func image(
-      precision: Float = 1,
-      perceptualPrecision: Float = 1,
-      traits: UITraitCollection = .init()
+        precision: Float = 1,
+        perceptualPrecision: Float = 1,
+        traits: UITraitCollection = .init()
     ) -> SyncSnapshot<Input, Output> {
-      return IdentitySyncSnapshot.image(
-        precision: precision,
-        perceptualPrecision: perceptualPrecision
-      ).pullback { layer in
-        let renderer = UIGraphicsImageRenderer(bounds: layer.bounds, format: .init(for: traits))
-        return .init(
-          rawValue: renderer.image { ctx in
-            layer.setNeedsLayout()
-            layer.layoutIfNeeded()
-            layer.render(in: ctx.cgContext)
-          })
-      }
+        IdentitySyncSnapshot.image(
+            precision: precision,
+            perceptualPrecision: perceptualPrecision
+        ).pullback { layer in
+            let renderer = UIGraphicsImageRenderer(bounds: layer.bounds, format: .init(for: traits))
+            return .init(
+                rawValue: renderer.image { ctx in
+                    layer.setNeedsLayout()
+                    layer.layoutIfNeeded()
+                    layer.render(in: ctx.cgContext)
+                }
+            )
+        }
     }
-  }
+}
 #endif

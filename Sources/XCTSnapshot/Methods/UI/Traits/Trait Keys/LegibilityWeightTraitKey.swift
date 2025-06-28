@@ -1,48 +1,50 @@
 #if os(iOS) || os(tvOS) || os(visionOS)
-  import UIKit
+import UIKit
 
-  private struct LegibilityWeightTraitKey: TraitKey {
+private struct LegibilityWeightTraitKey: TraitKey {
 
     static let defaultValue = UILegibilityWeight.unspecified
 
     @available(iOS 17, tvOS 17, *)
     static func apply(
-      _ value: Value,
-      to traitsOverrides: inout UITraitOverrides
+        _ value: Value,
+        to traitsOverrides: inout UITraitOverrides
     ) {
-      traitsOverrides.legibilityWeight = value
+        traitsOverrides.legibilityWeight = value
     }
 
     static func apply(_ value: Value, to traitCollection: inout UITraitCollection) {
-      #if os(visionOS)
+        #if os(visionOS)
         traitCollection = traitCollection.modifyingTraits {
-          $0.legibilityWeight = value
-        }
-      #else
-        if #available(iOS 17, tvOS 17, *) {
-          traitCollection = traitCollection.modifyingTraits {
             $0.legibilityWeight = value
-          }
-        } else {
-          traitCollection = .init(traitsFrom: [
-            traitCollection,
-            UITraitCollection(legibilityWeight: value),
-          ])
         }
-      #endif
+        #else
+        if #available(iOS 17, tvOS 17, *) {
+            traitCollection = traitCollection.modifyingTraits {
+                $0.legibilityWeight = value
+            }
+        } else {
+            traitCollection = .init(traitsFrom: [
+                traitCollection,
+                UITraitCollection(legibilityWeight: value),
+            ])
+        }
+        #endif
     }
-  }
+}
 
-  extension Traits {
+extension Traits {
 
+    /// Specifies the legibility weight for text.
     public var legibilityWeight: UILegibilityWeight {
-      get { self[LegibilityWeightTraitKey.self] }
-      set { self[LegibilityWeightTraitKey.self] = newValue }
+        get { self[LegibilityWeightTraitKey.self] }
+        set { self[LegibilityWeightTraitKey.self] = newValue }
     }
 
+    /// Creates a `Traits` instance with the specified legibility weight.
     public init(legibilityWeight: UILegibilityWeight) {
-      self.init()
-      self.legibilityWeight = legibilityWeight
+        self.init()
+        self.legibilityWeight = legibilityWeight
     }
-  }
+}
 #endif

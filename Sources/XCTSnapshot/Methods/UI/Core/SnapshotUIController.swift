@@ -3,25 +3,25 @@ import SpriteKit
 import SwiftUI
 
 #if os(iOS) || os(tvOS) || os(watchOS) || os(visionOS)
-  import UIKit
+import UIKit
 #elseif os(macOS)
-  @preconcurrency import AppKit
+@preconcurrency import AppKit
 #endif
 
 #if os(iOS) || os(tvOS) || os(macOS) || os(visionOS)
-  @MainActor
-  class SnapshotUIController: SDKViewController {
+@MainActor
+class SnapshotUIController: SDKViewController {
 
     // MARK: - Internal properties
 
     #if os(iOS) || os(tvOS) || os(visionOS)
-      override var shouldAutomaticallyForwardAppearanceMethods: Bool {
-        return true
-      }
+    override var shouldAutomaticallyForwardAppearanceMethods: Bool {
+        true
+    }
     #endif
 
     var configuration: LayoutConfiguration {
-      snapshotView.configuration
+        snapshotView.configuration
     }
 
     private let snapshotView: SnapshotView
@@ -38,311 +38,334 @@ import SwiftUI
     // MARK: - Inits
 
     init(_ view: SDKView, with configuration: LayoutConfiguration) {
-      let sizeListener = SizeListener()
-      view.addSizeListener(sizeListener)
-      self.childController = view.withController()
-      self.childSizeListener = sizeListener
-      self.snapshotView = .init(configuration: configuration)
-      super.init(nibName: nil, bundle: nil)
+        let sizeListener = SizeListener()
+        view.addSizeListener(sizeListener)
+        self.childController = view.withController()
+        self.childSizeListener = sizeListener
+        self.snapshotView = .init(configuration: configuration)
+        super.init(nibName: nil, bundle: nil)
     }
 
     init(_ viewController: SDKViewController, with configuration: LayoutConfiguration) {
-      let sizeListener = SizeListener()
-      viewController.view.addSizeListener(sizeListener)
-      self.childController = viewController
-      self.childSizeListener = sizeListener
-      self.snapshotView = .init(configuration: configuration)
-      super.init(nibName: nil, bundle: nil)
+        let sizeListener = SizeListener()
+        viewController.view.addSizeListener(sizeListener)
+        self.childController = viewController
+        self.childSizeListener = sizeListener
+        self.snapshotView = .init(configuration: configuration)
+        super.init(nibName: nil, bundle: nil)
     }
 
     init<Content: View>(_ content: Content, with configuration: LayoutConfiguration) {
-      let sizeListener = SizeListener()
-      #if os(macOS)
+        let sizeListener = SizeListener()
+        #if os(macOS)
         let viewController = NSHostingController(rootView: content.sizeListener(sizeListener))
-      #else
+        #else
         let viewController = UIHostingController(rootView: content.sizeListener(sizeListener))
-      #endif
-      self.childController = viewController
-      self.childSizeListener = sizeListener
-      self.snapshotView = .init(configuration: configuration)
-      super.init(nibName: nil, bundle: nil)
+        #endif
+        self.childController = viewController
+        self.childSizeListener = sizeListener
+        self.snapshotView = .init(configuration: configuration)
+        super.init(nibName: nil, bundle: nil)
     }
 
     required init?(coder: NSCoder) {
-      nil
+        nil
     }
 
     // MARK: - Super methods
 
     override func loadView() {
-      view = snapshotView
-      snapshotView.translatesAutoresizingMaskIntoConstraints = false
+        view = snapshotView
+        snapshotView.translatesAutoresizingMaskIntoConstraints = false
     }
 
     override func viewDidLoad() {
-      super.viewDidLoad()
-      attachChild()
-      #if os(macOS)
-        view.wantsLayer = true
-      #endif
+        super.viewDidLoad()
+        attachChild()
     }
 
     #if os(macOS)
-      override func viewDidLayout() {
+    override func viewDidLayout() {
         super.viewDidLayout()
         if isWaitingSnapshotSignal {
-          isWaitingSnapshotSignal = false
+            isWaitingSnapshotSignal = false
 
-          Task {
-            await snapshotSignal.signal()
-          }
+            Task {
+                await snapshotSignal.signal()
+            }
         }
-      }
+    }
+
+    override func viewWillAppear() {
+        super.viewWillAppear()
+
+        let trackingArea = NSTrackingArea(
+            rect: view.bounds,
+            options: [.mouseEnteredAndExited, .activeInKeyWindow],
+            owner: view
+        )
+
+        view.addTrackingArea(trackingArea)
+    }
+
+    override func viewWillDisappear() {
+        super.viewWillDisappear()
+
+        for trackingArea in view.trackingAreas {
+            view.removeTrackingArea(trackingArea)
+        }
+    }
     #else
-      override func viewWillAppear(_ animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         configuration.traits.commit(in: self)
-      }
+    }
 
-      override func viewDidLayoutSubviews() {
+    override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
 
         if isWaitingSnapshotSignal {
-          isWaitingSnapshotSignal = false
+            isWaitingSnapshotSignal = false
 
-          Task {
-            await snapshotSignal.signal()
-          }
+            Task {
+                await snapshotSignal.signal()
+            }
         }
-      }
-      #if os(iOS)
-        override func shouldAutomaticallyForwardRotationMethods() -> Bool {
-          return true
-        }
-      #endif
+    }
+    #if os(iOS)
+    override func shouldAutomaticallyForwardRotationMethods() -> Bool {
+        true
+    }
+    #endif
     #endif
 
     // MARK: - Internal methods
 
     func layoutIfNeeded() {
-      #if os(macOS)
-        let view = childController.view
-      #else
-        let view: UIView = childController.view ?? view
-      #endif
-
-      let size = view.frame.size
-      if size.height == .zero || size.width == .zero {
         #if os(macOS)
-          view.needsLayout = true
-          view.layoutSubtreeIfNeeded()
+        let view = childController.view
         #else
-          view.setNeedsLayout()
-          view.layoutIfNeeded()
+        let view: UIView = childController.view ?? view
         #endif
-      }
+
+        let size = view.frame.size
+        if size.height == .zero || size.width == .zero {
+            #if os(macOS)
+            view.needsLayout = true
+            view.layoutSubtreeIfNeeded()
+            #else
+            view.setNeedsLayout()
+            view.layoutIfNeeded()
+            #endif
+        }
     }
 
     func snapshot() async throws -> SDKImage {
-      #if !os(macOS)
+        #if !os(macOS)
         let traits = configuration.traits
-      #endif
+        #endif
 
-      isWaitingSnapshotSignal = true
+        isWaitingSnapshotSignal = true
 
-      #if os(macOS)
+        #if os(macOS)
         childController.view.needsLayout = true
         view.needsLayout = true
         view.layoutSubtreeIfNeeded()
-      #else
+        #else
         view.recursiveNeedsLayout()
         view.layoutIfNeeded()
-      #endif
-
-      try await snapshotSignal.wait()
-      await snapshotSignal.lock()
-
-      if let sceneView = childController.view as? SCNView {
-        return sceneView.snapshot()
-      }
-
-      if let skView = childController.view as? SKView,
-        let scene = skView.scene,
-        let image = skView.texture(from: scene)?.cgImage()
-      {
-        #if os(macOS)
-          return .init(
-            cgImage: image,
-            size: CGSize(
-              width: image.width,
-              height: image.height
-            )
-          )
-        #else
-          return .init(cgImage: image)
         #endif
-      }
 
-      #if os(macOS)
+        try await snapshotSignal.wait()
+        await snapshotSignal.lock()
+
+        if let sceneView = childController.view as? SCNView {
+            return sceneView.snapshot()
+        }
+
+        if let skView = childController.view as? SKView,
+            let scene = skView.scene,
+            let image = skView.texture(from: scene)?.cgImage()
+        {
+            #if os(macOS)
+            return .init(
+                cgImage: image,
+                size: CGSize(
+                    width: image.width,
+                    height: image.height
+                )
+            )
+            #else
+            return .init(cgImage: image)
+            #endif
+        }
+
+        #if os(macOS)
         return try snapshot(view)
-      #else
+        #else
         return try snapshot(view, with: traits)
-      #endif
+        #endif
     }
 
     enum DescriptorMethod: String {
-      #if os(macOS)
+        #if os(macOS)
         case subtreeDescription = "_subtreeDescription"
-      #else
+        #else
         case hierarchy = "_printHierarchy"
         case recursiveDescription = "recursiveDescription"
-      #endif
-
-      @MainActor
-      fileprivate func callAsFunction(_ viewController: SDKViewController) -> String {
-        let reference: NSObject
-
-        switch self {
-        #if os(macOS)
-          case .subtreeDescription:
-            reference = viewController.view
-        #else
-          case .hierarchy:
-            reference = viewController
-          case .recursiveDescription:
-            reference = viewController.view
         #endif
-        }
 
-        return
-          (reference
-          .perform(Selector(rawValue))
-          .retain()
-          .takeUnretainedValue() as! String).sanitizingPointersReferences()
-      }
+        @MainActor
+        fileprivate func callAsFunction(_ viewController: SDKViewController) -> String {
+            let reference: NSObject
+
+            switch self {
+            #if os(macOS)
+            case .subtreeDescription:
+                reference = viewController.view
+            #else
+            case .hierarchy:
+                reference = viewController
+            case .recursiveDescription:
+                reference = viewController.view
+            #endif
+            }
+
+            return
+                (reference
+                .perform(Selector(rawValue))
+                .retain()
+                .takeUnretainedValue() as! String).sanitizingPointersReferences()
+        }
     }
 
     func descriptor(_ method: DescriptorMethod) async throws -> String {
-      isWaitingSnapshotSignal = true
+        isWaitingSnapshotSignal = true
 
-      #if os(macOS)
+        #if os(macOS)
         childController.view.needsLayout = true
         view.needsLayout = true
         view.layoutSubtreeIfNeeded()
-      #else
+        #else
         childController.view.setNeedsLayout()
         view.setNeedsLayout()
         view.layoutIfNeeded()
-      #endif
+        #endif
 
-      try await snapshotSignal.wait()
-      await snapshotSignal.lock()
+        try await snapshotSignal.wait()
+        await snapshotSignal.lock()
 
-      return method(childController)
+        return method(childController)
     }
 
     func detachChild() {
-      defer { snapshotView.dispose() }
+        defer { snapshotView.dispose() }
 
-      NSLayoutConstraint.deactivate(childConstraints)
-      #if !os(macOS)
+        NSLayoutConstraint.deactivate(childConstraints)
+        #if !os(macOS)
         childController.additionalSafeAreaInsets = .zero
-      #endif
+        #endif
 
-      #if !os(macOS)
+        #if !os(macOS)
         childController.willMove(toParent: nil)
-      #endif
-      childController.view.removeFromSuperview()
-      childController.removeFromParent()
+        #endif
+        childController.view.removeFromSuperview()
+        childController.removeFromParent()
     }
 
     // MARK: - Private methods
 
     private func attachChild() {
-      addChild(childController)
-      snapshotView.add(childController.view, with: childSizeListener)
-      #if !os(macOS)
+        addChild(childController)
+        snapshotView.add(childController.view, with: childSizeListener)
+        #if !os(macOS)
         childController.didMove(toParent: self)
-      #endif
+        #endif
 
-      let heightAnchor = childController.view.heightAnchor.constraint(
-        equalTo: view.heightAnchor,
-        multiplier: 1
-      )
+        let heightAnchor = childController.view.heightAnchor.constraint(
+            equalTo: view.heightAnchor,
+            multiplier: 1
+        )
 
-      let widthAnchor = childController.view.widthAnchor.constraint(
-        equalTo: view.widthAnchor,
-        multiplier: 1
-      )
+        let widthAnchor = childController.view.widthAnchor.constraint(
+            equalTo: view.widthAnchor,
+            multiplier: 1
+        )
 
-      #if os(macOS)
+        #if os(macOS)
         heightAnchor.priority = .fittingSizeCompression
         widthAnchor.priority = .fittingSizeCompression
-      #else
+        #else
         heightAnchor.priority = .fittingSizeLevel
         widthAnchor.priority = .fittingSizeLevel
-      #endif
+        #endif
 
-      NSLayoutConstraint.activate(
-        [
-          heightAnchor,
-          widthAnchor,
-        ], storingAt: &childConstraints)
+        NSLayoutConstraint.activate(
+            [
+                heightAnchor,
+                widthAnchor,
+            ],
+            storingAt: &childConstraints
+        )
 
-      setupSizeConstraints()
+        setupSizeConstraints()
 
-      #if !os(macOS)
+        #if !os(macOS)
         childController.additionalSafeAreaInsets = configuration.safeArea
-      #endif
+        #endif
     }
 
     private func setupSizeConstraints() {
-      let size = configuration.size ?? .zero
+        let size = configuration.size ?? .zero
 
-      if size.height > .zero {
-        childController.view.setContentHuggingPriority(.defaultLow, for: .vertical)
-        childController.view.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
+        if size.height > .zero {
+            childController.view.setContentHuggingPriority(.defaultLow, for: .vertical)
+            childController.view.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
 
-        let heightAnchor = childController.view.heightAnchor.constraint(
-          equalToConstant: size.height
-        )
+            let heightAnchor = childController.view.heightAnchor.constraint(
+                equalToConstant: size.height
+            )
 
-        heightAnchor.priority = .required
+            heightAnchor.priority = .required
 
-        NSLayoutConstraint.activate(
-          [
-            heightAnchor
-          ], storingAt: &childConstraints)
-      } else {
-        childController.view.setContentHuggingPriority(.required, for: .vertical)
-        childController.view.setContentCompressionResistancePriority(.required, for: .vertical)
-      }
+            NSLayoutConstraint.activate(
+                [
+                    heightAnchor
+                ],
+                storingAt: &childConstraints
+            )
+        } else {
+            childController.view.setContentHuggingPriority(.required, for: .vertical)
+            childController.view.setContentCompressionResistancePriority(.required, for: .vertical)
+        }
 
-      if size.width > .zero {
-        childController.view.setContentHuggingPriority(.defaultLow, for: .horizontal)
-        childController.view.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
+        if size.width > .zero {
+            childController.view.setContentHuggingPriority(.defaultLow, for: .horizontal)
+            childController.view.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
 
-        let widthAnchor = childController.view.widthAnchor.constraint(
-          equalToConstant: size.width
-        )
+            let widthAnchor = childController.view.widthAnchor.constraint(
+                equalToConstant: size.width
+            )
 
-        widthAnchor.priority = .required
+            widthAnchor.priority = .required
 
-        NSLayoutConstraint.activate(
-          [
-            widthAnchor
-          ], storingAt: &childConstraints)
-      } else {
-        childController.view.setContentHuggingPriority(.required, for: .horizontal)
-        childController.view.setContentCompressionResistancePriority(.required, for: .horizontal)
-      }
+            NSLayoutConstraint.activate(
+                [
+                    widthAnchor
+                ],
+                storingAt: &childConstraints
+            )
+        } else {
+            childController.view.setContentHuggingPriority(.required, for: .horizontal)
+            childController.view.setContentCompressionResistancePriority(.required, for: .horizontal)
+        }
     }
 
     #if os(macOS)
-      private func snapshot(_ view: SDKView) throws -> SDKImage {
+    private func snapshot(_ view: SDKView) throws -> SDKImage {
         let bounds = snapshotView.calculateContentFrame()
         guard let rep = view.bitmapImageRepForCachingDisplay(in: bounds) else {
-          throw RenderingError()
+            throw RenderingError()
         }
 
         view.cacheDisplay(in: bounds, to: rep)
@@ -350,44 +373,44 @@ import SwiftUI
         let snapshot = NSImage(size: rep.size)
         snapshot.addRepresentation(rep)
         return snapshot
-      }
+    }
     #else
-      private func snapshot(
+    private func snapshot(
         _ view: SDKView,
         with traits: Traits
-      ) throws -> SDKImage {
+    ) throws -> SDKImage {
         let renderer = UIGraphicsImageRenderer(
-          bounds: snapshotView.calculateContentFrame(),
-          format: .init(for: traits())
+            bounds: snapshotView.calculateContentFrame(),
+            format: .init(for: traits())
         )
 
         return renderer.image {
-          view.layer.render(in: $0.cgContext)
+            view.layer.render(in: $0.cgContext)
         }
-      }
+    }
     #endif
-  }
+}
 #endif
 
 #if os(macOS)
-  import CoreGraphics
-  func CGContextCreateBitmapContext(size: CGSize, opaque: Bool, scale: CGFloat) -> CGContext? {
+import CoreGraphics
+func CGContextCreateBitmapContext(size: CGSize, opaque: Bool, scale: CGFloat) -> CGContext? {
     var scale = scale
 
     if scale == .zero {
-      // Match `UIGraphicsBeginImageContextWithOptions`, reset to the scale factor of the device’s main screen if scale is 0.
-      scale = NSScreen.main?.backingScaleFactor ?? 1
+        // Match `UIGraphicsBeginImageContextWithOptions`, reset to the scale factor of the device’s main screen if scale is 0.
+        scale = NSScreen.main?.backingScaleFactor ?? 1
     }
 
     let width = ceil(size.width * scale)
     let height = ceil(size.height * scale)
 
     guard width >= 1, height >= 1 else {
-      return nil
+        return nil
     }
 
     guard let space = NSScreen.main?.colorSpace?.cgColorSpace else {
-      return nil
+        return nil
     }
     // kCGImageAlphaNone is not supported in CGBitmapContextCreate.
     // Check #3330 for more detail about why this bitmap is choosen.
@@ -395,30 +418,30 @@ import SwiftUI
     // However, macOS's runtime detection will also call this function, cause recursive, so still hardcode here
     let bitmapInfo: CGBitmapInfo
     if !opaque {
-      // [NSImage imageWithSize:flipped:drawingHandler:] returns float(16-bits) RGBA8888 on alpha image, which we don't need
-      bitmapInfo = [
-        .byteOrderDefault, .init(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue),
-      ]
+        // [NSImage imageWithSize:flipped:drawingHandler:] returns float(16-bits) RGBA8888 on alpha image, which we don't need
+        bitmapInfo = [
+            .byteOrderDefault, .init(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue),
+        ]
     } else {
-      bitmapInfo = [.byteOrderDefault, .init(rawValue: CGImageAlphaInfo.noneSkipLast.rawValue)]
+        bitmapInfo = [.byteOrderDefault, .init(rawValue: CGImageAlphaInfo.noneSkipLast.rawValue)]
     }
 
     guard
-      let context = CGContext(
-        data: nil,
-        width: Int(width),
-        height: Int(height),
-        bitsPerComponent: 8,
-        bytesPerRow: .zero,
-        space: space,
-        bitmapInfo: bitmapInfo.rawValue
-      )
+        let context = CGContext(
+            data: nil,
+            width: Int(width),
+            height: Int(height),
+            bitsPerComponent: 8,
+            bytesPerRow: .zero,
+            space: space,
+            bitmapInfo: bitmapInfo.rawValue
+        )
     else { return nil }
 
     context.scaleBy(x: scale, y: scale)
 
     return context
-  }
+}
 
-  struct RenderingError: Error {}
+struct RenderingError: Error {}
 #endif

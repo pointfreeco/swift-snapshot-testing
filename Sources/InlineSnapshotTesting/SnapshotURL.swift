@@ -1,16 +1,16 @@
-public struct SnapshotURL: Sendable, Hashable {
+struct SnapshotURL: Sendable, Hashable {
 
-  public let path: StaticString
+    let path: StaticString
 
-  public init(path: StaticString) {
-    self.path = path
-  }
+    init(path: StaticString) {
+        self.path = path
+    }
 
-  public static func == (lhs: Self, rhs: Self) -> Bool {
-    String(describing: lhs.path) == String(describing: rhs.path)
-  }
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        String(describing: lhs.path) == String(describing: rhs.path)
+    }
 
-  public func hash(into hasher: inout Hasher) {
-    hasher.combine(String(describing: path))
-  }
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(String(describing: path))
+    }
 }

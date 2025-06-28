@@ -3,132 +3,122 @@ import Testing
 
 final class TestingSession: Sendable {
 
-  /// Global shared instance for configuring snapshot options.
-  ///
-  /// Use this property to set configurations like the default diff tool or recording mode.
-  ///
-  /// - Example:
-  ///   ```swift
-  ///   TestingSession.shared.diffTool = .ksdiff
-  ///   TestingSession.shared.record = .missing
-  ///   ```
-  static let shared = TestingSession()
+    static let shared = TestingSession()
 
-  // MARK: - Private properties
+    // MARK: - Private properties
 
-  private let testCounter = TestCounter()
-  private let forLoopCounter = TestCounter()
+    private let testCounter = TestCounter()
+    private let forLoopCounter = TestCounter()
 
-  private init() {}
+    private init() {}
 
-  @_spi(Internals)
-  public func functionPosition(
-    fileID: StaticString,
-    filePath: StaticString,
-    function: String,
-    line: UInt,
-    column: UInt
-  ) -> Int {
-    testCounter(
-      fileID: fileID,
-      filePath: filePath,
-      function: function,
-      line: line,
-      column: column
-    )
-  }
+    func functionPosition(
+        fileID: StaticString,
+        filePath: StaticString,
+        function: String,
+        line: UInt,
+        column: UInt
+    ) -> Int {
+        testCounter(
+            fileID: fileID,
+            filePath: filePath,
+            function: function,
+            line: line,
+            column: column
+        )
+    }
 
-  func forLoop(
-    fileID: StaticString,
-    filePath: StaticString,
-    function: String,
-    line: UInt,
-    column: UInt
-  ) -> Int {
-    forLoopCounter(
-      fileID: fileID,
-      filePath: filePath,
-      function: function,
-      line: line,
-      column: column
-    )
-  }
+    func forLoop(
+        fileID: StaticString,
+        filePath: StaticString,
+        function: String,
+        line: UInt,
+        column: UInt
+    ) -> Int {
+        forLoopCounter(
+            fileID: fileID,
+            filePath: filePath,
+            function: function,
+            line: line,
+            column: column
+        )
+    }
 }
 
 extension TestingSession {
 
-  fileprivate final class TestCounter: @unchecked Sendable {
+    fileprivate final class TestCounter: @unchecked Sendable {
 
-    // MARK: - Private properties
+        // MARK: - Private properties
 
-    private let lock = NSLock()
+        private let lock = NSLock()
 
-    // MARK: - Unsafe properties
+        // MARK: - Unsafe properties
 
-    private var _registry: [TestLocation: [TestPosition]] = [:]
+        private var _registry: [TestLocation: [TestPosition]] = [:]
 
-    init() {}
+        init() {}
 
-    func callAsFunction(
-      fileID: StaticString,
-      filePath: StaticString,
-      function: String,
-      line: UInt,
-      column: UInt
-    ) -> Int {
-      let key = TestLocation(
-        fileID: fileID,
-        filePath: filePath,
-        function: function
-      )
+        func callAsFunction(
+            fileID: StaticString,
+            filePath: StaticString,
+            function: String,
+            line: UInt,
+            column: UInt
+        ) -> Int {
+            let key = TestLocation(
+                fileID: fileID,
+                filePath: filePath,
+                function: function
+            )
 
-      let position = TestPosition(
-        line: line,
-        column: column
-      )
+            let position = TestPosition(
+                line: line,
+                column: column
+            )
 
-      return lock.withLock {
-        var items = _registry[key, default: []]
+            return lock.withLock {
+                var items = _registry[key, default: []]
 
-        if let index = items.firstIndex(of: position) {
-          return index + 1
+                if let index = items.firstIndex(of: position) {
+                    return index + 1
+                }
+
+                items.append(position)
+                _registry[key] = items
+                return items.count
+            }
         }
-
-        items.append(position)
-        _registry[key] = items
-        return items.count
-      }
     }
-  }
 }
 
 extension TestingSession.TestCounter {
 
-  fileprivate struct TestLocation: Hashable {
+    fileprivate struct TestLocation: Hashable {
 
-    private let fileID: String
-    private let filePath: String
-    private let function: String
+        private let fileID: String
+        private let filePath: String
+        private let function: String
 
-    init(
-      fileID: StaticString,
-      filePath: StaticString,
-      function: String
-    ) {
-      self.fileID = String(describing: fileID)
-      self.filePath = String(describing: filePath)
-      self.function = function
+        init(
+            fileID: StaticString,
+            filePath: StaticString,
+            function: String
+        ) {
+            self.fileID = String(describing: fileID)
+            self.filePath = String(describing: filePath)
+            self.function = function
+        }
     }
-  }
 
-  fileprivate struct TestPosition: Hashable {
+    fileprivate struct TestPosition: Hashable {
 
-    private let line: UInt
-    private let column: UInt
+        private let line: UInt
+        private let column: UInt
 
-    init(line: UInt, column: UInt) {
-      self.line = line
-      self.column = column
+        init(line: UInt, column: UInt) {
+            self.line = line
+            self.column = column
+        }
     }
-  }
 }

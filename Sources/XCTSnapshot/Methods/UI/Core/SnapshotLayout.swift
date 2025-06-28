@@ -3,7 +3,7 @@ import CoreGraphics
 /// Defines how a UI component's layout is configured during snapshot testing.
 public enum SnapshotLayout {
 
-  #if os(iOS) || os(tvOS) || os(visionOS)
+    #if os(iOS) || os(tvOS) || os(visionOS)
     /// Renders the component using a specific device configuration.
     ///
     /// - Parameter configuration: Layout configuration defining safe area margins, size,
@@ -14,24 +14,24 @@ public enum SnapshotLayout {
     ///   let layout = .device(.iPhone15ProMax)
     ///   ```
     case device(LayoutConfiguration)
-  #endif
+    #endif
 
-  /// Renders the component with an explicit fixed size.
-  ///
-  /// Useful for ensuring test consistency across devices or configurations.
-  ///
-  /// - Parameters:
-  ///   - width: Width in points.
-  ///   - height: Height in points.
-  ///
-  /// Example:
-  ///   ```swift
-  ///   let layout = .fixed(width: 375, height: 812) // iPhone 12 dimensions
-  ///   ```
-  case fixed(width: CGFloat, height: CGFloat)
+    /// Renders the component with an explicit fixed size.
+    ///
+    /// Useful for ensuring test consistency across devices or configurations.
+    ///
+    /// - Parameters:
+    ///   - width: Width in points.
+    ///   - height: Height in points.
+    ///
+    /// Example:
+    ///   ```swift
+    ///   let layout = .fixed(width: 375, height: 812) // iPhone 12 dimensions
+    ///   ```
+    case fixed(width: CGFloat, height: CGFloat)
 
-  /// Renders the component using its natural intrinsic content size.
-  ///
-  /// Ideal for content-adaptive components like labels or dynamic collections.
-  case sizeThatFits
+    /// Renders the component using its natural intrinsic content size.
+    ///
+    /// Ideal for content-adaptive components like labels or dynamic collections.
+    case sizeThatFits
 }

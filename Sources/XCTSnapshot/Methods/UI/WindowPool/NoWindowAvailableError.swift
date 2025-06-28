@@ -1,17 +1,17 @@
 #if os(macOS)
-  @preconcurrency import AppKit
+@preconcurrency import AppKit
 #elseif os(iOS) || os(tvOS) || os(visionOS)
-  import UIKit
+import UIKit
 #endif
 
 #if os(iOS) || os(tvOS) || os(visionOS) || os(macOS)
-  struct NoWindowAvailableError: Error, CustomDebugStringConvertible {
+struct NoWindowAvailableError: Error, CustomDebugStringConvertible {
     #if !os(macOS)
-      let sessionRole: UISceneSession.Role
+    let sessionRole: UISceneSession.Role
     #endif
 
     var debugDescription: String {
-      #if !os(macOS)
+        #if !os(macOS)
         """
         Failed to find a valid window for role: \(sessionRole).
 
@@ -25,7 +25,7 @@
         - When using an xcodeproj, ensure you activate the scene session before testing via: \
         `UIApplication.shared.activateSceneSession(for:)`
         """
-      #else
+        #else
         """
         [BETA OUTPUT]
 
@@ -39,15 +39,15 @@
         - The window might not be ordered or key. Verify your window creation flow and call \
         `makeKeyAndOrderFront(_:)` explicitly if needed.
         """
-      #endif
+        #endif
     }
-  }
+}
 #endif
 
 #if os(macOS)
-  enum UISceneSession {
+enum UISceneSession {
     enum Role {
-      case windowApplication
+        case windowApplication
     }
-  }
+}
 #endif

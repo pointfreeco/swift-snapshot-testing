@@ -1,12 +1,12 @@
 #if os(macOS)
-  import AppKit
-  import Cocoa
-  @preconcurrency import CoreGraphics
+import AppKit
+import Cocoa
+@preconcurrency import CoreGraphics
 
-  extension SyncSnapshot where Input: CGPath, Output == ImageBytes {
+extension SyncSnapshot where Input: CGPath, Output == ImageBytes {
     /// A snapshot strategy for comparing bezier paths based on pixel equality.
     public static var image: SyncSnapshot<Input, Output> {
-      return .image()
+        .image()
     }
 
     /// A snapshot strategy for comparing bezier paths based on pixel equality.
@@ -27,44 +27,44 @@
     ///     human eye.
     ///   - drawingMode: The drawing mode.
     public static func image(
-      precision: Float = 1,
-      perceptualPrecision: Float = 1,
-      drawingMode: CGPathDrawingMode = .eoFill
+        precision: Float = 1,
+        perceptualPrecision: Float = 1,
+        drawingMode: CGPathDrawingMode = .eoFill
     ) -> SyncSnapshot<Input, Output> {
-      return IdentitySyncSnapshot.image(
-        precision: precision,
-        perceptualPrecision: perceptualPrecision
-      ).pullback { path in
-        let bounds = path.boundingBoxOfPath
-        var transform = CGAffineTransform(
-          translationX: -bounds.origin.x,
-          y: -bounds.origin.y
-        )
+        IdentitySyncSnapshot.image(
+            precision: precision,
+            perceptualPrecision: perceptualPrecision
+        ).pullback { path in
+            let bounds = path.boundingBoxOfPath
+            var transform = CGAffineTransform(
+                translationX: -bounds.origin.x,
+                y: -bounds.origin.y
+            )
 
-        let path = path.copy(using: &transform)!
+            let path = path.copy(using: &transform)!
 
-        let image = NSImage(size: bounds.size, flipped: false) { destRect in
-          guard let context = NSGraphicsContext.current else {
-            return false
-          }
+            let image = NSImage(size: bounds.size, flipped: false) { destRect in
+                guard let context = NSGraphicsContext.current else {
+                    return false
+                }
 
-          context.imageInterpolation = .high
-          context.cgContext.addPath(path)
-          context.cgContext.drawPath(using: drawingMode)
-          return true
+                context.imageInterpolation = .high
+                context.cgContext.addPath(path)
+                context.cgContext.drawPath(using: drawingMode)
+                return true
+            }
+
+            return .init(rawValue: image)
         }
-
-        return .init(rawValue: image)
-      }
     }
-  }
+}
 #elseif os(iOS) || os(tvOS) || os(visionOS)
-  import UIKit
+import UIKit
 
-  extension SyncSnapshot where Input: CGPath, Output == ImageBytes {
+extension SyncSnapshot where Input: CGPath, Output == ImageBytes {
     /// A snapshot strategy for comparing bezier paths based on pixel equality.
     public static var image: SyncSnapshot<Input, Output> {
-      return .image()
+        .image()
     }
 
     /// A snapshot strategy for comparing bezier paths based on pixel equality.
@@ -76,103 +76,104 @@
     ///     [the precision](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e) of the
     ///     human eye.
     public static func image(
-      precision: Float = 1,
-      perceptualPrecision: Float = 1,
-      scale: CGFloat = 1,
-      drawingMode: CGPathDrawingMode = .eoFill
+        precision: Float = 1,
+        perceptualPrecision: Float = 1,
+        scale: CGFloat = 1,
+        drawingMode: CGPathDrawingMode = .eoFill
     ) -> SyncSnapshot<Input, Output> {
-      return IdentitySyncSnapshot.image(
-        precision: precision,
-        perceptualPrecision: perceptualPrecision
-      ).pullback { path in
-        let bounds = path.boundingBoxOfPath
-        let format: UIGraphicsImageRendererFormat
-        if #available(iOS 11.0, tvOS 11.0, *) {
-          format = UIGraphicsImageRendererFormat.preferred()
-        } else {
-          format = UIGraphicsImageRendererFormat.default()
+        IdentitySyncSnapshot.image(
+            precision: precision,
+            perceptualPrecision: perceptualPrecision
+        ).pullback { path in
+            let bounds = path.boundingBoxOfPath
+            let format: UIGraphicsImageRendererFormat
+            if #available(iOS 11.0, tvOS 11.0, *) {
+                format = UIGraphicsImageRendererFormat.preferred()
+            } else {
+                format = UIGraphicsImageRendererFormat.default()
+            }
+            format.scale = scale
+            let renderer = UIGraphicsImageRenderer(bounds: bounds, format: format)
+            return .init(
+                rawValue: renderer.image { ctx in
+                    let cgContext = ctx.cgContext
+                    cgContext.addPath(path)
+                    cgContext.drawPath(using: drawingMode)
+                }
+            )
         }
-        format.scale = scale
-        let renderer = UIGraphicsImageRenderer(bounds: bounds, format: format)
-        return .init(
-          rawValue: renderer.image { ctx in
-            let cgContext = ctx.cgContext
-            cgContext.addPath(path)
-            cgContext.drawPath(using: drawingMode)
-          }
-        )
-      }
     }
-  }
+}
 #endif
 
 #if os(macOS) || os(iOS) || os(tvOS) || os(visionOS)
-  @available(iOS 11.0, OSX 10.13, tvOS 11.0, *)
-  extension SyncSnapshot where Input: CGPath, Output == StringBytes {
+extension SyncSnapshot where Input: CGPath, Output == StringBytes {
     /// A snapshot strategy for comparing bezier paths based on element descriptions.
     public static var elementsDescription: SyncSnapshot<Input, Output> {
-      .elementsDescription(numberFormatter: defaultNumberFormatter)
+        .elementsDescription(numberFormatter: defaultNumberFormatter)
     }
 
     /// A snapshot strategy for comparing bezier paths based on element descriptions.
     ///
     /// - Parameter numberFormatter: The number formatter used for formatting points.
-    public static func elementsDescription(numberFormatter: NumberFormatter) -> SyncSnapshot<
-      Input, Output
+    public static func elementsDescription(
+        numberFormatter: NumberFormatter
+    ) -> SyncSnapshot<
+        Input, Output
     > {
-      let namesByType: [CGPathElementType: String] = [
-        .moveToPoint: "MoveTo",
-        .addLineToPoint: "LineTo",
-        .addQuadCurveToPoint: "QuadCurveTo",
-        .addCurveToPoint: "CurveTo",
-        .closeSubpath: "Close",
-      ]
+        let namesByType: [CGPathElementType: String] = [
+            .moveToPoint: "MoveTo",
+            .addLineToPoint: "LineTo",
+            .addQuadCurveToPoint: "QuadCurveTo",
+            .addCurveToPoint: "CurveTo",
+            .closeSubpath: "Close",
+        ]
 
-      let numberOfPointsByType: [CGPathElementType: Int] = [
-        .moveToPoint: 1,
-        .addLineToPoint: 1,
-        .addQuadCurveToPoint: 2,
-        .addCurveToPoint: 3,
-        .closeSubpath: 0,
-      ]
+        let numberOfPointsByType: [CGPathElementType: Int] = [
+            .moveToPoint: 1,
+            .addLineToPoint: 1,
+            .addQuadCurveToPoint: 2,
+            .addCurveToPoint: 3,
+            .closeSubpath: 0,
+        ]
 
-      return IdentitySyncSnapshot<StringBytes>.lines.pullback { path in
-        var string: String = ""
+        return IdentitySyncSnapshot<StringBytes>.lines.pullback { path in
+            var string: String = ""
 
-        path.applyWithBlock { elementPointer in
-          let element = elementPointer.pointee
-          let name = namesByType[element.type] ?? "Unknown"
+            path.applyWithBlock { elementPointer in
+                let element = elementPointer.pointee
+                let name = namesByType[element.type] ?? "Unknown"
 
-          if element.type == .moveToPoint && !string.isEmpty {
-            string += "\n"
-          }
+                if element.type == .moveToPoint && !string.isEmpty {
+                    string += "\n"
+                }
 
-          string += name
+                string += name
 
-          if let numberOfPoints = numberOfPointsByType[element.type] {
-            let points = UnsafeBufferPointer(start: element.points, count: numberOfPoints)
-            string +=
-              " "
-              + points.map { point in
-                let x = numberFormatter.string(from: point.x as NSNumber)!
-                let y = numberFormatter.string(from: point.y as NSNumber)!
-                return "(\(x), \(y))"
-              }.joined(separator: " ")
-          }
+                if let numberOfPoints = numberOfPointsByType[element.type] {
+                    let points = UnsafeBufferPointer(start: element.points, count: numberOfPoints)
+                    string +=
+                        " "
+                        + points.map { point in
+                            let x = numberFormatter.string(from: point.x as NSNumber)!
+                            let y = numberFormatter.string(from: point.y as NSNumber)!
+                            return "(\(x), \(y))"
+                        }.joined(separator: " ")
+                }
 
-          string += "\n"
+                string += "\n"
+            }
+
+            return .init(rawValue: string)
         }
-
-        return .init(rawValue: string)
-      }
     }
-  }
+}
 
-  private let defaultNumberFormatter: NumberFormatter = {
+private let defaultNumberFormatter: NumberFormatter = {
     let numberFormatter = NumberFormatter()
     numberFormatter.decimalSeparator = "."
     numberFormatter.minimumFractionDigits = 1
     numberFormatter.maximumFractionDigits = 3
     return numberFormatter
-  }()
+}()
 #endif

@@ -10,21 +10,29 @@ import Foundation
 /// for comparison.
 public protocol BytesRepresentable: Sendable {
 
-  associatedtype RawValue
+    associatedtype RawValue
 
-  var rawValue: RawValue { get }
+    /// The underlying value used for serialization and deserialization.
+    /// This can be any type, such as `String`, `Data`, or `UIImage`.
+    var rawValue: RawValue { get }
 
-  init(rawValue: RawValue)
+    /// Initializes an instance from a raw value.
+    ///
+    /// This initializer is used to create a type from its underlying raw value, which is
+    /// typically the serialized form of the data (e.g., `String`, `Data`, or `UIImage`).
+    ///
+    /// - Parameter rawValue: The raw value representing the instance's data.
+    init(rawValue: RawValue)
 
-  /// Initializes an instance from data stored in the container.
-  ///
-  /// - Parameter container: The byte container containing data to read.
-  /// - Throws: An error if deserialization fails.
-  init(from container: BytesContainer) throws
+    /// Initializes an instance from data stored in the container.
+    ///
+    /// - Parameter container: The byte container containing data to read.
+    /// - Throws: An error if deserialization fails.
+    init(from container: BytesContainer) throws
 
-  /// Serializes the instance's data and writes it to the provided container.
-  ///
-  /// - Parameter container: The byte container where data will be stored.
-  /// - Throws: An error if serialization fails.
-  func serialize(to container: BytesContainer) throws
+    /// Serializes the instance's data and writes it to the provided container.
+    ///
+    /// - Parameter container: The byte container where data will be stored.
+    /// - Throws: An error if serialization fails.
+    func serialize(to container: BytesContainer) throws
 }

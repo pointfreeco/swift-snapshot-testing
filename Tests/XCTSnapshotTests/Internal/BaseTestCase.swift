@@ -1,15 +1,23 @@
-import XCTSnapshot
+@_spi(Internals) import XCTSnapshot
 import XCTest
 
 @MainActor
 class BaseTestCase: XCTestCase, Sendable {
-  override func invokeTest() {
-    withTestingEnvironment(
-      record: .failed,
-      diffTool: .ksdiff,
-      platform: ""
-    ) {
-      super.invokeTest()
+
+    @MainActor
+    var platform: String? {
+        ""
     }
-  }
+
+    override func invokeTest() {
+        withTestingEnvironment(
+            record: .failed,
+            diffTool: .ksdiff,
+            platform: performOnMainThread {
+                self.platform
+            }
+        ) {
+            super.invokeTest()
+        }
+    }
 }

@@ -1,53 +1,53 @@
 #if os(iOS) || os(tvOS) || os(watchOS) || os(macOS) || os(visionOS)
-  import CoreGraphics
+import CoreGraphics
 
-  extension CGSize {
+extension CGSize {
 
     func scaleThatFits(_ size: CGSize) -> CGFloat {
-      if size.width <= width && size.height <= height {
-        return 1
-      }
+        if size.width <= width && size.height <= height {
+            return 1
+        }
 
-      let scaleWidth = width / size.width
-      let scaleHeight = height / size.height
+        let scaleWidth = width / size.width
+        let scaleHeight = height / size.height
 
-      return min(scaleWidth, scaleHeight)
+        return min(scaleWidth, scaleHeight)
     }
 
     func scaleToFit(_ size: CGSize) -> CGSize {
-      let scale = scaleThatFits(size)
+        let scale = scaleThatFits(size)
 
-      return CGSize(
-        width: size.width * scale,
-        height: size.height * scale
-      )
+        return CGSize(
+            width: size.width * scale,
+            height: size.height * scale
+        )
     }
-  }
+}
 
-  extension CGRect {
+extension CGRect {
 
     func scale(by scale: CGFloat) -> CGRect {
-      guard scale != 1 else {
-        return self
-      }
+        guard scale != 1 else {
+            return self
+        }
 
-      let center = CGPoint(x: midX, y: midY)
+        let center = CGPoint(x: midX, y: midY)
 
-      let scaledSize = CGSize(
-        width: width * scale,
-        height: height * scale
-      )
+        let scaledSize = CGSize(
+            width: width * scale,
+            height: height * scale
+        )
 
-      return .init(
-        x: center.x - scaledSize.width / 2,
-        y: center.y - scaledSize.height / 2,
-        width: scaledSize.width,
-        height: scaledSize.height
-      )
+        return .init(
+            x: center.x - scaledSize.width / 2,
+            y: center.y - scaledSize.height / 2,
+            width: scaledSize.width,
+            height: scaledSize.height
+        )
     }
-  }
+}
 
-  extension CGSize {
+extension CGSize {
 
     /// 440 x 956
     static let screen6_9 = CGSize(width: 440, height: 956)
@@ -86,7 +86,7 @@
     static let screen4_7 = CGSize(width: 375, height: 667)
 
     func reflected() -> CGSize {
-      .init(width: height, height: width)
+        .init(width: height, height: width)
     }
-  }
+}
 #endif

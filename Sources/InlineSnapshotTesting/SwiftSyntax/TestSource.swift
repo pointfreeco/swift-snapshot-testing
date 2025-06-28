@@ -1,9 +1,9 @@
 #if canImport(SwiftSyntax601)
-  import SwiftSyntax
+import SwiftSyntax
 
-  struct TestSource {
+struct TestSource {
     let source: String
     let sourceFile: SourceFileSyntax
     let sourceLocationConverter: SourceLocationConverter
-  }
+}
 #endif

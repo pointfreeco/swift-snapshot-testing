@@ -6,9 +6,9 @@ import Foundation
 /// such as reading/writing in a `BytesContainer`.
 public struct BytesSerializationError: Error {
 
-  /// Initializes an instance of `BytesSerializationError`.
-  ///
-  /// This initializer creates a basic error instance, typically used to indicate generic failures during
-  /// serialization/deserialization processes.
-  public init() {}
+    /// Initializes an instance of `BytesSerializationError`.
+    ///
+    /// This initializer creates a basic error instance, typically used to indicate generic failures during
+    /// serialization/deserialization processes.
+    public init() {}
 }

@@ -2,49 +2,49 @@ import Foundation
 
 actor AsyncSignal {
 
-  private var isLocked: Bool
-  private var pendingOperations = [AsyncOperation]()
+    private var isLocked: Bool
+    private var pendingOperations = [AsyncOperation]()
 
-  init(_ locked: Bool = true) {
-    isLocked = locked
-  }
-
-  func lock() {
-    isLocked = true
-  }
-
-  func wait() async throws {
-    guard isLocked else {
-      return
+    init(_ locked: Bool = true) {
+        isLocked = locked
     }
 
-    let operation = AsyncOperation()
+    func lock() {
+        isLocked = true
+    }
 
-    try await withTaskCancellationHandler { [weak operation] in
-      try await withUnsafeThrowingContinuation {
-        guard let operation else {
-          return
+    func wait() async throws {
+        guard isLocked else {
+            return
         }
 
-        operation.schedule($0)
-        pendingOperations.insert(operation, at: .zero)
-      }
-    } onCancel: {
-      operation.cancelled()
-    }
-  }
+        let operation = AsyncOperation()
 
-  func signal() {
-    isLocked = false
+        try await withTaskCancellationHandler { [weak operation] in
+            try await withUnsafeThrowingContinuation {
+                guard let operation else {
+                    return
+                }
 
-    while let operation = pendingOperations.popLast() {
-      operation.resume()
+                operation.schedule($0)
+                pendingOperations.insert(operation, at: .zero)
+            }
+        } onCancel: {
+            operation.cancelled()
+        }
     }
-  }
 
-  deinit {
-    for operation in pendingOperations {
-      operation.dispose()
+    func signal() {
+        isLocked = false
+
+        while let operation = pendingOperations.popLast() {
+            operation.resume()
+        }
     }
-  }
+
+    deinit {
+        for operation in pendingOperations {
+            operation.dispose()
+        }
+    }
 }

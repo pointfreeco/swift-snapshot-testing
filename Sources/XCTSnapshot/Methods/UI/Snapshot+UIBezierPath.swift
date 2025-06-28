@@ -1,10 +1,10 @@
 #if os(iOS) || os(tvOS) || os(visionOS)
-  @preconcurrency import UIKit
+@preconcurrency import UIKit
 
-  extension SyncSnapshot where Input: UIBezierPath, Output == ImageBytes {
+extension SyncSnapshot where Input: UIBezierPath, Output == ImageBytes {
     /// A snapshot strategy for comparing bezier paths based on pixel equality.
     public static var image: SyncSnapshot<Input, Output> {
-      return .image()
+        .image()
     }
 
     /// A snapshot strategy for comparing bezier paths based on pixel equality.
@@ -17,49 +17,51 @@
     ///     human eye.
     ///   - scale: The scale to use when loading the reference image from disk.
     public static func image(
-      precision: Float = 1,
-      perceptualPrecision: Float = 1,
-      scale: CGFloat = 1
+        precision: Float = 1,
+        perceptualPrecision: Float = 1,
+        scale: CGFloat = 1
     ) -> SyncSnapshot<Input, Output> {
-      return IdentitySyncSnapshot.image(
-        precision: precision,
-        perceptualPrecision: perceptualPrecision
-      ).pullback { path in
-        let bounds = path.bounds
-        let format: UIGraphicsImageRendererFormat
-        if #available(iOS 11.0, tvOS 11.0, *) {
-          format = UIGraphicsImageRendererFormat.preferred()
-        } else {
-          format = UIGraphicsImageRendererFormat.default()
+        IdentitySyncSnapshot.image(
+            precision: precision,
+            perceptualPrecision: perceptualPrecision
+        ).pullback { path in
+            let bounds = path.bounds
+            let format: UIGraphicsImageRendererFormat
+            if #available(iOS 11.0, tvOS 11.0, *) {
+                format = UIGraphicsImageRendererFormat.preferred()
+            } else {
+                format = UIGraphicsImageRendererFormat.default()
+            }
+            format.scale = scale
+            let renderer = UIGraphicsImageRenderer(bounds: bounds, format: format)
+            return .init(
+                rawValue: renderer.image { ctx in
+                    path.fill()
+                }
+            )
         }
-        format.scale = scale
-        let renderer = UIGraphicsImageRenderer(bounds: bounds, format: format)
-        return .init(
-          rawValue: renderer.image { ctx in
-            path.fill()
-          })
-      }
     }
-  }
+}
 
-  @available(iOS 11.0, tvOS 11.0, *)
-  extension SyncSnapshot where Input: UIBezierPath, Output == StringBytes {
+extension SyncSnapshot where Input: UIBezierPath, Output == StringBytes {
     /// A snapshot strategy for comparing bezier paths based on pixel equality.
     public static var elementsDescription: SyncSnapshot<Input, Output> {
-      SyncSnapshot<CGPath, StringBytes>.elementsDescription.pullback {
-        $0.cgPath
-      }
+        SyncSnapshot<CGPath, StringBytes>.elementsDescription.pullback {
+            $0.cgPath
+        }
     }
 
     /// A snapshot strategy for comparing bezier paths based on pixel equality.
     ///
     /// - Parameter numberFormatter: The number formatter used for formatting points.
-    public static func elementsDescription(numberFormatter: NumberFormatter) -> SyncSnapshot<
-      Input, Output
+    public static func elementsDescription(
+        numberFormatter: NumberFormatter
+    ) -> SyncSnapshot<
+        Input, Output
     > {
-      SyncSnapshot<CGPath, StringBytes>.elementsDescription(
-        numberFormatter: numberFormatter
-      ).pullback { path in path.cgPath }
+        SyncSnapshot<CGPath, StringBytes>.elementsDescription(
+            numberFormatter: numberFormatter
+        ).pullback { path in path.cgPath }
     }
-  }
+}
 #endif

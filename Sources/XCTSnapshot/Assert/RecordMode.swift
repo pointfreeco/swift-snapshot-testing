@@ -1,22 +1,19 @@
 import Foundation
 
-/// Controls when new snapshots are recorded during tests.
+/// Specifies the recording behavior for snapshots during testing.
+///
+/// Adjusts whether and how snapshot files are created or updated during test execution.
 public enum RecordMode: Int16, Sendable {
 
-  /// Prevents recording of any new snapshots.
-  ///
-  /// Tests will fail if current snapshots don't match results, but no automatic updates will occur.
-  case never
+    /// Never records new snapshots. Tests fail if results differ from existing ones; no files are updated.
+    case never
 
-  /// Records only missing or modified snapshots.
-  ///
-  /// If a snapshot already exists, it won't be replaced even if mismatches occur.
-  case missing
+    /// Records only if a snapshot is missing. Existing snapshots are not replaced, even if mismatches occur.
+    case missing
 
-  case failed
+    /// Records snapshots only when tests fail due to a mismatch. Useful for automatically updating failing snapshots.
+    case failed
 
-  /// Records snapshots on every execution, overwriting existing ones.
-  ///
-  /// Useful for intentionally updating snapshots after UI/UX changes.
-  case all
+    /// Always records snapshots, overwriting any existing files. Use to intentionally update all snapshots after UI changes.
+    case all
 }

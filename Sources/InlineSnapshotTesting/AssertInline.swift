@@ -3,39 +3,37 @@ import Foundation
 @preconcurrency import XCTest
 
 #if canImport(SwiftSyntax601)
-  @_spi(Internals) import XCTSnapshot
-  import SwiftParser
-  import SwiftSyntax
-  import SwiftSyntaxBuilder
-  import XCTest
+@_spi(Internals) import XCTSnapshot
+import SwiftParser
+import SwiftSyntax
+import SwiftSyntaxBuilder
+import XCTest
 
-  /// Asserts that a given value matches an inline string snapshot.
-  ///
-  /// See <doc:InlineSnapshotTesting> for more info.
-  ///
-  /// - Parameters:
-  ///   - value: A value to compare against a snapshot.
-  ///   - snapshot: A strategy for snapshot and comparing values.
-  ///   - message: An optional description of the assertion, for inclusion in test results.
-  ///   - isRecording: Whether or not to record a new reference.
-  ///   - timeout: The amount of time a snapshot must be generated in.
-  ///   - closureDescriptor: An optional description of where the snapshot is inlined. This parameter
-  ///     should be omitted unless you are writing a custom helper that calls this function under
-  ///     the hood. See ``SnapshotClosureDescriptor`` for more.
-  ///   - expected: An optional closure that returns a previously generated snapshot. When omitted,
-  ///     the library will automatically write a snapshot into your test file at the call sight of
-  ///     the assertion.
-  ///   - fileID: The file ID in which failure occurred. Defaults to the file ID of the test case in
-  ///     which this function was called.
-  ///   - file: The file in which failure occurred. Defaults to the file path of the test case in
-  ///     which this function was called.
-  ///   - function: The function where the assertion occurs. The default is the name of the test
-  ///     method where you call this function.
-  ///   - line: The line number on which failure occurred. Defaults to the line number on which this
-  ///     function was called.
-  ///   - column: The column on which failure occurred. Defaults to the column on which this
-  ///     function was called.
-  public func assertInline<Input: Sendable, Output: BytesRepresentable>(
+/// Asserts that a given value matches an inline string snapshot using the specified snapshot testing strategy.
+///
+/// This function compares the output of a value—evaluated lazily—with an inline snapshot string, which is stored directly in your test source code.
+/// If the output does not match the inline snapshot, the test will fail and optionally provide a descriptive message.
+/// You can optionally record new snapshots, customize serialization, and specify the snapshot comparison strategy.
+///
+/// - Parameters:
+///   - value: A closure that returns the value to compare against the snapshot. This is evaluated only when the assertion runs.
+///   - snapshot: The snapshot testing strategy to use for serialization and comparison.
+///   - message: An optional closure that returns a description for test results. Defaults to an empty string.
+///   - record: An optional mode indicating whether to record a new reference snapshot. If `nil`, recording is determined automatically.
+///   - timeout: The number of seconds to wait for the snapshot operation to complete. Defaults to 5.
+///   - name: An optional name to distinguish this snapshot from others in the same test.
+///   - serialization: The strategy used to serialize the snapshot data. Defaults to `DataSerialization()`.
+///   - closureDescriptor: An optional descriptor describing the inline snapshot’s location. Typically not needed unless implementing custom helpers.
+///   - expected: An optional closure that returns a previously generated snapshot value. When omitted, the expected value will be populated inline at the call site.
+///   - fileID: The file ID in which the assertion was called. Defaults to the file ID of the test case.
+///   - file: The file path in which the assertion was called. Defaults to the file path of the test case.
+///   - function: The function name in which the assertion was called. Defaults to the test method name.
+///   - line: The line number on which the assertion was called. Defaults to the line number of the call site.
+///   - column: The column on which the assertion was called. Defaults to the column number of the call site.
+/// - Throws: Rethrows any error thrown by the value provider or snapshot strategy.
+/// - Important: When using the Swift Testing framework, you must explicitly set the @Suite(.finalizeSnapshots) trait to ensure inline snapshots are written correctly.
+/// - SeeAlso: <doc:InlineSnapshotTesting>
+public func assertInline<Input: Sendable, Output: BytesRepresentable>(
     of value: @autoclosure @Sendable () throws -> Input,
     as snapshot: AsyncSnapshot<Input, Output>,
     message: @autoclosure @escaping @Sendable () -> String = "",
@@ -50,56 +48,76 @@ import Foundation
     function: StaticString = #function,
     line: UInt = #line,
     column: UInt = #column
-  ) async throws {
-    preconditionSwiftEnvironment(
-      file: filePath,
-      line: line
-    )
-
-    let engine = InlineSnapshotEngine<XCTSnapshot.Async<Input, Output>>(
-      expected: expected,
-      message: message,
-      closureDescriptor: closureDescriptor
+) async throws {
+    let engine = SnapshotInlineEngine<XCTSnapshot.Async<Input, Output>>(
+        expected: expected,
+        message: message,
+        closureDescriptor: closureDescriptor
     )
 
     let tester = SnapshotTester(
-      engine: engine,
-      record: record,
-      timeout: timeout,
-      name: name,
-      serialization: serialization,
-      fileID: fileID,
-      filePath: filePath,
-      function: function,
-      line: line,
-      column: column
+        engine: engine,
+        record: record,
+        timeout: timeout,
+        name: name,
+        serialization: serialization,
+        fileID: fileID,
+        filePath: filePath,
+        function: function,
+        line: line,
+        column: column
     )
 
     guard let failure = try await tester(value(), for: snapshot) else {
-      return
+        return
     }
 
     switch failure.reason {
     case .doesNotMatch:
-      closureDescriptor.fail(
-        failure.message,
-        fileID: fileID,
-        file: filePath,
-        line: line,
-        column: column
-      )
+        closureDescriptor.fail(
+            failure.message,
+            fileID: fileID,
+            file: filePath,
+            line: line,
+            column: column
+        )
     default:
-      TestingSystem.shared.record(
-        message: failure.message,
-        fileID: fileID,
-        filePath: filePath,
-        line: line,
-        column: column
-      )
+        TestingSystem.shared.record(
+            message: failure.message,
+            fileID: fileID,
+            filePath: filePath,
+            line: line,
+            column: column
+        )
     }
-  }
+}
 
-  public func assertInline<Input, Output: BytesRepresentable>(
+/// Asserts that a value matches an inline string snapshot using a snapshot testing strategy.
+///
+/// This function compares the output of a value—evaluated lazily—with an inline snapshot string
+/// stored directly in your test source code. If the output does not match the inline snapshot,
+/// the test will fail and optionally provide a descriptive message. You can optionally record new
+/// snapshots, customize serialization, and specify the snapshot comparison strategy.
+///
+/// - Parameters:
+///   - value: A closure that returns the value to compare against the snapshot. This is evaluated only when the assertion runs.
+///   - snapshot: The snapshot testing strategy to use for serialization and comparison.
+///   - message: An optional closure that returns a description for test results. Defaults to an empty string.
+///   - record: An optional mode indicating whether to record a new reference snapshot. If `nil`, recording is determined automatically.
+///   - timeout: The number of seconds to wait for the snapshot operation to complete. Defaults to 5.
+///   - name: An optional name to distinguish this snapshot from others in the same test.
+///   - serialization: The strategy used to serialize the snapshot data. Defaults to `DataSerialization()`.
+///   - closureDescriptor: An optional descriptor for the inline snapshot’s location. Typically not needed unless implementing custom helpers.
+///   - expected: An optional closure that returns a previously generated snapshot value. When omitted, the expected value will be populated inline at the call site.
+///   - fileID: The file ID in which the assertion was called. Defaults to the file ID of the test case.
+///   - file: The file path in which the assertion was called. Defaults to the file path of the test case.
+///   - function: The function name in which the assertion was called. Defaults to the test method name.
+///   - line: The line number on which the assertion was called. Defaults to the line number of the call site.
+///   - column: The column on which the assertion was called. Defaults to the column number of the call site.
+/// - Throws: Rethrows any error thrown by the value provider or snapshot strategy.
+/// - Important: When using the Swift Testing framework, you must explicitly set the @Suite(.finalizeSnapshots) trait to ensure inline snapshots are written correctly.
+/// - SeeAlso: <doc:InlineSnapshotTesting>
+public func assertInline<Input, Output: BytesRepresentable>(
     of value: @autoclosure @Sendable () throws -> Input,
     as snapshot: SyncSnapshot<Input, Output>,
     message: @autoclosure @escaping @Sendable () -> String = "",
@@ -114,57 +132,52 @@ import Foundation
     function: StaticString = #function,
     line: UInt = #line,
     column: UInt = #column
-  ) throws {
-    preconditionSwiftEnvironment(
-      file: filePath,
-      line: line
-    )
-
-    let engine = InlineSnapshotEngine<Sync<Input, Output>>(
-      expected: expected,
-      message: message,
-      closureDescriptor: closureDescriptor
+) throws {
+    let engine = SnapshotInlineEngine<Sync<Input, Output>>(
+        expected: expected,
+        message: message,
+        closureDescriptor: closureDescriptor
     )
 
     let tester = SnapshotTester(
-      engine: engine,
-      record: record,
-      timeout: timeout,
-      name: name,
-      serialization: serialization,
-      fileID: fileID,
-      filePath: filePath,
-      function: function,
-      line: line,
-      column: column
+        engine: engine,
+        record: record,
+        timeout: timeout,
+        name: name,
+        serialization: serialization,
+        fileID: fileID,
+        filePath: filePath,
+        function: function,
+        line: line,
+        column: column
     )
 
     guard let failure = try tester(value(), for: snapshot) else {
-      return
+        return
     }
 
     switch failure.reason {
     case .doesNotMatch:
-      closureDescriptor.fail(
-        failure.message,
-        fileID: fileID,
-        file: filePath,
-        line: line,
-        column: column
-      )
+        closureDescriptor.fail(
+            failure.message,
+            fileID: fileID,
+            file: filePath,
+            line: line,
+            column: column
+        )
     default:
-      TestingSystem.shared.record(
-        message: failure.message,
-        fileID: fileID,
-        filePath: filePath,
-        line: line,
-        column: column
-      )
+        TestingSystem.shared.record(
+            message: failure.message,
+            fileID: fileID,
+            filePath: filePath,
+            line: line,
+            column: column
+        )
     }
-  }
+}
 #else
-  @available(*, unavailable, message: "'assertInline' requires 'swift-syntax' >= 509.0.0")
-  public func assertInline<Input: Sendable, Output: BytesRepresentable>(
+@available(*, unavailable, message: "'assertInline' requires 'swift-syntax' >= 509.0.0")
+public func assertInline<Input: Sendable, Output: BytesRepresentable>(
     of value: @autoclosure @Sendable () throws -> Input,
     as snapshot: AsyncSnapshot<Input, Output>,
     message: @autoclosure @escaping @Sendable () -> String = "",
@@ -178,12 +191,12 @@ import Foundation
     function: StaticString = #function,
     line: UInt = #line,
     column: UInt = #column
-  ) async throws {
+) async throws {
     fatalError()
-  }
+}
 
-  @available(*, unavailable, message: "'assertInline' requires 'swift-syntax' >= 509.0.0")
-  public func assertInline<Input, Output: BytesRepresentable>(
+@available(*, unavailable, message: "'assertInline' requires 'swift-syntax' >= 509.0.0")
+public func assertInline<Input, Output: BytesRepresentable>(
     of value: @autoclosure @Sendable () throws -> Input,
     as snapshot: SyncSnapshot<Input, Output>,
     message: @autoclosure @escaping @Sendable () -> String = "",
@@ -197,31 +210,7 @@ import Foundation
     function: StaticString = #function,
     line: UInt = #line,
     column: UInt = #column
-  ) throws {
+) throws {
     fatalError()
-  }
-#endif
-
-private func preconditionSwiftEnvironment(
-  file filePath: StaticString,
-  line: UInt
-) {
-  if TestingSystem.shared.isSwiftTestingRunning {
-    #if compiler(<6.1)
-      fatalError(
-        """
-        The function `assertInline(of:as:)` is available only when:
-        - Using the **Swift Testing Framework** with a **Swift compiler version ≥ 6.1**, or
-        - Using **XCTest** (any Swift version is supported).
-
-        To fix this:
-        - If you're using Swift Testing, update your Swift compiler to 6.1 or newer.
-        - If you're not using XCTest yet, consider migrating to XCTestCase to avoid compiler \
-        version restrictions.
-        """,
-        file: filePath,
-        line: line
-      )
-    #endif
-  }
 }
+#endif
