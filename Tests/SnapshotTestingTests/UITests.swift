@@ -1,5 +1,7 @@
 import SnapshotTesting
+
 @testable import XCTSnapshot
+
 #if canImport(Testing)
 import Testing
 
@@ -32,7 +34,7 @@ struct UITests {
             contentView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             contentView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             contentView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            contentView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
+            contentView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
         ])
 
         return view
@@ -68,7 +70,7 @@ struct UITests {
 
                     contentView.translatesAutoresizingMaskIntoConstraints = false
                     rectangleView.translatesAutoresizingMaskIntoConstraints = false
-                    
+
                     scrollView.addSubview(contentView)
                     contentView.addSubview(rectangleView)
 
@@ -77,7 +79,7 @@ struct UITests {
                         contentView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
                         contentView.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
                         contentView.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
-                        contentView.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor)
+                        contentView.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
                     ])
 
                     NSLayoutConstraint.activate([
@@ -85,7 +87,7 @@ struct UITests {
                         rectangleView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
                         rectangleView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
                         rectangleView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-                        rectangleView.heightAnchor.constraint(equalToConstant: 200)
+                        rectangleView.heightAnchor.constraint(equalToConstant: 200),
                     ])
 
                     return scrollView
@@ -107,7 +109,7 @@ struct UITests {
 
         NSLayoutConstraint.activate([
             view.heightAnchor.constraint(equalToConstant: 300),
-            constraint
+            constraint,
         ])
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
@@ -136,7 +138,7 @@ struct UITests {
 
             let testCases = [
                 (.light, "lightMode"),
-                (.dark, "darkMode")
+                (.dark, "darkMode"),
             ]
 
             for (style, name) in testCases {
@@ -159,7 +161,7 @@ struct UITests {
         let categories: [UITraitCollection.ContentSizeCategory] = [
             .extraSmall,
             .large,
-            .accessibilityExtraExtraExtraLarge
+            .accessibilityExtraExtraExtraLarge,
         ]
 
         for category in categories {
@@ -182,7 +184,7 @@ struct UITests {
             named: "iPhone16Pro"
         )
     }
-#endif
+    #endif
 
     @Test
     func complexLayouts() async throws {
@@ -195,7 +197,7 @@ struct UITests {
         #endif
         NSLayoutConstraint.activate([
             bigView.heightAnchor.constraint(equalToConstant: 3000),
-            bigView.widthAnchor.constraint(equalToConstant: 2000)
+            bigView.widthAnchor.constraint(equalToConstant: 2000),
         ])
 
         try await assert(of: bigView, as: .image)

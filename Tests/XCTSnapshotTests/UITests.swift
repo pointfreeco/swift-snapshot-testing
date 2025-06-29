@@ -20,9 +20,9 @@ final class UITests: BaseTestCase {
         nil
     }
 
-//    override var record: RecordMode {
-//        .missing
-//    }
+    //    override var record: RecordMode {
+    //        .missing
+    //    }
 
     #if os(iOS) || os(tvOS) || os(visionOS)
     @MainActor
@@ -1505,7 +1505,7 @@ final class UITests: BaseTestCase {
         let view = NSView()
         NSLayoutConstraint.activate([
             view.heightAnchor.constraint(equalToConstant: 10),
-            view.widthAnchor.constraint(equalToConstant: 10)
+            view.widthAnchor.constraint(equalToConstant: 10),
         ])
         view.wantsLayer = true
         view.layer?.backgroundColor = NSColor.green.cgColor
