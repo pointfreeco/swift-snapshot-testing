@@ -1,4 +1,6 @@
 @_spi(Internals) @testable import XCTSnapshot
+
+#if canImport(XCTest)
 import XCTest
 
 class WithSnapshotTestingTests: XCTestCase {
@@ -37,3 +39,4 @@ class WithSnapshotTestingTests: XCTestCase {
         }
     }
 }
+#endif

@@ -1,5 +1,4 @@
 import Foundation
-@preconcurrency import XCTest
 
 #if os(iOS) || os(macOS) || os(tvOS) || os(watchOS) || os(visionOS)
 import CoreServices

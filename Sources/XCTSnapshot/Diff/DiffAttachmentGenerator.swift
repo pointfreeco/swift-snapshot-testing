@@ -1,5 +1,4 @@
 import Foundation
-@preconcurrency import XCTest
 
 /// Container for messages and attachments generated during snapshot comparisons.
 ///

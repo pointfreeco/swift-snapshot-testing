@@ -1,3 +1,4 @@
+#if canImport(XCTest)
 import XCTest
 
 final class CleanCounterBetweenTestCases: NSObject, XCTestObservation {
@@ -27,6 +28,7 @@ extension XCTestCase {
         CleanCounterBetweenTestCases.registerIfNeeded()
     }
 }
+#endif
 
 @_spi(Internals)
 public let XCTestBundleDidFinishNotification = Notification.Name(

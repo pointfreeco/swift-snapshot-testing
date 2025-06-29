@@ -1,5 +1,3 @@
-@preconcurrency import XCTest
-
 #if os(iOS) || os(tvOS) || os(watchOS)
 import UIKit
 #elseif os(macOS)

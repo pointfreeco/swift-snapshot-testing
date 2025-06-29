@@ -100,7 +100,7 @@ public struct SnapshotClosureDescriptor: Sendable, Hashable {
         file filePath: StaticString,
         line: UInt,
         column: UInt
-    ) {
+    ) throws {
         var trailingClosureLine: Int?
         if let testSource = InlineSnapshotManager.current[SnapshotURL(path: filePath)] {
             let visitor = SnapshotVisitor(
@@ -113,7 +113,7 @@ public struct SnapshotClosureDescriptor: Sendable, Hashable {
             trailingClosureLine = visitor.trailingClosureLine
         }
 
-        TestingSystem.shared.record(
+        try TestingSystem.shared.record(
             message: message(),
             fileID: fileID,
             filePath: filePath,

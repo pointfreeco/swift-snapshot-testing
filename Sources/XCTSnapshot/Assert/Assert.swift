@@ -1,4 +1,4 @@
-import XCTest
+import Foundation
 
 // MARK: - Assert snapshot
 
@@ -73,7 +73,7 @@ public func assert<Input: Sendable, Output: BytesRepresentable>(
 
     guard let message = failure else { return }
 
-    TestingSystem.shared.record(
+    try TestingSystem.shared.record(
         message: message,
         fileID: fileID,
         filePath: filePath,
@@ -295,7 +295,7 @@ public func assert<Input, Output: BytesRepresentable>(
 
     guard let message = failure else { return }
 
-    TestingSystem.shared.record(
+    try TestingSystem.shared.record(
         message: message,
         fileID: fileID,
         filePath: filePath,

@@ -1,5 +1,7 @@
 import SnapshotTestingCustomDump
 import XCTSnapshot
+
+#if canImport(XCTest)
 import XCTest
 
 class CustomDumpTests: XCTestCase {
@@ -74,3 +76,4 @@ class CustomDumpTests: XCTestCase {
         try assert(of: user, as: .customDump, named: "named")
     }
 }
+#endif

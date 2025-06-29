@@ -1,5 +1,4 @@
 import Foundation
-import XCTest
 
 /// A diff attachment generator that compares two data blobs (typically images or binary snapshots) and generates an attachment describing any differences.
 ///

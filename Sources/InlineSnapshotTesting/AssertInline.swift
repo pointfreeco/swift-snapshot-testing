@@ -1,13 +1,11 @@
 import Foundation
 @_spi(Internals) import XCTSnapshot
-@preconcurrency import XCTest
 
 #if canImport(SwiftSyntax601)
 @_spi(Internals) import XCTSnapshot
 import SwiftParser
 import SwiftSyntax
 import SwiftSyntaxBuilder
-import XCTest
 
 /// Asserts that a given value matches an inline string snapshot using the specified snapshot testing strategy.
 ///
@@ -74,7 +72,7 @@ public func assertInline<Input: Sendable, Output: BytesRepresentable>(
 
     switch failure.reason {
     case .doesNotMatch:
-        closureDescriptor.fail(
+        try closureDescriptor.fail(
             failure.message,
             fileID: fileID,
             file: filePath,
@@ -82,7 +80,7 @@ public func assertInline<Input: Sendable, Output: BytesRepresentable>(
             column: column
         )
     default:
-        TestingSystem.shared.record(
+        try TestingSystem.shared.record(
             message: failure.message,
             fileID: fileID,
             filePath: filePath,
@@ -158,7 +156,7 @@ public func assertInline<Input, Output: BytesRepresentable>(
 
     switch failure.reason {
     case .doesNotMatch:
-        closureDescriptor.fail(
+        try closureDescriptor.fail(
             failure.message,
             fileID: fileID,
             file: filePath,
@@ -166,7 +164,7 @@ public func assertInline<Input, Output: BytesRepresentable>(
             column: column
         )
     default:
-        TestingSystem.shared.record(
+        try TestingSystem.shared.record(
             message: failure.message,
             fileID: fileID,
             filePath: filePath,

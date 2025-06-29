@@ -1,5 +1,7 @@
 import Foundation
 import SnapshotTesting
+
+#if canImport(XCTest)
 import XCTest
 
 @testable import InlineSnapshotTesting
@@ -347,3 +349,4 @@ private func assertCustomInlineSnapshot(
         column: column
     )
 }
+#endif

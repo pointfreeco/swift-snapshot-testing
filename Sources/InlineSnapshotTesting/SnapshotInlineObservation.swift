@@ -1,5 +1,5 @@
 @_spi(Internals) import XCTSnapshot
-import XCTest
+import Foundation
 
 final class SnapshotInlineObservation: @unchecked Sendable {
 

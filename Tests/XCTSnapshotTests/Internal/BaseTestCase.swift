@@ -1,4 +1,6 @@
 @_spi(Internals) import XCTSnapshot
+
+#if canImport(XCTest)
 @preconcurrency import XCTest
 
 class BaseTestCase: XCTestCase {
@@ -21,3 +23,4 @@ class BaseTestCase: XCTestCase {
         }
     }
 }
+#endif

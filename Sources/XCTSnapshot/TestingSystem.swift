@@ -1,4 +1,7 @@
+import Foundation
+#if canImport(XCTest)
 @preconcurrency import XCTest
+#endif
 
 @_spi(Internals)
 public struct TestingSystemEnvironment {
@@ -87,12 +90,12 @@ public final class TestingSystem: Sendable {
                 column: column
             )
         } else {
-            #if !os(Linux) && !os(Android) && !os(Windows)
+            #if canImport(XCTest) && (os(iOS) || os(tvOS) || os(macOS) || os(visionOS) || os(watchOS))
             performOnMainThread {
                 XCTContext.runActivity(named: name) { activity in
                     for attachment in attachments {
                         activity.add(
-                            XCTAttachment.init(
+                            XCTAttachment(
                                 uniformTypeIdentifier: attachment.uniformTypeIdentifier,
                                 name: attachment.name,
                                 payload: attachment.payload
@@ -111,7 +114,7 @@ public final class TestingSystem: Sendable {
         filePath: StaticString,
         line: UInt,
         column: UInt
-    ) {
+    ) throws {
         if let swiftTestingSystem = self as? SwiftTestingSystem, swiftTestingSystem.isRunning {
             swiftTestingSystem.record(
                 message: message,
@@ -121,7 +124,27 @@ public final class TestingSystem: Sendable {
                 column: column
             )
         } else {
+            #if canImport(XCTest)
             XCTFail(message, file: filePath, line: line)
+            #else
+            throw TestingFailure(
+                message: message,
+                fileID: fileID,
+                filePath: filePath,
+                line: line,
+                column: column
+            )
+            #endif
         }
     }
 }
+
+#if !canImport(XCTest)
+public struct TestingFailure: Error {
+    public let message: String
+    public let fileID: StaticString
+    public let filePath: StaticString
+    public let line: UInt
+    public let column: UInt
+}
+#endif

@@ -1,6 +1,10 @@
-import XCTest
-
 @testable import XCTSnapshot
+
+#if os(iOS) || os(tvOS) || os(visionOS)
+import UIKit
+#elseif os(macOS)
+import AppKit
+#endif
 
 #if os(macOS) || os(iOS) || os(tvOS) || os(visionOS)
 extension CGPath {

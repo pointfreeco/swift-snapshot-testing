@@ -1,5 +1,7 @@
 @preconcurrency import Foundation
 import XCTSnapshot
+
+#if canImport(XCTest)
 @preconcurrency import XCTest
 
 #if canImport(FoundationNetworking)
@@ -132,3 +134,4 @@ final class FoundationTests: BaseTestCase {
         )
     }
 }
+#endif

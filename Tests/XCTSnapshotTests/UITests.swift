@@ -20,6 +20,10 @@ final class UITests: BaseTestCase {
         nil
     }
 
+//    override var record: RecordMode {
+//        .missing
+//    }
+
     #if os(iOS) || os(tvOS) || os(visionOS)
     @MainActor
     func testAutolayout() async throws {

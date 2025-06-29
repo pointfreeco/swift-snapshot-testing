@@ -1,4 +1,6 @@
 import SnapshotTesting
+
+#if canImport(XCTest)
 import XCTest
 
 class BaseTestCase: XCTestCase {
@@ -11,3 +13,4 @@ class BaseTestCase: XCTestCase {
         }
     }
 }
+#endif

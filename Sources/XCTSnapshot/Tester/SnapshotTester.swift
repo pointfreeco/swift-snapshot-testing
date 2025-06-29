@@ -1,5 +1,7 @@
 import Foundation
-@preconcurrency import XCTest
+#if canImport(XCTest)
+import XCTest
+#endif
 
 @_spi(Internals)
 public struct SnapshotTester<Engine: SnapshotEngine>: Sendable {
@@ -35,7 +37,9 @@ public struct SnapshotTester<Engine: SnapshotEngine>: Sendable {
         column: UInt
     ) {
         if !TestingSystem.shared.isSwiftTestingRunning {
+            #if canImport(XCTest)
             XCTestCase.registerObserverIfNeeded()
+            #endif
         }
 
         self.engine = engine
@@ -87,17 +91,21 @@ public struct SnapshotTester<Engine: SnapshotEngine>: Sendable {
         _ input: Input,
         for snapshot: Snapshot<Executor>
     ) throws -> SnapshotFailure? where Executor == Sync<Input, Output> {
-        let tookSnapshot = XCTestExpectation(description: "Took snapshot")
+        let dispatchGroup = DispatchGroup()
         let unsafeDiffable = UnsafeSyncDiffable<Output>()
 
+        dispatchGroup.enter()
         snapshot.executor(input) { result in
             unsafeDiffable.result = result
-            tookSnapshot.fulfill()
+            dispatchGroup.leave()
         }
 
-        let result = XCTWaiter.wait(for: [tookSnapshot], timeout: timeout)
+        let result = dispatchGroup.wait(
+            timeout: .now() + .nanoseconds(Int(timeout * 1_000_000_000))
+        )
+
         switch result {
-        case .completed:
+        case .success:
             return try assert(
                 diffable: unsafeDiffable.result.get(),
                 pathExtension: snapshot.pathExtension,
@@ -109,10 +117,6 @@ public struct SnapshotTester<Engine: SnapshotEngine>: Sendable {
                 snapshotURL: FileManager.default.temporaryDirectory,
                 didWriteNewSnapshot: false
             )
-        case .incorrectOrder, .invertedFulfillment, .interrupted:
-            throw XCTestExecutionError()
-        @unknown default:
-            throw XCTestExecutionError()
         }
     }
 }
@@ -376,8 +380,6 @@ extension SnapshotTester {
         )
     }
 }
-
-struct XCTestExecutionError: Error {}
 
 struct UnsafeSyncDiffableError: Error {}
 

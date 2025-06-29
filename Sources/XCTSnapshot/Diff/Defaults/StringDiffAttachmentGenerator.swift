@@ -1,5 +1,4 @@
 import Foundation
-import XCTest
 
 /// A diff attachment generator that compares two UTF-8 strings line-by-line and produces a patch-style text diff
 /// as an `SnapshotAttachment`. Calculates differences between collections using the Longest Common
