@@ -1493,7 +1493,7 @@ final class UITests: BaseTestCase {
         button.title = "Push Me"
         button.sizeToFit()
         if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
-            try await assert(of: button, as: .image, record: .all)
+            try await assert(of: button, as: .image)
             print("Finished")
             try await assert(of: button, as: .recursiveDescription)
         }
@@ -1503,7 +1503,10 @@ final class UITests: BaseTestCase {
     @MainActor
     func testNSViewWithLayer() async throws {
         let view = NSView()
-        view.frame = CGRect(x: 0.0, y: 0.0, width: 10.0, height: 10.0)
+        NSLayoutConstraint.activate([
+            view.heightAnchor.constraint(equalToConstant: 10),
+            view.widthAnchor.constraint(equalToConstant: 10)
+        ])
         view.wantsLayer = true
         view.layer?.backgroundColor = NSColor.green.cgColor
         view.layer?.cornerRadius = 5
