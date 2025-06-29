@@ -1,0 +1,5 @@
+CustomDumpTests.Child(
+  father: CustomDumpTests.Father(
+    child: CustomDumpTests.Child(↩︎)
+  )
+)

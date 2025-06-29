@@ -48,13 +48,13 @@ message that allows you to quickly open a diff of two files, such as
 assertion so that new snapshots are generated and saved to disk.
 
 These properties can be overridden for a scope of an operation using the
-``withSnapshotTesting(record:diffTool:operation:)-2kuyr`` function. In a Swift Testing context 
+``withTestingEnvironment(record:diffTool:operation:)-2kuyr`` function. In a Swift Testing context 
 you can apply the ``Testing/Trait/snapshots`` trait to either a single test or an entire suite: 
 
 ```swift
 import SnapshotTesting
 
-@Suite(.snapshots(record: .failed, diffTool: .ksdiff))
+@Suite(.record(.failed), .diffTool(.ksdiff))
 struct FeatureTests {
   …
 }
@@ -63,12 +63,12 @@ struct FeatureTests {
 This will override the `diffTool` and `record` properties for each test in the suite.
 
 In an XCTest context, the simplest way to do this is to override the `invokeTest` method on 
-`XCTestCase` and wrap it in `withSnapshotTesting`:
+`XCTestCase` and wrap it in `withTestingEnvironment`:
 
 ```swift
 class FeatureTests: XCTestCase {
   override func invokeTest() {
-    withSnapshotTesting(record: .failed, diffTool: .ksdiff) {
+    withTestingEnvironment(record: .failed, diffTool: .ksdiff) {
       super.invokeTest()
     }
   }

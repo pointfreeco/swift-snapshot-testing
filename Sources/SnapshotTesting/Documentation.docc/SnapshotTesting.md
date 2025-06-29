@@ -20,7 +20,7 @@ Powerfully flexible snapshot testing.
 ### Configuration
 
 - ``Testing/Trait/snapshots(diffTool:record:)``
-- ``withSnapshotTesting(record:diffTool:operation:)-2kuyr``
+- ``withTestingEnvironment(record:diffTool:operation:)-2kuyr``
 - ``SnapshotTestingConfiguration``
 
 ### Deprecations

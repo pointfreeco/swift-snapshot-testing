@@ -1,6 +1,6 @@
 # Migrating to 1.17
 
-Learn how to use the new `withSnapshotTesting` tool for customizing how snapshots are generated and
+Learn how to use the new `withTestingEnvironment` tool for customizing how snapshots are generated and
 diffs displayed.
 
 ## Overview
@@ -42,11 +42,11 @@ These customization options have a few downsides currently.
 
 Because of these reasons, the globals ``isRecording`` and ``diffTool`` are now deprecated, and we
 have introduced a new tool that greatly improves upon all of these problems. There is now a function
-called ``withSnapshotTesting(record:diffTool:operation:)-2kuyr`` for customizing snapshots. It 
+called ``withTestingEnvironment(record:diffTool:operation:)-2kuyr`` for customizing snapshots. It 
 allows you to customize how the `assertSnapshot` tool behaves for a well-defined scope.
 
 Rather than overriding `isRecording` or `diffTool` directly in your tests, you can wrap your test in
-`withSnapshotTesting`:
+`withTestingEnvironment`:
 
 @Row {
   @Column {
@@ -65,7 +65,7 @@ Rather than overriding `isRecording` or `diffTool` directly in your tests, you c
     // After
 
     func testFeature() {
-      withSnapshotTesting(record: .all, diffTool: .ksdiff) {
+      withTestingEnvironment(record: .all, diffTool: .ksdiff) {
         assertSnapshot(…)
       }
     }
@@ -100,7 +100,7 @@ method of `XCTestCase`:
 
     class FeatureTests: XCTestCase {
       override func invokeTest() {
-        withSnapshotTesting(record: .all, diffTool: .ksdiff) {
+        withTestingEnvironment(record: .all, diffTool: .ksdiff) {
           super.invokeTest()
         }
       }
@@ -158,7 +158,7 @@ must use what are known as "test traits":
 ```swift
 import SnapshotTesting
 
-@Suite(.snapshots(record: .all, diffTool: .ksdiff))
+@Suite(.record(.all), .diffTool(.ksdiff))
 struct FeatureTests {
   …
 }

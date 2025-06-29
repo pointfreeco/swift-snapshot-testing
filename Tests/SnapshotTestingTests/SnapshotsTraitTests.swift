@@ -1,51 +1,63 @@
-#if compiler(>=6) && canImport(Testing)
-  import Testing
-  @_spi(Internals) import SnapshotTesting
+import SnapshotTesting
+import Testing
 
-  extension BaseSuite {
+extension BaseSuite {
+
     struct SnapshotsTraitTests {
-      @Test(.snapshots(diffTool: "ksdiff"))
-      func testDiffTool() {
-        #expect(
-          _diffTool(currentFilePath: "old.png", failedFilePath: "new.png")
-            == "ksdiff old.png new.png"
-        )
-      }
 
-      @Suite(.snapshots(diffTool: "ksdiff"))
-      struct OverrideDiffTool {
-        @Test(.snapshots(diffTool: "difftool"))
-        func testDiffToolOverride() {
-          #expect(
-            _diffTool(currentFilePath: "old.png", failedFilePath: "new.png")
-              == "difftool old.png new.png"
-          )
-        }
-
-        @Suite(.snapshots(record: .all))
-        struct OverrideRecord {
-          @Test
-          func config() {
+        @Test(.diffTool("ksdiff"))
+        func testDiffTool() {
             #expect(
-              _diffTool(currentFilePath: "old.png", failedFilePath: "new.png")
-                == "ksdiff old.png new.png"
+                SnapshotEnvironment.current.diffTool(
+                    currentFilePath: "old.png",
+                    failedFilePath: "new.png"
+                )
+                    == "ksdiff old.png new.png"
             )
-            #expect(_record == .all)
-          }
-
-          @Suite(.snapshots(record: .failed, diffTool: "diff"))
-          struct OverrideDiffToolAndRecord {
-            @Test
-            func config() {
-              #expect(
-                _diffTool(currentFilePath: "old.png", failedFilePath: "new.png")
-                  == "diff old.png new.png"
-              )
-              #expect(_record == .failed)
-            }
-          }
         }
-      }
+
+        @Suite(.diffTool("ksdiff"))
+        struct OverrideDiffTool {
+            @Test(.diffTool("difftool"))
+            func testDiffToolOverride() {
+                #expect(
+                    SnapshotEnvironment.current.diffTool(
+                        currentFilePath: "old.png",
+                        failedFilePath: "new.png"
+                    )
+                        == "difftool old.png new.png"
+                )
+            }
+
+            @Suite(.record(.all))
+            struct OverrideRecord {
+                @Test
+                func config() {
+                    #expect(
+                        SnapshotEnvironment.current.diffTool(
+                            currentFilePath: "old.png",
+                            failedFilePath: "new.png"
+                        )
+                            == "ksdiff old.png new.png"
+                    )
+                    #expect(SnapshotEnvironment.current.recordMode == .all)
+                }
+
+                @Suite(.record(.failed), .diffTool("diff"))
+                struct OverrideDiffToolAndRecord {
+                    @Test
+                    func config() {
+                        #expect(
+                            SnapshotEnvironment.current.diffTool(
+                                currentFilePath: "old.png",
+                                failedFilePath: "new.png"
+                            )
+                                == "diff old.png new.png"
+                        )
+                        #expect(SnapshotEnvironment.current.recordMode == .failed)
+                    }
+                }
+            }
+        }
     }
-  }
-#endif
+}

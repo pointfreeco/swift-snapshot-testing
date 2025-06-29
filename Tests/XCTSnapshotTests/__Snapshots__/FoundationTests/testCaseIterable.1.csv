@@ -1,0 +1,4 @@
+"up","StringBytes(rawValue: "left")"
+"down","StringBytes(rawValue: "right")"
+"left","StringBytes(rawValue: "down")"
+"right","StringBytes(rawValue: "up")"
