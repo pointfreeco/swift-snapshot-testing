@@ -559,7 +559,8 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
               // FIXME: ?? multipleTrailingClosures.removeFirst()
               functionCallExpr.trailingClosure =
                 if let trailingClosureTrivia, trailingClosureTrivia.count > 0 {
-                  snapshotClosure.with(\.trailingTrivia, snapshotClosure.trailingTrivia + trailingClosureTrivia)
+                  snapshotClosure.with(
+                    \.trailingTrivia, snapshotClosure.trailingTrivia + trailingClosureTrivia)
                 } else {
                   snapshotClosure
                 }
@@ -569,7 +570,9 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
               )
               functionCallExpr.trailingClosure =
                 if let trailingClosureTrivia, trailingClosureTrivia.count > 0 {
-                  additionalTrailingClosure.closure.with(\.trailingTrivia, additionalTrailingClosure.closure.trailingTrivia + trailingClosureTrivia)
+                  additionalTrailingClosure.closure.with(
+                    \.trailingTrivia,
+                    additionalTrailingClosure.closure.trailingTrivia + trailingClosureTrivia)
                 } else {
                   additionalTrailingClosure.closure
                 }
@@ -611,10 +614,12 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
               if snapshot.wasRecording {
                 if let snapshotClosure {
                   functionCallExpr.additionalTrailingClosures[index].label = snapshotLabel
-                  let trailingTrivia = functionCallExpr.additionalTrailingClosures[index].closure.trailingTrivia
+                  let trailingTrivia = functionCallExpr.additionalTrailingClosures[index].closure
+                    .trailingTrivia
                   functionCallExpr.additionalTrailingClosures[index].closure =
                     if trailingTrivia.count > 0 {
-                      snapshotClosure.with(\.trailingTrivia, snapshotClosure.trailingTrivia + trailingTrivia)
+                      snapshotClosure.with(
+                        \.trailingTrivia, snapshotClosure.trailingTrivia + trailingTrivia)
                     } else {
                       snapshotClosure
                     }
