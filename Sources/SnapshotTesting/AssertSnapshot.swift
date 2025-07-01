@@ -331,7 +331,9 @@ public func verifySnapshot<Value, Format>(
         snapshotFileUrl = snapshotFileUrl.appendingPathExtension(ext)
       }
       let fileManager = FileManager.default
-      try fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
+      if !fileManager.fileExists(atPath: snapshotDirectoryUrl.path) {
+        try fileManager.createDirectory(at: snapshotDirectoryUrl, withIntermediateDirectories: true)
+      }
 
       let tookSnapshot = XCTestExpectation(description: "Took snapshot")
       var optionalDiffable: Format?
