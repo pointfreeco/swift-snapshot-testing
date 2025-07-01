@@ -26,9 +26,8 @@
       /// A snapshot strategy for comparing SwiftUI Views based on pixel equality.
       ///
       /// - Parameters:
-      ///   - drawHierarchyInKeyWindow: Utilize the simulator's key window in order to render
-      ///     `UIAppearance` and `UIVisualEffect`s. This option requires a host application for your
-      ///     tests and will _not_ work for framework test targets.
+      ///   - renderingMode: The rendering mode to use. Defaults to `.auto` which automatically 
+      ///     detects SwiftUI content and uses the most accurate rendering method when possible.
       ///   - precision: The percentage of pixels that must match.
       ///   - perceptualPrecision: The percentage a pixel must match the source pixel to be considered a
       ///     match. 98-99% mimics
@@ -37,7 +36,7 @@
       ///   - layout: A view layout override.
       ///   - traits: A trait collection override.
       public static func image(
-        drawHierarchyInKeyWindow: Bool = false,
+        renderingMode: SwiftUIRenderingMode = .auto,
         precision: Float = 1,
         perceptualPrecision: Float = 1,
         layout: SwiftUISnapshotLayout = .sizeThatFits,
@@ -81,12 +80,44 @@
 
           return snapshotView(
             config: config,
-            drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+            renderingMode: renderingMode,
             traits: traits,
             view: controller.view,
             viewController: controller
           )
         }
+      }
+
+      /// A snapshot strategy for comparing SwiftUI Views based on pixel equality.
+      ///
+      /// - Parameters:
+      ///   - drawHierarchyInKeyWindow: Utilize the simulator's key window in order to render
+      ///     `UIAppearance` and `UIVisualEffect`s. This option requires a host application for your
+      ///     tests and will _not_ work for framework test targets.
+      ///   - precision: The percentage of pixels that must match.
+      ///   - perceptualPrecision: The percentage a pixel must match the source pixel to be considered a
+      ///     match. 98-99% mimics
+      ///     [the precision](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e) of the
+      ///     human eye.
+      ///   - layout: A view layout override.
+      ///   - traits: A trait collection override.
+      @available(*, deprecated, message: "Use renderingMode parameter instead")
+      public static func image(
+        drawHierarchyInKeyWindow: Bool,
+        precision: Float = 1,
+        perceptualPrecision: Float = 1,
+        layout: SwiftUISnapshotLayout = .sizeThatFits,
+        traits: UITraitCollection = .init()
+      )
+        -> Snapshotting
+      {
+        return .image(
+          renderingMode: drawHierarchyInKeyWindow ? .enabled : .disabled,
+          precision: precision,
+          perceptualPrecision: perceptualPrecision,
+          layout: layout,
+          traits: traits
+        )
       }
     }
   #endif
