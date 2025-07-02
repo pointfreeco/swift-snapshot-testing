@@ -911,6 +911,28 @@ final class SnapshotTestingTests: BaseTestCase {
     #endif
   }
 
+  func testUserInterfaceStyleTraitWithView() {
+    #if os(iOS)
+      let label = UILabel()
+      label.backgroundColor = UIColor(dynamicProvider: { collection in
+        collection.userInterfaceStyle == .dark ? .red : .blue
+      })
+      label.textColor = UIColor.label
+      label.text = "What's the point?"
+
+      assertSnapshot(
+        of: label,
+        as: .image(traits: .init(userInterfaceStyle: .dark)),
+        named: "dark-label-\(name)"
+      )
+      assertSnapshot(
+        of: label,
+        as: .image(traits: .init(userInterfaceStyle: .light)),
+        named: "light-label-\(name)"
+      )
+    #endif
+  }
+
   func testTraitsWithViewController() {
     #if os(iOS)
       let label = UILabel()
