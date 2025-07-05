@@ -120,10 +120,12 @@ class SnapshotView: SDKView {
 
     private func downscale(_ transformableView: SDKView, with size: CGSize) {
         let safeArea = configuration.safeArea
-        let scale = scale(for: CGSize(
-            width: size.width + safeArea.left + safeArea.right,
-            height: size.height + safeArea.top + safeArea.bottom
-        ))
+        let scale = scale(
+            for: CGSize(
+                width: size.width + safeArea.left + safeArea.right,
+                height: size.height + safeArea.top + safeArea.bottom
+            )
+        )
         #if os(macOS)
         self.layer?.contentsScale = scale
         #else

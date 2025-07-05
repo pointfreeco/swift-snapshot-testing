@@ -1,5 +1,5 @@
-@_spi(Internals) import XCSnapshotTesting
 import Foundation
+@_spi(Internals) import XCSnapshotTesting
 
 final class SnapshotInlineObservation: @unchecked Sendable {
 

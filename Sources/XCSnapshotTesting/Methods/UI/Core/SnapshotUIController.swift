@@ -68,7 +68,8 @@ class SnapshotUIController: SDKViewController {
         }
 
         let sizeListener = SizeListener()
-        let rootView = content
+        let rootView =
+            content
             .frame(width: size(\.width), height: size(\.height))
             .sizeListener(sizeListener)
         #if os(macOS)

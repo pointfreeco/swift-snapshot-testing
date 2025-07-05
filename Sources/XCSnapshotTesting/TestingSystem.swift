@@ -1,4 +1,5 @@
 import Foundation
+
 #if canImport(XCTest)
 @preconcurrency import XCTest
 #endif
