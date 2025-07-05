@@ -52,12 +52,9 @@ extension SyncSnapshot where Input: CaseIterable & Sendable, Output == StringByt
                 }
                 .sequence()
                 .map {
-                    StringBytes(
-                        rawValue:
-                            $0
-                            .map { "\"\($0)\",\"\($1)\"" }
-                            .joined(separator: "\n")
-                    )
+                    $0
+                    .map { "\"\($0)\",\"\($1)\"" }
+                    .joined(separator: "\n")
                 }
                 .callAsFunction(f) {
                     continuation.resume(with: $0)

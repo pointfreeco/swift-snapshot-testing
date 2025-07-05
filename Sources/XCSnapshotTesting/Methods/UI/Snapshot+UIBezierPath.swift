@@ -34,11 +34,9 @@ extension SyncSnapshot where Input: UIBezierPath, Output == ImageBytes {
             }
             format.scale = scale
             let renderer = UIGraphicsImageRenderer(bounds: bounds, format: format)
-            return .init(
-                rawValue: renderer.image { ctx in
-                    path.fill()
-                }
-            )
+            return renderer.image { ctx in
+                path.fill()
+            }
         }
     }
 }

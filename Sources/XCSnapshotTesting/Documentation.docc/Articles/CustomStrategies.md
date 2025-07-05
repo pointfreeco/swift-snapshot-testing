@@ -59,8 +59,7 @@ extension AsyncSnapshot where Input: WKWebView, Output == ImageBytes {
     .image
     .pullback { webView in
       Async { 
-        let image = try await webView.takeSnapshot(with: nil)
-        return ImageBytes(rawValue: image)
+        try await webView.takeSnapshot(with: nil)
       }
   }
 }
@@ -80,8 +79,7 @@ extension AsyncSnapshot where Input: WKWebView, Output == ImageBytes {
     pathExtension: "png",
     attachmentGenerator: .image,
     executor: Async { webView in
-        let image = try await webView.takeSnapshot(with: nil)
-        return ImageBytes(rawValue: image)
+        try await webView.takeSnapshot(with: nil)
     }
   )
 }

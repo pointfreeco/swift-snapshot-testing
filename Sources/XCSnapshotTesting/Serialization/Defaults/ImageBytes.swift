@@ -170,7 +170,7 @@ extension SyncSnapshot where Input: NSImage, Output == ImageBytes {
         IdentitySyncSnapshot.image(
             precision: precision,
             perceptualPrecision: perceptualPrecision
-        ).pullback { ImageBytes(rawValue: $0) }
+        ).pullback { $0 }
     }
 }
 #else
@@ -205,7 +205,7 @@ extension SyncSnapshot where Input: UIImage, Output == ImageBytes {
         IdentitySyncSnapshot.image(
             precision: precision,
             perceptualPrecision: perceptualPrecision
-        ).pullback { ImageBytes(rawValue: $0) }
+        ).pullback { $0 }
     }
     #elseif os(watchOS)
     public static func image(
@@ -213,7 +213,7 @@ extension SyncSnapshot where Input: UIImage, Output == ImageBytes {
     ) -> SyncSnapshot<Input, Output> {
         IdentitySyncSnapshot.image(
             precision: precision
-        ).pullback { ImageBytes(rawValue: $0) }
+        ).pullback { $0 }
     }
     #endif
 }

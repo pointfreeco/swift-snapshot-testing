@@ -61,7 +61,7 @@ extension SyncSnapshot where Input == URLRequest, Output == StringBytes {
                     } ?? []
             }
 
-            return .init(rawValue: ([method] + headers + body).joined(separator: "\n"))
+            return ([method] + headers + body).joined(separator: "\n")
         }
     }
 
@@ -119,7 +119,7 @@ extension SyncSnapshot where Input == URLRequest, Output == StringBytes {
             // URL
             components.append("\"\(request.url!.sortingQueryItems()!.absoluteString)\"")
 
-            return .init(rawValue: components.joined(separator: " \\\n\t"))
+            return components.joined(separator: " \\\n\t")
         }
     }
 }

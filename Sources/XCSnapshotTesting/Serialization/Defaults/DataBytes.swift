@@ -26,15 +26,8 @@ public struct DataBytes: BytesRepresentable {
 
 extension IdentitySyncSnapshot<DataBytes> {
     /// A snapshot strategy for comparing strings based on equality.
-    public static let data = Self(
+    public static let data = IdentitySyncSnapshot<DataBytes>(
         pathExtension: nil,
         attachmentGenerator: .data
     )
-}
-
-extension SyncSnapshot<Data, DataBytes> {
-    /// A snapshot strategy for comparing strings based on equality.
-    public static let data = IdentitySyncSnapshot.data.map {
-        $0.pullback { .init(rawValue: $0) }
-    }
 }

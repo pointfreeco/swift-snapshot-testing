@@ -40,7 +40,7 @@ extension SyncSnapshot where Input: CALayer, Output == ImageBytes {
             layer.layoutIfNeeded()
             layer.render(in: context)
             image.unlockFocus()
-            return .init(rawValue: image)
+            return image
         }
     }
 }
@@ -72,13 +72,11 @@ extension SyncSnapshot where Input: CALayer, Output == ImageBytes {
             perceptualPrecision: perceptualPrecision
         ).pullback { layer in
             let renderer = UIGraphicsImageRenderer(bounds: layer.bounds, format: .init(for: traits))
-            return .init(
-                rawValue: renderer.image { ctx in
-                    layer.setNeedsLayout()
-                    layer.layoutIfNeeded()
-                    layer.render(in: ctx.cgContext)
-                }
-            )
+            return renderer.image { ctx in
+                layer.setNeedsLayout()
+                layer.layoutIfNeeded()
+                layer.render(in: ctx.cgContext)
+            }
         }
     }
 }

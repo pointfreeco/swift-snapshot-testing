@@ -25,7 +25,7 @@ extension SyncSnapshot where Output == StringBytes {
     /// ```
     public static var customDump: SyncSnapshot<Input, Output> {
         IdentitySyncSnapshot<StringBytes>.lines.pullback {
-            StringBytes(rawValue: String(customDumping: $0))
+            String(customDumping: $0)
         }
     }
 }

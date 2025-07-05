@@ -27,11 +27,9 @@ extension SyncSnapshot where Input: Encodable & Sendable, Output == StringBytes 
     /// - Parameter encoder: A JSON encoder.
     public static func json(_ encoder: JSONEncoder) -> SyncSnapshot<Input, Output> {
         let snapshot = IdentitySyncSnapshot.lines.pullback { (encodable: Input) in
-            try .init(
-                rawValue: String(
-                    decoding: encoder.encode(encodable),
-                    as: UTF8.self
-                )
+            try String(
+                decoding: encoder.encode(encodable),
+                as: UTF8.self
             )
         }
 
@@ -78,11 +76,9 @@ extension SyncSnapshot where Input: Encodable & Sendable, Output == StringBytes 
     /// - Parameter encoder: A property list encoder.
     public static func plist(_ encoder: Foundation.PropertyListEncoder) -> SyncSnapshot<Input, Output> {
         let snapshot = IdentitySyncSnapshot.lines.pullback { (encodable: Input) in
-            try .init(
-                rawValue: String(
-                    decoding: encoder.encode(encodable),
-                    as: UTF8.self
-                )
+            try String(
+                decoding: encoder.encode(encodable),
+                as: UTF8.self
             )
         }
 

@@ -51,7 +51,7 @@ extension SyncSnapshot where Input: NSBezierPath, Output == ImageBytes {
                     return true
                 }
 
-                return .init(rawValue: image)
+                return image
             }
         }
     }
@@ -115,7 +115,7 @@ extension SyncSnapshot where Input: NSBezierPath, Output == StringBytes {
                 string += "\n"
             }
 
-            return .init(rawValue: string)
+            return string
         }
     }
 }

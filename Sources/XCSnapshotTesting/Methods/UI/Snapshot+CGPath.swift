@@ -58,7 +58,7 @@ extension SyncSnapshot where Input: CGPath, Output == ImageBytes {
                 return true
             }
 
-            return .init(rawValue: image)
+            return image
         }
     }
 }
@@ -96,13 +96,11 @@ extension SyncSnapshot where Input: CGPath, Output == ImageBytes {
             }
             format.scale = scale
             let renderer = UIGraphicsImageRenderer(bounds: bounds, format: format)
-            return .init(
-                rawValue: renderer.image { ctx in
-                    let cgContext = ctx.cgContext
-                    cgContext.addPath(path)
-                    cgContext.drawPath(using: drawingMode)
-                }
-            )
+            return renderer.image { ctx in
+                let cgContext = ctx.cgContext
+                cgContext.addPath(path)
+                cgContext.drawPath(using: drawingMode)
+            }
         }
     }
 }
@@ -166,7 +164,7 @@ extension SyncSnapshot where Input: CGPath, Output == StringBytes {
                 string += "\n"
             }
 
-            return .init(rawValue: string)
+            return string
         }
     }
 }

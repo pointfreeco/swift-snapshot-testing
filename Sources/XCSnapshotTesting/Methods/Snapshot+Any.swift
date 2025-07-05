@@ -15,7 +15,7 @@ extension SyncSnapshot where Output == StringBytes {
     /// ```
     public static var description: SyncSnapshot<Input, Output> {
         IdentitySyncSnapshot.lines.pullback {
-            StringBytes(rawValue: String(describing: $0))
+            String(describing: $0)
         }
     }
 }
@@ -41,14 +41,12 @@ extension SyncSnapshot where Output == StringBytes {
         ]
 
         let snapshot = IdentitySyncSnapshot.lines.pullback { (data: Input) in
-            try StringBytes(
-                rawValue: String(
-                    decoding: JSONSerialization.data(
-                        withJSONObject: data,
-                        options: options
-                    ),
-                    as: UTF8.self
-                )
+            try String(
+                decoding: JSONSerialization.data(
+                    withJSONObject: data,
+                    options: options
+                ),
+                as: UTF8.self
             )
         }
 

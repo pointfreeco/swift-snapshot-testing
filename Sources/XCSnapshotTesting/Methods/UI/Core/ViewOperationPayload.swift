@@ -46,13 +46,11 @@ extension Async where Output == ViewOperationPayload {
     }
 
     func snapshot(
-        _ executor: Sync<ImageBytes, ImageBytes>
+        _ executor: Sync<SDKImage, ImageBytes>
     ) -> Async<Input, ImageBytes> {
         map { @MainActor payload in
             let image = try await executor(
-                ImageBytes(
-                    rawValue: payload.input.snapshot()
-                )
+                payload.input.snapshot()
             )
 
             payload.window.removeRootViewController()
@@ -78,14 +76,12 @@ extension Async where Output == ViewOperationPayload {
     }
 
     func descriptor(
-        _ executor: Sync<StringBytes, StringBytes>,
+        _ executor: Sync<String, StringBytes>,
         method: SnapshotUIController.DescriptorMethod
     ) -> Async<Input, StringBytes> {
         map { @MainActor payload in
             let string = try await executor(
-                StringBytes(
-                    rawValue: payload.input.descriptor(method)
-                )
+                payload.input.descriptor(method)
             )
 
             payload.window.removeRootViewController()

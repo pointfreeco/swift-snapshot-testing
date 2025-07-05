@@ -80,11 +80,9 @@ extension Snapshot where Input: UIKit.UIApplication, Output == ImageBytes {
                     )
 
                     let image = try await executor(
-                        ImageBytes(
-                            rawValue: renderer.image {
-                                window.layer.render(in: $0.cgContext)
-                            }
-                        )
+                        renderer.image {
+                            window.layer.render(in: $0.cgContext)
+                        }
                     )
 
                     return image

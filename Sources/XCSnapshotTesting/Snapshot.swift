@@ -56,7 +56,7 @@ public typealias AsyncSnapshot<Input: Sendable, Output: BytesRepresentable> = Sn
 ///
 /// This type simplifies configuration when working with data that doesn't require processing
 /// before comparison, such as raw values or unmodified objects.
-public typealias IdentitySyncSnapshot<Output: BytesRepresentable> = SyncSnapshot<Output, Output>
+public typealias IdentitySyncSnapshot<Output: BytesRepresentable> = SyncSnapshot<Output.RawValue, Output>
 
 /// A convenience type for asynchronous snapshots where input and output types are identical.
 ///
@@ -70,7 +70,7 @@ public typealias IdentitySyncSnapshot<Output: BytesRepresentable> = SyncSnapshot
 ///
 /// This type simplifies configuration when working with asynchronous data that doesn't require processing
 /// before comparison, such as raw values or unmodified objects.
-public typealias IdentityAsyncSnapshot<Output: BytesRepresentable> = AsyncSnapshot<Output, Output>
+public typealias IdentityAsyncSnapshot<Output: BytesRepresentable> = AsyncSnapshot<Output.RawValue, Output>
 
 /// Configuration defining how snapshots are generated, compared, and displayed during tests.
 ///
@@ -168,7 +168,7 @@ public struct Snapshot<Executor: SnapshotExecutor>: Sendable where Executor.Outp
     }
 }
 
-extension IdentitySyncSnapshot where Executor.Input == Executor.Output {
+extension IdentitySyncSnapshot where Executor.Output: BytesRepresentable, Executor.Input == Executor.Output.RawValue {
 
     /// Initializes a new configuration with the specified path extension and attachment generator.
     ///
@@ -190,16 +190,16 @@ extension IdentitySyncSnapshot where Executor.Input == Executor.Output {
     public init<Output: BytesRepresentable, AttachmentGenerator>(
         pathExtension: String?,
         attachmentGenerator: AttachmentGenerator
-    ) where AttachmentGenerator: DiffAttachmentGenerator<Output>, Executor == Sync<Output, Output> {
+    ) where AttachmentGenerator: DiffAttachmentGenerator<Output>, Executor == Sync<Output.RawValue, Output> {
         self.init(
             pathExtension: pathExtension,
             attachmentGenerator: attachmentGenerator,
-            executor: .init { $0 }
+            executor: .init { .init(rawValue: $0) }
         )
     }
 }
 
-extension IdentityAsyncSnapshot where Executor.Input == Executor.Output {
+extension IdentityAsyncSnapshot where Executor.Output: BytesRepresentable, Executor.Input == Executor.Output.RawValue {
 
     /// Initializes a new configuration with the specified path extension and attachment generator for asynchronous context.
     ///
@@ -221,11 +221,11 @@ extension IdentityAsyncSnapshot where Executor.Input == Executor.Output {
     public init<Output: BytesRepresentable, AttachmentGenerator>(
         pathExtension: String?,
         attachmentGenerator: AttachmentGenerator
-    ) where AttachmentGenerator: DiffAttachmentGenerator<Output>, Executor == Async<Output, Output> {
+    ) where AttachmentGenerator: DiffAttachmentGenerator<Output>, Executor == Async<Output.RawValue, Output> {
         self.init(
             pathExtension: pathExtension,
             attachmentGenerator: attachmentGenerator,
-            executor: .init { $0 }
+            executor: .init { .init(rawValue: $0) }
         )
     }
 }

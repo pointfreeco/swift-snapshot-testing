@@ -220,7 +220,7 @@ extension Snapshot where Input: SwiftUI.View & Sendable, Output == ImageBytes {
                 }
 
                 return try await executor(
-                    ImageBytes(rawValue: renderer.uiImage ?? UIImage())
+                    renderer.uiImage ?? UIImage()
                 )
             }
         }
