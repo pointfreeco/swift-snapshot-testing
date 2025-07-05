@@ -122,13 +122,31 @@ final class SnapshotRewriter: SyntaxRewriter {
 
             case 0:
                 functionCallExpr.rightParen?.trailingTrivia = .space
+                let trailingClosureTrivia = functionCallExpr.trailingClosure?.trailingTrivia
                 if let snapshotClosure {
-                    functionCallExpr.trailingClosure = snapshotClosure  // FIXME: ?? multipleTrailingClosures.removeFirst()
+                    // FIXME: ?? multipleTrailingClosures.removeFirst()
+                    functionCallExpr.trailingClosure =
+                        if let trailingClosureTrivia, trailingClosureTrivia.count > 0 {
+                            snapshotClosure.with(
+                                \.trailingTrivia,
+                                snapshotClosure.trailingTrivia + trailingClosureTrivia
+                            )
+                        } else {
+                            snapshotClosure
+                        }
                 } else if !functionCallExpr.additionalTrailingClosures.isEmpty {
                     let additionalTrailingClosure = functionCallExpr.additionalTrailingClosures.remove(
                         at: functionCallExpr.additionalTrailingClosures.startIndex
                     )
-                    functionCallExpr.trailingClosure = additionalTrailingClosure.closure
+                    functionCallExpr.trailingClosure =
+                        if let trailingClosureTrivia, trailingClosureTrivia.count > 0 {
+                            additionalTrailingClosure.closure.with(
+                                \.trailingTrivia,
+                                additionalTrailingClosure.closure.trailingTrivia + trailingClosureTrivia
+                            )
+                        } else {
+                            additionalTrailingClosure.closure
+                        }
                 } else {
                     functionCallExpr.rightParen?.trailingTrivia = ""
                     functionCallExpr.trailingClosure = nil
@@ -164,7 +182,17 @@ final class SnapshotRewriter: SyntaxRewriter {
                     ) {
                         if let snapshotClosure {
                             functionCallExpr.additionalTrailingClosures[index].label = snapshotLabel
-                            functionCallExpr.additionalTrailingClosures[index].closure = snapshotClosure
+                            let trailingTrivia = functionCallExpr.additionalTrailingClosures[index].closure
+                                .trailingTrivia
+                            functionCallExpr.additionalTrailingClosures[index].closure =
+                                if trailingTrivia.count > 0 {
+                                    snapshotClosure.with(
+                                        \.trailingTrivia,
+                                        snapshotClosure.trailingTrivia + trailingTrivia
+                                    )
+                                } else {
+                                    snapshotClosure
+                                }
                         } else {
                             functionCallExpr.additionalTrailingClosures.remove(at: index)
                         }
