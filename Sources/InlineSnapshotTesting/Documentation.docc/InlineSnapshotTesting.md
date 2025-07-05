@@ -8,7 +8,7 @@ Powerfully convenient snapshot testing.
 alongside the test files. This makes for compact test cases with single line assertions...
 
 ```swift
-assertSnapshot(of: value, as: .json)
+assert(of: value, as: .json)
 ```
 
 ...but can make verification more cumbersome: one must find the corresponding file in order to
@@ -68,7 +68,10 @@ Re-run "testMySnapshot" to test against the newly-recorded snapshot.
 
 ### Essentials
 
-- ``assertInline(of:as:message:record:timeout:closureDescriptor:matches:file:function:line:column:)``
+- ``assertInline(of:as:message:record:timeout:serialization:closureDescriptor:matches:fileID:file:function:line:column:)-(_,SyncSnapshot<Input, Output>,_,_,_,_,_,_,_,_,_,_,_)``
+- ``assertInline(of:as:message:record:timeout:serialization:closureDescriptor:matches:fileID:file:function:line:column:)-(_,AsyncSnapshot<Input, Output>,_,_,_,_,_,_,_,_,_,_,_)``
+- ``assertInline(of:as:message:record:timeout:name:serialization:closureDescriptor:matches:fileID:file:function:line:column:)-(_,SyncSnapshot<Input, Output>,_,_,_,_,_,_,_,_,_,_,_,_)``
+- ``assertInline(of:as:message:record:timeout:name:serialization:closureDescriptor:matches:fileID:file:function:line:column:)-(_,AsyncSnapshot<Input, Output>,_,_,_,_,_,_,_,_,_,_,_,_)``
 
 ### Writing a custom helper
 

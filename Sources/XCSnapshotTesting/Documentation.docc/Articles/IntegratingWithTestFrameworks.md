@@ -17,20 +17,20 @@ the hood, that will not bubble up to an actual test failure when tests are run. 
 you have a test case inheriting from `XCTestCase` that ultimiately invokes the new style `#expect`
 macro, that too will not actually trigger a test failure.
 
-However, these details have all been hidden away in the SnapshotTesting library. You can simply
-use ``assertSnapshot(of:as:named:record:timeout:file:testName:line:)`` in either an `XCTestCase`
-subclass _or_ `@Test`, and it will dynamically detect what context it is running in and trigger
-the correct test failure:
+However, these details have all been hidden away in the XCSnapshotTesting library. You can simply
+use ``assert(of:as:serialization:named:record:snapshotDirectory:timeout:fileID:file:testName:line:column:)``
+in either an `XCTestCase` subclass _or_ `@Test`, and it will dynamically detect what context it is 
+running in and trigger the correct test failure:
 
 ```swift
 @Test 
-func testFeature() {
-  assertSnapshot(of: MyView(), as: .image)  // ✅
+func testFeature() async throws {
+  try await assert(of: await MyView(), as: .image)  // ✅
 }
 
 class FeatureTests: XCTestCase {
-  func testFeature() {
-    assertSnapshot(of: MyView(), as: .image)  // ✅
+  func testFeature() async throws {
+    try await assert(of: await MyView(), as: .image)  // ✅
   }
 }
 ```
@@ -39,16 +39,16 @@ class FeatureTests: XCTestCase {
 
 For the most part, asserting on snapshots works the same whether you are using XCTest or Swift
 Testing. There is one major difference, and that is how snapshot configuration works. There are
-two major ways snapshots can be configured: ``SnapshotTestingConfiguration/diffTool-swift.property``
-and ``SnapshotTestingConfiguration/record-swift.property``. 
+two major ways snapshots can be configured: ``SnapshotEnvironmentValues/diffTool``
+and ``SnapshotEnvironmentValues/recordMode``. 
 
 The `diffTool` property allows you to customize how a command is printed to the test failure
 message that allows you to quickly open a diff of two files, such as
-[Kaleidoscope](http://kaleidoscope.app). The `record` property allows you to change the mode of
+[Kaleidoscope](http://kaleidoscope.app). The `recordMode` property allows you to change the mode of
 assertion so that new snapshots are generated and saved to disk.
 
 These properties can be overridden for a scope of an operation using the
-``withTestingEnvironment(record:diffTool:operation:)-2kuyr`` function. In a Swift Testing context 
+``withTestingEnvironment(_:operation:file:line:)`` function. In a Swift Testing context 
 you can apply the ``Testing/Trait/snapshots`` trait to either a single test or an entire suite: 
 
 ```swift
