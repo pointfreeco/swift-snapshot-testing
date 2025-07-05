@@ -1,8 +1,8 @@
 import Foundation
-@_spi(Internals) import XCTSnapshot
+@_spi(Internals) import XCSnapshotTesting
 
 #if canImport(SwiftSyntax601)
-@_spi(Internals) import XCTSnapshot
+@_spi(Internals) import XCSnapshotTesting
 import SwiftParser
 import SwiftSyntax
 import SwiftSyntaxBuilder
@@ -47,7 +47,7 @@ public func assertInline<Input: Sendable, Output: BytesRepresentable>(
     line: UInt = #line,
     column: UInt = #column
 ) async throws {
-    let engine = SnapshotInlineEngine<XCTSnapshot.Async<Input, Output>>(
+    let engine = SnapshotInlineEngine<XCSnapshotTesting.Async<Input, Output>>(
         expected: expected,
         message: message,
         closureDescriptor: closureDescriptor

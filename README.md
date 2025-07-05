@@ -43,8 +43,8 @@ try await assert(of: user, as: .customDump)
 
 The latest documentation is available for both main components of the framework:
 
-- For **XCTSnapshot** (the core snapshot testing functionality):
-  [XCTSnapshot Documentation](https://swiftpackageindex.com/pointfreeco/swift-snapshot-testing/main/documentation/xctsnapshot)
+- For **XCSnapshotTesting** (the core snapshot testing functionality):
+  [XCSnapshotTesting Documentation](https://swiftpackageindex.com/pointfreeco/swift-snapshot-testing/main/documentation/xcsnapshottesting)
 
 - For **SnapshotTesting** (the Swift Testing integration and utilities):
   [SnapshotTesting Documentation](https://swiftpackageindex.com/pointfreeco/swift-snapshot-testing/main/documentation/snapshottesting)

@@ -1,5 +1,5 @@
 @preconcurrency import Foundation
-import XCTSnapshot
+import XCSnapshotTesting
 
 #if canImport(XCTest)
 @preconcurrency import XCTest

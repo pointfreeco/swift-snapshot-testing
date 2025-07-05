@@ -1,1 +1,1 @@
-@_exported import XCTSnapshot
+@_exported import XCSnapshotTesting

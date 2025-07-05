@@ -1,6 +1,6 @@
 import SnapshotTesting
 
-@testable import XCTSnapshot
+@testable import XCSnapshotTesting
 
 #if canImport(Testing)
 import Testing

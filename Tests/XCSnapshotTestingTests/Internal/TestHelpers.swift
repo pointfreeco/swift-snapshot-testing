@@ -1,4 +1,4 @@
-@testable import XCTSnapshot
+@testable import XCSnapshotTesting
 
 #if os(iOS) || os(tvOS) || os(visionOS)
 import UIKit

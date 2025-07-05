@@ -1,4 +1,4 @@
-@_spi(Internals) @testable import XCTSnapshot
+@_spi(Internals) @testable import XCSnapshotTesting
 
 #if canImport(XCTest)
 import XCTest

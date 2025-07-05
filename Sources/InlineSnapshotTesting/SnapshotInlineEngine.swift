@@ -1,7 +1,7 @@
 #if canImport(SwiftSyntax601)
 import SwiftSyntax
 import Foundation
-@_spi(Internals) import XCTSnapshot
+@_spi(Internals) import XCSnapshotTesting
 
 struct SnapshotInlineEngine<Executor: SnapshotExecutor>: SnapshotEngine where Executor.Output: BytesRepresentable {
 

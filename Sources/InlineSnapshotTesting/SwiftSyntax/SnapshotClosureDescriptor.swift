@@ -1,4 +1,4 @@
-@_spi(Internals) import XCTSnapshot
+@_spi(Internals) import XCSnapshotTesting
 
 /// A structure that describes the location of an inline snapshot.
 ///

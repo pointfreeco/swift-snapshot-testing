@@ -12,8 +12,8 @@ let package = Package(
     ],
     products: [
         .library(
-            name: "XCTSnapshot",
-            targets: ["XCTSnapshot"]
+            name: "XCSnapshotTesting",
+            targets: ["XCSnapshotTesting"]
         ),
         .library(
             name: "SnapshotTesting",
@@ -62,17 +62,17 @@ let package = Package(
         ),
         /* TARGETS */
         .target(
-            name: "XCTSnapshot",
+            name: "XCSnapshotTesting",
             dependencies: ["_SnapshotTesting"]
         ),
         .target(
             name: "SnapshotTesting",
-            dependencies: ["XCTSnapshot"]
+            dependencies: ["XCSnapshotTesting"]
         ),
         .target(
             name: "SnapshotTestingCustomDump",
             dependencies: [
-                "XCTSnapshot",
+                "XCSnapshotTesting",
                 .product(name: "CustomDump", package: "swift-custom-dump"),
                 "_SnapshotTestingCustomDump",
             ]
@@ -91,7 +91,7 @@ let package = Package(
         /* DEPRECATED TESTS */
         .testTarget(
             name: "_SnapshotTestingTests",
-            dependencies: ["XCTSnapshot", "SnapshotTesting"],
+            dependencies: ["XCSnapshotTesting", "SnapshotTesting"],
             path: "Tests/Deprecated/SnapshotTestingTests",
             exclude: [
                 "__Fixtures__",
@@ -107,8 +107,8 @@ let package = Package(
         ),
         /* TESTS */
         .testTarget(
-            name: "XCTSnapshotTests",
-            dependencies: ["XCTSnapshot"],
+            name: "XCSnapshotTestingTests",
+            dependencies: ["XCSnapshotTesting"],
             exclude: [
                 "__Fixtures__",
                 "__Snapshots__",

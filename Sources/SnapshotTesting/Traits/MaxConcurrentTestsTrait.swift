@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@_spi(Internals) import XCTSnapshot
+@_spi(Internals) import XCSnapshotTesting
 
 public struct MaxConcurrentTestsTrait: SuiteTrait, TestTrait {
     public let isRecursive = true

@@ -1,5 +1,5 @@
 import CustomDump
-import XCTSnapshot
+import XCSnapshotTesting
 
 #if !os(visionOS)
 @_exported import _SnapshotTestingCustomDump

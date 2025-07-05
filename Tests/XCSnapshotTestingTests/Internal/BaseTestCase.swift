@@ -1,4 +1,4 @@
-@_spi(Internals) import XCTSnapshot
+@_spi(Internals) import XCSnapshotTesting
 
 #if canImport(XCTest)
 @preconcurrency import XCTest

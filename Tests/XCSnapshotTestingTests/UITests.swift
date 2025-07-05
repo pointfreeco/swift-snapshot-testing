@@ -11,7 +11,7 @@ import SpriteKit
 #else
 import UIKit
 #endif
-@testable import XCTSnapshot
+@testable import XCSnapshotTesting
 
 @MainActor
 final class UITests: BaseTestCase {
