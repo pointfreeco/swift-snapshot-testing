@@ -130,14 +130,22 @@ struct UITests {
             $0.disableInconsistentTraitsChecker = true
         } operation: {
             let view = SDKView()
-            #if !os(tvOS)
+            #if os(visionOS)
+            view.backgroundColor = .init(dynamicProvider: {
+                if $0.userInterfaceStyle == .light {
+                    return .red
+                } else {
+                    return .blue
+                }
+            })
+            #elseif !os(tvOS)
             view.backgroundColor = .systemBackground
             #else
             view.backgroundColor = .systemGray
             #endif
 
             let testCases = [
-                (.light, "lightMode"),
+                (UIUserInterfaceStyle.light, "lightMode"),
                 (.dark, "darkMode"),
             ]
 
@@ -158,18 +166,22 @@ struct UITests {
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.adjustsFontForContentSizeCategory = true
 
-        let categories: [UITraitCollection.ContentSizeCategory] = [
+        let categories: [UIContentSizeCategory] = [
             .extraSmall,
             .large,
             .accessibilityExtraExtraExtraLarge,
         ]
 
-        for category in categories {
-            try await assert(
-                of: label,
-                as: .image(traits: .init(preferredContentSizeCategory: category)),
-                named: category.rawValue
-            )
+        try await withTestingEnvironment {
+            $0.disableInconsistentTraitsChecker = true
+        } operation: {
+            for category in categories {
+                try await assert(
+                    of: label,
+                    as: .image(traits: .init(preferredContentSizeCategory: category)),
+                    named: category.rawValue
+                )
+            }
         }
     }
 

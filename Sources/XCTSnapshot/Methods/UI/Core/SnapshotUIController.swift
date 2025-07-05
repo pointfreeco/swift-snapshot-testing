@@ -397,7 +397,11 @@ class SnapshotUIController: SDKViewController {
             for: traits()
         )
 
+        #if os(visionOS)
+        format.scale = traits.displayScale
+        #else
         format.scale = view.window?.screen.scale ?? traits.displayScale
+        #endif
 
         let renderer = UIGraphicsImageRenderer(
             bounds: bounds,

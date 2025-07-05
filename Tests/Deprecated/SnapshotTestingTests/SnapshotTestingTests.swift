@@ -17,7 +17,7 @@ import SwiftUI
 #if canImport(WebKit)
 @preconcurrency import WebKit
 #endif
-#if canImport(UIKit)
+#if canImport(UIKit) && !os(watchOS)
 import UIKit.UIView
 #endif
 

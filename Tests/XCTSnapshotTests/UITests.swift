@@ -20,10 +20,6 @@ final class UITests: BaseTestCase {
         nil
     }
 
-    //    override var record: RecordMode {
-    //        .missing
-    //    }
-
     #if os(iOS) || os(tvOS) || os(visionOS)
     @MainActor
     func testAutolayout() async throws {
@@ -1237,6 +1233,7 @@ final class UITests: BaseTestCase {
         XCTAssertNotNil(failure)
     }
 
+    #if !os(tvOS)
     @MainActor
     func testEmbeddedWebView() async throws {
         let label = UILabel()
@@ -1260,6 +1257,7 @@ final class UITests: BaseTestCase {
             )
         }
     }
+    #endif
 
     func testSwiftUIView_tvOS() async throws {
         struct MyView: SwiftUI.View {
@@ -1503,6 +1501,7 @@ final class UITests: BaseTestCase {
     @MainActor
     func testNSViewWithLayer() async throws {
         let view = NSView()
+        view.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             view.heightAnchor.constraint(equalToConstant: 10),
             view.widthAnchor.constraint(equalToConstant: 10),
@@ -1518,6 +1517,7 @@ final class UITests: BaseTestCase {
     #endif
 
     #if os(iOS) || os(tvOS) || os(macOS) || os(visionOS) || os(watchOS)
+    @available(watchOS 9.0, *)
     @MainActor
     func testSwiftUIView_iOS() async throws {
         @MainActor
@@ -1555,7 +1555,7 @@ final class UITests: BaseTestCase {
                 as: .image(layout: .fixed(width: 200.0, height: 100.0)),
                 named: "fixed"
             )
-            #if !os(macOS)
+            #if !os(macOS) && !os(watchOS)
             try await assert(
                 of: view,
                 as: .image(layout: .device(.iPhoneSE)),

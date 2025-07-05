@@ -185,7 +185,7 @@ extension SyncSnapshot where Input: UIImage, Output == ImageBytes {
         .image()
     }
 
-    #if os(iOS) || os(tvOS)
+    #if os(iOS) || os(tvOS) || os(visionOS)
     /// Creates a custom image snapshot configuration with precision and scale settings.
     ///
     /// - Parameters:
@@ -207,7 +207,7 @@ extension SyncSnapshot where Input: UIImage, Output == ImageBytes {
             perceptualPrecision: perceptualPrecision
         ).pullback { ImageBytes(rawValue: $0) }
     }
-    #else
+    #elseif os(watchOS)
     public static func image(
         precision: Float = 1
     ) -> SyncSnapshot<Input, Output> {
