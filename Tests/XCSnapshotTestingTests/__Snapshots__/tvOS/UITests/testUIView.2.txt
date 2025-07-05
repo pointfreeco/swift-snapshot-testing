@@ -1,0 +1,13 @@
+<UIButton; frame = (0 0; 124.5 84.5); opaque = NO; gestureRecognizers = <NSArray>; layer = <CALayer>>
+   | <_TtC11XCTSnapshotP33_CD07B10D49DF51CB5D5D85C591EE4D9618UIViewSizeListener; frame = (0 0; 124.5 84.5); layer = <CALayer>>
+   | <_UIFloatingContentView; frame = (0 0; 124.5 84.5); opaque = NO; layer = <CALayer>>
+   |    | <UIView; frame = (-0.4375 -0.4375; 124.5 84.5); transform3D = [0.8, 0, 0, 0; 0, 0.8, 0, 0; 0, 0, 1, -0.001; 0, 0, 0, 1]; alpha = 0; opaque = NO; layer = <CALayer>>
+   |    | <_UIFloatingContentTransformView; frame = (0 0; 124.5 84.5); layer = <CATransformLayer>>
+   |    |    | <_UIFloatingContentCornerRadiusAnimatingView; frame = (0 0; 124.5 84.5); opaque = NO; layer = <CALayer>>
+   |    |    |    | <UIVisualEffectView; frame = (0 0; 124.5 84.5); animations = { opacity=<CAKeyframeAnimation>; }; layer = <CALayer>> effect=<UIBlurEffect> style=UIBlurEffectStyleATVSemiAutomatic invertedAutomaticStyle
+   |    |    |    |    | <_UIVisualEffectBackdropView; frame = (0 0; 124.5 84.5); autoresize = W+H; userInteractionEnabled = NO; layer = <UICABackdropLayer>>
+   |    |    |    |    | <_UIVisualEffectSubview; frame = (0 0; 124.5 84.5); alpha = 0.4; autoresize = W+H; userInteractionEnabled = NO; backgroundColor = UIExtendedSRGBColorSpace 0.117647 0.117647 0.117647 1; layer = <CALayer>>
+   |    |    | <_UIFloatingContentCornerRadiusAnimatingScreenScaleInheritingView; frame = (0 0; 124.5 84.5); clipsToBounds = YES; opaque = NO; layer = <CALayer>>
+   |    |    |    | <_UIFloatingContentCornerRadiusAnimatingView; frame = (0 0; 124.5 84.5); layer = <CALayer>>
+   |    |    |    | <UIView; frame = (0 0; 124.5 84.5); layer = <CALayer>>
+   |    |    |    |    | <UIImageView; frame = (40 20; 44.5 44.5); clipsToBounds = YES; opaque = NO; userInteractionEnabled = NO; image = <UIImage symbol "plus.circle"; (44 44)@2>; layer = <CALayer>>

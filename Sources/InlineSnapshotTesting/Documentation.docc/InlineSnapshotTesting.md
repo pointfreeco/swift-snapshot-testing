@@ -8,7 +8,7 @@ Powerfully convenient snapshot testing.
 alongside the test files. This makes for compact test cases with single line assertions...
 
 ```swift
-assertSnapshot(of: value, as: .json)
+assert(of: value, as: .json)
 ```
 
 ...but can make verification more cumbersome: one must find the corresponding file in order to
@@ -29,14 +29,14 @@ snapshot sit next to each other in the assertion. One can `import InlineSnapshot
 the above assertion as:
 
 ```swift
-assertInlineSnapshot(of: value, as: .json)
+assertInline(of: value, as: .json)
 ```
 
 And when the test is run, it will automatically insert the snapshot as a trailing closure to be used
 by future test runs, and fail:
 
 ```swift
-assertInlineSnapshot(of: value, as: .json) {  // ❌
+assertInline(of: value, as: .json) {  // ❌
   """
   {
     "id": 42,
@@ -68,8 +68,11 @@ Re-run "testMySnapshot" to test against the newly-recorded snapshot.
 
 ### Essentials
 
-- ``assertInlineSnapshot(of:as:message:record:timeout:syntaxDescriptor:matches:file:function:line:column:)``
+- ``assertInline(of:as:message:record:timeout:serialization:closureDescriptor:matches:fileID:file:function:line:column:)-(_,SyncSnapshot<Input, Output>,_,_,_,_,_,_,_,_,_,_,_)``
+- ``assertInline(of:as:message:record:timeout:serialization:closureDescriptor:matches:fileID:file:function:line:column:)-(_,AsyncSnapshot<Input, Output>,_,_,_,_,_,_,_,_,_,_,_)``
+- ``assertInline(of:as:message:record:timeout:name:serialization:closureDescriptor:matches:fileID:file:function:line:column:)-(_,SyncSnapshot<Input, Output>,_,_,_,_,_,_,_,_,_,_,_,_)``
+- ``assertInline(of:as:message:record:timeout:name:serialization:closureDescriptor:matches:fileID:file:function:line:column:)-(_,AsyncSnapshot<Input, Output>,_,_,_,_,_,_,_,_,_,_,_,_)``
 
 ### Writing a custom helper
 
-- ``InlineSnapshotSyntaxDescriptor``
+- ``SnapshotClosureDescriptor``
