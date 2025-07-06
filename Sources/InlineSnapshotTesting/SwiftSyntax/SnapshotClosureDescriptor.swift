@@ -3,12 +3,12 @@
 /// A structure that describes the location of an inline snapshot.
 ///
 /// Provide this structure when defining custom snapshot functions that call
-/// ``assertInline(of:as:message:record:timeout:name:serialization:closureDescriptor:matches:fileID:file:function:line:column:)-(_,AsyncSnapshot<Input, Output>,_,_,_,_,_,_,_,_,_,_,_,_)``
+/// ``InlineSnapshotTesting/assertInline(of:as:message:record:timeout:name:serialization:closureDescriptor:matches:fileID:file:function:line:column:)``
 /// under the hood.
 /// A descriptor for the trailing closure used to supply an inline snapshot in a custom snapshot assertion.
 ///
 /// Use this type when implementing custom snapshot assertion utilities that ultimately delegate to
-/// ``assertInline(of:as:message:record:timeout:name:serialization:closureDescriptor:matches:fileID:file:function:line:column:)``.
+/// ``InlineSnapshotTesting/assertInline(of:as:message:record:timeout:name:serialization:closureDescriptor:matches:fileID:file:function:line:column:)``.
 /// It describes the structure of the inline snapshot trailing closure, supporting both current and deprecated closure labels,
 /// as well as more advanced cases where multiple trailing closures may exist.
 ///
@@ -88,7 +88,7 @@ public struct SnapshotClosureDescriptor: Sendable, Hashable {
     ///   - message: An optional description of the assertion, for inclusion in test results.
     ///   - fileID: The file ID in which failure occurred. Defaults to the file ID of the test case
     ///     in which this function was called.
-    ///   - file: The file in which failure occurred. Defaults to the file path of the test case in
+    ///   - filePath: The file in which failure occurred. Defaults to the file path of the test case in
     ///     which this function was called.
     ///   - line: The line number on which failure occurred. Defaults to the line number on which
     ///     this function was called.

@@ -45,13 +45,16 @@ public struct ImageBytes: BytesRepresentable {
     }
 
     #if os(macOS)
+    /// Initializes from a `NSImage`.
+    ///
+    /// - Parameter rawValue: Image to convert to bytes for snapshot testing.
     public init(rawValue: NSImage) {
         self.rawValue = rawValue
     }
     #else
     /// Initializes from a `UIImage`.
     ///
-    /// - Parameter image: Image to convert to bytes for snapshot testing.
+    /// - Parameter rawValue: Image to convert to bytes for snapshot testing.
     public init(rawValue: UIKit.UIImage) {
         self.rawValue = rawValue
     }

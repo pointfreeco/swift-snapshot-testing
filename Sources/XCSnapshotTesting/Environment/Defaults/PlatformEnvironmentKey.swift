@@ -71,7 +71,7 @@ extension SnapshotEnvironmentValues {
     ///
     /// - Note: This is particularly useful for UI snapshot testing where different platforms may have different default layouts and behaviors.
     /// - SeeAlso:
-    ///     - ``withTestingEnvironment(record:diffTool:maxConcurrentTests:platform:operation:file:line:))``
+    ///     - ``withTestingEnvironment(record:diffTool:maxConcurrentTests:platform:operation:file:line:)``
     public var platform: String {
         get { self[PlatformEnvironmentKey.self] }
         set { self[PlatformEnvironmentKey.self] = newValue }

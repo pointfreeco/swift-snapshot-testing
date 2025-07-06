@@ -116,7 +116,7 @@ public func withTestingEnvironment<R>(
 ///   - diffTool: Optionally specifies a custom diff tool for the operation.
 ///   - maxConcurrentTests: Optionally limits the number of concurrent tests.
 ///   - platform: Optionally overrides the platform identifier for snapshot paths.
-///   - environment: A closure that can further modify the `SnapshotEnvironmentValues`.
+///   - mutating: A closure that can further modify the `SnapshotEnvironmentValues`.
 ///   - operation: The asynchronous operation to perform within the modified environment.
 ///   - isolation: An optional actor used to isolate the operation. Defaults to the current isolation context.
 ///   - file: The file name for diagnostic purposes. Defaults to the current file.
@@ -209,7 +209,7 @@ public func withTestingEnvironment<R: Sendable>(
 ///   - diffTool: Optionally specifies a custom diff tool for the operation.
 ///   - maxConcurrentTests: Optionally limits the number of concurrent tests.
 ///   - platform: Optionally overrides the platform identifier for snapshot paths.
-///   - environment: A closure that can further modify the `SnapshotEnvironmentValues`.
+///   - mutating: A closure that can further modify the `SnapshotEnvironmentValues`.
 ///   - operation: The synchronous operation to perform within the modified environment.
 ///   - file: The file name for diagnostic purposes. Defaults to the current file.
 ///   - line: The line number for diagnostic purposes. Defaults to the current line.

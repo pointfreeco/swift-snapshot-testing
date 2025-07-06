@@ -32,7 +32,7 @@ import Foundation
 /// without modifying individual test files.
 ///
 /// ## See Also
-/// - ``withTestingEnvironment(diffTool:_:)``
+/// - ``withTestingEnvironment(record:diffTool:maxConcurrentTests:platform:operation:file:line:)``
 /// - ``DiffTool/ksdiff``
 /// - ``DiffTool/default``
 ///
@@ -79,7 +79,7 @@ public struct DiffTool: Sendable, ExpressibleByStringLiteral {
     /// - Use Cases:
     ///   - Suitable for CI environments or when no external diff tool is available.
     ///   - Provides clear next steps for developers to configure more advanced comparison tools.
-    /// - SeeAlso: ``DiffTool/ksdiff``, ``withTestingEnvironment(diffTool:_:)``
+    /// - SeeAlso: ``DiffTool/ksdiff``, ``withTestingEnvironment(record:diffTool:maxConcurrentTests:platform:operation:file:line:)``
     public static let `default` = Self {
         """
         @−

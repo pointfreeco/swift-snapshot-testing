@@ -23,8 +23,9 @@ import SwiftSyntaxBuilder
 ///   - serialization: The strategy used to serialize the snapshot data. Defaults to `DataSerialization()`.
 ///   - closureDescriptor: An optional descriptor describing the inline snapshot’s location. Typically not needed unless implementing custom helpers.
 ///   - expected: An optional closure that returns a previously generated snapshot value. When omitted, the expected value will be populated inline at the call site.
+///   - isolation: Optionally specify an actor for input evaluation, supporting thread/actor isolation. Defaults to current context.   
 ///   - fileID: The file ID in which the assertion was called. Defaults to the file ID of the test case.
-///   - file: The file path in which the assertion was called. Defaults to the file path of the test case.
+///   - filePath: The file path in which the assertion was called. Defaults to the file path of the test case.
 ///   - function: The function name in which the assertion was called. Defaults to the test method name.
 ///   - line: The line number on which the assertion was called. Defaults to the line number of the call site.
 ///   - column: The column on which the assertion was called. Defaults to the column number of the call site.
@@ -32,7 +33,7 @@ import SwiftSyntaxBuilder
 /// - Important: When using the Swift Testing framework, you must explicitly set the @Suite(.finalizeSnapshots) trait to ensure inline snapshots are written correctly.
 /// - SeeAlso: <doc:InlineSnapshotTesting>
 public func assertInline<Input: Sendable, Output: BytesRepresentable>(
-    of value: @autoclosure @Sendable () throws -> Input,
+    of value: @autoclosure @Sendable () async throws -> Input,
     as snapshot: AsyncSnapshot<Input, Output>,
     message: @autoclosure @escaping @Sendable () -> String = "",
     record: RecordMode? = nil,
@@ -41,6 +42,7 @@ public func assertInline<Input: Sendable, Output: BytesRepresentable>(
     serialization: DataSerialization = DataSerialization(),
     closureDescriptor: SnapshotClosureDescriptor = SnapshotClosureDescriptor(),
     matches expected: (@Sendable () -> Output.RawValue)? = nil,
+    isolation: isolated Actor? = #isolation,
     fileID: StaticString = #fileID,
     file filePath: StaticString = #filePath,
     function: StaticString = #function,
@@ -108,7 +110,7 @@ public func assertInline<Input: Sendable, Output: BytesRepresentable>(
 ///   - closureDescriptor: An optional descriptor for the inline snapshot’s location. Typically not needed unless implementing custom helpers.
 ///   - expected: An optional closure that returns a previously generated snapshot value. When omitted, the expected value will be populated inline at the call site.
 ///   - fileID: The file ID in which the assertion was called. Defaults to the file ID of the test case.
-///   - file: The file path in which the assertion was called. Defaults to the file path of the test case.
+///   - filePath: The file path in which the assertion was called. Defaults to the file path of the test case.
 ///   - function: The function name in which the assertion was called. Defaults to the test method name.
 ///   - line: The line number on which the assertion was called. Defaults to the line number of the call site.
 ///   - column: The column on which the assertion was called. Defaults to the column number of the call site.

@@ -19,7 +19,7 @@ import Foundation
 ///   - timeout: Time in seconds before the assertion fails for taking too long. Defaults to zero (no timeout).
 ///   - isolation: Optionally specify an actor for input evaluation, supporting thread/actor isolation. Defaults to current context.
 ///   - fileID: The unique identifier for the file in which the assertion appears. Supplied automatically by the compiler.
-///   - file: The file path where the assertion is called. Supplied automatically by the compiler.
+///   - filePath: The file path where the assertion is called. Supplied automatically by the compiler.
 ///   - testName: The name of the test function calling the assertion. Supplied automatically by the compiler.
 ///   - line: The source line number where the assertion is called. Supplied automatically by the compiler.
 ///   - column: The source column where the assertion is called. Supplied automatically by the compiler.
@@ -30,7 +30,8 @@ import Foundation
 ///   avoid snapshot counting issues. Automatic snapshot naming relies on the call site position.
 ///
 /// - Note: The recording mode falls back to session-level or environment settings if not provided.
-///   Use testing traits, or ``withTestingEnvironment(record:operation:)`` to control globally.
+///   Use testing traits, or ``withTestingEnvironment(record:diffTool:maxConcurrentTests:platform:operation:file:line:)``
+///   to control globally.
 ///
 /// - Example:
 ///   ```swift
@@ -98,7 +99,7 @@ public func assert<Input: Sendable, Output: BytesRepresentable>(
 ///   - timeout: Maximum seconds to wait for input evaluation per assertion. Defaults to `.zero`.
 ///   - isolation: Optionally specify an actor context for input evaluation, supporting actor/thread isolation. Defaults to current context.
 ///   - fileID: The unique identifier of the source file. Provided automatically by the compiler.
-///   - file: The path to the source file. Provided automatically.
+///   - filePath: The path to the source file. Provided automatically.
 ///   - testName: The name of the test function. Provided automatically.
 ///   - line: The line number of the assertion in the source file. Provided automatically.
 ///   - column: The column number of the assertion in the source file. Provided automatically.
@@ -166,7 +167,7 @@ public func assert<Input: Sendable, Output: BytesRepresentable>(
 ///   - timeout: Maximum seconds to wait for input evaluation per assertion. Defaults to `.zero`.
 ///   - isolation: Optionally specify an actor context for input evaluation, supporting actor/thread isolation. Defaults to current context.
 ///   - fileID: The unique identifier of the source file. Provided automatically by the compiler.
-///   - file: The path to the source file. Provided automatically.
+///   - filePath: The path to the source file. Provided automatically.
 ///   - testName: The name of the test function. Provided automatically.
 ///   - line: The line number of the assertion in the source file. Provided automatically.
 ///   - column: The column number of the assertion in the source file. Provided automatically.
@@ -245,7 +246,7 @@ public func assert<Input: Sendable, Output: BytesRepresentable>(
 ///   - snapshotDirectory: Optionally specify a custom directory for stored snapshots, overriding the default.
 ///   - timeout: Time in seconds before the assertion fails if too long. Defaults to 5 seconds.
 ///   - fileID: The unique identifier of the source file. Provided automatically by the compiler.
-///   - file: The path to the source file. Provided automatically.
+///   - filePath: The path to the source file. Provided automatically.
 ///   - testName: The name of the test function. Provided automatically.
 ///   - line: The line number of the assertion call. Provided automatically.
 ///   - column: The column number of the assertion call. Provided automatically.
@@ -318,7 +319,7 @@ public func assert<Input, Output: BytesRepresentable>(
 ///   - snapshotDirectory: Optionally specify a custom directory for storing or comparing snapshots, overriding the default.
 ///   - timeout: Maximum seconds to wait for each assertion. Defaults to 5.
 ///   - fileID: The unique identifier of the source file. Provided automatically by the compiler.
-///   - file: The path to the source file. Provided automatically.
+///   - filePath: The path to the source file. Provided automatically.
 ///   - testName: The name of the test function. Provided automatically.
 ///   - line: The line number of the assertion in the source file. Provided automatically.
 ///   - column: The column number of the assertion in the source file. Provided automatically.
@@ -382,7 +383,7 @@ public func assert<Input, Output: BytesRepresentable>(
 ///   - snapshotDirectory: Optionally specify a custom directory for storing or comparing snapshots, overriding the default.
 ///   - timeout: Maximum seconds to wait for each assertion. Defaults to 5.
 ///   - fileID: The unique identifier of the source file. Provided automatically by the compiler.
-///   - file: The path to the source file. Provided automatically.
+///   - filePath: The path to the source file. Provided automatically.
 ///   - testName: The name of the test function. Provided automatically.
 ///   - line: The line number of the assertion in the source file. Provided automatically.
 ///   - column: The column number of the assertion in the source file. Provided automatically.
@@ -448,7 +449,7 @@ public func assert<Input, Output: BytesRepresentable>(
 ///   - timeout: Maximum seconds to wait for input evaluation or snapshotting. Defaults to `.zero`.
 ///   - isolation: Optionally specify an actor for input evaluation, supporting thread/actor isolation. Defaults to current context.
 ///   - fileID: The unique identifier of the source file. Provided automatically by the compiler.
-///   - file: The path to the source file. Provided automatically.
+///   - filePath: The path to the source file. Provided automatically.
 ///   - testName: The name of the test function. Provided automatically.
 ///   - line: The line number of the assertion in the source file. Provided automatically.
 ///   - column: The column number of the assertion in the source file. Provided automatically.
@@ -511,7 +512,7 @@ public func verify<Input: Sendable, Output: BytesRepresentable>(
 ///   - snapshotDirectory: Optionally specify a directory for storing or comparing snapshots, overriding the default.
 ///   - timeout: Maximum seconds to wait for input evaluation or snapshotting. Defaults to 5 seconds.
 ///   - fileID: The unique identifier of the source file. Provided automatically by the compiler.
-///   - file: The path to the source file. Provided automatically.
+///   - filePath: The path to the source file. Provided automatically.
 ///   - testName: The name of the test function. Provided automatically.
 ///   - line: The line number of the assertion in the source file. Provided automatically.
 ///   - column: The column number of the assertion in the source file. Provided automatically.

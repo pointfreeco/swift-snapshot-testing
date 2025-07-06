@@ -30,7 +30,7 @@ public struct SnapshotAttachment: Sendable {
     /// Initializes a `SnapshotAttachment` with a custom uniform type identifier, name, and payload.
     ///
     /// - Parameters:
-    ///   - uniformTypeIdentifier: The uniform type identifier for the attachment. Defaults to `"public.data"` if `nil`.
+    ///   - identifier: The uniform type identifier for the attachment. Defaults to `"public.data"` if `nil`.
     ///   - name: An optional name for the attachment.
     ///   - payload: The binary data payload. Defaults to `nil` if not provided.
     public init(uniformTypeIdentifier identifier: String?, name: String?, payload: Data?) {
@@ -42,7 +42,7 @@ public struct SnapshotAttachment: Sendable {
     /// Initializes a `SnapshotAttachment` with raw data, using a default uniform type identifier.
     ///
     /// - Parameters:
-    ///   - data: The binary data to use as the payload.
+    ///   - payload: The binary data to use as the payload.
     ///
     /// - SeeAlso: Uses `"public.data"` as the uniform type identifier.
     public init(data payload: Data) {
@@ -56,7 +56,7 @@ public struct SnapshotAttachment: Sendable {
     ///
     /// - Parameters:
     ///   - payload: The binary data to use as the payload.
-    ///   - uniformTypeIdentifier: The uniform type identifier for the attachment.
+    ///   - identifier: The uniform type identifier for the attachment.
     public init(data payload: Data, uniformTypeIdentifier identifier: String) {
         self.init(
             uniformTypeIdentifier: identifier,

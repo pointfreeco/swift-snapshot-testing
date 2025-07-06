@@ -29,7 +29,7 @@ extension SyncSnapshot where Input: CGPath, Output == ImageBytes {
     ///     match. 98-99% mimics
     ///     [the precision](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e) of the
     ///     human eye.
-    ///   - drawingMode: The drawing mode.
+    ///   - drawingMode: The mode used to render the path, defined by `CGPathDrawingMode`. Determines whether the path is stroked, filled, or both.
     public static func image(
         precision: Float = 1,
         perceptualPrecision: Float = 1,
@@ -77,6 +77,8 @@ extension SyncSnapshot where Input: CGPath, Output == ImageBytes {
     ///     match. 98-99% mimics
     ///     [the precision](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e) of the
     ///     human eye.
+    ///   - scale: The scale factor for the rendered image.
+    ///   - drawingMode: The mode used to render the path, defined by `CGPathDrawingMode`. Determines whether the path is stroked, filled, or both.
     public static func image(
         precision: Float = 1,
         perceptualPrecision: Float = 1,
