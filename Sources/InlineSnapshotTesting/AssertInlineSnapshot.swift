@@ -340,24 +340,15 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
         writeInlineSnapshots()
       }
     }
-    DispatchQueue.mainSync {
+    if Thread.isMainThread {
       XCTestObservationCenter.shared.addTestObserver(InlineSnapshotObserver())
+    } else {
+      DispatchQueue.main.sync {
+        XCTestObservationCenter.shared.addTestObserver(InlineSnapshotObserver())
+      }
     }
   }()
 
-  extension DispatchQueue {
-    private static let key = DispatchSpecificKey<UInt8>()
-    private static let value: UInt8 = 0
-
-    fileprivate static func mainSync<R>(execute block: () -> R) -> R {
-      Self.main.setSpecific(key: key, value: value)
-      if getSpecific(key: key) == value {
-        return block()
-      } else {
-        return main.sync(execute: block)
-      }
-    }
-  }
 
   @_spi(Internals) public struct File: Hashable {
     public let path: StaticString
