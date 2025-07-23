@@ -349,7 +349,6 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
     }
   }()
 
-
   @_spi(Internals) public struct File: Hashable {
     public let path: StaticString
     public static func == (lhs: Self, rhs: Self) -> Bool {
