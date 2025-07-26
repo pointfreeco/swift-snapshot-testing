@@ -32,6 +32,6 @@ format:
 		--ignore-unparsable-files \
 		--in-place \
 		--recursive \
-		./Package.swift ./Sources ./Tests
+		Package.swift ./Tests $(find ./Sources -name "*.swift" \ -not -path "./Sources/Deprecated/*")
 
 test-all: test-linux test-macos test-ios
