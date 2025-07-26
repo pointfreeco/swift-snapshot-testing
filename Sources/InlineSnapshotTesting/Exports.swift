@@ -1,1 +1,5 @@
-@_exported import SnapshotTesting
+@_exported import XCSnapshotTesting
+
+#if !os(visionOS)
+@_exported import _InlineSnapshotTesting
+#endif

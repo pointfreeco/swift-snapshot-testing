@@ -1,0 +1,3 @@
+[   A     ! W   ] h=--- v=--- NSView f=(0,0,10,10) b=(-) => <NSViewBackingLayer>
+  [   A     !     ] h=--- v=--- _TtC11XCTSnapshotP33_CD07B10D49DF51CB5D5D85C591EE4D9618UIViewSizeListener f=(0,0,10,10) b=(-)
+A=autoresizesSubviews, C=canDrawConcurrently, D=needsDisplay, F=flipped, G=gstate, H=hidden (h=by ancestor), L=needsLayout (l=child needsLayout), U=needsUpdateConstraints (u=child needsUpdateConstraints), O=opaque, P=preservesContentDuringLiveResize, S=scaled/rotated, W=wantsLayer (w=ancestor wantsLayer), V=needsVibrancy (v=allowsVibrancy), #=has surface

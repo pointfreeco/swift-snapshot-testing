@@ -1,0 +1,11 @@
+CustomDumpTests.DictionarySetContainer(
+  dict: [
+    "a": 1,
+    "b": 2,
+    "c": 3
+  ],
+  set: Set([
+    CustomDumpTests.Person(name: "Brandon"),
+    CustomDumpTests.Person(name: "Stephen")
+  ])
+)
