@@ -969,6 +969,15 @@ final class SnapshotTestingTests: BaseTestCase {
       assertSnapshot(of: view, as: .recursiveDescription)
     #endif
   }
+  
+  func testUIViewAlwaysRecording() {
+    #if os(iOS)
+      let view = UIButton(type: .contactAdd)
+      // Just useful to test the XCAttachment
+      assertSnapshot(of: view, as: .image, record: true)
+    #endif
+  }
+
 
   func testUIViewControllerLifeCycle() {
     #if os(iOS)

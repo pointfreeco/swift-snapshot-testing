@@ -302,9 +302,9 @@ public func verifySnapshot<Value, Format>(
   #endif
 
   let record =
-    (recording == true
+    (recording == true || (screenshotbotMode && isPng(snapshotting: snapshotting))
       ? .all
-      : (screenshotbotMode && isPng(snapshotting: snapshotting) || recording == false)
+      : (recording == false)
         ? .missing : nil)
 
     ?? SnapshotTestingConfiguration.current?.record
@@ -382,13 +382,15 @@ public func verifySnapshot<Value, Format>(
         }
 
         #if !os(Android) && !os(Linux) && !os(Windows)
-          if !isSwiftTesting,
-            ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS")
+          if (!isSwiftTesting &&
+            ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS"))
           {
             XCTContext.runActivity(named: "Attached Recorded Snapshot") { activity in
+
               if writeToDisk {
-                // Snapshot was written to disk. Create attachment from file
+                // Snapshot was written to disk. Create attachment from filesisswifttesting
                 let attachment = XCTAttachment(contentsOfFile: snapshotFileUrl)
+                attachment.lifetime = .keepAlways
                 activity.add(attachment)
               } else {
                 // Snapshot was not written to disk. Create attachment from data and path extension
@@ -400,6 +402,7 @@ public func verifySnapshot<Value, Format>(
                   name: snapshotFileUrl.lastPathComponent,
                   payload: snapshotData
                 )
+                attachment.lifetime = .keepAlways
 
                 activity.add(attachment)
               }
