@@ -239,21 +239,21 @@ targets: [
 
   - [AccessibilitySnapshot](https://github.com/cashapp/AccessibilitySnapshot) adds easy regression
     testing for iOS accessibility.
-    
+
   - [AccessibilitySnapshotColorBlindness](https://github.com/Sherlouk/AccessibilitySnapshotColorBlindness)
     adds snapshot strategies for color blindness simulation on iOS views, view controllers and images.
 
   - [GRDBSnapshotTesting](https://github.com/SebastianOsinski/GRDBSnapshotTesting) adds snapshot
     strategy for testing SQLite database migrations made with [GRDB](https://github.com/groue/GRDB.swift).
 
-  - [Nimble-SnapshotTesting](https://github.com/tahirmt/Nimble-SnapshotTesting) adds 
+  - [Nimble-SnapshotTesting](https://github.com/tahirmt/Nimble-SnapshotTesting) adds
     [Nimble](https://github.com/Quick/Nimble) matchers for SnapshotTesting to be used by Swift
     Package Manager.
 
   - [Prefire](https://github.com/BarredEwe/Prefire) generating Snapshot Tests via
     [Swift Package Plugins](https://github.com/apple/swift-package-manager/blob/main/Documentation/Plugins.md)
     using SwiftUI `Preview`
-  
+
   - [PreviewSnapshots](https://github.com/doordash-oss/swiftui-preview-snapshots) share `View`
     configurations between SwiftUI Previews and snapshot tests and generate several snapshots with a
     single test assertion.
@@ -274,6 +274,9 @@ targets: [
 
   - [SnapshotTestingHEIC](https://github.com/alexey1312/SnapshotTestingHEIC) adds image support
   using the HEIC storage format which reduces file sizes in comparison to PNG.
+
+  - [SnapshotTestingWebP(Experimental)](https://github.com/alexey1312/SnapshotTestingWebP) adds image support
+  using the WebP storage format which reduces file sizes in comparison to PNG.
 
   - [SnapshotVision](https://github.com/gregersson/swift-snapshot-testing-vision) adds snapshot
     strategy for text recognition on views and images. Uses Apples Vision framework.
