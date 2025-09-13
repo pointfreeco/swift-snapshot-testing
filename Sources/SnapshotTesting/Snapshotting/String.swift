@@ -23,35 +23,8 @@ extension Diffing where Value == String {
       .flatMap { [$0.patchMark] + $0.lines }
       .joined(separator: "\n")
 
-    // Create three DualAttachments for better visibility
-    let referenceAttachment = DualAttachment(
-      data: Data(old.utf8),
-      uniformTypeIdentifier: "public.plain-text",
-      name: "reference.txt"
-    )
-
-   let actualAttachment = DualAttachment(
-      data: Data(new.utf8),
-      uniformTypeIdentifier: "public.plain-text",
-      name: "failure.txt"
-    )
-
-    let diffAttachment = DualAttachment(
-      data: Data(failure.utf8),
-      uniformTypeIdentifier: "public.patch-file",
-      name: "difference.patch"
-    )
-
-    let xctAttachments = [
-      referenceAttachment.xctAttachment,
-      actualAttachment.xctAttachment,
-      diffAttachment.xctAttachment
-    ]
-    let dualAttachments = [referenceAttachment, actualAttachment, diffAttachment]
-
-    // Store DualAttachments for later retrieval
-    AttachmentStorage.store(dualAttachments, for: xctAttachments)
-
-    return (failure, xctAttachments)
+    let attachment = XCTAttachment(
+      data: Data(failure.utf8), uniformTypeIdentifier: "public.patch-file")
+    return (failure, [attachment])
   }
 }
