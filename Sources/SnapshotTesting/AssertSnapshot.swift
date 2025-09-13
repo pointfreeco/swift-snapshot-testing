@@ -370,9 +370,31 @@ public func verifySnapshot<Value, Format>(
         }
 
         #if !os(Android) && !os(Linux) && !os(Windows)
-          if !isSwiftTesting,
-            ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS")
-          {
+          if isSwiftTesting {
+            #if canImport(Testing)
+              // Use Swift Testing's Attachment API
+              #if compiler(>=6.2)
+                if Test.current != nil {
+                  let attachmentData: Data
+                  if writeToDisk {
+                    attachmentData = (try? Data(contentsOf: snapshotFileUrl)) ?? snapshotData
+                  } else {
+                    attachmentData = snapshotData
+                  }
+                  Attachment.record(
+                    attachmentData,
+                    named: snapshotFileUrl.lastPathComponent,
+                    sourceLocation: SourceLocation(
+                      fileID: fileID.description,
+                      filePath: filePath.description,
+                      line: Int(line),
+                      column: Int(column)
+                    )
+                  )
+                }
+              #endif
+            #endif
+          } else if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
             XCTContext.runActivity(named: "Attached Recorded Snapshot") { activity in
               if writeToDisk {
                 // Snapshot was written to disk. Create attachment from file
@@ -457,9 +479,29 @@ public func verifySnapshot<Value, Format>(
 
       if !attachments.isEmpty {
         #if !os(Linux) && !os(Android) && !os(Windows)
-          if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS"),
-            !isSwiftTesting
-          {
+          if isSwiftTesting {
+            #if canImport(Testing)
+              // Use Swift Testing's Attachment API for failure diffs
+              #if compiler(>=6.2)
+                if Test.current != nil {
+                  // Retrieve DualAttachments that were stored during diff creation
+                  if let dualAttachments = AttachmentStorage.retrieve(for: attachments) {
+                    // Record each DualAttachment using Swift Testing API
+                    for dualAttachment in dualAttachments {
+                      dualAttachment.record(
+                        fileID: fileID,
+                        filePath: filePath,
+                        line: line,
+                        column: column
+                      )
+                    }
+                    // Clear the storage after recording
+                    AttachmentStorage.clear(for: attachments)
+                  }
+                }
+              #endif
+            #endif
+          } else if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
             XCTContext.runActivity(named: "Attached Failure Diff") { activity in
               attachments.forEach {
                 activity.add($0)

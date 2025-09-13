@@ -36,17 +36,20 @@
             old, new, precision: precision, perceptualPrecision: perceptualPrecision)
         else { return nil }
         let difference = SnapshotTesting.diff(old, new)
-        let oldAttachment = XCTAttachment(image: old)
-        oldAttachment.name = "reference"
+
+        // Create DualAttachments that work with both XCTest and Swift Testing
+        @_spi(Internals) let oldAttachment = DualAttachment(image: old, name: "reference")
         let isEmptyImage = new.size == .zero
-        let newAttachment = XCTAttachment(image: isEmptyImage ? emptyImage() : new)
-        newAttachment.name = "failure"
-        let differenceAttachment = XCTAttachment(image: difference)
-        differenceAttachment.name = "difference"
-        return (
-          message,
-          [oldAttachment, newAttachment, differenceAttachment]
-        )
+        @_spi(Internals) let newAttachment = DualAttachment(image: isEmptyImage ? emptyImage() : new, name: "failure")
+        @_spi(Internals) let differenceAttachment = DualAttachment(image: difference, name: "difference")
+
+        let xctAttachments = [oldAttachment.xctAttachment, newAttachment.xctAttachment, differenceAttachment.xctAttachment]
+        let dualAttachments = [oldAttachment, newAttachment, differenceAttachment]
+
+        // Store DualAttachments for later retrieval
+        AttachmentStorage.store(dualAttachments, for: xctAttachments)
+
+        return (message, xctAttachments)
       }
     }
 
