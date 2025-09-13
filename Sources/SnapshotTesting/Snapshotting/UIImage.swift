@@ -38,10 +38,10 @@
         let difference = SnapshotTesting.diff(old, new)
 
         // Create DualAttachments that work with both XCTest and Swift Testing
-        @_spi(Internals) let oldAttachment = DualAttachment(image: old, name: "reference")
+        let oldAttachment = DualAttachment(image: old, name: "reference")
         let isEmptyImage = new.size == .zero
-        @_spi(Internals) let newAttachment = DualAttachment(image: isEmptyImage ? emptyImage() : new, name: "failure")
-        @_spi(Internals) let differenceAttachment = DualAttachment(image: difference, name: "difference")
+        let newAttachment = DualAttachment(image: isEmptyImage ? emptyImage() : new, name: "failure")
+        let differenceAttachment = DualAttachment(image: difference, name: "difference")
 
         let xctAttachments = [oldAttachment.xctAttachment, newAttachment.xctAttachment, differenceAttachment.xctAttachment]
         let dualAttachments = [oldAttachment, newAttachment, differenceAttachment]

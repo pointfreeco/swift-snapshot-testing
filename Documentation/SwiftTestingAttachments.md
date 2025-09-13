@@ -1,8 +1,10 @@
-# Swift Testing Attachment Support
+# Swift Testing attachment support
+
+Learn how snapshot test failures automatically attach reference images, actual results, and diffs to your test results when using Swift Testing.
 
 ## Overview
 
-Starting with Swift 6.2 / Xcode 26, swift-snapshot-testing now supports attachments when running tests with Swift Testing. This means snapshot failures will automatically attach reference images, actual results, and diffs directly to your test results in Xcode.
+Starting with Swift 6.2 and Xcode 26, swift-snapshot-testing now supports attachments when running tests with Swift Testing. When a snapshot test fails, the library automatically attaches the reference image, actual result, and a visual diff directly to your test results in Xcode, making it easier to diagnose and fix test failures.
 
 ## Requirements
 
@@ -10,21 +12,25 @@ Starting with Swift 6.2 / Xcode 26, swift-snapshot-testing now supports attachme
 - **Xcode 26** or later
 - Tests must be run using Swift Testing (not XCTest)
 
-## How It Works
+## How it works
 
 When a snapshot test fails under Swift Testing:
 
-### For Image Snapshots
+When a snapshot test fails under Swift Testing:
+
+### Image snapshots
+
 Three attachments are created:
-1. **reference** - The expected image
-2. **failure** - The actual image that was captured
-3. **difference** - A visual diff showing the differences
+- **reference**: The expected image
+- **failure**: The actual image that was captured
+- **difference**: A visual diff highlighting the differences
 
-### For String/Text Snapshots
+### Text snapshots
+
 One attachment is created:
-- **difference.patch** - A unified diff showing the changes
+- **difference.patch**: A unified diff showing the textual changes
 
-## Implementation Details
+## Implementation details
 
 The implementation uses a dual-attachment system:
 - `DualAttachment` stores both the raw data and an `XCTAttachment`
@@ -44,13 +50,13 @@ The implementation uses a dual-attachment system:
 - Extract with: `xcrun xcresulttool get --path Test.xcresult --id <attachment-id>`
 - Or open the `.xcresult` file directly in Xcode
 
-## Performance Considerations
+## Performance considerations
 
 - Large images (>10MB) are automatically compressed using JPEG to reduce storage
 - Attachments are only created on test failure (not on success)
 - Thread-safe storage ensures no race conditions in parallel test execution
 
-## Example Usage
+## Example usage
 
 ```swift
 import Testing
@@ -64,7 +70,7 @@ import SnapshotTesting
 }
 ```
 
-## Backward Compatibility
+## Backward compatibility
 
 - Code using XCTest continues to work unchanged
 - Swift versions before 6.2 will use XCTAttachment (no Swift Testing attachments)
@@ -72,6 +78,6 @@ import SnapshotTesting
 
 ## Notes
 
-- Attachments are non-copyable and can only be attached once per test
-- The attachment system respects the test's source location for better debugging
-- Empty images and corrupted data are handled gracefully
+- Attachments are non-copyable and can only be attached once per test.
+- The attachment system respects the test's source location for better debugging.
+- Empty images and corrupted data are handled gracefully.

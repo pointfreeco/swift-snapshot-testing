@@ -16,23 +16,28 @@
       // Test that string snapshots create attachments on failure
       @Test func testStringSnapshotAttachments() {
         // String snapshots should create a patch attachment on failure
+        let original = """
+        Line 1
+        Line 2
+        Line 3
+        """
+
+        let modified = """
+        Line 1
+        Line 2 Modified
+        Line 3
+        Line 4 Added
+        """
+
+        // First record the original
         withKnownIssue {
-          let original = """
-          Line 1
-          Line 2
-          Line 3
-          """
-
-          let modified = """
-          Line 1
-          Line 2 Modified
-          Line 3
-          Line 4 Added
-          """
-
-          // First record the original
           assertSnapshot(of: original, as: .lines, named: "multiline", record: true)
-          // Then test with modified (should fail and create patch attachment)
+        } matching: { issue in
+          issue.description.contains("recorded snapshot")
+        }
+
+        // Then test with modified (should fail and create patch attachment)
+        withKnownIssue {
           assertSnapshot(of: modified, as: .lines, named: "multiline")
         } matching: { issue in
           issue.description.contains("does not match reference")
@@ -59,7 +64,11 @@
         UIGraphicsEndImageContext()
 
         // First record the red image
-        assertSnapshot(of: redImage, as: .image, named: "color-test", record: true)
+        withKnownIssue {
+          assertSnapshot(of: redImage, as: .image, named: "color-test", record: true)
+        } matching: { issue in
+          issue.description.contains("recorded snapshot")
+        }
 
         // Then test with blue image (should fail and create attachments)
         withKnownIssue {
@@ -89,7 +98,11 @@
         blueImage.unlockFocus()
 
         // First record the red image
-        assertSnapshot(of: redImage, as: .image, named: "color-test", record: true)
+        withKnownIssue {
+          assertSnapshot(of: redImage, as: .image, named: "color-test", record: true)
+        } matching: { issue in
+          issue.description.contains("recorded snapshot")
+        }
 
         // Then test with blue image (should fail and create attachments)
         withKnownIssue {
@@ -103,12 +116,16 @@
 
       @Test func testRecordedSnapshotAttachment() {
         // When recording a snapshot, it should also create an attachment
-        assertSnapshot(
-          of: ["key": "value"],
-          as: .json,
-          named: "recorded-test",
-          record: true
-        )
+        withKnownIssue {
+          assertSnapshot(
+            of: ["key": "value"],
+            as: .json,
+            named: "recorded-test",
+            record: true
+          )
+        } matching: { issue in
+          issue.description.contains("recorded snapshot")
+        }
 
         // The recorded snapshot should have created an attachment
         // even though there was no failure
@@ -117,7 +134,11 @@
       @Test func testNoAttachmentsOnSuccess() {
         // First record a snapshot
         let data = "Consistent Data"
-        assertSnapshot(of: data, as: .lines, named: "success-test", record: true)
+        withKnownIssue {
+          assertSnapshot(of: data, as: .lines, named: "success-test", record: true)
+        } matching: { issue in
+          issue.description.contains("recorded snapshot")
+        }
 
         // Then test with the same data (should pass with no attachments)
         assertSnapshot(of: data, as: .lines, named: "success-test")
@@ -136,7 +157,11 @@
         let modified = TestStruct(name: "Modified", value: 100)
 
         // Record original
-        assertSnapshot(of: original, as: .dump, named: "struct-test", record: true)
+        withKnownIssue {
+          assertSnapshot(of: original, as: .dump, named: "struct-test", record: true)
+        } matching: { issue in
+          issue.description.contains("recorded snapshot")
+        }
 
         // Test with modified (should fail and create attachments)
         withKnownIssue {
@@ -150,15 +175,33 @@
         // Test that multiple snapshot failures in one test create
         // multiple sets of attachments
 
+        // First failure - record
         withKnownIssue {
-          // First failure
           assertSnapshot(of: "First", as: .lines, named: "multi-1", record: true)
-          assertSnapshot(of: "First Modified", as: .lines, named: "multi-1")
+        } matching: { issue in
+          issue.description.contains("recorded snapshot")
+        }
 
-          // Second failure
+        // First failure - test
+        withKnownIssue {
+          assertSnapshot(of: "First Modified", as: .lines, named: "multi-1")
+        } matching: { issue in
+          issue.description.contains("does not match reference")
+        }
+
+        // Second failure - record
+        withKnownIssue {
           assertSnapshot(of: "Second", as: .lines, named: "multi-2", record: true)
+        } matching: { issue in
+          issue.description.contains("recorded snapshot")
+        }
+
+        // Second failure - test
+        withKnownIssue {
           assertSnapshot(of: "Second Modified", as: .lines, named: "multi-2")
-        } matching: { _ in true }
+        } matching: { issue in
+          issue.description.contains("does not match reference")
+        }
       }
     }
   }
