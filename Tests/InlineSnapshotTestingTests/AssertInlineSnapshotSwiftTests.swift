@@ -30,8 +30,8 @@
         } matching: { issue in
           var issuePrefix = "Issue recorded"
           #if compiler(>=6.2)
-          // Swift 6.2+ changed the error message format
-          issuePrefix += " (error)"
+            // Swift 6.2+ changed the error message format
+            issuePrefix += " (error)"
           #endif
 
           return issue.description == """

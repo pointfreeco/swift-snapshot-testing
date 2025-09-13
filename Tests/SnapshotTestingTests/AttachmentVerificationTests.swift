@@ -1,4 +1,5 @@
 import XCTest
+
 @testable import SnapshotTesting
 
 final class AttachmentVerificationTests: XCTestCase {
@@ -8,17 +9,17 @@ final class AttachmentVerificationTests: XCTestCase {
     let diffing = Diffing<String>.lines
 
     let oldString = """
-    Line 1
-    Line 2
-    Line 3
-    """
+      Line 1
+      Line 2
+      Line 3
+      """
 
     let newString = """
-    Line 1
-    Line 2 Modified
-    Line 3
-    Line 4 Added
-    """
+      Line 1
+      Line 2 Modified
+      Line 3
+      Line 4 Added
+      """
 
     // Perform the diff
     let result = diffing.diff(oldString, newString)
@@ -39,113 +40,119 @@ final class AttachmentVerificationTests: XCTestCase {
   }
 
   #if os(iOS) || os(tvOS)
-  func testImageDiffCreatesThreeAttachments() {
-    // Create two different images
-    let size = CGSize(width: 10, height: 10)
+    func testImageDiffCreatesThreeAttachments() {
+      // Create two different images
+      let size = CGSize(width: 10, height: 10)
 
-    UIGraphicsBeginImageContext(size)
-    let context1 = UIGraphicsGetCurrentContext()!
-    context1.setFillColor(UIColor.red.cgColor)
-    context1.fill(CGRect(origin: .zero, size: size))
-    let redImage = UIGraphicsGetImageFromCurrentImageContext()!
-    UIGraphicsEndImageContext()
+      UIGraphicsBeginImageContext(size)
+      let context1 = UIGraphicsGetCurrentContext()!
+      context1.setFillColor(UIColor.red.cgColor)
+      context1.fill(CGRect(origin: .zero, size: size))
+      let redImage = UIGraphicsGetImageFromCurrentImageContext()!
+      UIGraphicsEndImageContext()
 
-    UIGraphicsBeginImageContext(size)
-    let context2 = UIGraphicsGetCurrentContext()!
-    context2.setFillColor(UIColor.blue.cgColor)
-    context2.fill(CGRect(origin: .zero, size: size))
-    let blueImage = UIGraphicsGetImageFromCurrentImageContext()!
-    UIGraphicsEndImageContext()
+      UIGraphicsBeginImageContext(size)
+      let context2 = UIGraphicsGetCurrentContext()!
+      context2.setFillColor(UIColor.blue.cgColor)
+      context2.fill(CGRect(origin: .zero, size: size))
+      let blueImage = UIGraphicsGetImageFromCurrentImageContext()!
+      UIGraphicsEndImageContext()
 
-    // Create image diffing
-    let diffing = Diffing<UIImage>.image
+      // Create image diffing
+      let diffing = Diffing<UIImage>.image
 
-    // Perform the diff
-    let result = diffing.diff(redImage, blueImage)
+      // Perform the diff
+      let result = diffing.diff(redImage, blueImage)
 
-    // Verify we got a difference
-    XCTAssertNotNil(result, "Should have found differences between red and blue images")
+      // Verify we got a difference
+      XCTAssertNotNil(result, "Should have found differences between red and blue images")
 
-    // Verify we got exactly 3 attachments
-    let (_, attachments) = result!
-    XCTAssertEqual(attachments.count, 3, "Should create 3 attachments for image diffs")
+      // Verify we got exactly 3 attachments
+      let (_, attachments) = result!
+      XCTAssertEqual(attachments.count, 3, "Should create 3 attachments for image diffs")
 
-    // Verify attachment names
-    let attachmentNames = attachments.compactMap { $0.name }
-    XCTAssertTrue(attachmentNames.contains("reference"), "Should have reference attachment")
-    XCTAssertTrue(attachmentNames.contains("failure"), "Should have failure attachment")
-    XCTAssertTrue(attachmentNames.contains("difference"), "Should have difference attachment")
+      // Verify attachment names
+      let attachmentNames = attachments.compactMap { $0.name }
+      XCTAssertTrue(attachmentNames.contains("reference"), "Should have reference attachment")
+      XCTAssertTrue(attachmentNames.contains("failure"), "Should have failure attachment")
+      XCTAssertTrue(attachmentNames.contains("difference"), "Should have difference attachment")
 
-    // Verify DualAttachments were stored
-    let dualAttachments = AttachmentStorage.retrieve(for: attachments)
-    XCTAssertNotNil(dualAttachments, "DualAttachments should be stored")
-    XCTAssertEqual(dualAttachments?.count, 3, "Should store 3 DualAttachments")
+      // Verify DualAttachments were stored
+      let dualAttachments = AttachmentStorage.retrieve(for: attachments)
+      XCTAssertNotNil(dualAttachments, "DualAttachments should be stored")
+      XCTAssertEqual(dualAttachments?.count, 3, "Should store 3 DualAttachments")
 
-    // Verify all attachments have data
-    if let dualAttachments = dualAttachments {
-      for attachment in dualAttachments {
-        XCTAssertGreaterThan(attachment.data.count, 0, "Attachment '\(attachment.name ?? "unnamed")' should have data")
-        XCTAssertEqual(attachment.uniformTypeIdentifier, "public.png", "Image attachments should be PNG")
+      // Verify all attachments have data
+      if let dualAttachments = dualAttachments {
+        for attachment in dualAttachments {
+          XCTAssertGreaterThan(
+            attachment.data.count, 0,
+            "Attachment '\(attachment.name ?? "unnamed")' should have data")
+          XCTAssertEqual(
+            attachment.uniformTypeIdentifier, "public.png", "Image attachments should be PNG")
+        }
       }
-    }
 
-    // Clean up
-    AttachmentStorage.clear(for: attachments)
-  }
+      // Clean up
+      AttachmentStorage.clear(for: attachments)
+    }
   #endif
 
   #if os(macOS)
-  func testNSImageDiffCreatesThreeAttachments() {
-    // Create two different images
-    let size = NSSize(width: 10, height: 10)
+    func testNSImageDiffCreatesThreeAttachments() {
+      // Create two different images
+      let size = NSSize(width: 10, height: 10)
 
-    let redImage = NSImage(size: size)
-    redImage.lockFocus()
-    NSColor.red.setFill()
-    NSRect(origin: .zero, size: size).fill()
-    redImage.unlockFocus()
+      let redImage = NSImage(size: size)
+      redImage.lockFocus()
+      NSColor.red.setFill()
+      NSRect(origin: .zero, size: size).fill()
+      redImage.unlockFocus()
 
-    let blueImage = NSImage(size: size)
-    blueImage.lockFocus()
-    NSColor.blue.setFill()
-    NSRect(origin: .zero, size: size).fill()
-    blueImage.unlockFocus()
+      let blueImage = NSImage(size: size)
+      blueImage.lockFocus()
+      NSColor.blue.setFill()
+      NSRect(origin: .zero, size: size).fill()
+      blueImage.unlockFocus()
 
-    // Create image diffing
-    let diffing = Diffing<NSImage>.image
+      // Create image diffing
+      let diffing = Diffing<NSImage>.image
 
-    // Perform the diff
-    let result = diffing.diff(redImage, blueImage)
+      // Perform the diff
+      let result = diffing.diff(redImage, blueImage)
 
-    // Verify we got a difference
-    XCTAssertNotNil(result, "Should have found differences between red and blue images")
+      // Verify we got a difference
+      XCTAssertNotNil(result, "Should have found differences between red and blue images")
 
-    // Verify we got exactly 3 attachments
-    let (_, attachments) = result!
-    XCTAssertEqual(attachments.count, 3, "Should create 3 attachments for image diffs")
+      // Verify we got exactly 3 attachments
+      let (_, attachments) = result!
+      XCTAssertEqual(attachments.count, 3, "Should create 3 attachments for image diffs")
 
-    // Verify attachment names
-    let attachmentNames = attachments.compactMap { $0.name }
-    XCTAssertTrue(attachmentNames.contains("reference"), "Should have reference attachment")
-    XCTAssertTrue(attachmentNames.contains("failure"), "Should have failure attachment")
-    XCTAssertTrue(attachmentNames.contains("difference"), "Should have difference attachment")
+      // Verify attachment names
+      let attachmentNames = attachments.compactMap { $0.name }
+      XCTAssertTrue(attachmentNames.contains("reference"), "Should have reference attachment")
+      XCTAssertTrue(attachmentNames.contains("failure"), "Should have failure attachment")
+      XCTAssertTrue(attachmentNames.contains("difference"), "Should have difference attachment")
 
-    // Verify DualAttachments were stored
-    let dualAttachments = AttachmentStorage.retrieve(for: attachments)
-    XCTAssertNotNil(dualAttachments, "DualAttachments should be stored")
-    XCTAssertEqual(dualAttachments?.count, 3, "Should store 3 DualAttachments")
+      // Verify DualAttachments were stored
+      let dualAttachments = AttachmentStorage.retrieve(for: attachments)
+      XCTAssertNotNil(dualAttachments, "DualAttachments should be stored")
+      XCTAssertEqual(dualAttachments?.count, 3, "Should store 3 DualAttachments")
 
-    // Verify all attachments have data
-    if let dualAttachments = dualAttachments {
-      for attachment in dualAttachments {
-        XCTAssertGreaterThan(attachment.data.count, 0, "Attachment '\(attachment.name ?? "unnamed")' should have data")
-        XCTAssertEqual(attachment.uniformTypeIdentifier, "public.png", "Image attachments should be PNG")
+      // Verify all attachments have data
+      if let dualAttachments = dualAttachments {
+        for attachment in dualAttachments {
+          XCTAssertGreaterThan(
+            attachment.data.count, 0,
+            "Attachment '\(attachment.name ?? "unnamed")' should have data")
+          XCTAssertEqual(
+            attachment.uniformTypeIdentifier, "public.png", "Image attachments should be PNG")
+        }
       }
-    }
 
-    // Clean up
-    AttachmentStorage.clear(for: attachments)
-  }
+      // Clean up
+      AttachmentStorage.clear(for: attachments)
+    }
   #endif
 
   func testNoAttachmentsOnSuccess() {

@@ -1,11 +1,12 @@
 import XCTest
+
 @testable import SnapshotTesting
 
 final class AttachmentStorageTests: XCTestCase {
   func testStoreAndRetrieve() {
     let dualAttachments = [
       DualAttachment(data: Data(), uniformTypeIdentifier: nil, name: "test1"),
-      DualAttachment(data: Data(), uniformTypeIdentifier: nil, name: "test2")
+      DualAttachment(data: Data(), uniformTypeIdentifier: nil, name: "test2"),
     ]
 
     let xctAttachments = dualAttachments.map { $0.xctAttachment }
@@ -51,11 +52,13 @@ final class AttachmentStorageTests: XCTestCase {
     // Create multiple attachments
     var allAttachments: [(dual: [DualAttachment], xct: [XCTAttachment])] = []
     for i in 0..<100 {
-      let dual = [DualAttachment(
-        data: "\(i)".data(using: .utf8)!,
-        uniformTypeIdentifier: nil,
-        name: "attachment-\(i)"
-      )]
+      let dual = [
+        DualAttachment(
+          data: "\(i)".data(using: .utf8)!,
+          uniformTypeIdentifier: nil,
+          name: "attachment-\(i)"
+        )
+      ]
       let xct = dual.map { $0.xctAttachment }
       allAttachments.append((dual: dual, xct: xct))
     }

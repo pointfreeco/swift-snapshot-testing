@@ -394,7 +394,9 @@ public func verifySnapshot<Value, Format>(
                 }
               #endif
             #endif
-          } else if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
+          } else if ProcessInfo.processInfo.environment.keys.contains(
+            "__XCODE_BUILT_PRODUCTS_DIR_PATHS")
+          {
             XCTContext.runActivity(named: "Attached Recorded Snapshot") { activity in
               if writeToDisk {
                 // Snapshot was written to disk. Create attachment from file
@@ -501,7 +503,9 @@ public func verifySnapshot<Value, Format>(
                 }
               #endif
             #endif
-          } else if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
+          } else if ProcessInfo.processInfo.environment.keys.contains(
+            "__XCODE_BUILT_PRODUCTS_DIR_PATHS")
+          {
             XCTContext.runActivity(named: "Attached Failure Diff") { activity in
               attachments.forEach {
                 activity.add($0)

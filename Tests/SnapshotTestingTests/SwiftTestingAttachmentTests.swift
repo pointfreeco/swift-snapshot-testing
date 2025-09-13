@@ -17,17 +17,17 @@
       @Test func testStringSnapshotAttachments() {
         // String snapshots should create a patch attachment on failure
         let original = """
-        Line 1
-        Line 2
-        Line 3
-        """
+          Line 1
+          Line 2
+          Line 3
+          """
 
         let modified = """
-        Line 1
-        Line 2 Modified
-        Line 3
-        Line 4 Added
-        """
+          Line 1
+          Line 2 Modified
+          Line 3
+          Line 4 Added
+          """
 
         // First record the original
         withKnownIssue {
@@ -45,73 +45,73 @@
       }
 
       #if os(iOS) || os(tvOS)
-      @Test func testImageSnapshotAttachments() {
-        // Create two different images to force a failure
-        let size = CGSize(width: 100, height: 100)
+        @Test func testImageSnapshotAttachments() {
+          // Create two different images to force a failure
+          let size = CGSize(width: 100, height: 100)
 
-        UIGraphicsBeginImageContext(size)
-        let context1 = UIGraphicsGetCurrentContext()!
-        context1.setFillColor(UIColor.red.cgColor)
-        context1.fill(CGRect(origin: .zero, size: size))
-        let redImage = UIGraphicsGetImageFromCurrentImageContext()!
-        UIGraphicsEndImageContext()
+          UIGraphicsBeginImageContext(size)
+          let context1 = UIGraphicsGetCurrentContext()!
+          context1.setFillColor(UIColor.red.cgColor)
+          context1.fill(CGRect(origin: .zero, size: size))
+          let redImage = UIGraphicsGetImageFromCurrentImageContext()!
+          UIGraphicsEndImageContext()
 
-        UIGraphicsBeginImageContext(size)
-        let context2 = UIGraphicsGetCurrentContext()!
-        context2.setFillColor(UIColor.blue.cgColor)
-        context2.fill(CGRect(origin: .zero, size: size))
-        let blueImage = UIGraphicsGetImageFromCurrentImageContext()!
-        UIGraphicsEndImageContext()
+          UIGraphicsBeginImageContext(size)
+          let context2 = UIGraphicsGetCurrentContext()!
+          context2.setFillColor(UIColor.blue.cgColor)
+          context2.fill(CGRect(origin: .zero, size: size))
+          let blueImage = UIGraphicsGetImageFromCurrentImageContext()!
+          UIGraphicsEndImageContext()
 
-        // First record the red image
-        withKnownIssue {
-          assertSnapshot(of: redImage, as: .image, named: "color-test", record: true)
-        } matching: { issue in
-          issue.description.contains("recorded snapshot")
+          // First record the red image
+          withKnownIssue {
+            assertSnapshot(of: redImage, as: .image, named: "color-test", record: true)
+          } matching: { issue in
+            issue.description.contains("recorded snapshot")
+          }
+
+          // Then test with blue image (should fail and create attachments)
+          withKnownIssue {
+            assertSnapshot(of: blueImage, as: .image, named: "color-test")
+          } matching: { issue in
+            // Should create reference, failure, and difference image attachments
+            issue.description.contains("does not match reference")
+          }
         }
-
-        // Then test with blue image (should fail and create attachments)
-        withKnownIssue {
-          assertSnapshot(of: blueImage, as: .image, named: "color-test")
-        } matching: { issue in
-          // Should create reference, failure, and difference image attachments
-          issue.description.contains("does not match reference")
-        }
-      }
       #endif
 
       #if os(macOS)
-      @Test func testNSImageSnapshotAttachments() {
-        // Create two different images to force a failure
-        let size = NSSize(width: 100, height: 100)
+        @Test func testNSImageSnapshotAttachments() {
+          // Create two different images to force a failure
+          let size = NSSize(width: 100, height: 100)
 
-        let redImage = NSImage(size: size)
-        redImage.lockFocus()
-        NSColor.red.setFill()
-        NSRect(origin: .zero, size: size).fill()
-        redImage.unlockFocus()
+          let redImage = NSImage(size: size)
+          redImage.lockFocus()
+          NSColor.red.setFill()
+          NSRect(origin: .zero, size: size).fill()
+          redImage.unlockFocus()
 
-        let blueImage = NSImage(size: size)
-        blueImage.lockFocus()
-        NSColor.blue.setFill()
-        NSRect(origin: .zero, size: size).fill()
-        blueImage.unlockFocus()
+          let blueImage = NSImage(size: size)
+          blueImage.lockFocus()
+          NSColor.blue.setFill()
+          NSRect(origin: .zero, size: size).fill()
+          blueImage.unlockFocus()
 
-        // First record the red image
-        withKnownIssue {
-          assertSnapshot(of: redImage, as: .image, named: "color-test", record: true)
-        } matching: { issue in
-          issue.description.contains("recorded snapshot")
+          // First record the red image
+          withKnownIssue {
+            assertSnapshot(of: redImage, as: .image, named: "color-test", record: true)
+          } matching: { issue in
+            issue.description.contains("recorded snapshot")
+          }
+
+          // Then test with blue image (should fail and create attachments)
+          withKnownIssue {
+            assertSnapshot(of: blueImage, as: .image, named: "color-test")
+          } matching: { issue in
+            // Should create reference, failure, and difference image attachments
+            issue.description.contains("does not match reference")
+          }
         }
-
-        // Then test with blue image (should fail and create attachments)
-        withKnownIssue {
-          assertSnapshot(of: blueImage, as: .image, named: "color-test")
-        } matching: { issue in
-          // Should create reference, failure, and difference image attachments
-          issue.description.contains("does not match reference")
-        }
-      }
       #endif
 
       @Test func testRecordedSnapshotAttachment() {

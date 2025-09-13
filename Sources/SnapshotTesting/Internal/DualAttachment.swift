@@ -67,12 +67,15 @@ internal struct DualAttachment {
 
       // Convert NSImage to Data
       if let tiffData = image.tiffRepresentation,
-         let bitmapImage = NSBitmapImageRep(data: tiffData) {
+        let bitmapImage = NSBitmapImageRep(data: tiffData)
+      {
         imageData = bitmapImage.representation(using: .png, properties: [:])
 
         // If image is too large (>10MB), try JPEG compression
         if let data = imageData, data.count > 10_485_760 {
-          if let jpegData = bitmapImage.representation(using: .jpeg, properties: [.compressionFactor: 0.8]) {
+          if let jpegData = bitmapImage.representation(
+            using: .jpeg, properties: [.compressionFactor: 0.8])
+          {
             imageData = jpegData
           }
         }

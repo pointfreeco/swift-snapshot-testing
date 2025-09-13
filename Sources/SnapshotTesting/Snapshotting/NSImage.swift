@@ -31,7 +31,10 @@
         let newAttachment = DualAttachment(image: new, name: "failure")
         let differenceAttachment = DualAttachment(image: difference, name: "difference")
 
-        let xctAttachments = [oldAttachment.xctAttachment, newAttachment.xctAttachment, differenceAttachment.xctAttachment]
+        let xctAttachments = [
+          oldAttachment.xctAttachment, newAttachment.xctAttachment,
+          differenceAttachment.xctAttachment,
+        ]
         let dualAttachments = [oldAttachment, newAttachment, differenceAttachment]
 
         // Store DualAttachments for later retrieval
