@@ -26,21 +26,22 @@
         else { return nil }
         let difference = SnapshotTesting.diff(old, new)
 
-        // Create DualAttachments that work with both XCTest and Swift Testing
-        let oldAttachment = DualAttachment(image: old, name: "reference")
-        let newAttachment = DualAttachment(image: new, name: "failure")
-        let differenceAttachment = DualAttachment(image: difference, name: "difference")
+        let oldData = NSImagePNGRepresentation(old) ?? Data()
+        let oldAttachment = XCTAttachment(image: old)
+        oldAttachment.name = "reference"
+        oldAttachment.userInfo = ["imageData": oldData]
 
-        let xctAttachments = [
-          oldAttachment.xctAttachment, newAttachment.xctAttachment,
-          differenceAttachment.xctAttachment,
-        ]
-        let dualAttachments = [oldAttachment, newAttachment, differenceAttachment]
+        let newData = NSImagePNGRepresentation(new) ?? Data()
+        let newAttachment = XCTAttachment(image: new)
+        newAttachment.name = "failure"
+        newAttachment.userInfo = ["imageData": newData]
 
-        // Store DualAttachments for later retrieval
-        AttachmentStorage.store(dualAttachments, for: xctAttachments)
+        let differenceData = NSImagePNGRepresentation(difference) ?? Data()
+        let differenceAttachment = XCTAttachment(image: difference)
+        differenceAttachment.name = "difference"
+        differenceAttachment.userInfo = ["imageData": differenceData]
 
-        return (message, xctAttachments)
+        return (message, [oldAttachment, newAttachment, differenceAttachment])
       }
     }
   }

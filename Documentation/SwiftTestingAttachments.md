@@ -16,8 +16,6 @@ Starting with Swift 6.2 and Xcode 26, swift-snapshot-testing now supports attach
 
 When a snapshot test fails under Swift Testing:
 
-When a snapshot test fails under Swift Testing:
-
 ### Image snapshots
 
 Three attachments are created:

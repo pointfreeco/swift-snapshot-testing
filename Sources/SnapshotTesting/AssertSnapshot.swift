@@ -474,21 +474,19 @@ public func verifySnapshot<Value, Format>(
         #if !os(Linux) && !os(Android) && !os(Windows)
           if isSwiftTesting {
             #if canImport(Testing) && compiler(>=6.2)
-              // Use Swift Testing's Attachment API for failure diffs
               if Test.current != nil {
-                // Retrieve DualAttachments that were stored during diff creation
-                if let dualAttachments = AttachmentStorage.retrieve(for: attachments) {
-                  // Record each DualAttachment using Swift Testing API
-                  for dualAttachment in dualAttachments {
-                    dualAttachment.record(
+                for attachment in attachments {
+                  if let userInfo = attachment.userInfo,
+                     let imageData = userInfo["imageData"] as? Data {
+                    STAttachments.record(
+                      imageData,
+                      named: attachment.name,
                       fileID: fileID,
                       filePath: filePath,
                       line: line,
                       column: column
                     )
                   }
-                  // Clear the storage after recording
-                  AttachmentStorage.clear(for: attachments)
                 }
               }
             #endif

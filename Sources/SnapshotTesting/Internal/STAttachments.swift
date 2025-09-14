@@ -41,7 +41,6 @@ internal enum STAttachments {
       line: UInt,
       column: UInt
     ) {
-      // No-op when Swift Testing is not available
     }
   #endif
 }
