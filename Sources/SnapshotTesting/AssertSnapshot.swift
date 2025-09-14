@@ -482,26 +482,24 @@ public func verifySnapshot<Value, Format>(
       if !attachments.isEmpty {
         #if !os(Linux) && !os(Android) && !os(Windows)
           if isSwiftTesting {
-            #if canImport(Testing)
+            #if canImport(Testing) && compiler(>=6.2)
               // Use Swift Testing's Attachment API for failure diffs
-              #if compiler(>=6.2)
-                if Test.current != nil {
-                  // Retrieve DualAttachments that were stored during diff creation
-                  if let dualAttachments = AttachmentStorage.retrieve(for: attachments) {
-                    // Record each DualAttachment using Swift Testing API
-                    for dualAttachment in dualAttachments {
-                      dualAttachment.record(
-                        fileID: fileID,
-                        filePath: filePath,
-                        line: line,
-                        column: column
-                      )
-                    }
-                    // Clear the storage after recording
-                    AttachmentStorage.clear(for: attachments)
+              if Test.current != nil {
+                // Retrieve DualAttachments that were stored during diff creation
+                if let dualAttachments = AttachmentStorage.retrieve(for: attachments) {
+                  // Record each DualAttachment using Swift Testing API
+                  for dualAttachment in dualAttachments {
+                    dualAttachment.record(
+                      fileID: fileID,
+                      filePath: filePath,
+                      line: line,
+                      column: column
+                    )
                   }
+                  // Clear the storage after recording
+                  AttachmentStorage.clear(for: attachments)
                 }
-              #endif
+              }
             #endif
           } else if ProcessInfo.processInfo.environment.keys.contains(
             "__XCODE_BUILT_PRODUCTS_DIR_PATHS")
