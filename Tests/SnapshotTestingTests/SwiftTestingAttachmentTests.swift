@@ -1,4 +1,4 @@
-#if compiler(>=6) && canImport(Testing)
+#if compiler(>=6.2) && canImport(Testing)
   import Testing
   import SnapshotTesting
   @testable import SnapshotTesting

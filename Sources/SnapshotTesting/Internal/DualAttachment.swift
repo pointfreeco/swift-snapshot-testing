@@ -1,12 +1,11 @@
 import Foundation
-import XCTest
 
-#if canImport(Testing)
-  import Testing
-#endif
+#if !os(Linux) && !os(Android) && !os(Windows) && canImport(XCTest)
+  import XCTest
 
-/// A wrapper that holds both XCTAttachment and the raw data for Swift Testing
-internal struct DualAttachment {
+  /// A wrapper that holds both XCTAttachment and the raw data for Swift Testing
+  internal struct DualAttachment {
+  let id: UUID
   let xctAttachment: XCTAttachment
   let data: Data
   let uniformTypeIdentifier: String?
@@ -17,6 +16,7 @@ internal struct DualAttachment {
     uniformTypeIdentifier: String? = nil,
     name: String? = nil
   ) {
+    self.id = UUID()
     self.data = data
     self.uniformTypeIdentifier = uniformTypeIdentifier
     self.name = name
@@ -40,20 +40,11 @@ internal struct DualAttachment {
 
   #if os(iOS) || os(tvOS)
     init(image: UIImage, name: String? = nil) {
-      var imageData: Data?
+      // Always use PNG for stable, deterministic diffs
+      let imageData = image.pngData() ?? Data()
 
-      // Try PNG first
-      imageData = image.pngData()
-
-      // If image is too large (>10MB), try JPEG compression
-      if let data = imageData, data.count > 10_485_760 {
-        if let jpegData = image.jpegData(compressionQuality: 0.8) {
-          imageData = jpegData
-        }
-      }
-
-      let finalData = imageData ?? Data()
-      self.data = finalData
+      self.id = UUID()
+      self.data = imageData
       self.uniformTypeIdentifier = "public.png"
       self.name = name
 
@@ -63,26 +54,18 @@ internal struct DualAttachment {
     }
   #elseif os(macOS)
     init(image: NSImage, name: String? = nil) {
-      var imageData: Data?
+      // Always use PNG for stable, deterministic diffs
+      var imageData = Data()
 
-      // Convert NSImage to Data
+      // Convert NSImage to PNG Data
       if let tiffData = image.tiffRepresentation,
         let bitmapImage = NSBitmapImageRep(data: tiffData)
       {
-        imageData = bitmapImage.representation(using: .png, properties: [:])
-
-        // If image is too large (>10MB), try JPEG compression
-        if let data = imageData, data.count > 10_485_760 {
-          if let jpegData = bitmapImage.representation(
-            using: .jpeg, properties: [.compressionFactor: 0.8])
-          {
-            imageData = jpegData
-          }
-        }
+        imageData = bitmapImage.representation(using: .png, properties: [:]) ?? Data()
       }
 
-      let finalData = imageData ?? Data()
-      self.data = finalData
+      self.id = UUID()
+      self.data = imageData
       self.uniformTypeIdentifier = "public.png"
       self.name = name
 
@@ -99,36 +82,29 @@ internal struct DualAttachment {
     line: UInt,
     column: UInt
   ) {
-    #if canImport(Testing) && compiler(>=6.2)
-      // Only record if we're in a Swift Testing context
-      guard Test.current != nil else { return }
-
-      // Use Swift Testing's Attachment API
-      Attachment.record(
-        data,
-        named: name,
-        sourceLocation: SourceLocation(
-          fileID: fileID.description,
-          filePath: filePath.description,
-          line: Int(line),
-          column: Int(column)
-        )
-      )
-    #endif
+    STAttachments.record(
+      data,
+      named: name,
+      fileID: fileID,
+      filePath: filePath,
+      line: line,
+      column: column
+    )
+    }
   }
-}
 
-// Helper to convert arrays
-extension Array where Element == XCTAttachment {
-  func toDualAttachments() -> [DualAttachment] {
-    // We can't extract data from existing XCTAttachments,
-    // so this is mainly for migration purposes
-    return []
+  // Helper to convert arrays
+  extension Array where Element == XCTAttachment {
+    func toDualAttachments() -> [DualAttachment] {
+      // We can't extract data from existing XCTAttachments,
+      // so this is mainly for migration purposes
+      return []
+    }
   }
-}
 
-extension Array where Element == DualAttachment {
-  func toXCTAttachments() -> [XCTAttachment] {
-    return self.map { $0.xctAttachment }
+  extension Array where Element == DualAttachment {
+    func toXCTAttachments() -> [XCTAttachment] {
+      return self.map { $0.xctAttachment }
+    }
   }
-}
+#endif
