@@ -30,9 +30,8 @@ One attachment is created:
 
 ## Implementation details
 
-The implementation uses a dual-attachment system:
-- `DualAttachment` stores both the raw data and an `XCTAttachment`
-- When running under Swift Testing, it calls `Attachment.record()` with the raw data
+The implementation uses XCTAttachment's userInfo to store image data:
+- When running under Swift Testing, it extracts the image data from userInfo and records it via `STAttachments.record()`
 - When running under XCTest, it uses the traditional `XCTAttachment` approach
 - This ensures backward compatibility while adding new functionality
 
@@ -47,12 +46,6 @@ The implementation uses a dual-attachment system:
 - Attachments are saved to the `.xcresult` bundle
 - Extract with: `xcrun xcresulttool get --path Test.xcresult --id <attachment-id>`
 - Or open the `.xcresult` file directly in Xcode
-
-## Performance considerations
-
-- Large images (>10MB) are automatically compressed using JPEG to reduce storage
-- Attachments are only created on test failure (not on success)
-- Thread-safe storage ensures no race conditions in parallel test execution
 
 ## Example usage
 
