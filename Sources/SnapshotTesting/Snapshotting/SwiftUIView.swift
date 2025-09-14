@@ -54,7 +54,7 @@
         #endif
         case .sizeThatFits:
           config = .init(safeArea: .zero, size: nil, traits: traits)
-        case .fixed(width: let width, height: let height):
+        case .fixed(let width, let height):
           let size = CGSize(width: width, height: height)
           config = .init(safeArea: .zero, size: size, traits: traits)
         }

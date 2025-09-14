@@ -206,7 +206,7 @@ final class SnapshotTestingTests: BaseTestCase {
       button.bezelStyle = .rounded
       button.title = "Push Me"
       button.sizeToFit()
-      // Skip snapshot tests in Xcode 16+ due to NSButton rendering changes
+      // Skip snapshot tests in Xcode 26+ (Swift 6.2+) due to NSButton rendering changes
       // See: https://github.com/pointfreeco/swift-snapshot-testing/issues/1020
       #if compiler(<6.2)
         if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
@@ -248,7 +248,7 @@ final class SnapshotTestingTests: BaseTestCase {
         label.isBezeled = false
         label.isEditable = false
       #endif
-      // Skip snapshot tests in Xcode 16+ due to rendering changes
+      // Skip snapshot tests in Xcode 26+ (Swift 6.2+) due to rendering changes
       // See: https://github.com/pointfreeco/swift-snapshot-testing/issues/1020
       #if compiler(<6.2)
         if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {

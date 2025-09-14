@@ -477,7 +477,8 @@ public func verifySnapshot<Value, Format>(
               if Test.current != nil {
                 for attachment in attachments {
                   if let userInfo = attachment.userInfo,
-                     let imageData = userInfo["imageData"] as? Data {
+                    let imageData = userInfo["imageData"] as? Data
+                  {
                     STAttachments.record(
                       imageData,
                       named: attachment.name,

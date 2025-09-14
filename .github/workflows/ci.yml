@@ -15,9 +15,12 @@ jobs:
         xcode:
           - 15.4
           - '16.1'
+        include:
+          - xcode: '26.0'
+            os: macos-15
 
-    name: macOS
-    runs-on: macos-14
+    name: macOS (Xcode ${{ matrix.xcode }})
+    runs-on: ${{ matrix.os || 'macos-14' }}
     steps:
       - uses: actions/checkout@v3
       - name: Select Xcode ${{ matrix.xcode }}
