@@ -36,25 +36,17 @@
             old, new, precision: precision, perceptualPrecision: perceptualPrecision)
         else { return nil }
         let difference = SnapshotTesting.diff(old, new)
-
-        let oldData = old.pngData() ?? Data()
         let oldAttachment = XCTAttachment(image: old)
         oldAttachment.name = "reference"
-        oldAttachment.userInfo = ["imageData": oldData]
-
         let isEmptyImage = new.size == .zero
-        let actualNew = isEmptyImage ? emptyImage() : new
-        let newData = actualNew.pngData() ?? Data()
-        let newAttachment = XCTAttachment(image: actualNew)
+        let newAttachment = XCTAttachment(image: isEmptyImage ? emptyImage() : new)
         newAttachment.name = "failure"
-        newAttachment.userInfo = ["imageData": newData]
-
-        let differenceData = difference.pngData() ?? Data()
         let differenceAttachment = XCTAttachment(image: difference)
         differenceAttachment.name = "difference"
-        differenceAttachment.userInfo = ["imageData": differenceData]
-
-        return (message, [oldAttachment, newAttachment, differenceAttachment])
+        return (
+          message,
+          [oldAttachment, newAttachment, differenceAttachment]
+        )
       }
     }
 

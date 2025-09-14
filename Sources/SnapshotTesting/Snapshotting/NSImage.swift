@@ -25,23 +25,16 @@
             old, new, precision: precision, perceptualPrecision: perceptualPrecision)
         else { return nil }
         let difference = SnapshotTesting.diff(old, new)
-
-        let oldData = NSImagePNGRepresentation(old) ?? Data()
         let oldAttachment = XCTAttachment(image: old)
         oldAttachment.name = "reference"
-        oldAttachment.userInfo = ["imageData": oldData]
-
-        let newData = NSImagePNGRepresentation(new) ?? Data()
         let newAttachment = XCTAttachment(image: new)
         newAttachment.name = "failure"
-        newAttachment.userInfo = ["imageData": newData]
-
-        let differenceData = NSImagePNGRepresentation(difference) ?? Data()
         let differenceAttachment = XCTAttachment(image: difference)
         differenceAttachment.name = "difference"
-        differenceAttachment.userInfo = ["imageData": differenceData]
-
-        return (message, [oldAttachment, newAttachment, differenceAttachment])
+        return (
+          message,
+          [oldAttachment, newAttachment, differenceAttachment]
+        )
       }
     }
   }
