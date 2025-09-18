@@ -29,7 +29,14 @@
 
       return Diffing(
         toData: { $0.pngData() ?? emptyImage().pngData()! },
-        fromData: { UIImage(data: $0, scale: imageScale)! }
+        fromData: {
+            guard let image = UIImage(data: $0, scale: imageScale) else {
+                fatalError(
+                    "Unable to load image from data on file for snapshot diffing. Check the contents of the image file. Projects using `git lfs` for file storage may need to run `git lfs pull`."
+                )
+            }
+            return image
+        }
       ) { old, new in
         guard
           let message = compare(
