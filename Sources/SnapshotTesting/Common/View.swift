@@ -926,6 +926,48 @@
       }
     }
 
+//<<<<<<< HEAD
+//  if size.width == 0 || size.height == 0 {
+//    // Try to call sizeToFit() if the view still has invalid size
+//    view.sizeToFit()
+//    view.setNeedsLayout()
+//    view.layoutIfNeeded()
+//  }
+//
+//  return dispose
+//}
+//
+//func snapshotView(
+//  config: ViewImageConfig,
+//  drawHierarchyInKeyWindow: Bool,
+//  traits: UITraitCollection,
+//  view: UIView,
+//  viewController: UIViewController,
+//  delay: Double? = nil
+//  )
+//  -> Async<UIImage> {
+//    let initialFrame = view.frame
+//    let dispose = prepareView(
+//      config: config,
+//      drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+//      traits: traits,
+//      view: view,
+//      viewController: viewController
+//    )
+//    // NB: Avoid safe area influence.
+//    if config.safeArea == .zero { view.frame.origin = .init(x: offscreen, y: offscreen) }
+//
+//    return (view.snapshot ?? Async { callback in
+//      addImagesForRenderedViews(view).sequence().delay(by: delay).run { views in
+//        callback(
+//          renderer(bounds: view.bounds, for: traits).image { ctx in
+//            if drawHierarchyInKeyWindow {
+//              view.drawHierarchy(in: view.bounds, afterScreenUpdates: true)
+//            } else {
+//              view.layer.render(in: ctx.cgContext)
+//            }
+//          }
+//=======
     func prepareView(
       config: ViewImageConfig,
       drawHierarchyInKeyWindow: Bool,
@@ -970,7 +1012,8 @@
       drawHierarchyInKeyWindow: Bool,
       traits: UITraitCollection,
       view: UIView,
-      viewController: UIViewController
+      viewController: UIViewController,
+      delay: Double? = nil
     )
       -> Async<UIImage>
     {
@@ -988,7 +1031,7 @@
       return
         (view.snapshot
         ?? Async { callback in
-          addImagesForRenderedViews(view).sequence().run { views in
+          addImagesForRenderedViews(view).sequence().delay(by: delay).run { views in
             callback(
               renderer(bounds: view.bounds, for: traits).image { ctx in
                 if drawHierarchyInKeyWindow {
