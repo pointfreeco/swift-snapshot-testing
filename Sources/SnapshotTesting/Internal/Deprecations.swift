@@ -94,7 +94,7 @@ public func _verifyInlineSnapshot<Value>(
     let trimmedReference = reference.trimmingCharacters(in: .whitespacesAndNewlines)
 
     // Always perform diff, and return early on success!
-    guard let (failure, attachments) = snapshotting.diffing.diff(trimmedReference, diffable) else {
+    guard let (failure, attachments, diffValue) = snapshotting.diffing.diff(trimmedReference, diffable) else {
       return nil
     }
 
