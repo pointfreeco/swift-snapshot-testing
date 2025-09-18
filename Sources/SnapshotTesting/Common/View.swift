@@ -289,6 +289,53 @@
             safeArea: .init(top: 20, left: 0, bottom: 0, right: 0), size: size, traits: traits)
         }
 
+        public static let iPadMini6thGen = ViewImageConfig.iPadMini6thGen(.landscape)
+
+        public static func iPadMini6thGen(_ orientation: Orientation) -> ViewImageConfig {
+          switch orientation {
+          case .landscape:
+            return ViewImageConfig.iPadMini6thGen(.landscape(splitView: .full))
+          case .portrait:
+            return ViewImageConfig.iPadMini6thGen(.portrait(splitView: .full))
+          }
+        }
+
+        public static func iPadMini6thGen(_ orientation: TabletOrientation) -> ViewImageConfig {
+          let size: CGSize
+          let traits: UITraitCollection
+          switch orientation {
+          case .landscape(let splitView):
+            switch splitView {
+            case .oneThird:
+              size = .init(width: 375, height: 744)
+              traits = .iPadMini6thGen_Compact_SplitView
+            case .oneHalf:
+              size = .init(width: 561.5, height: 744)
+              traits = .iPadMini6thGen_Compact_SplitView
+            case .twoThirds:
+              size = .init(width: 748, height: 744)
+              traits = .iPadMini6thGen
+            case .full:
+              size = .init(width: 1133, height: 744)
+              traits = .iPadMini6thGen
+            }
+          case .portrait(let splitView):
+            switch splitView {
+            case .oneThird:
+              size = .init(width: 320, height: 1133)
+              traits = .iPadMini6thGen_Compact_SplitView
+            case .twoThirds:
+              size = .init(width: 414, height: 1133)
+              traits = .iPadMini6thGen_Compact_SplitView
+            case .full:
+              size = .init(width: 744, height: 1133)
+              traits = .iPadMini6thGen
+            }
+          }
+          return .init(
+            safeArea: .init(top: 24, left: 0, bottom: 20, right: 0), size: size, traits: traits)
+        }
+
         public static let iPad9_7 = iPadMini
 
         public static func iPad9_7(_ orientation: Orientation) -> ViewImageConfig {
@@ -775,6 +822,8 @@
 
         public static let iPadMini = iPad
         public static let iPadMini_Compact_SplitView = iPadCompactSplitView
+        public static let iPadMini6thGen = iPad
+        public static let iPadMini6thGen_Compact_SplitView = iPadCompactSplitView
         public static let iPad9_7 = iPad
         public static let iPad9_7_Compact_SplitView = iPadCompactSplitView
         public static let iPad10_2 = iPad
