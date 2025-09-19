@@ -12,17 +12,16 @@ jobs:
   macos:
     strategy:
       matrix:
-        xcode:
-          - 15.4
-          - '16.1'
         include:
-          - xcode: '26.0'
+          - xcode: '16.4'
             os: macos-15
+          - xcode: '26.0'
+            os: macos-26
 
     name: macOS (Xcode ${{ matrix.xcode }})
-    runs-on: ${{ matrix.os || 'macos-14' }}
+    runs-on: ${{ matrix.os || 'macos-15' }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Select Xcode ${{ matrix.xcode }}
         run: sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode }}.app
       - name: Run tests
@@ -32,7 +31,7 @@ jobs:
     strategy:
       matrix:
         swift:
-          - '5.9'
+          - '6.1'
 
     container: swift:${{ matrix.swift }}
     name: Linux (Swift ${{ matrix.swift }})
@@ -40,30 +39,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: swift test
-
-  # windows:
-  #   strategy:
-  #     matrix:
-  #       swift:
-  #         - "5.9.1"
-
-  #   name: Windows (Swift ${{ matrix.swift }})
-  #   runs-on: windows-latest
-
-  #   steps:
-  #     - uses: compnerd/gha-setup-swift@main
-  #       with:
-  #         branch: swift-${{ matrix.swift }}-release
-  #         tag: ${{ matrix.swift }}-RELEASE
-
-  #     - name: Set git to use LF
-  #       run: |
-  #         git config --global core.autocrlf false
-  #         git config --global core.eol lf
-
-  #     - uses: actions/checkout@v4
-  #     - run: swift build
-  #     - run: swift test
 
   android:
     strategy:
