@@ -370,8 +370,23 @@ public func verifySnapshot<Value, Format>(
         }
 
         #if !os(Android) && !os(Linux) && !os(Windows)
-          if !isSwiftTesting,
-            ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS")
+          if isSwiftTesting {
+            let attachmentData: Data
+            if writeToDisk {
+              attachmentData = (try? Data(contentsOf: snapshotFileUrl)) ?? snapshotData
+            } else {
+              attachmentData = snapshotData
+            }
+            STAttachments.record(
+              attachmentData,
+              named: snapshotFileUrl.lastPathComponent,
+              fileID: fileID,
+              filePath: filePath,
+              line: line,
+              column: column
+            )
+          } else if ProcessInfo.processInfo.environment.keys.contains(
+            "__XCODE_BUILT_PRODUCTS_DIR_PATHS")
           {
             XCTContext.runActivity(named: "Attached Recorded Snapshot") { activity in
               if writeToDisk {
@@ -457,8 +472,27 @@ public func verifySnapshot<Value, Format>(
 
       if !attachments.isEmpty {
         #if !os(Linux) && !os(Android) && !os(Windows)
-          if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS"),
-            !isSwiftTesting
+          if isSwiftTesting {
+            #if canImport(Testing) && compiler(>=6.2)
+              if Test.current != nil {
+                for attachment in attachments {
+                  if let userInfo = attachment.userInfo,
+                    let imageData = userInfo["imageData"] as? Data
+                  {
+                    STAttachments.record(
+                      imageData,
+                      named: attachment.name,
+                      fileID: fileID,
+                      filePath: filePath,
+                      line: line,
+                      column: column
+                    )
+                  }
+                }
+              }
+            #endif
+          } else if ProcessInfo.processInfo.environment.keys.contains(
+            "__XCODE_BUILT_PRODUCTS_DIR_PATHS")
           {
             XCTContext.runActivity(named: "Attached Failure Diff") { activity in
               attachments.forEach {
