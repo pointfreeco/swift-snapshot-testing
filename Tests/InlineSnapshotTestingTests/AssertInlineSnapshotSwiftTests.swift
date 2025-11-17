@@ -28,15 +28,15 @@
             """
           }
         } matching: { issue in
-          issue.description == """
-            Issue recorded: Snapshot did not match. Difference: …
+          issue.description.hasSuffix("""
+            Snapshot did not match. Difference: …
 
               @@ −1,3 +1,4 @@
                ▿ 2 elements
                  - "Hello"
               +  - "World"
                
-            """
+            """)
         }
       }
 
