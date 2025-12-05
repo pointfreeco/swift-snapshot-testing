@@ -1,4 +1,4 @@
-// swift-tools-version:5.9
+// swift-tools-version:6.0
 
 import PackageDescription
 
@@ -65,5 +65,6 @@ let package = Package(
         .product(name: "CustomDump", package: "swift-custom-dump"),
       ]
     ),
-  ]
+  ],
+  swiftLanguageModes: [.v5]
 )
