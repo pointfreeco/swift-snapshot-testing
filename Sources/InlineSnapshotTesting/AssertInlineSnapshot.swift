@@ -1,5 +1,9 @@
 import Foundation
 
+#if canImport(Testing)
+  import Testing
+#endif
+
 #if canImport(SwiftSyntax509)
   @_spi(Internals) import SnapshotTesting
   import SwiftParser
@@ -340,6 +344,11 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
         writeInlineSnapshots()
       }
     }
+    #if canImport(Testing)
+      if Test.current != nil {
+        return
+      }
+    #endif
     if Thread.isMainThread {
       XCTestObservationCenter.shared.addTestObserver(InlineSnapshotObserver())
     } else {
