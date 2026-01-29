@@ -1,9 +1,5 @@
 import Foundation
 
-#if canImport(Testing)
-  import Testing
-#endif
-
 #if canImport(SwiftSyntax509)
   @_spi(Internals) import SnapshotTesting
   import SwiftParser
