@@ -1076,11 +1076,13 @@
 
     private func getKeyWindow() -> UIWindow? {
       var window: UIWindow?
-      if #available(iOS 15.0, *) {
-        window = UIApplication.sharedIfAvailable?.connectedScenes
-          .compactMap { $0 as? UIWindowScene }
-          .flatMap { $0.windows }
-          .first { $0.isKeyWindow }
+      if #available(iOS 13.0, *),
+        let keyWindow = UIApplication.sharedIfAvailable?.connectedScenes
+          .compactMap({ $0 as? UIWindowScene })
+          .flatMap({ $0.windows })
+          .first(where: { $0.isKeyWindow })
+      {
+        window = keyWindow
       } else if #available(iOS 13.0, *) {
         window = UIApplication.sharedIfAvailable?.windows.first { $0.isKeyWindow }
       } else {
@@ -1097,8 +1099,12 @@
         self.config = config
 
         // Attach to current window scene to ensure consistent safe area behavior
-        let scene = UIApplication.sharedIfAvailable?.connectedScenes.first(where: { $0.activationState == .foregroundActive || $0.activationState == .foregroundInactive })
-        if #available(iOS 13.0, *), let windowScene = scene as? UIWindowScene {
+        if #available(iOS 13.0, *),
+          let scene = UIApplication.sharedIfAvailable?.connectedScenes.first(where: {
+            $0.activationState == .foregroundActive || $0.activationState == .foregroundInactive
+          }),
+          let windowScene = scene as? UIWindowScene
+        {
           super.init(windowScene: windowScene)
           self.frame = .init(origin: .zero, size: size)
         } else {
