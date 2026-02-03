@@ -1076,7 +1076,12 @@
 
     private func getKeyWindow() -> UIWindow? {
       var window: UIWindow?
-      if #available(iOS 13.0, *) {
+      if #available(iOS 15.0, *) {
+        window = UIApplication.sharedIfAvailable?.connectedScenes
+          .compactMap { $0 as? UIWindowScene }
+          .flatMap { $0.windows }
+          .first { $0.isKeyWindow }
+      } else if #available(iOS 13.0, *) {
         window = UIApplication.sharedIfAvailable?.windows.first { $0.isKeyWindow }
       } else {
         window = UIApplication.sharedIfAvailable?.keyWindow
@@ -1090,7 +1095,15 @@
       init(config: ViewImageConfig, viewController: UIViewController) {
         let size = config.size ?? viewController.view.bounds.size
         self.config = config
-        super.init(frame: .init(origin: .zero, size: size))
+
+        // Attach to current window scene to ensure consistent safe area behavior
+        let scene = UIApplication.sharedIfAvailable?.connectedScenes.first(where: { $0.activationState == .foregroundActive || $0.activationState == .foregroundInactive })
+        if #available(iOS 13.0, *), let windowScene = scene as? UIWindowScene {
+          super.init(windowScene: windowScene)
+          self.frame = .init(origin: .zero, size: size)
+        } else {
+          super.init(frame: .init(origin: .zero, size: size))
+        }
 
         // NB: Safe area renders inaccurately for UI{Navigation,TabBar}Controller.
         // Fixes welcome!
