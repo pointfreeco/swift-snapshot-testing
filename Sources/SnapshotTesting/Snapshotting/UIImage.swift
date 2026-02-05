@@ -29,7 +29,7 @@
 
       return Diffing(
         toData: { $0.pngData() ?? emptyImage().pngData()! },
-        fromData: { UIImage(data: $0, scale: imageScale)! }
+        fromData: { UIImage(data: $0, scale: imageScale) }
       ) { old, new in
         guard
           let message = compare(
