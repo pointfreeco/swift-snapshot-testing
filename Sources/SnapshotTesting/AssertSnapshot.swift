@@ -103,7 +103,7 @@ public func assertSnapshot<Value, Format>(
   of value: @autoclosure () throws -> Value,
   as snapshotting: Snapshotting<Value, Format>,
   named name: String? = nil,
-  record recording: Bool? = nil,
+  record: SnapshotTestingConfiguration.Record? = nil,
   timeout: TimeInterval = 5,
   fileID: StaticString = #fileID,
   file filePath: StaticString = #filePath,
@@ -115,7 +115,7 @@ public func assertSnapshot<Value, Format>(
     of: try value(),
     as: snapshotting,
     named: name,
-    record: recording,
+    record: record,
     timeout: timeout,
     fileID: fileID,
     file: filePath,
@@ -154,7 +154,7 @@ public func assertSnapshot<Value, Format>(
 public func assertSnapshots<Value, Format>(
   of value: @autoclosure () throws -> Value,
   as strategies: [String: Snapshotting<Value, Format>],
-  record recording: Bool? = nil,
+  record: SnapshotTestingConfiguration.Record? = nil,
   timeout: TimeInterval = 5,
   fileID: StaticString = #fileID,
   file filePath: StaticString = #filePath,
@@ -167,7 +167,7 @@ public func assertSnapshots<Value, Format>(
       of: try value(),
       as: strategy,
       named: name,
-      record: recording,
+      record: record,
       timeout: timeout,
       fileID: fileID,
       file: filePath,
@@ -198,7 +198,7 @@ public func assertSnapshots<Value, Format>(
 public func assertSnapshots<Value, Format>(
   of value: @autoclosure () throws -> Value,
   as strategies: [Snapshotting<Value, Format>],
-  record recording: Bool? = nil,
+  record: SnapshotTestingConfiguration.Record? = nil,
   timeout: TimeInterval = 5,
   fileID: StaticString = #fileID,
   file filePath: StaticString = #filePath,
@@ -210,7 +210,7 @@ public func assertSnapshots<Value, Format>(
     assertSnapshot(
       of: try value(),
       as: strategy,
-      record: recording,
+      record: record,
       timeout: timeout,
       fileID: fileID,
       file: filePath,
@@ -276,7 +276,7 @@ public func verifySnapshot<Value, Format>(
   of value: @autoclosure () throws -> Value,
   as snapshotting: Snapshotting<Value, Format>,
   named name: String? = nil,
-  record recording: Bool? = nil,
+  record: SnapshotTestingConfiguration.Record? = nil,
   snapshotDirectory: String? = nil,
   timeout: TimeInterval = 5,
   fileID: StaticString = #fileID,
@@ -293,10 +293,7 @@ public func verifySnapshot<Value, Format>(
     CleanCounterBetweenTestCases.registerIfNeeded()
   #endif
 
-  let record =
-    (recording == true ? .all : recording == false ? .missing : nil)
-    ?? SnapshotTestingConfiguration.current?.record
-    ?? _record
+  let record = record ?? SnapshotTestingConfiguration.current?.record ?? _record
   return withSnapshotTesting(record: record) { () -> String? in
     do {
       let fileUrl = URL(fileURLWithPath: "\(filePath)", isDirectory: false)
