@@ -87,7 +87,7 @@ public var __record: SnapshotTestingConfiguration.Record = {
 ///   - value: A value to compare against a reference.
 ///   - snapshotting: A strategy for serializing, deserializing, and comparing values.
 ///   - name: An optional description of the snapshot.
-///   - recording: Whether or not to record a new reference.
+///   - record: The record mode to use while asserting snapshots.
 ///   - timeout: The amount of time a snapshot must be generated in.
 ///   - fileID: The file ID in which failure occurred. Defaults to the file ID of the test case in
 ///     which this function was called.
@@ -139,7 +139,7 @@ public func assertSnapshot<Value, Format>(
 ///   - value: A value to compare against a reference.
 ///   - strategies: A dictionary of names and strategies for serializing, deserializing, and
 ///     comparing values.
-///   - recording: Whether or not to record a new reference.
+///   - recording: The record mode to use while asserting snapshots.
 ///   - timeout: The amount of time a snapshot must be generated in.
 ///   - fileID: The file ID in which failure occurred. Defaults to the file ID of the test case in
 ///     which this function was called.
@@ -183,7 +183,7 @@ public func assertSnapshots<Value, Format>(
 /// - Parameters:
 ///   - value: A value to compare against a reference.
 ///   - strategies: An array of strategies for serializing, deserializing, and comparing values.
-///   - recording: Whether or not to record a new reference.
+///   - record: The record mode to use while asserting snapshots.
 ///   - timeout: The amount of time a snapshot must be generated in.
 ///   - fileID: The file ID in which failure occurred. Defaults to the file ID of the test case in
 ///     which this function was called.
@@ -233,7 +233,7 @@ public func assertSnapshots<Value, Format>(
 ///   of value: @autoclosure () throws -> Value,
 ///   as snapshotting: Snapshotting<Value, Format>,
 ///   named name: String? = nil,
-///   record recording: Bool = false,
+///   record: SnapshotTestingConfiguration.Record? = nil,
 ///   timeout: TimeInterval = 5,
 ///   file: StaticString = #file,
 ///   testName: String = #function,
@@ -245,7 +245,7 @@ public func assertSnapshots<Value, Format>(
 ///       of: value,
 ///       as: snapshotting,
 ///       named: name,
-///       record: recording,
+///       record: record,
 ///       snapshotDirectory: snapshotDirectory,
 ///       timeout: timeout,
 ///       file: file,
@@ -260,7 +260,7 @@ public func assertSnapshots<Value, Format>(
 ///   - value: A value to compare against a reference.
 ///   - snapshotting: A strategy for serializing, deserializing, and comparing values.
 ///   - name: An optional description of the snapshot.
-///   - recording: Whether or not to record a new reference.
+///   - record: The record mode to use while asserting snapshots.
 ///   - snapshotDirectory: Optional directory to save snapshots. By default snapshots will be saved
 ///     in a directory with the same name as the test file, and that directory will sit inside a
 ///     directory `__Snapshots__` that sits next to your test file.
