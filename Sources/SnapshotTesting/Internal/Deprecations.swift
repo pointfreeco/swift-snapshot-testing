@@ -1,6 +1,137 @@
 import Foundation
 import XCTest
 
+// Deprecated after 1.18.9:
+
+@available(
+  *, deprecated,
+  message: "Use overload with 'record: SnapshotTestingConfiguration.Record?'"
+)
+@_disfavoredOverload
+public func assertSnapshot<Value, Format>(
+  of value: @autoclosure () throws -> Value,
+  as snapshotting: Snapshotting<Value, Format>,
+  named name: String? = nil,
+  record recording: Bool? = nil,
+  timeout: TimeInterval = 5,
+  fileID: StaticString = #fileID,
+  file filePath: StaticString = #filePath,
+  testName: String = #function,
+  line: UInt = #line,
+  column: UInt = #column
+) {
+  assertSnapshot(
+    of: try value(),
+    as: snapshotting,
+    named: name,
+    record: SnapshotTestingConfiguration.Record(recording),
+    timeout: timeout,
+    fileID: fileID,
+    file: filePath,
+    testName: testName,
+    line: line,
+    column: column
+  )
+}
+
+@available(
+  *, deprecated,
+  message: "Use overload with 'record: SnapshotTestingConfiguration.Record?'"
+)
+@_disfavoredOverload
+public func assertSnapshots<Value, Format>(
+  of value: @autoclosure () throws -> Value,
+  as strategies: [String: Snapshotting<Value, Format>],
+  record recording: Bool? = nil,
+  timeout: TimeInterval = 5,
+  fileID: StaticString = #fileID,
+  file filePath: StaticString = #filePath,
+  testName: String = #function,
+  line: UInt = #line,
+  column: UInt = #column
+) {
+  assertSnapshots(
+    of: try value(),
+    as: strategies,
+    record: SnapshotTestingConfiguration.Record(recording),
+    timeout: timeout,
+    fileID: fileID,
+    file: filePath,
+    testName: testName,
+    line: line,
+    column: column
+  )
+}
+
+@available(
+  *, deprecated,
+  message: "Use overload with 'record: SnapshotTestingConfiguration.Record?'"
+)
+@_disfavoredOverload
+public func assertSnapshots<Value, Format>(
+  of value: @autoclosure () throws -> Value,
+  as strategies: [Snapshotting<Value, Format>],
+  record recording: Bool? = nil,
+  timeout: TimeInterval = 5,
+  fileID: StaticString = #fileID,
+  file filePath: StaticString = #filePath,
+  testName: String = #function,
+  line: UInt = #line,
+  column: UInt = #column
+) {
+  assertSnapshots(
+    of: try value(),
+    as: strategies,
+    record: SnapshotTestingConfiguration.Record(recording),
+    timeout: timeout,
+    fileID: fileID,
+    file: filePath,
+    testName: testName,
+    line: line,
+    column: column
+  )
+}
+
+@available(
+  *, deprecated,
+  message: "Use overload with 'record: SnapshotTestingConfiguration.Record?'"
+)
+@_disfavoredOverload
+public func verifySnapshot<Value, Format>(
+  of value: @autoclosure () throws -> Value,
+  as snapshotting: Snapshotting<Value, Format>,
+  named name: String? = nil,
+  record recording: Bool? = nil,
+  snapshotDirectory: String? = nil,
+  timeout: TimeInterval = 5,
+  fileID: StaticString = #fileID,
+  file filePath: StaticString = #file,
+  testName: String = #function,
+  line: UInt = #line,
+  column: UInt = #column
+) -> String? {
+  verifySnapshot(
+    of: try value(),
+    as: snapshotting,
+    named: name,
+    record: SnapshotTestingConfiguration.Record(recording),
+    snapshotDirectory: snapshotDirectory,
+    timeout: timeout,
+    fileID: fileID,
+    file: filePath,
+    testName: testName,
+    line: line,
+    column: column
+  )
+}
+
+extension SnapshotTestingConfiguration.Record {
+  fileprivate init?(_ recording: Bool?) {
+    guard let recording else { return nil }
+    self = recording ? .all : .missing
+  }
+}
+
 // Deprecated after 1.12.0:
 
 @available(
@@ -410,7 +541,7 @@ public func verifySnapshot<Value, Format>(
     of: try value(),
     as: snapshotting,
     named: name,
-    record: recording,
+    record: SnapshotTestingConfiguration.Record(recording),
     snapshotDirectory: snapshotDirectory,
     timeout: timeout,
     file: file,
