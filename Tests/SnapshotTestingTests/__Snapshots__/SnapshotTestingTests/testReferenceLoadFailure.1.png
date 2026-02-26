@@ -1,0 +1,8 @@
+version https://git-lfs.github.com/spec/v1
+ <<<<<<< HEAD
+ oid sha256:8f57480096cbd8332496c9465c72eeeab707c5a422152fbd78b9148abb9b112b
+ size 1047456
+ =======
+ oid sha256:0a2ebbcfe842520876e53c1483ea7aa4738ba49177c67a707a3a6b4ac9197c26
+ size 1051011
+ >>>>>>> 6a3fb3bd2 (my-branch-name)

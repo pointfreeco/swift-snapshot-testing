@@ -426,7 +426,9 @@ public func verifySnapshot<Value, Format>(
       }
 
       let data = try Data(contentsOf: snapshotFileUrl)
-      let reference = snapshotting.diffing.fromData(data)
+      guard let reference = snapshotting.diffing.fromData(data) else {
+        return "Failed to serialize \(snapshotFileUrl) as \(Format.self)"
+      }
 
       #if os(iOS) || os(tvOS)
         // If the image generation fails for the diffable part and the reference was empty, use the reference
