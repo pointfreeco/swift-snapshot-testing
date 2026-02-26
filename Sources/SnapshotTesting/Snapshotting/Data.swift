@@ -12,7 +12,7 @@ extension Snapshotting where Value == Data, Format == Data {
           old.count == new.count
           ? "Expected data to match"
           : "Expected \(new) to match \(old)"
-        return (message, [])
+        return (message, [], nil)
       }
     )
   }
