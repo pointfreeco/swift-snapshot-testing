@@ -61,7 +61,7 @@
     }
   }
 
-  private func NSImagePNGRepresentation(_ image: NSImage) -> Data? {
+  internal func NSImagePNGRepresentation(_ image: NSImage) -> Data? {
     guard let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
       return nil
     }
@@ -155,7 +155,7 @@
     return context
   }
 
-  private func diff(_ old: NSImage, _ new: NSImage) -> NSImage {
+  internal func diff(_ old: NSImage, _ new: NSImage) -> NSImage {
     let oldCiImage = CIImage(cgImage: old.cgImage(forProposedRect: nil, context: nil, hints: nil)!)
     let newCiImage = CIImage(cgImage: new.cgImage(forProposedRect: nil, context: nil, hints: nil)!)
     let differenceFilter = CIFilter(name: "CIDifferenceBlendMode")!

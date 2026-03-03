@@ -178,7 +178,7 @@
     return context
   }
 
-  private func diff(_ old: UIImage, _ new: UIImage) -> UIImage {
+  internal func diff(_ old: UIImage, _ new: UIImage) -> UIImage {
     let width = max(old.size.width, new.size.width)
     let height = max(old.size.height, new.size.height)
     let scale = max(old.scale, new.scale)

@@ -367,8 +367,23 @@ public func verifySnapshot<Value, Format>(
         }
 
         #if !os(Android) && !os(Linux) && !os(Windows)
-          if !isSwiftTesting,
-            ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS")
+          if isSwiftTesting {
+            let attachmentData: Data
+            if writeToDisk {
+              attachmentData = (try? Data(contentsOf: snapshotFileUrl)) ?? snapshotData
+            } else {
+              attachmentData = snapshotData
+            }
+            STAttachments.record(
+              attachmentData,
+              named: snapshotFileUrl.lastPathComponent,
+              fileID: fileID,
+              filePath: filePath,
+              line: line,
+              column: column
+            )
+          } else if ProcessInfo.processInfo.environment.keys.contains(
+            "__XCODE_BUILT_PRODUCTS_DIR_PATHS")
           {
             XCTContext.runActivity(named: "Attached Recorded Snapshot") { activity in
               if writeToDisk {
@@ -454,8 +469,58 @@ public func verifySnapshot<Value, Format>(
 
       if !attachments.isEmpty {
         #if !os(Linux) && !os(Android) && !os(Windows)
-          if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS"),
-            !isSwiftTesting
+          if isSwiftTesting {
+            #if canImport(Testing) && compiler(>=6.2)
+              if Test.current != nil {
+                // XCTAttachment doesn't expose its internal data, so we recreate it from the
+                // source values (reference/diffable) based on the attachment name.
+                for attachment in attachments {
+                  var attachmentData: Data?
+                  var attachmentName: String? = attachment.name
+
+                  switch attachment.name {
+                  case "reference":
+                    attachmentData = snapshotting.diffing.toData(reference)
+                    attachmentName = "reference.\(snapshotting.pathExtension ?? "data")"
+                  case "failure":
+                    attachmentData = snapshotting.diffing.toData(diffable)
+                    attachmentName = "failure.\(snapshotting.pathExtension ?? "data")"
+                  case "difference":
+                    #if os(macOS)
+                      if let oldImage = reference as? NSImage, let newImage = diffable as? NSImage {
+                        attachmentData = SnapshotTesting.NSImagePNGRepresentation(
+                          SnapshotTesting.diff(oldImage, newImage))
+                        attachmentName = "difference.\(snapshotting.pathExtension ?? "png")"
+                      }
+                    #elseif os(iOS) || os(tvOS)
+                      if let oldImage = reference as? UIImage, let newImage = diffable as? UIImage {
+                        attachmentData = SnapshotTesting.diff(oldImage, newImage).pngData()
+                        attachmentName = "difference.\(snapshotting.pathExtension ?? "png")"
+                      }
+                    #endif
+                  default:
+                    // String diffs and other non-image attachments.
+                    attachmentData = Data(failure.utf8)
+                    if attachmentName == nil {
+                      attachmentName = "difference.patch"
+                    }
+                  }
+
+                  if let attachmentData = attachmentData {
+                    STAttachments.record(
+                      attachmentData,
+                      named: attachmentName,
+                      fileID: fileID,
+                      filePath: filePath,
+                      line: line,
+                      column: column
+                    )
+                  }
+                }
+              }
+            #endif
+          } else if ProcessInfo.processInfo.environment.keys.contains(
+            "__XCODE_BUILT_PRODUCTS_DIR_PATHS")
           {
             XCTContext.runActivity(named: "Attached Failure Diff") { activity in
               attachments.forEach {

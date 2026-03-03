@@ -12,11 +12,14 @@ jobs:
   macos:
     strategy:
       matrix:
-        xcode:
-          - '16.4'
+        include:
+          - xcode: '16.4'
+            os: macos-15
+          - xcode: '26.0'
+            os: macos-26
 
-    name: macOS
-    runs-on: macos-15
+    name: macOS (Xcode ${{ matrix.xcode }})
+    runs-on: ${{ matrix.os || 'macos-15' }}
     steps:
       - uses: actions/checkout@v4
       - name: Select Xcode ${{ matrix.xcode }}

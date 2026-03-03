@@ -1,0 +1,7 @@
+▿ TestStruct
+  - name: "Original"
+  ▿ nested: 1 key/value pair
+    ▿ (2 elements)
+      - key: "key"
+      - value: "value"
+  - value: 42
