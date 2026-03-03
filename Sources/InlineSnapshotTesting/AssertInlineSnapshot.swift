@@ -99,17 +99,19 @@ import Foundation
         let expected = expected?()
         func recordSnapshot() {
           // NB: Write snapshot state before calling `XCTFail` in case `continueAfterFailure = false`
-          inlineSnapshotState[File(path: filePath), default: []].append(
-            InlineSnapshot(
-              expected: expected,
-              actual: actual,
-              wasRecording: record == .all || record == .failed,
-              syntaxDescriptor: syntaxDescriptor,
-              function: "\(function)",
-              line: line,
-              column: column
+          inlineSnapshotState.withLock { [actual] in
+            $0[File(path: filePath), default: []].append(
+              InlineSnapshot(
+                expected: expected,
+                actual: actual,
+                wasRecording: record == .all || record == .failed,
+                syntaxDescriptor: syntaxDescriptor,
+                function: "\(function)",
+                line: line,
+                column: column
+              )
             )
-          )
+          }
         }
         guard
           record != .all,
@@ -335,17 +337,8 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
 
 #if canImport(SwiftSyntax509)
   private let installTestObserver: Void = {
-    final class InlineSnapshotObserver: NSObject, XCTestObservation {
-      func testBundleDidFinish(_ testBundle: Bundle) {
-        writeInlineSnapshots()
-      }
-    }
-    if Thread.isMainThread {
-      XCTestObservationCenter.shared.addTestObserver(InlineSnapshotObserver())
-    } else {
-      DispatchQueue.main.sync {
-        XCTestObservationCenter.shared.addTestObserver(InlineSnapshotObserver())
-      }
+    atexit {
+      writeInlineSnapshots()
     }
   }()
 
@@ -369,7 +362,8 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
     public var column: UInt
   }
 
-  @_spi(Internals) public var inlineSnapshotState: [File: [InlineSnapshot]] = [:]
+  @_spi(Internals)
+  public var inlineSnapshotState: LockIsolated<[File: [InlineSnapshot]]> = LockIsolated([:])
 
   private struct TestSource {
     let source: String
@@ -398,29 +392,31 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
   private var testSourceCache: [File: TestSource] = [:]
 
   private func writeInlineSnapshots() {
-    defer { inlineSnapshotState.removeAll() }
-    for (file, snapshots) in inlineSnapshotState {
-      let line = snapshots.first?.line ?? 1
-      guard let testSource = try? testSource(file: file)
-      else {
-        fatalError("Couldn't load snapshot from disk", file: file.path, line: line)
-      }
-      let snapshotRewriter = SnapshotRewriter(
-        file: file,
-        snapshots: snapshots.sorted {
-          $0.line != $1.line
-            ? $0.line < $1.line
-            : $0.syntaxDescriptor.trailingClosureOffset < $1.syntaxDescriptor.trailingClosureOffset
-        },
-        sourceLocationConverter: testSource.sourceLocationConverter
-      )
-      let updatedSource = snapshotRewriter.visit(testSource.sourceFile).description
-      do {
-        if testSource.source != updatedSource {
-          try updatedSource.write(toFile: "\(file.path)", atomically: true, encoding: .utf8)
+    inlineSnapshotState.withLock { inlineSnapshotState in
+      defer { inlineSnapshotState.removeAll() }
+      for (file, snapshots) in inlineSnapshotState {
+        let line = snapshots.first?.line ?? 1
+        guard let testSource = try? testSource(file: file)
+        else {
+          fatalError("Couldn't load snapshot from disk", file: file.path, line: line)
         }
-      } catch {
-        fatalError("Threw error: \(error)", file: file.path, line: line)
+        let snapshotRewriter = SnapshotRewriter(
+          file: file,
+          snapshots: snapshots.sorted {
+            $0.line != $1.line
+              ? $0.line < $1.line
+              : $0.syntaxDescriptor.trailingClosureOffset < $1.syntaxDescriptor.trailingClosureOffset
+          },
+          sourceLocationConverter: testSource.sourceLocationConverter
+        )
+        let updatedSource = snapshotRewriter.visit(testSource.sourceFile).description
+        do {
+          if testSource.source != updatedSource {
+            try updatedSource.write(toFile: "\(file.path)", atomically: true, encoding: .utf8)
+          }
+        } catch {
+          fatalError("Threw error: \(error)", file: file.path, line: line)
+        }
       }
     }
   }
@@ -764,3 +760,24 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
     }
   }
 #endif
+
+import Foundation
+
+@_spi(Internals)
+public final class LockIsolated<Value>: @unchecked Sendable {
+  private var _value: Value
+  private let lock = NSLock()
+  init(_ value: @autoclosure @Sendable () throws -> Value) rethrows {
+    self._value = try value()
+  }
+  @_spi(Internals)
+  public func withLock<T: Sendable>(
+    _ operation: @Sendable (inout Value) throws -> T
+  ) rethrows -> T {
+    lock.lock()
+    defer { lock.unlock() }
+    var value = _value
+    defer { _value = value }
+    return try operation(&value)
+  }
+}
