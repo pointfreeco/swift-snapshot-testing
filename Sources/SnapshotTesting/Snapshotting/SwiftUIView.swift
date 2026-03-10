@@ -38,6 +38,7 @@
       ///   - traits: A trait collection override.
       public static func image(
         drawHierarchyInKeyWindow: Bool = false,
+        isOpaque: Bool = true,
         precision: Float = 1,
         perceptualPrecision: Float = 1,
         layout: SwiftUISnapshotLayout = .sizeThatFits,
@@ -72,6 +73,9 @@
             )
           } else {
             let hostingController = UIHostingController.init(rootView: view)
+            if isOpaque == false {
+              hostingController.view.backgroundColor = .clear
+            }
 
             let maxSize = CGSize(width: 0.0, height: 0.0)
             config.size = hostingController.sizeThatFits(in: maxSize)
@@ -82,6 +86,7 @@
           return snapshotView(
             config: config,
             drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+            isOpaque: isOpaque,
             traits: traits,
             view: controller.view,
             viewController: controller
