@@ -394,8 +394,8 @@ public func verifySnapshot<Value, Format>(
 
         #if canImport(Testing) && compiler(>=6.2)
           if isSwiftTesting {
-            Attachment<Data>.record(
-              snapshotData,
+            Attachment<[UInt8]>.record(
+              Array(snapshotData),
               named: snapshotFileUrl.lastPathComponent
             )
           }
@@ -483,8 +483,8 @@ public func verifySnapshot<Value, Format>(
             let failureName = pathExtension.isEmpty
               ? "failure" : "failure.\(pathExtension)"
 
-            Attachment<Data>.record(data, named: referenceName)
-            Attachment<Data>.record(failedSnapshotData, named: failureName)
+            Attachment<[UInt8]>.record(Array(data), named: referenceName)
+            Attachment<[UInt8]>.record(Array(failedSnapshotData), named: failureName)
 
             #if os(iOS) || os(tvOS)
               if let refImage = reference as? UIImage,
@@ -492,7 +492,7 @@ public func verifySnapshot<Value, Format>(
               {
                 let differenceImage = diff(refImage, newImage)
                 if let differenceData = differenceImage.pngData() {
-                  Attachment<Data>.record(differenceData, named: "difference.png")
+                  Attachment<[UInt8]>.record(Array(differenceData), named: "difference.png")
                 }
               }
             #elseif os(macOS)
@@ -501,7 +501,7 @@ public func verifySnapshot<Value, Format>(
               {
                 let differenceImage = diff(refImage, newImage)
                 if let differenceData = NSImagePNGRepresentation(differenceImage) {
-                  Attachment<Data>.record(differenceData, named: "difference.png")
+                  Attachment<[UInt8]>.record(Array(differenceData), named: "difference.png")
                 }
               }
             #endif
