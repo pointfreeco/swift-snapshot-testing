@@ -391,6 +391,15 @@ public func verifySnapshot<Value, Format>(
             }
           }
         #endif
+
+        #if canImport(Testing) && compiler(>=6.2)
+          if isSwiftTesting {
+            Attachment<Data>.record(
+              snapshotData,
+              named: snapshotFileUrl.lastPathComponent
+            )
+          }
+        #endif
       }
 
       if record == .all {
@@ -450,7 +459,8 @@ public func verifySnapshot<Value, Format>(
       try fileManager.createDirectory(at: artifactsSubUrl, withIntermediateDirectories: true)
       let failedSnapshotFileUrl = artifactsSubUrl.appendingPathComponent(
         snapshotFileUrl.lastPathComponent)
-      try snapshotting.diffing.toData(diffable).write(to: failedSnapshotFileUrl)
+      let failedSnapshotData = snapshotting.diffing.toData(diffable)
+      try failedSnapshotData.write(to: failedSnapshotFileUrl)
 
       if !attachments.isEmpty {
         #if !os(Linux) && !os(Android) && !os(Windows)
@@ -462,6 +472,39 @@ public func verifySnapshot<Value, Format>(
                 activity.add($0)
               }
             }
+          }
+        #endif
+
+        #if canImport(Testing) && compiler(>=6.2)
+          if isSwiftTesting {
+            let pathExtension = snapshotFileUrl.pathExtension
+            let referenceName = pathExtension.isEmpty
+              ? "reference" : "reference.\(pathExtension)"
+            let failureName = pathExtension.isEmpty
+              ? "failure" : "failure.\(pathExtension)"
+
+            Attachment<Data>.record(data, named: referenceName)
+            Attachment<Data>.record(failedSnapshotData, named: failureName)
+
+            #if os(iOS) || os(tvOS)
+              if let refImage = reference as? UIImage,
+                let newImage = diffable as? UIImage
+              {
+                let differenceImage = diff(refImage, newImage)
+                if let differenceData = differenceImage.pngData() {
+                  Attachment<Data>.record(differenceData, named: "difference.png")
+                }
+              }
+            #elseif os(macOS)
+              if let refImage = reference as? NSImage,
+                let newImage = diffable as? NSImage
+              {
+                let differenceImage = diff(refImage, newImage)
+                if let differenceData = NSImagePNGRepresentation(differenceImage) {
+                  Attachment<Data>.record(differenceData, named: "difference.png")
+                }
+              }
+            #endif
           }
         #endif
       }
