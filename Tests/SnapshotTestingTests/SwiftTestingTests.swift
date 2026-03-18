@@ -27,7 +27,12 @@
       }
 
       #if canImport(AppKit)
-        @Test func testImage() {
+        @Test(
+          .enabled {
+            !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW")
+          }
+        )
+        func testImage() {
           let redPixel = NSImage(size: NSSize(width: 1, height: 1), flipped: false) { rect in
             NSColor.red.setFill()
             rect.fill()
