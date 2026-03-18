@@ -11,7 +11,7 @@ public struct Diffing<Value> {
 
   /// Compares two values. If the values do not match, returns a failure message and artifacts
   /// describing the failure.
-  @available(*, deprecated, message: "Use 'diff'")
+  @available(*, deprecated, message: "Use 'diffV2'")
   public var diff: (Value, Value) -> (String, [XCTAttachment])? {
     @storageRestrictions(initializes: diffV2)
     init(diff) {
@@ -47,6 +47,8 @@ public struct Diffing<Value> {
     }
   }
 
+  /// Compares two values. If the values do not match, returns a failure message and artifacts
+  /// describing the failure.
   public var diffV2: (Value, Value) -> (String, [DiffAttachment])?
 
   /// Creates a new `Diffing` on `Value`.
