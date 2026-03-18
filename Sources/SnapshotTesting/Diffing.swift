@@ -88,6 +88,7 @@ public struct Diffing<Value> {
 }
 
 public enum DiffAttachment {
+  @available(*, deprecated)
   case xcTest(XCTAttachment)
   case data(Data, name: String)
 }
