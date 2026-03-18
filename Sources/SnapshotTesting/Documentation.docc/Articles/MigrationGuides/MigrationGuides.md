@@ -14,4 +14,5 @@ these guides contain tips to do so.
 
 ### Guides
 
+- <doc:MigratingTo1.19>
 - <doc:MigratingTo1.17>
