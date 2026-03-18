@@ -129,7 +129,7 @@ import Foundation
               Automatically recorded a new snapshot for "\(syntaxDescriptor.trailingClosureLabel)".
               """
           }
-          if let difference = snapshotting.diffing.diff(expected ?? "", actual ?? "")?.0 {
+          if let difference = snapshotting.diffing.diffV2(expected ?? "", actual ?? "")?.0 {
             failure += " Difference: …\n\n\(difference.indenting(by: 2))"
           }
           recordIssue(
@@ -160,7 +160,7 @@ import Foundation
           return
         }
         guard
-          let difference = snapshotting.diffing.diff(expected, actual ?? "")?.0
+          let difference = snapshotting.diffing.diffV2(expected, actual ?? "")?.0
         else { return }
 
         let message = message()

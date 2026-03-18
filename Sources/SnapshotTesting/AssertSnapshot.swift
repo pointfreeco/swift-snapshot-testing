@@ -1,3 +1,4 @@
+import Foundation
 import XCTest
 
 #if canImport(Testing)
@@ -438,7 +439,7 @@ public func verifySnapshot<Value, Format>(
         }
       #endif
 
-      guard let (failure, attachments) = snapshotting.diffing.diff(reference, diffable) else {
+      guard let (failure, attachments) = snapshotting.diffing.diffV2(reference, diffable) else {
         return nil
       }
 
@@ -454,15 +455,29 @@ public func verifySnapshot<Value, Format>(
 
       if !attachments.isEmpty {
         #if !os(Linux) && !os(Android) && !os(Windows)
-          if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS"),
-            !isSwiftTesting
-          {
+        if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
+          if isSwiftTesting {
+            attachments.forEach {
+              switch $0 {
+              case .xcTest:
+                break
+              case .data(let data, name: let name):
+                Attachment.record(data, named: name)
+              }
+            }
+          } else {
             XCTContext.runActivity(named: "Attached Failure Diff") { activity in
               attachments.forEach {
-                activity.add($0)
+                switch $0 {
+                case .xcTest(let attachment):
+                  activity.add(attachment)
+                case .data:
+                  break
+                }
               }
             }
           }
+        }
         #endif
       }
 

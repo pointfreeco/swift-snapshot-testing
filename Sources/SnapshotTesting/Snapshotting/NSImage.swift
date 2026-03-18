@@ -16,7 +16,7 @@
     ///     human eye.
     /// - Returns: A new diffing strategy.
     public static func image(precision: Float = 1, perceptualPrecision: Float = 1) -> Diffing {
-      return .init(
+      return .diff(
         toData: { NSImagePNGRepresentation($0)! },
         fromData: { NSImage(data: $0)! }
       ) { old, new in
@@ -25,12 +25,9 @@
             old, new, precision: precision, perceptualPrecision: perceptualPrecision)
         else { return nil }
         let difference = SnapshotTesting.diff(old, new)
-        let oldAttachment = XCTAttachment(image: old)
-        oldAttachment.name = "reference"
-        let newAttachment = XCTAttachment(image: new)
-        newAttachment.name = "failure"
-        let differenceAttachment = XCTAttachment(image: difference)
-        differenceAttachment.name = "difference"
+        let oldAttachment = DiffAttachment.data(NSImagePNGRepresentation(old)!, name: "reference.png")
+        let newAttachment = DiffAttachment.data(NSImagePNGRepresentation(new)!, name: "failure.png")
+        let differenceAttachment = DiffAttachment.data(NSImagePNGRepresentation(difference)!, name: "difference.png")
         return (
           message,
           [oldAttachment, newAttachment, differenceAttachment]

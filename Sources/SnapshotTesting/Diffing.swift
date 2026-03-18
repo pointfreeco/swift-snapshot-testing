@@ -11,7 +11,43 @@ public struct Diffing<Value> {
 
   /// Compares two values. If the values do not match, returns a failure message and artifacts
   /// describing the failure.
-  public var diff: (Value, Value) -> (String, [XCTAttachment])?
+  @available(*, deprecated, message: "Use 'diff'")
+  public var diff: (Value, Value) -> (String, [XCTAttachment])? {
+    @storageRestrictions(initializes: diffV2)
+    init(diff) {
+      self.diffV2 = {
+        guard let (message, attachments) = diff($0, $1)
+        else {
+          return nil
+        }
+        return (message, attachments.map(DiffAttachment.xcTest))
+      }
+    }
+    get {
+      {
+        guard let (message, attachments) = diffV2($0, $1)
+        else { return nil }
+        return (
+          message,
+          attachments.compactMap {
+            guard case .xcTest(let attachment) = $0 else { return nil }
+            return attachment
+          }
+        )
+      }
+    }
+    set {
+      diffV2 = {
+        guard let (message, attachments) = newValue($0, $1)
+        else {
+          return nil
+        }
+        return (message, attachments.map(DiffAttachment.xcTest))
+      }
+    }
+  }
+
+  public var diffV2: (Value, Value) -> (String, [DiffAttachment])?
 
   /// Creates a new `Diffing` on `Value`.
   ///
@@ -19,6 +55,7 @@ public struct Diffing<Value> {
   ///   - toData: A function used to convert a value _to_ data.
   ///   - fromData: A function used to produce a value _from_ data.
   ///   - diff: A function used to compare two values. If the values do not match, returns a failure
+  @available(*, deprecated, message: "Use 'Diffing.diff'")
   public init(
     toData: @escaping (_ value: Value) -> Data,
     fromData: @escaping (_ data: Data) -> Value,
@@ -28,4 +65,27 @@ public struct Diffing<Value> {
     self.fromData = fromData
     self.diff = diff
   }
+
+  private init(
+    toData: @escaping (Value) -> Data,
+    fromData: @escaping (Data) -> Value,
+    diffV2: @escaping (Value, Value) -> (String, [DiffAttachment])?
+  ) {
+    self.toData = toData
+    self.fromData = fromData
+    self.diffV2 = diffV2
+  }
+
+  public static func diff(
+    toData: @escaping (_ value: Value) -> Data,
+    fromData: @escaping (_ data: Data) -> Value,
+    diffV2: @escaping (_ lhs: Value, _ rhs: Value) -> (String, [DiffAttachment])?
+  ) -> Self {
+    Diffing(toData: toData, fromData: fromData, diffV2: diffV2)
+  }
+}
+
+public enum DiffAttachment {
+  case xcTest(XCTAttachment)
+  case data(Data, name: String)
 }
