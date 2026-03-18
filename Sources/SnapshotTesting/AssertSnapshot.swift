@@ -373,16 +373,18 @@ public func verifySnapshot<Value, Format>(
         #if !os(Android) && !os(Linux) && !os(Windows)
           if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
             if isSwiftTesting {
-              Attachment.record(
-                writeToDisk ? try Data(contentsOf: snapshotFileUrl) : snapshotData,
-                named: snapshotFileUrl.lastPathComponent,
-                sourceLocation: SourceLocation(
-                  fileID: fileID.description,
-                  filePath: filePath.description,
-                  line: Int(line),
-                  column: Int(column)
+              #if compiler(>=6.2)
+                Attachment.record(
+                  writeToDisk ? try Data(contentsOf: snapshotFileUrl) : snapshotData,
+                  named: snapshotFileUrl.lastPathComponent,
+                  sourceLocation: SourceLocation(
+                    fileID: fileID.description,
+                    filePath: filePath.description,
+                    line: Int(line),
+                    column: Int(column)
+                  )
                 )
-              )
+              #endif
             } else {
               XCTContext.runActivity(named: "Attached Recorded Snapshot") { activity in
                 if writeToDisk {
