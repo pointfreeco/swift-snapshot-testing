@@ -27,7 +27,7 @@
         imageScale = UIScreen.main.scale
       }
 
-      return Diffing(
+      return .diff(
         toData: { $0.pngData() ?? emptyImage().pngData()! },
         fromData: { UIImage(data: $0, scale: imageScale)! }
       ) { old, new in
@@ -36,13 +36,11 @@
             old, new, precision: precision, perceptualPrecision: perceptualPrecision)
         else { return nil }
         let difference = SnapshotTesting.diff(old, new)
-        let oldAttachment = XCTAttachment(image: old)
-        oldAttachment.name = "reference"
         let isEmptyImage = new.size == .zero
-        let newAttachment = XCTAttachment(image: isEmptyImage ? emptyImage() : new)
-        newAttachment.name = "failure"
-        let differenceAttachment = XCTAttachment(image: difference)
-        differenceAttachment.name = "difference"
+        let oldAttachment = DiffAttachment.data(old.pngData()!, name: "reference.png")
+        let newAttachment = DiffAttachment.data(
+          (isEmptyImage ? emptyImage() : new).pngData()!, name: "failure.png")
+        let differenceAttachment = DiffAttachment.data(difference.pngData()!, name: "difference.png")
         return (
           message,
           [oldAttachment, newAttachment, differenceAttachment]
