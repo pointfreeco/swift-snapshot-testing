@@ -9,35 +9,6 @@ import XCTest
 
 #if canImport(Testing)
   import Testing
-
-  #if compiler(>=6.2)
-    private func recordSwiftTestingAttachment(
-      _ data: Data,
-      named name: String,
-      sourceLocation: SourceLocation
-    ) {
-      #if compiler(>=6.3)
-        if name.hasSuffix(".png") {
-          #if canImport(UIKit)
-            if #available(iOS 14.0, tvOS 14.0, *) {
-              if let image = UIImage(data: data) {
-                Attachment.record(image, named: name, as: .png, sourceLocation: sourceLocation)
-                return
-              }
-            }
-          #elseif canImport(AppKit)
-            if #available(macOS 11.0, *) {
-              if let image = NSImage(data: data) {
-                Attachment.record(image, named: name, as: .png, sourceLocation: sourceLocation)
-                return
-              }
-            }
-          #endif
-        }
-      #endif
-      Attachment.record(data, named: name, sourceLocation: sourceLocation)
-    }
-  #endif
 #endif
 
 /// Enhances failure messages with a command line diff tool expression that can be copied and pasted
@@ -661,3 +632,22 @@ enum File {
     }
   }
 }
+
+#if canImport(Testing) && compiler(>=6.2)
+  private func recordSwiftTestingAttachment(
+    _ data: Data,
+    named name: String,
+    sourceLocation: SourceLocation
+  ) {
+    #if compiler(>=6.3) && (canImport(UIKit) || canImport(AppKit))
+      if #available(iOS 14.0, tvOS 14.0, macOS 11.0, *),
+        name.hasSuffix(".png"),
+        let image = Image(data: data)
+      {
+        Attachment.record(image, named: name, as: .png, sourceLocation: sourceLocation)
+        return
+      }
+    #endif
+    Attachment.record(data, named: name, sourceLocation: sourceLocation)
+  }
+#endif
