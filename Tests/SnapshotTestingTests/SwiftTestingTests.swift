@@ -6,6 +6,10 @@
     import AppKit
   #endif
 
+  #if canImport(UIKit)
+    import UIKit
+  #endif
+
   extension BaseSuite {
     @Suite(.serialized, .snapshots(record: .missing))
     struct SwiftTestingTests {
@@ -25,6 +29,32 @@
           )
         }
       }
+
+      #if canImport(UIKit)
+      @Test(
+        .enabled {
+          !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW")
+        }
+      )
+      func testUIImage() {
+        let redPixel = UIGraphicsImageRenderer(size: CGSize(width: 1, height: 1)).image { context in
+          UIColor.red.setFill()
+          context.fill(CGRect(x: 0, y: 0, width: 1, height: 1))
+        }
+        let bluePixel = UIGraphicsImageRenderer(size: CGSize(width: 1, height: 1)).image { context in
+          UIColor.blue.setFill()
+          context.fill(CGRect(x: 0, y: 0, width: 1, height: 1))
+        }
+        assertSnapshot(of: redPixel, as: .image, named: "pixel")
+        withKnownIssue {
+          assertSnapshot(of: bluePixel, as: .image, named: "pixel")
+        } matching: { issue in
+          issue.description.hasSuffix(
+            "Newly-taken snapshot does not match reference."
+          )
+        }
+      }
+      #endif
 
       #if canImport(AppKit)
         @Test(

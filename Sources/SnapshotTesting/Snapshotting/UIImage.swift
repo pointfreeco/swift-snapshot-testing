@@ -25,9 +25,9 @@
       } else {
         imageScale = UIScreen.main.scale
       }
-
+      let toData: (UIImage) -> Data = { $0.pngData() ?? emptyImage().pngData()! }
       return .diff(
-        toData: { $0.pngData() ?? emptyImage().pngData()! },
+        toData: toData,
         fromData: { UIImage(data: $0, scale: imageScale)! }
       ) { old, new in
         guard
@@ -35,14 +35,13 @@
             old, new, precision: precision, perceptualPrecision: perceptualPrecision)
         else { return nil }
         let difference = SnapshotTesting.diff(old, new)
-        let referenceData = old.pngData() ?? emptyImage().pngData()!
         let isEmptyImage = new.size == .zero
-        let failureImage = isEmptyImage ? emptyImage() : new
-        let failureData = failureImage.pngData() ?? emptyImage().pngData()!
-        let differenceData = difference.pngData() ?? emptyImage().pngData()!
-        let referenceAttachment = DiffAttachment.data(referenceData, name: "reference.png")
-        let failureAttachment = DiffAttachment.data(failureData, name: "failure.png")
-        let differenceAttachment = DiffAttachment.data(differenceData, name: "difference.png")
+        let referenceAttachment = DiffAttachment.data(toData(old), name: "reference.png")
+        let failureAttachment = DiffAttachment.data(
+          toData(isEmptyImage ? emptyImage() : new),
+          name: "failure.png"
+        )
+        let differenceAttachment = DiffAttachment.data(toData(difference), name: "difference.png")
         return (
           message,
           [referenceAttachment, failureAttachment, differenceAttachment]
