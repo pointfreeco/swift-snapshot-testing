@@ -371,27 +371,40 @@ public func verifySnapshot<Value, Format>(
         }
 
         #if !os(Android) && !os(Linux) && !os(Windows)
-          if !isSwiftTesting,
-            ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS")
-          {
-            XCTContext.runActivity(named: "Attached Recorded Snapshot") { activity in
-              if writeToDisk {
-                // Snapshot was written to disk. Create attachment from file
-                let attachment = XCTAttachment(contentsOfFile: snapshotFileUrl)
-                activity.add(attachment)
-              } else {
-                // Snapshot was not written to disk. Create attachment from data and path extension
-                let typeIdentifier = snapshotting.pathExtension.flatMap(
-                  uniformTypeIdentifier(fromExtension:)
+          if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
+            if isSwiftTesting {
+              #if compiler(>=6.2)
+                Attachment.record(
+                  writeToDisk ? try Data(contentsOf: snapshotFileUrl) : snapshotData,
+                  named: snapshotFileUrl.lastPathComponent,
+                  sourceLocation: SourceLocation(
+                    fileID: fileID.description,
+                    filePath: filePath.description,
+                    line: Int(line),
+                    column: Int(column)
+                  )
                 )
+              #endif
+            } else {
+              XCTContext.runActivity(named: "Attached Recorded Snapshot") { activity in
+                if writeToDisk {
+                  // Snapshot was written to disk. Create attachment from file
+                  let attachment = XCTAttachment(contentsOfFile: snapshotFileUrl)
+                  activity.add(attachment)
+                } else {
+                  // Snapshot was not written to disk. Create attachment from data and path extension
+                  let typeIdentifier = snapshotting.pathExtension.flatMap(
+                    uniformTypeIdentifier(fromExtension:)
+                  )
 
-                let attachment = XCTAttachment(
-                  uniformTypeIdentifier: typeIdentifier,
-                  name: snapshotFileUrl.lastPathComponent,
-                  payload: snapshotData
-                )
+                  let attachment = XCTAttachment(
+                    uniformTypeIdentifier: typeIdentifier,
+                    name: snapshotFileUrl.lastPathComponent,
+                    payload: snapshotData
+                  )
 
-                activity.add(attachment)
+                  activity.add(attachment)
+                }
               }
             }
           }
@@ -469,7 +482,16 @@ public func verifySnapshot<Value, Format>(
                   case .xcTest:
                     break
                   case .data(let data, let name):
-                    Attachment.record(data, named: name)
+                    Attachment.record(
+                      data,
+                      named: name,
+                      sourceLocation: SourceLocation(
+                        fileID: fileID.description,
+                        filePath: filePath.description,
+                        line: Int(line),
+                        column: Int(column)
+                      )
+                    )
                   }
                 }
               #endif
