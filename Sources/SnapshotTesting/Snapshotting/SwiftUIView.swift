@@ -70,11 +70,26 @@
             controller = UIHostingController.init(
               rootView: view
             )
+          } else if #available(iOS 16.0, tvOS 16.0, *) {
+            let colorScheme: ColorScheme = traits.userInterfaceStyle == .dark ? .dark : .light
+            let styledView = view.environment(\.colorScheme, colorScheme)
+            let displayScale = traits.displayScale
+
+            return Async<UIImage> { callback in
+              MainActor.assumeIsolated {
+                let renderer = ImageRenderer(content: styledView)
+                renderer.proposedSize = ProposedViewSize(width: nil, height: nil)
+                renderer.scale = displayScale > 0
+                  ? CGFloat(displayScale)
+                  : UIScreen.main.scale
+                callback(renderer.uiImage ?? UIImage())
+              }
+            }
           } else {
             let hostingController = UIHostingController.init(rootView: view)
-
-            let maxSize = CGSize(width: 0.0, height: 0.0)
-            config.size = hostingController.sizeThatFits(in: maxSize)
+            let screenWidth = UIScreen.main.bounds.width
+            let proposed = CGSize(width: screenWidth, height: .greatestFiniteMagnitude)
+            config.size = hostingController.sizeThatFits(in: proposed)
 
             controller = hostingController
           }
