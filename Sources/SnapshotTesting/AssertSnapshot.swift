@@ -286,6 +286,7 @@ public func verifySnapshot<Value, Format>(
   named name: String? = nil,
   record: SnapshotTestingConfiguration.Record? = nil,
   snapshotDirectory: String? = nil,
+  snapshotArtifactsDirectory: String? = nil,
   timeout: TimeInterval = 5,
   fileID: StaticString = #fileID,
   file filePath: StaticString = #file,
@@ -467,7 +468,8 @@ public func verifySnapshot<Value, Format>(
       }
 
       let artifactsUrl = URL(
-        fileURLWithPath: ProcessInfo.processInfo.environment["SNAPSHOT_ARTIFACTS"]
+        fileURLWithPath: snapshotArtifactsDirectory
+          ?? ProcessInfo.processInfo.environment["SNAPSHOT_ARTIFACTS"]
           ?? NSTemporaryDirectory(),
         isDirectory: true
       )
