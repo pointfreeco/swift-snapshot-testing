@@ -1,0 +1,637 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Test Swift × swift-syntax combinations on Linux via Podman.
+#
+# swift-syntax versions specify a minimum Swift version (swift-tools-version), not an
+# exclusive pairing. For example, swift-syntax 509.x requires Swift 5.7+, meaning it
+# can be used with Swift 5.9, 6.0, 6.1, etc. Users may pin to older swift-syntax
+# versions while using newer Swift compilers.
+#
+# Older Swift compilers (5.9, 5.10, 6.0) parse source inside #if branches that
+# evaluate to false, so syntax errors in platform-gated code (e.g., #if os(iOS))
+# can crash compilation even on Linux. This script verifies the fix.
+
+readonly SWIFT_VERSIONS=(5.9 5.10 6.0 6.1 6.2)
+readonly SYNTAX_VERSIONS=(509 510 600 601 602 603 604)
+readonly MAX_RETRIES=2  # Retry transient compiler crashes
+
+# Detect if stdout is a terminal (for status line updates)
+if [[ -t 1 ]]; then
+  IS_TTY=true
+else
+  IS_TTY=false
+fi
+
+# Check if output indicates a transient failure worth retrying:
+# - git clone/fetch failures (network issues, TLS disconnects)
+# Note: compiler crashes (error: fatalError) are NOT retried — they are almost
+# always caused by real source issues, and retrying masks permanent failures.
+is_transient_failure() {
+  local output_file="$1"
+  grep -qE "Failed to clone repository|RPC failed" \
+    "$output_file" 2>/dev/null
+}
+
+# Detect optimal parallel jobs from Podman VM resources
+# Outputs: "jobs memory_gb" (e.g., "6 144")
+detect_parallel_jobs() {
+  local memory_mb cpus
+  memory_mb=$(podman machine inspect --format '{{.Resources.Memory}}' 2>/dev/null) || return 1
+  cpus=$(podman machine inspect --format '{{.Resources.CPUs}}' 2>/dev/null) || cpus=4
+  if [[ -z "$memory_mb" || "$memory_mb" -lt 1 ]]; then
+    return 1
+  fi
+  local memory_gb=$((memory_mb / 1024))
+  local jobs_by_memory=$((memory_mb / 8192))
+  local jobs_by_cpus=$((cpus / 3))
+  local max_jobs=8
+
+  local jobs=$jobs_by_memory
+  if [[ "$jobs_by_cpus" -lt "$jobs" ]]; then
+    jobs=$jobs_by_cpus
+  fi
+  if [[ "$max_jobs" -lt "$jobs" ]]; then
+    jobs=$max_jobs
+  fi
+  if [[ "$jobs" -lt 1 ]]; then
+    jobs=1
+  fi
+  echo "$jobs $memory_gb"
+}
+
+# Map short syntax version to range
+syntax_range() {
+  case "$1" in
+    509) echo "509.0.0..<510.0.0" ;;
+    510) echo "510.0.0..<511.0.0" ;;
+    600) echo "600.0.0..<601.0.0" ;;
+    601) echo "601.0.0..<602.0.0" ;;
+    602) echo "602.0.0..<603.0.0" ;;
+    603) echo "603.0.0..<604.0.0" ;;
+    604) echo "604.0.0-prerelease..<605.0.0" ;;
+    *) echo "Unknown syntax version: $1" >&2; exit 1 ;;
+  esac
+}
+
+# Expand partial Swift version (6 → 6.0 6.1 6.2)
+expand_swift_version() {
+  local pattern="$1"
+  local matches=()
+  for v in "${SWIFT_VERSIONS[@]}"; do
+    if [[ "$v" == "$pattern"* ]]; then
+      matches+=("$v")
+    fi
+  done
+  if [[ ${#matches[@]} -eq 0 ]]; then
+    echo "No Swift versions match: $pattern" >&2
+    exit 1
+  fi
+  echo "${matches[@]}"
+}
+
+usage() {
+  cat <<EOF
+Usage: $(basename "$0") [OPTIONS]
+
+Test Swift × swift-syntax combinations on Linux via Podman.
+
+Options:
+  --swift VERSION        Swift version(s) to test (e.g., 5.9, 6, 6.1)
+                         Can be specified multiple times. Partial matching supported.
+  --swift-syntax VERSION swift-syntax version(s) to test (e.g., 509, 600)
+                         Can be specified multiple times.
+  --parallel [N|auto]    Run up to N tests concurrently (default: auto)
+                         'auto' detects optimal parallelism from Podman VM memory
+  --sequential           Run tests sequentially (default behavior)
+  --dry-run              Don't run tests, just show what would run
+  --verbose              Show full test output
+  --log-dir DIR          Write test output to files in DIR
+  --continue-on-error    Continue testing after failures
+  -h, --help             Show this help
+
+Examples:
+  $(basename "$0")                              # Full matrix
+  $(basename "$0") --swift 5.9 --swift-syntax 509
+  $(basename "$0") --swift 6                    # All Swift 6.x versions
+  $(basename "$0") --dry-run                    # Preview without running
+  $(basename "$0") --parallel                   # Auto-detect parallelism
+  $(basename "$0") --parallel 8                 # 8 concurrent jobs
+  $(basename "$0") --parallel --continue-on-error
+
+Requires: podman machine start
+EOF
+}
+
+# Parse arguments
+swift_filters=()
+syntax_filters=()
+dry_run=false
+verbose=false
+log_dir=""
+continue_on_error=false
+parallel_jobs=0  # 0 means sequential
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --swift) swift_filters+=("$2"); shift 2 ;;
+    --swift-syntax) syntax_filters+=("$2"); shift 2 ;;
+    --dry-run) dry_run=true; shift ;;
+    --verbose) verbose=true; shift ;;
+    --log-dir) log_dir="$2"; shift 2 ;;
+    --continue-on-error) continue_on_error=true; shift ;;
+    --sequential) parallel_jobs=0; shift ;;
+    --parallel)
+      if [[ $# -gt 1 && "$2" =~ ^[0-9]+$ ]]; then
+        parallel_jobs="$2"
+        if [[ "$parallel_jobs" -lt 1 ]]; then
+          echo "Error: --parallel requires a positive integer" >&2
+          exit 1
+        fi
+        shift 2
+      elif [[ $# -gt 1 && "$2" == "auto" ]]; then
+        parallel_jobs="auto"
+        shift 2
+      else
+        parallel_jobs="auto"
+        shift
+      fi
+      ;;
+    -h|--help) usage; exit 0 ;;
+    *) echo "Unknown option: $1" >&2; usage >&2; exit 1 ;;
+  esac
+done
+
+# Warn about verbose + parallel
+if [[ "$verbose" == true && "$parallel_jobs" != "0" ]]; then
+  echo "Warning: --verbose with --parallel may produce interleaved output" >&2
+fi
+
+# Determine versions to test
+if [[ ${#swift_filters[@]} -eq 0 ]]; then
+  swift_to_test=("${SWIFT_VERSIONS[@]}")
+else
+  swift_to_test=()
+  for filter in "${swift_filters[@]}"; do
+    for v in $(expand_swift_version "$filter"); do
+      swift_to_test+=("$v")
+    done
+  done
+fi
+
+if [[ ${#syntax_filters[@]} -eq 0 ]]; then
+  syntax_to_test=("${SYNTAX_VERSIONS[@]}")
+else
+  syntax_to_test=("${syntax_filters[@]}")
+fi
+
+# Build combination list
+combinations=()
+for swift_ver in "${swift_to_test[@]}"; do
+  for syntax_ver in "${syntax_to_test[@]}"; do
+    combinations+=("${swift_ver}:${syntax_ver}")
+  done
+done
+
+total=${#combinations[@]}
+
+if [[ "$dry_run" == true ]]; then
+  echo "Would run $total combination(s):"
+  for combo in "${combinations[@]}"; do
+    IFS=: read -r swift_ver syntax_ver <<< "$combo"
+    echo "  Swift $swift_ver × swift-syntax $syntax_ver"
+  done
+  echo ""
+  if [[ "$parallel_jobs" == "0" ]]; then
+    echo "Mode: sequential"
+  elif [[ "$parallel_jobs" == "auto" ]]; then
+    echo "Mode: parallel (auto-detect)"
+  else
+    echo "Mode: parallel ($parallel_jobs concurrent jobs)"
+  fi
+  exit 0
+fi
+
+# Pre-flight checks
+if ! command -v podman &>/dev/null; then
+  echo "Error: Podman is not installed." >&2
+  echo "" >&2
+  echo "Install with:" >&2
+  echo "  brew install podman" >&2
+  echo "" >&2
+  echo "Then setup a VM with:" >&2
+  echo "  bin/setup-podman" >&2
+  exit 1
+fi
+
+if ! podman info &>/dev/null; then
+  echo "Error: Podman is not running." >&2
+  echo "" >&2
+  echo "Start Podman with:" >&2
+  echo "  podman machine start" >&2
+  echo "" >&2
+  echo "Or setup a new VM with:" >&2
+  echo "  bin/setup-podman" >&2
+  exit 1
+fi
+
+# Resolve "auto" parallel jobs from Podman VM memory
+if [[ "$parallel_jobs" == "auto" ]]; then
+  if detected=$(detect_parallel_jobs); then
+    read -r parallel_jobs memory_gb <<< "$detected"
+    echo "Auto-detected $parallel_jobs parallel jobs (${memory_gb} GB Podman VM)"
+  else
+    parallel_jobs=4
+    echo "Could not detect Podman VM memory, defaulting to $parallel_jobs parallel jobs"
+  fi
+fi
+
+# Prepare log directory with timestamped subdirectory
+if [[ -n "$log_dir" ]]; then
+  timestamp=$(date +%Y-%m-%d_%H%M%S)
+  log_dir="$log_dir/$timestamp"
+  mkdir -p "$log_dir"
+  echo "Logging to: $log_dir"
+fi
+
+# ============================================================================
+# Sequential execution (default)
+# ============================================================================
+run_sequential() {
+  local passed=0
+  local failed=0
+  local failed_combos=()
+
+
+
+  for i in "${!combinations[@]}"; do
+    combo="${combinations[$i]}"
+    IFS=: read -r swift_ver syntax_ver <<< "$combo"
+    syntax_range_val=$(syntax_range "$syntax_ver")
+
+    progress="[$((i + 1))/$total]"
+    label="Swift $swift_ver × swift-syntax $syntax_ver"
+
+    printf "%s %s ... " "$progress" "$label"
+
+    # Mount source read-only, copy into container for full isolation.
+    # Each container gets its own Package.resolved and .build — no shared state.
+    cmd=(
+      podman run --rm
+      -v "$(pwd)":/source:ro
+      -e "SWIFT_SYNTAX_VERSION=$syntax_range_val"
+      "swift:$swift_ver"
+      bash -c "mkdir -p /workspace && cp -a /source/. /workspace/ && cd /workspace && rm -f Package.resolved && swift test"
+    )
+
+    local attempt=0
+    local test_passed=false
+
+    while [[ "$attempt" -lt "$MAX_RETRIES" ]]; do
+      ((attempt++)) || true
+
+      local log_file=""
+      if [[ -n "$log_dir" ]]; then
+        log_file="$log_dir/swift-${swift_ver}_syntax-${syntax_ver}_attempt-${attempt}.log"
+      fi
+
+      if [[ "$verbose" == true ]]; then
+        if [[ "$attempt" -gt 1 ]]; then
+          printf "%s %s (retry %d/%d) ... " "$progress" "$label" "$attempt" "$MAX_RETRIES"
+        fi
+        echo ""
+        tmp_output=$(mktemp)
+        if "${cmd[@]}" 2>&1 | tee "$tmp_output"; then
+          echo "✓ $label passed"
+          test_passed=true
+          if [[ -n "$log_file" ]]; then
+            mv "$tmp_output" "$log_file"
+          else
+            rm -f "$tmp_output"
+          fi
+          break
+        else
+          if is_transient_failure "$tmp_output" && [[ "$attempt" -lt "$MAX_RETRIES" ]]; then
+            echo "⟳ $label transient failure, retrying in 5s..."
+            if [[ -n "$log_file" ]]; then
+              mv "$tmp_output" "$log_file"
+            else
+              rm -f "$tmp_output"
+            fi
+            sleep 5
+          else
+            echo "✗ $label FAILED"
+            if [[ -n "$log_file" ]]; then
+              mv "$tmp_output" "$log_file"
+            else
+              rm -f "$tmp_output"
+            fi
+          fi
+        fi
+      else
+        tmp_output=$(mktemp)
+        if "${cmd[@]}" > "$tmp_output" 2>&1; then
+          if [[ "$attempt" -gt 1 ]]; then
+            echo "✓ (retry $attempt)"
+          else
+            echo "✓"
+          fi
+          test_passed=true
+          if [[ -n "$log_file" ]]; then
+            mv "$tmp_output" "$log_file"
+          else
+            rm "$tmp_output"
+          fi
+          break
+        else
+          if is_transient_failure "$tmp_output" && [[ "$attempt" -lt "$MAX_RETRIES" ]]; then
+            printf "⟳ retry %d (in 5s)... " "$((attempt + 1))"
+            if [[ -n "$log_file" ]]; then
+              mv "$tmp_output" "$log_file"
+            else
+              rm -f "$tmp_output"
+            fi
+            sleep 5
+          else
+            if [[ "$attempt" -gt 1 ]]; then
+              echo "✗ FAILED (after $attempt attempts)"
+            else
+              echo "✗ FAILED"
+            fi
+
+            if [[ -n "$log_file" ]]; then
+              mv "$tmp_output" "$log_file"
+              echo "  Log: $log_file"
+            else
+              echo "  Last 20 lines of output:"
+              tail -20 "$tmp_output" | sed 's/^/    /'
+              rm "$tmp_output"
+            fi
+          fi
+        fi
+      fi
+    done
+
+    if [[ "$test_passed" == true ]]; then
+      ((passed++)) || true
+    else
+      ((failed++)) || true
+      failed_combos+=("$label")
+      if [[ "$continue_on_error" != true ]]; then
+        echo ""
+        echo "Stopping on first failure. Use --continue-on-error to run all."
+        break
+      fi
+    fi
+  done
+
+  echo ""
+  echo "Results: $passed passed, $failed failed (of $total)"
+
+  if [[ $failed -gt 0 ]]; then
+    echo ""
+    echo "Failed combinations:"
+    for combo in "${failed_combos[@]}"; do
+      echo "  - $combo"
+    done
+    echo ""
+    echo "Re-run a specific failure with:"
+    echo "  $(basename "$0") --swift <version> --swift-syntax <version> --verbose"
+    exit 1
+  fi
+}
+
+# ============================================================================
+# Parallel execution
+# ============================================================================
+run_parallel() {
+  local max_jobs="$parallel_jobs"
+
+  local state_dir
+  state_dir=$(mktemp -d)
+  cleanup_parallel() {
+    [[ -n "${state_dir:-}" ]] && rm -rf "$state_dir"
+  }
+  trap cleanup_parallel EXIT
+
+  local queue_file="$state_dir/queue"
+  local running_file="$state_dir/running"
+  local results_file="$state_dir/results"
+  local stop_file="$state_dir/stop"
+
+  printf "%s\n" "${combinations[@]}" > "$queue_file"
+  touch "$running_file" "$results_file"
+
+  echo "0" > "$state_dir/passed"
+  echo "0" > "$state_dir/failed"
+
+  declare -A job_pids=()
+  declare -A job_combos=()
+  declare -A job_outputs=()
+
+  local retries_dir="$state_dir/retries"
+  mkdir -p "$retries_dir"
+
+  get_retry_count() {
+    local combo="$1"
+    local file="$retries_dir/${combo//:/_}"
+    if [[ -f "$file" ]]; then
+      cat "$file"
+    else
+      echo "1"
+    fi
+  }
+
+  increment_retry_count() {
+    local combo="$1"
+    local file="$retries_dir/${combo//:/_}"
+    local current
+    current=$(get_retry_count "$combo")
+    echo "$((current + 1))" > "$file"
+  }
+
+  update_status() {
+    [[ "$IS_TTY" == true ]] || return 0
+    local running=${#job_pids[@]}
+    local passed=$(cat "$state_dir/passed")
+    local failed=$(cat "$state_dir/failed")
+    local completed=$((passed + failed))
+    local queued=$((total - completed - running))
+
+    printf "\r\033[K[%d running, %d passed, %d failed, %d queued]" \
+      "$running" "$passed" "$failed" "$queued"
+  }
+
+  process_completed_job() {
+    local pid="$1"
+    local exit_code="$2"
+    local combo="${job_combos[$pid]}"
+    local output_file="${job_outputs[$pid]}"
+
+    IFS=: read -r swift_ver syntax_ver <<< "$combo"
+    local label="Swift $swift_ver × swift-syntax $syntax_ver"
+    local attempt
+    attempt=$(get_retry_count "$combo")
+
+    grep -v "^${combo}$" "$running_file" > "$running_file.tmp" 2>/dev/null || true
+    mv "$running_file.tmp" "$running_file" 2>/dev/null || true
+
+    [[ "$IS_TTY" == true ]] && printf "\r\033[K"
+
+    if [[ "$exit_code" -eq 0 ]]; then
+      if [[ "$attempt" -gt 1 ]]; then
+        echo "✓ $label (retry $attempt)"
+      else
+        echo "✓ $label"
+      fi
+      local passed=$(cat "$state_dir/passed")
+      echo "$((passed + 1))" > "$state_dir/passed"
+
+      local log_file_name="swift-${swift_ver}_syntax-${syntax_ver}_attempt-${attempt}.log"
+      if [[ -n "$log_dir" ]]; then
+        mv "$output_file" "$log_dir/$log_file_name" 2>/dev/null || true
+      else
+        rm -f "$output_file"
+      fi
+    else
+      if is_transient_failure "$output_file" && [[ "$attempt" -lt "$MAX_RETRIES" ]]; then
+        echo "⟳ $label transient failure (attempt $attempt/$MAX_RETRIES), re-queuing..."
+
+        local log_file_name="swift-${swift_ver}_syntax-${syntax_ver}_attempt-${attempt}.log"
+        if [[ -n "$log_dir" ]]; then
+          mv "$output_file" "$log_dir/$log_file_name" 2>/dev/null || true
+        else
+          rm -f "$output_file"
+        fi
+
+        increment_retry_count "$combo"
+        echo "$combo" >> "$queue_file"
+      else
+        if [[ "$attempt" -gt 1 ]]; then
+          echo "✗ $label FAILED (after $attempt attempts)"
+        else
+          echo "✗ $label FAILED"
+        fi
+        local failed_count=$(cat "$state_dir/failed")
+        echo "$((failed_count + 1))" > "$state_dir/failed"
+        echo "$label" >> "$results_file"
+
+        local log_file_name="swift-${swift_ver}_syntax-${syntax_ver}_attempt-${attempt}.log"
+        if [[ -n "$log_dir" ]]; then
+          mv "$output_file" "$log_dir/$log_file_name" 2>/dev/null || true
+          echo "  Log: $log_dir/$log_file_name"
+        else
+          if [[ -f "$output_file" ]]; then
+            echo "  Last 20 lines of output:"
+            tail -20 "$output_file" | sed 's/^/    /'
+          fi
+          rm -f "$output_file"
+        fi
+
+        if [[ "$continue_on_error" != true ]]; then
+          touch "$stop_file"
+        fi
+      fi
+    fi
+
+    unset "job_pids[$pid]"
+    unset "job_combos[$pid]"
+    unset "job_outputs[$pid]"
+  }
+
+  while true; do
+    if [[ -f "$stop_file" ]]; then
+      for pid in "${!job_pids[@]}"; do
+        wait "$pid" 2>/dev/null && exit_code=0 || exit_code=$?
+        process_completed_job "$pid" "$exit_code"
+      done
+      break
+    fi
+
+    for pid in "${!job_pids[@]}"; do
+      if ! kill -0 "$pid" 2>/dev/null; then
+        wait "$pid" 2>/dev/null && exit_code=0 || exit_code=$?
+        process_completed_job "$pid" "$exit_code"
+      fi
+    done
+
+    local running_count=${#job_pids[@]}
+    while [[ "$running_count" -lt "$max_jobs" ]]; do
+      if [[ ! -s "$queue_file" ]]; then
+        break
+      fi
+
+      local combo
+      combo=$(head -1 "$queue_file")
+      tail -n +2 "$queue_file" > "$queue_file.tmp"
+      mv "$queue_file.tmp" "$queue_file"
+
+      if [[ -f "$stop_file" ]]; then
+        break
+      fi
+
+      IFS=: read -r swift_ver syntax_ver <<< "$combo"
+      local syntax_range_val
+      syntax_range_val=$(syntax_range "$syntax_ver")
+
+      echo "$combo" >> "$running_file"
+
+      local output_file="$state_dir/output_${swift_ver}_${syntax_ver}"
+
+      # Mount source read-only, copy into container for full isolation.
+      # Each container gets its own Package.resolved and .build — no shared state.
+      (
+        podman run --rm \
+          -v "$(pwd)":/source:ro \
+          -e "SWIFT_SYNTAX_VERSION=$syntax_range_val" \
+          "swift:$swift_ver" \
+          bash -c "mkdir -p /workspace && cp -a /source/. /workspace/ && cd /workspace && rm -f Package.resolved && swift test"
+      ) > "$output_file" 2>&1 &
+
+      local pid=$!
+      job_pids[$pid]=1
+      job_combos[$pid]="$combo"
+      job_outputs[$pid]="$output_file"
+
+      ((running_count++)) || true
+    done
+
+    update_status
+
+    if [[ ${#job_pids[@]} -eq 0 && ! -s "$queue_file" ]]; then
+      break
+    fi
+
+    sleep 0.1
+  done
+
+  [[ "$IS_TTY" == true ]] && printf "\r\033[K"
+
+  local passed=$(cat "$state_dir/passed")
+  local failed=$(cat "$state_dir/failed")
+
+  echo ""
+  echo "Results: $passed passed, $failed failed (of $total)"
+
+  if [[ "$failed" -gt 0 ]]; then
+    echo ""
+    echo "Failed combinations:"
+    while IFS= read -r combo; do
+      echo "  - $combo"
+    done < "$results_file"
+    echo ""
+    echo "Re-run a specific failure with:"
+    echo "  $(basename "$0") --swift <version> --swift-syntax <version> --verbose"
+    exit 1
+  fi
+}
+
+# ============================================================================
+# Main
+# ============================================================================
+if [[ "$parallel_jobs" -gt 0 ]]; then
+  echo "Running $total combinations with $parallel_jobs parallel jobs..."
+  run_parallel
+else
+  run_sequential
+fi

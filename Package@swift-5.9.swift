@@ -1,5 +1,6 @@
 // swift-tools-version:5.9
 
+import Foundation
 import PackageDescription
 
 let package = Package(
@@ -26,7 +27,11 @@ let package = Package(
   ],
   dependencies: [
     .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "1.3.3"),
-    .package(url: "https://github.com/swiftlang/swift-syntax", "509.0.0"..<"605.0.0"),
+    .conditionalPackage(
+      url: "https://github.com/swiftlang/swift-syntax",
+      envVar: "SWIFT_SYNTAX_VERSION",
+      default: "509.0.0..<605.0.0"
+    ),
   ],
   targets: [
     .target(
@@ -67,3 +72,33 @@ let package = Package(
     ),
   ]
 )
+
+extension Package.Dependency {
+  static func conditionalPackage(
+    url: String,
+    envVar: String,
+    default versionExpression: String
+  ) -> Package.Dependency {
+    let versionRangeString = ProcessInfo.processInfo.environment[envVar] ?? versionExpression
+    let rangeOperators = ["..<", "..."]
+    for op in rangeOperators {
+      if versionRangeString.contains(op) {
+        let parts = versionRangeString.split(separator: op, maxSplits: 1, omittingEmptySubsequences: true)
+          .map(String.init)
+        guard
+          parts.count == 2,
+          let lower = Version(parts[0]),
+          let upper = Version(parts[1])
+        else {
+          fatalError("Invalid version expression format: \(versionRangeString)")
+        }
+        if op == "..<" {
+          return .package(url: url, lower..<upper)
+        } else {
+          return .package(url: url, lower...upper)
+        }
+      }
+    }
+    fatalError("No valid range operator found in expression: \(versionRangeString)")
+  }
+}

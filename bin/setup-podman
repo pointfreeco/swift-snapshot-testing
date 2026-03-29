@@ -1,0 +1,490 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Setup Podman VM for Linux testing.
+# Interactive by default — guides developers through configuration.
+
+# ============================================================================
+# RAM lookup table (Apple Silicon configurations)
+# ============================================================================
+# Format: "host_gb:recommended_gb:light_gb" (light_gb=0 means no light option)
+readonly RAM_TABLE=(
+  "16:10:0"
+  "24:16:8"
+  "36:24:12"
+  "48:32:16"
+  "64:48:16"
+  "96:72:24"
+  "128:96:32"
+  "192:144:32"
+  "256:192:32"
+  "512:384:48"
+)
+
+# ============================================================================
+# Helper functions
+# ============================================================================
+
+# Lookup RAM configuration, rounding down to nearest tier
+lookup_ram() {
+  local host_gb="$1"
+  local result=""
+
+  for entry in "${RAM_TABLE[@]}"; do
+    IFS=: read -r tier_gb rec_gb light_gb <<< "$entry"
+    if [[ "$host_gb" -ge "$tier_gb" ]]; then
+      result="$entry"
+    fi
+  done
+
+  if [[ -z "$result" ]]; then
+    # Below minimum tier, use smallest
+    result="${RAM_TABLE[0]}"
+  fi
+
+  echo "$result"
+}
+
+# Calculate CPUs for recommended (75% of host, minimum 4)
+calc_cpus_recommended() {
+  local host_cpus="$1"
+  local cpus=$((host_cpus * 3 / 4))
+  if [[ "$cpus" -lt 4 ]]; then
+    cpus=4
+  fi
+  echo "$cpus"
+}
+
+# Calculate CPUs for light (50% of host, minimum 4)
+calc_cpus_light() {
+  local host_cpus="$1"
+  local cpus=$((host_cpus / 2))
+  if [[ "$cpus" -lt 4 ]]; then
+    cpus=4
+  fi
+  echo "$cpus"
+}
+
+# Calculate parallel jobs based on VM resources
+# Uses same formula as bin/test-linux: min(memory/8GB, cpus/3, 8)
+calc_parallel_jobs() {
+  local memory_gb="$1"
+  local cpus="$2"
+
+  local jobs_by_memory=$((memory_gb / 8))
+  local jobs_by_cpus=$((cpus / 3))
+  local max_jobs=8
+
+  local jobs=$jobs_by_memory
+  if [[ "$jobs_by_cpus" -lt "$jobs" ]]; then
+    jobs=$jobs_by_cpus
+  fi
+  if [[ "$max_jobs" -lt "$jobs" ]]; then
+    jobs=$max_jobs
+  fi
+  if [[ "$jobs" -lt 1 ]]; then
+    jobs=1
+  fi
+  echo "$jobs"
+}
+
+# Get current machine state
+get_machine_state() {
+  if ! podman machine inspect &>/dev/null; then
+    echo "none"
+  else
+    local state
+    state=$(podman machine inspect --format '{{.State}}' 2>/dev/null)
+    echo "$state"
+  fi
+}
+
+# Get current machine resources
+get_machine_resources() {
+  local memory_mb cpus
+  memory_mb=$(podman machine inspect --format '{{.Resources.Memory}}' 2>/dev/null) || echo "0"
+  cpus=$(podman machine inspect --format '{{.Resources.CPUs}}' 2>/dev/null) || echo "0"
+  local memory_gb=$((memory_mb / 1024))
+  echo "$memory_gb $cpus"
+}
+
+# Prompt for selection
+prompt_choice() {
+  local prompt="$1"
+  local max="$2"
+  local choice
+
+  while true; do
+    printf "%s" "$prompt" >&2
+    read -r choice
+    if [[ "$choice" =~ ^[1-9][0-9]*$ ]] && [[ "$choice" -ge 1 ]] && [[ "$choice" -le "$max" ]]; then
+      echo "$choice"
+      return
+    fi
+    echo "Please enter a number between 1 and $max" >&2
+  done
+}
+
+# ============================================================================
+# Actions
+# ============================================================================
+
+create_machine() {
+  local memory_mb="$1"
+  local cpus="$2"
+
+  echo ""
+  echo "Creating Podman machine..."
+  podman machine init --memory "$memory_mb" --cpus "$cpus"
+  echo "Starting Podman machine..."
+  podman machine start
+  echo ""
+  echo "✓ Ready"
+}
+
+start_machine() {
+  echo ""
+  echo "Starting Podman machine..."
+  podman machine start
+  echo ""
+  echo "✓ Ready"
+}
+
+stop_machine() {
+  echo ""
+  echo "Stopping Podman machine..."
+  podman machine stop
+  echo ""
+  echo "✓ Stopped"
+}
+
+reconfigure_machine() {
+  local memory_mb="$1"
+  local cpus="$2"
+  local was_running="$3"
+
+  echo ""
+  if [[ "$was_running" == "running" ]]; then
+    echo "Stopping Podman machine..."
+    podman machine stop
+  fi
+  echo "Reconfiguring..."
+  podman machine set --memory "$memory_mb" --cpus "$cpus"
+  echo "Starting Podman machine..."
+  podman machine start
+  echo ""
+  echo "✓ Ready"
+}
+
+delete_machine() {
+  echo ""
+  echo "Deleting Podman machine..."
+  podman machine rm -f
+  echo ""
+  echo "✓ Deleted"
+}
+
+# ============================================================================
+# Interactive flows
+# ============================================================================
+
+flow_no_machine() {
+  local host_gb="$1"
+  local host_cpus="$2"
+  local ram_entry="$3"
+
+  IFS=: read -r tier_gb rec_gb light_gb <<< "$ram_entry"
+  local rec_cpus light_cpus
+  rec_cpus=$(calc_cpus_recommended "$host_cpus")
+  light_cpus=$(calc_cpus_light "$host_cpus")
+
+  local rec_jobs light_jobs
+  rec_jobs=$(calc_parallel_jobs "$rec_gb" "$rec_cpus")
+  light_jobs=$(calc_parallel_jobs "$light_gb" "$light_cpus")
+
+  echo ""
+  echo "Create a Podman machine:"
+  echo ""
+
+  if [[ "$light_gb" -eq 0 ]]; then
+    # Only one option for small machines
+    echo "  [1] Recommended (${rec_gb} GB, ${rec_cpus} CPUs) — ${rec_jobs} parallel job(s)"
+    echo "  [2] Custom"
+    echo ""
+
+    local choice
+    choice=$(prompt_choice "> " 2)
+
+    case "$choice" in
+      1) create_machine "$((rec_gb * 1024))" "$rec_cpus" ;;
+      2) flow_custom "$host_cpus" ;;
+    esac
+  else
+
+    echo "  [1] Recommended (${rec_gb} GB, ${rec_cpus} CPUs) — ${rec_jobs} parallel jobs"
+    echo "  [2] Light (${light_gb} GB, ${light_cpus} CPUs) — ${light_jobs} parallel job(s), frees macOS resources"
+    echo "  [3] Custom"
+    echo ""
+
+    local choice
+    choice=$(prompt_choice "> " 3)
+
+    case "$choice" in
+      1) create_machine "$((rec_gb * 1024))" "$rec_cpus" ;;
+      2) create_machine "$((light_gb * 1024))" "$light_cpus" ;;
+      3) flow_custom "$host_cpus" ;;
+    esac
+  fi
+}
+
+flow_stopped() {
+  local current_gb="$1"
+  local current_cpus="$2"
+  local host_gb="$3"
+  local host_cpus="$4"
+  local ram_entry="$5"
+
+  echo ""
+  echo "  [1] Start"
+  echo "  [2] Reconfigure"
+  echo "  [3] Delete"
+  echo ""
+
+  local choice
+  choice=$(prompt_choice "> " 3)
+
+  case "$choice" in
+    1) start_machine ;;
+    2) flow_reconfigure "$host_gb" "$host_cpus" "$ram_entry" "stopped" ;;
+    3) delete_machine ;;
+  esac
+}
+
+flow_running() {
+  local current_gb="$1"
+  local current_cpus="$2"
+  local host_gb="$3"
+  local host_cpus="$4"
+  local ram_entry="$5"
+
+  echo ""
+  echo "Ready! Run 'bin/test-linux' to test."
+  echo ""
+  echo "Other options:"
+  echo "  [1] Reconfigure (will restart)"
+  echo "  [2] Stop"
+  echo "  [3] Delete"
+  echo ""
+  echo "Press Enter to exit, or choose an option:"
+
+  local choice
+  read -r choice
+
+  case "$choice" in
+    "") exit 0 ;;
+    1) flow_reconfigure "$host_gb" "$host_cpus" "$ram_entry" "running" ;;
+    2) stop_machine ;;
+    3) delete_machine ;;
+    *) exit 0 ;;
+  esac
+}
+
+flow_reconfigure() {
+  local host_gb="$1"
+  local host_cpus="$2"
+  local ram_entry="$3"
+  local was_running="$4"
+
+  IFS=: read -r tier_gb rec_gb light_gb <<< "$ram_entry"
+  local rec_cpus light_cpus
+  rec_cpus=$(calc_cpus_recommended "$host_cpus")
+  light_cpus=$(calc_cpus_light "$host_cpus")
+
+  local rec_jobs light_jobs
+  rec_jobs=$(calc_parallel_jobs "$rec_gb" "$rec_cpus")
+  light_jobs=$(calc_parallel_jobs "$light_gb" "$light_cpus")
+
+  echo ""
+  echo "Reconfigure to:"
+  echo ""
+
+  if [[ "$light_gb" -eq 0 ]]; then
+    echo "  [1] Recommended (${rec_gb} GB, ${rec_cpus} CPUs) — ${rec_jobs} parallel job(s)"
+    echo "  [2] Custom"
+    echo ""
+
+    local choice
+    choice=$(prompt_choice "> " 2)
+
+    case "$choice" in
+      1) reconfigure_machine "$((rec_gb * 1024))" "$rec_cpus" "$was_running" ;;
+      2) flow_custom_reconfigure "$host_cpus" "$was_running" ;;
+    esac
+  else
+
+    echo "  [1] Recommended (${rec_gb} GB, ${rec_cpus} CPUs) — ${rec_jobs} parallel jobs"
+    echo "  [2] Light (${light_gb} GB, ${light_cpus} CPUs) — ${light_jobs} parallel job(s)"
+    echo "  [3] Custom"
+    echo ""
+
+    local choice
+    choice=$(prompt_choice "> " 3)
+
+    case "$choice" in
+      1) reconfigure_machine "$((rec_gb * 1024))" "$rec_cpus" "$was_running" ;;
+      2) reconfigure_machine "$((light_gb * 1024))" "$light_cpus" "$was_running" ;;
+      3) flow_custom_reconfigure "$host_cpus" "$was_running" ;;
+    esac
+  fi
+}
+
+flow_custom() {
+  local host_cpus="$1"
+
+  echo ""
+  printf "Memory (GB): "
+  read -r memory_gb
+  printf "CPUs [default: %d]: " "$(calc_cpus_recommended "$host_cpus")"
+  read -r cpus
+
+  if [[ -z "$cpus" ]]; then
+    cpus=$(calc_cpus_recommended "$host_cpus")
+  fi
+
+  create_machine "$((memory_gb * 1024))" "$cpus"
+}
+
+flow_custom_reconfigure() {
+  local host_cpus="$1"
+  local was_running="$2"
+
+  echo ""
+  printf "Memory (GB): "
+  read -r memory_gb
+  printf "CPUs [default: %d]: " "$(calc_cpus_recommended "$host_cpus")"
+  read -r cpus
+
+  if [[ -z "$cpus" ]]; then
+    cpus=$(calc_cpus_recommended "$host_cpus")
+  fi
+
+  reconfigure_machine "$((memory_gb * 1024))" "$cpus" "$was_running"
+}
+
+# ============================================================================
+# Usage
+# ============================================================================
+
+usage() {
+  cat <<EOF
+Usage: $(basename "$0") [OPTIONS]
+
+Setup Podman VM for Linux testing. Interactive by default.
+
+Options:
+  --auto       Non-interactive: start or create with recommended settings
+  --status     Show current status and exit
+  -h, --help   Show this help
+
+Examples:
+  $(basename "$0")           # Interactive setup
+  $(basename "$0") --auto    # Quick start with recommended settings
+  $(basename "$0") --status  # Check current state
+EOF
+}
+
+# ============================================================================
+# Main
+# ============================================================================
+
+# Parse arguments
+auto_mode=false
+status_only=false
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --auto) auto_mode=true; shift ;;
+    --status) status_only=true; shift ;;
+    -h|--help) usage; exit 0 ;;
+    *) echo "Unknown option: $1" >&2; usage >&2; exit 1 ;;
+  esac
+done
+
+# Check Podman installation
+if ! command -v podman &>/dev/null; then
+  echo "Podman: ✗ not installed"
+  echo ""
+  echo "Install with:"
+  echo "  brew install podman"
+  exit 1
+fi
+
+podman_version=$(podman --version | awk '{print $3}')
+echo "Podman: ✓ installed ($podman_version)"
+
+# Get host resources
+host_memory_bytes=$(sysctl -n hw.memsize)
+host_gb=$((host_memory_bytes / 1024 / 1024 / 1024))
+host_cpus=$(sysctl -n hw.ncpu)
+
+# Get machine state
+state=$(get_machine_state)
+
+if [[ "$state" == "none" ]]; then
+  echo "Machine: not found"
+else
+  read -r current_gb current_cpus <<< "$(get_machine_resources)"
+  if [[ "$state" == "running" ]]; then
+    echo "Machine: ✓ running (${current_gb} GB, ${current_cpus} CPUs)"
+  else
+    echo "Machine: stopped (${current_gb} GB, ${current_cpus} CPUs)"
+  fi
+fi
+
+echo ""
+echo "Host: ${host_gb} GB RAM, ${host_cpus} CPUs"
+
+# Status only mode
+if [[ "$status_only" == true ]]; then
+  exit 0
+fi
+
+# Lookup RAM configuration
+ram_entry=$(lookup_ram "$host_gb")
+IFS=: read -r tier_gb rec_gb light_gb <<< "$ram_entry"
+
+# Auto mode
+if [[ "$auto_mode" == true ]]; then
+  rec_cpus=$(calc_cpus_recommended "$host_cpus")
+
+  case "$state" in
+    none)
+      echo ""
+      echo "Creating with recommended settings (${rec_gb} GB, ${rec_cpus} CPUs)..."
+      create_machine "$((rec_gb * 1024))" "$rec_cpus"
+      ;;
+    running)
+      echo ""
+      echo "✓ Ready"
+      ;;
+    *)
+      echo ""
+      echo "Starting..."
+      start_machine
+      ;;
+  esac
+  exit 0
+fi
+
+# Interactive mode
+case "$state" in
+  none)
+    flow_no_machine "$host_gb" "$host_cpus" "$ram_entry"
+    ;;
+  running)
+    flow_running "$current_gb" "$current_cpus" "$host_gb" "$host_cpus" "$ram_entry"
+    ;;
+  *)
+    flow_stopped "$current_gb" "$current_cpus" "$host_gb" "$host_cpus" "$ram_entry"
+    ;;
+esac

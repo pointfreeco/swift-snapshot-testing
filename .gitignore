@@ -38,6 +38,7 @@ playground.xcworkspace
 # Packages/
 # Package.pins
 .build/
+.build-*-*
 .swiftpm
 
 # CocoaPods
@@ -68,3 +69,4 @@ fastlane/screenshots
 fastlane/test_output
 
 .DS_Store
+tmp/
