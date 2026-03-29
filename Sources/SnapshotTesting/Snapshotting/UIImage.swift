@@ -211,7 +211,8 @@ private func normalizedComponentDiff(_ old: UIImage, _ new: UIImage) -> UIImage?
           bitsPerComponent: imageContextBitsPerComponent,
           bitsPerPixel: imageContextBitsPerComponent,
           colorSpace: outputColorSpace,
-          bitmapInfo: .init(),
+          // NB: No trailing comma — Swift 5.9/5.10/6.0 crash parsing it, even inside #if os(iOS).
+          bitmapInfo: .init()
         )
   else {
     return nil
