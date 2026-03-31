@@ -7,6 +7,12 @@
     #if os(iOS) || os(tvOS)
       /// Center the view in a device container described by`config`.
       case device(config: ViewImageConfig)
+      /// Constrain the view to the device width and fit the height to its content.
+      ///
+      /// Use this layout for views that rely on a container-provided width
+      /// (e.g., `containerRelativeFrame`) but should still size their height
+      /// to fit content.
+      case fillWidth(for: ViewImageConfig)
     #endif
     /// Center the view in a fixed size container.
     case fixed(width: CGFloat, height: CGFloat)
@@ -46,17 +52,24 @@
         -> Snapshotting
       {
         let config: ViewImageConfig
+        let fillWidth: CGFloat?
 
         switch layout {
         #if os(iOS) || os(tvOS)
           case let .device(config: deviceConfig):
             config = deviceConfig
+            fillWidth = nil
+          case let .fillWidth(for: deviceConfig):
+            config = .init(safeArea: .zero, size: nil, traits: deviceConfig.traits ?? traits)
+            fillWidth = deviceConfig.size?.width
         #endif
         case .sizeThatFits:
           config = .init(safeArea: .zero, size: nil, traits: traits)
+          fillWidth = nil
         case let .fixed(width: width, height: height):
           let size = CGSize(width: width, height: height)
           config = .init(safeArea: .zero, size: size, traits: traits)
+          fillWidth = nil
         }
 
         return SimplySnapshotting.image(
@@ -66,15 +79,35 @@
 
           let controller: UIViewController
 
-          if config.size != nil {
+          if let fillWidth {
+            let hostingController = UIHostingController(rootView: view)
+            let proposed = CGSize(width: fillWidth, height: .greatestFiniteMagnitude)
+            config.size = hostingController.sizeThatFits(in: proposed)
+            controller = hostingController
+          } else if config.size != nil {
             controller = UIHostingController.init(
               rootView: view
             )
+          } else if #available(iOS 16.0, tvOS 16.0, *) {
+            let colorScheme: ColorScheme = traits.userInterfaceStyle == .dark ? .dark : .light
+            let styledView = view.environment(\.colorScheme, colorScheme)
+            let displayScale = traits.displayScale
+
+            return Async<UIImage> { callback in
+              MainActor.assumeIsolated {
+                let renderer = ImageRenderer(content: styledView)
+                renderer.proposedSize = ProposedViewSize(width: nil, height: nil)
+                renderer.scale = displayScale > 0
+                  ? CGFloat(displayScale)
+                  : UIScreen.main.scale
+                callback(renderer.uiImage ?? UIImage())
+              }
+            }
           } else {
             let hostingController = UIHostingController.init(rootView: view)
-
-            let maxSize = CGSize(width: 0.0, height: 0.0)
-            config.size = hostingController.sizeThatFits(in: maxSize)
+            let screenWidth = UIScreen.main.bounds.width
+            let proposed = CGSize(width: screenWidth, height: .greatestFiniteMagnitude)
+            config.size = hostingController.sizeThatFits(in: proposed)
 
             controller = hostingController
           }

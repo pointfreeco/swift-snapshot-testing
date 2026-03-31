@@ -1300,6 +1300,30 @@ final class SnapshotTestingTests: BaseTestCase {
         as: .image(layout: .device(config: .iPhoneSe), traits: .init(userInterfaceStyle: .light)),
         named: "device")
     }
+
+    @available(iOS 13.0, *)
+    func testSwiftUIView_sizeThatFits_padding() {
+      let view = Text("Hello, World!")
+        .padding()
+
+      assertSnapshot(
+        of: view, as: .image(layout: .sizeThatFits, traits: .init(userInterfaceStyle: .light)),
+        named: "size-that-fits")
+    }
+
+    @available(iOS 13.0, *)
+    func testSwiftUIView_sizeThatFits_spacer() {
+      let view = HStack {
+        Text("Left")
+        Spacer()
+        Text("Right")
+      }
+      .padding()
+
+      assertSnapshot(
+        of: view, as: .image(layout: .sizeThatFits, traits: .init(userInterfaceStyle: .light)),
+        named: "size-that-fits")
+    }
   #endif
 
   #if os(tvOS)
