@@ -211,7 +211,7 @@ private func normalizedComponentDiff(_ old: UIImage, _ new: UIImage) -> UIImage?
           bitsPerComponent: imageContextBitsPerComponent,
           bitsPerPixel: imageContextBitsPerComponent,
           colorSpace: outputColorSpace,
-          bitmapInfo: .init(),
+          bitmapInfo: .init()
         )
   else {
     return nil
