@@ -242,6 +242,23 @@
           return .init(safeArea: safeArea, size: size, traits: .iPhone13ProMax(orientation))
         }
 
+        public static let iPhone17Pro = ViewImageConfig.iPhone17Pro(.portrait)
+
+        public static func iPhone17Pro(_ orientation: Orientation) -> ViewImageConfig {
+          let safeArea: UIEdgeInsets
+          let size: CGSize
+          switch orientation {
+          case .landscape:
+            safeArea = .init(top: 20, left: 62, bottom: 20, right: 62)
+            size = .init(width: 874, height: 402)
+          case .portrait:
+            safeArea = .init(top: 62, left: 0, bottom: 34, right: 0)
+            size = .init(width: 402, height: 874)
+          }
+
+          return .init(safeArea: safeArea, size: size, traits: .iPhone17Pro(orientation))
+        }
+
         public static let iPadMini = ViewImageConfig.iPadMini(.landscape)
 
         public static func iPadMini(_ orientation: Orientation) -> ViewImageConfig {
@@ -760,6 +777,33 @@
             return .init(
               traitsFrom: base + [
                 .init(horizontalSizeClass: .regular),
+                .init(verticalSizeClass: .compact),
+              ]
+            )
+          case .portrait:
+            return .init(
+              traitsFrom: base + [
+                .init(horizontalSizeClass: .compact),
+                .init(verticalSizeClass: .regular),
+              ]
+            )
+          }
+        }
+
+        public static func iPhone17Pro(_ orientation: ViewImageConfig.Orientation)
+          -> UITraitCollection
+        {
+          let base: [UITraitCollection] = [
+            .init(forceTouchCapability: .unavailable),
+            .init(layoutDirection: .leftToRight),
+            .init(preferredContentSizeCategory: .medium),
+            .init(userInterfaceIdiom: .phone),
+          ]
+          switch orientation {
+          case .landscape:
+            return .init(
+              traitsFrom: base + [
+                .init(horizontalSizeClass: .compact),
                 .init(verticalSizeClass: .compact),
               ]
             )
