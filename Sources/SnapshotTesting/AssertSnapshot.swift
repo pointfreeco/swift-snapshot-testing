@@ -537,8 +537,11 @@ public func verifySnapshot<Value, Format>(
       }
 
       if record == .failed {
-        try recordSnapshot(writeToDisk: true)
-        failureMessage += " A new snapshot was automatically recorded."
+        let shouldWriteToDisk = artifactsDirectory == nil
+        try recordSnapshot(writeToDisk: shouldWriteToDisk)
+        if shouldWriteToDisk {
+          failureMessage += " A new snapshot was automatically recorded."
+        }
       }
 
       return """
