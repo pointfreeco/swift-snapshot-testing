@@ -73,6 +73,15 @@
           } else {
             let hostingController = UIHostingController.init(rootView: view)
 
+            // NB: Avoid safe area influence.
+            if config.safeArea == .zero {
+              if #available(iOS 16.4, tvOS 16.4, *) {
+                hostingController.safeAreaRegions = []
+              } else {
+                hostingController._disableSafeArea = true
+              }
+            }
+
             let maxSize = CGSize(width: 0.0, height: 0.0)
             config.size = hostingController.sizeThatFits(in: maxSize)
 
