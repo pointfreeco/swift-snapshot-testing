@@ -440,15 +440,22 @@ public func verifySnapshot<Value, Format>(
             No reference was found on disk. New snapshot was not recorded because recording is disabled
             """
         } else {
-          try recordSnapshot(writeToDisk: true)
+          let shouldWriteToDisk = artifactsDirectory == nil
+          try recordSnapshot(writeToDisk: shouldWriteToDisk)
 
-          return """
-            No reference was found on disk. Automatically recorded snapshot: …
+          if shouldWriteToDisk {
+            return """
+              No reference was found on disk. Automatically recorded snapshot: …
 
-            open "\(snapshotFileUrl.absoluteString)"
+              open "\(snapshotFileUrl.absoluteString)"
 
-            Re-run "\(testName)" to assert against the newly-recorded snapshot.
-            """
+              Re-run "\(testName)" to assert against the newly-recorded snapshot.
+              """
+          } else {
+            return """
+              No reference was found on disk. Snapshot was not recorded because an artifacts directory is configured.
+              """
+          }
         }
       }
 
