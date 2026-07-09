@@ -22,7 +22,7 @@ let package = Package(
   ],
   dependencies: [
     .package(
-      url: "https://github.com/apple/swift-syntax.git",
+      url: "https://github.com/swiftlang/swift-syntax",
       from: "509.0.0-swift-DEVELOPMENT-SNAPSHOT-2023-09-05-a"
     )
   ],
