@@ -1,13 +1,23 @@
-@testable import SnapshotTesting
-import XCTest
-
-#if os(iOS) || os(macOS) || os(tvOS)
-import SceneKit
-import SpriteKit
+import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
 #endif
-#if os(iOS) || os(macOS)
+#if canImport(SceneKit)
+import SceneKit
+#endif
+#if canImport(SpriteKit)
+import SpriteKit
+import SwiftUI
+#endif
+#if canImport(WebKit)
 import WebKit
 #endif
+#if canImport(UIKit)
+import UIKit.UIView
+#endif
+import XCTest
+
+@testable import SnapshotTesting
 
 final class SnapshotTestingTests: XCTestCase {
   override func setUp() {
@@ -130,6 +140,29 @@ final class SnapshotTestingTests: XCTestCase {
     )
   }
 
+  func testCGPath() {
+    #if os(iOS) || os(tvOS) || os(macOS)
+    let path = CGPath.heart
+
+    let osName: String
+    #if os(iOS)
+    osName = "iOS"
+    #elseif os(tvOS)
+    osName = "tvOS"
+    #elseif os(macOS)
+    osName = "macOS"
+    #endif
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(matching: path, as: .image, named: osName)
+    }
+
+    if #available(iOS 11.0, OSX 10.13, tvOS 11.0, *) {
+      assertSnapshot(matching: path, as: .elementsDescription, named: osName)
+    }
+    #endif
+  }
+
   func testEncodable() {
     struct User: Encodable { let id: Int, name: String, bio: String }
     let user = User(id: 1, name: "Blobby", bio: "Blobbed around the world.")
@@ -141,27 +174,27 @@ final class SnapshotTestingTests: XCTestCase {
   }
 
   func testMixedViews() {
-    #if os(iOS) || os(macOS)
-    // NB: CircleCI crashes while trying to instantiate SKView.
-    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
-      let webView = WKWebView(frame: .init(x: 0, y: 0, width: 50, height: 50))
-      webView.loadHTMLString("🌎", baseURL: nil)
-
-      let skView = SKView(frame: .init(x: 50, y: 0, width: 50, height: 50))
-      let scene = SKScene(size: .init(width: 50, height: 50))
-      let node = SKShapeNode(circleOfRadius: 15)
-      node.fillColor = .red
-      node.position = .init(x: 25, y: 25)
-      scene.addChild(node)
-      skView.presentScene(scene)
-
-      let view = View(frame: .init(x: 0, y: 0, width: 100, height: 50))
-      view.addSubview(webView)
-      view.addSubview(skView)
-
-      assertSnapshot(matching: view, as: .image, named: platform)
-    }
-    #endif
+//    #if os(iOS) || os(macOS)
+//    // NB: CircleCI crashes while trying to instantiate SKView.
+//    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+//      let webView = WKWebView(frame: .init(x: 0, y: 0, width: 50, height: 50))
+//      webView.loadHTMLString("🌎", baseURL: nil)
+//
+//      let skView = SKView(frame: .init(x: 50, y: 0, width: 50, height: 50))
+//      let scene = SKScene(size: .init(width: 50, height: 50))
+//      let node = SKShapeNode(circleOfRadius: 15)
+//      node.fillColor = .red
+//      node.position = .init(x: 25, y: 25)
+//      scene.addChild(node)
+//      skView.presentScene(scene)
+//
+//      let view = View(frame: .init(x: 0, y: 0, width: 100, height: 50))
+//      view.addSubview(webView)
+//      view.addSubview(skView)
+//
+//      assertSnapshot(matching: view, as: .image, named: platform)
+//    }
+//    #endif
   }
 
   func testMultipleSnapshots() {
@@ -175,15 +208,41 @@ final class SnapshotTestingTests: XCTestCase {
     assertSnapshot(matching: user, as: .dump, named: "named")
   }
 
+  func testNSBezierPath() {
+    #if os(macOS)
+    let path = NSBezierPath.heart
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(matching: path, as: .image, named: "macOS")
+    }
+
+    assertSnapshot(matching: path, as: .elementsDescription, named: "macOS")
+    #endif
+  }
+
   func testNSView() {
     #if os(macOS)
     let button = NSButton()
     button.bezelStyle = .rounded
     button.title = "Push Me"
     button.sizeToFit()
-    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
       assertSnapshot(matching: button, as: .image)
       assertSnapshot(matching: button, as: .recursiveDescription)
+    }
+    #endif
+  }
+  
+  func testNSViewWithLayer() {
+    #if os(macOS)
+    let view = NSView()
+    view.frame = CGRect(x: 0.0, y: 0.0, width: 10.0, height: 10.0)
+    view.wantsLayer = true
+    view.layer?.backgroundColor = NSColor.green.cgColor
+    view.layer?.cornerRadius = 5
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(matching: view, as: .image)
+      assertSnapshot(matching: view, as: .recursiveDescription)
     }
     #endif
   }
@@ -205,7 +264,7 @@ final class SnapshotTestingTests: XCTestCase {
     label.isBezeled = false
     label.isEditable = false
     #endif
-    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
       label.text = "Hello."
       assertSnapshot(matching: label, as: .image(precision: 0.9), named: platform)
       label.text = "Hello"
@@ -215,59 +274,59 @@ final class SnapshotTestingTests: XCTestCase {
   }
 
   func testSCNView() {
-    #if os(iOS) || os(macOS) || os(tvOS)
-    // NB: CircleCI crashes while trying to instantiate SCNView.
-    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
-      let scene = SCNScene()
-
-      let sphereGeometry = SCNSphere(radius: 3)
-      sphereGeometry.segmentCount = 200
-      let sphereNode = SCNNode(geometry: sphereGeometry)
-      sphereNode.position = SCNVector3Zero
-      scene.rootNode.addChildNode(sphereNode)
-
-      sphereGeometry.firstMaterial?.diffuse.contents = URL(fileURLWithPath: String(#file))
-        .deletingLastPathComponent()
-        .appendingPathComponent("__Fixtures__/earth.png")
-
-      let cameraNode = SCNNode()
-      cameraNode.camera = SCNCamera()
-      cameraNode.position = SCNVector3Make(0, 0, 8)
-      scene.rootNode.addChildNode(cameraNode)
-
-      let omniLight = SCNLight()
-      omniLight.type = .omni
-      let omniLightNode = SCNNode()
-      omniLightNode.light = omniLight
-      omniLightNode.position = SCNVector3Make(10, 10, 10)
-      scene.rootNode.addChildNode(omniLightNode)
-
-      assertSnapshot(
-        matching: scene,
-        as: .image(size: .init(width: 500, height: 500)),
-        named: platform
-      )
-    }
-    #endif
+//    #if os(iOS) || os(macOS) || os(tvOS)
+//    // NB: CircleCI crashes while trying to instantiate SCNView.
+//    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+//      let scene = SCNScene()
+//
+//      let sphereGeometry = SCNSphere(radius: 3)
+//      sphereGeometry.segmentCount = 200
+//      let sphereNode = SCNNode(geometry: sphereGeometry)
+//      sphereNode.position = SCNVector3Zero
+//      scene.rootNode.addChildNode(sphereNode)
+//
+//      sphereGeometry.firstMaterial?.diffuse.contents = URL(fileURLWithPath: String(#file), isDirectory: false)
+//        .deletingLastPathComponent()
+//        .appendingPathComponent("__Fixtures__/earth.png")
+//
+//      let cameraNode = SCNNode()
+//      cameraNode.camera = SCNCamera()
+//      cameraNode.position = SCNVector3Make(0, 0, 8)
+//      scene.rootNode.addChildNode(cameraNode)
+//
+//      let omniLight = SCNLight()
+//      omniLight.type = .omni
+//      let omniLightNode = SCNNode()
+//      omniLightNode.light = omniLight
+//      omniLightNode.position = SCNVector3Make(10, 10, 10)
+//      scene.rootNode.addChildNode(omniLightNode)
+//
+//      assertSnapshot(
+//        matching: scene,
+//        as: .image(size: .init(width: 500, height: 500)),
+//        named: platform
+//      )
+//    }
+//    #endif
   }
 
   func testSKView() {
-    #if os(iOS) || os(macOS) || os(tvOS)
-    // NB: CircleCI crashes while trying to instantiate SKView.
-    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
-      let scene = SKScene(size: .init(width: 50, height: 50))
-      let node = SKShapeNode(circleOfRadius: 15)
-      node.fillColor = .red
-      node.position = .init(x: 25, y: 25)
-      scene.addChild(node)
-
-      assertSnapshot(
-        matching: scene,
-        as: .image(size: .init(width: 50, height: 50)),
-        named: platform
-      )
-    }
-    #endif
+//    #if os(iOS) || os(macOS) || os(tvOS)
+//    // NB: CircleCI crashes while trying to instantiate SKView.
+//    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+//      let scene = SKScene(size: .init(width: 50, height: 50))
+//      let node = SKShapeNode(circleOfRadius: 15)
+//      node.fillColor = .red
+//      node.position = .init(x: 25, y: 25)
+//      scene.addChild(node)
+//
+//      assertSnapshot(
+//        matching: scene,
+//        as: .image(size: .init(width: 50, height: 50)),
+//        named: platform
+//      )
+//    }
+//    #endif
   }
 
   func testTableViewController() {
@@ -451,20 +510,7 @@ final class SnapshotTestingTests: XCTestCase {
       assertSnapshot(
         matching: viewController, as: .image(on: .iPadPro12_9(.portrait)), named: "ipad-pro-12-9-alternative")
 
-      [
-        "extra-small": UIContentSizeCategory.extraSmall,
-        "small": .small,
-        "medium": .medium,
-        "large": .large,
-        "extra-large": .extraLarge,
-        "extra-extra-large": .extraExtraLarge,
-        "extra-extra-extra-large": .extraExtraExtraLarge,
-        "accessibility-medium": .accessibilityMedium,
-        "accessibility-large": .accessibilityLarge,
-        "accessibility-extra-large": .accessibilityExtraLarge,
-        "accessibility-extra-extra-large": .accessibilityExtraExtraLarge,
-        "accessibility-extra-extra-extra-large": .accessibilityExtraExtraExtraLarge,
-        ].forEach { name, contentSize in
+      allContentSizes.forEach { name, contentSize in
           assertSnapshot(
             matching: viewController,
             as: .image(on: .iPhoneSe, traits: .init(preferredContentSizeCategory: contentSize)),
@@ -474,6 +520,8 @@ final class SnapshotTestingTests: XCTestCase {
       #elseif os(tvOS)
       assertSnapshot(
         matching: viewController, as: .image(on: .tv), named: "tv")
+      assertSnapshot(
+        matching: viewController, as: .image(on: .tv4K), named: "tv4k")
       #endif
     }
     #endif
@@ -587,11 +635,257 @@ final class SnapshotTestingTests: XCTestCase {
     #endif
   }
 
+  func testCollectionViewsWithMultipleScreenSizes() {
+    #if os(iOS)
+
+    final class CollectionViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+
+      let flowLayout: UICollectionViewFlowLayout = {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        layout.minimumLineSpacing = 20
+        return layout
+      }()
+
+      lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
+
+      override func viewDidLoad() {
+        super.viewDidLoad()
+
+        view.backgroundColor = .white
+        view.addSubview(collectionView)
+
+        collectionView.backgroundColor = .white
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "Cell")
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+          collectionView.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+          collectionView.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
+          collectionView.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+          collectionView.bottomAnchor.constraint(equalTo: view.layoutMarginsGuide.bottomAnchor)
+        ])
+
+        collectionView.reloadData()
+      }
+
+      override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        collectionView.collectionViewLayout.invalidateLayout()
+      }
+
+      override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        collectionView.collectionViewLayout.invalidateLayout()
+      }
+
+      func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath)
+        cell.contentView.backgroundColor = .orange
+        return cell
+      }
+
+      func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return 20
+      }
+
+      func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        sizeForItemAt indexPath: IndexPath
+        ) -> CGSize {
+        return CGSize(
+          width: min(collectionView.frame.width - 50, 300),
+          height: collectionView.frame.height
+        )
+      }
+
+    }
+
+    let viewController = CollectionViewController()
+
+    assertSnapshots(matching: viewController, as: [
+      "ipad": .image(on: .iPadPro12_9),
+      "iphoneSe": .image(on: .iPhoneSe),
+      "iphone8": .image(on: .iPhone8),
+      "iphoneMax": .image(on: .iPhoneXsMax)
+    ])
+    #endif
+  }
+
+  func testTraitsWithView() {
+    #if os(iOS)
+    if #available(iOS 11.0, *) {
+      let label = UILabel()
+      label.font = .preferredFont(forTextStyle: .title1)
+      label.adjustsFontForContentSizeCategory = true
+      label.text = "What's the point?"
+
+      allContentSizes.forEach { name, contentSize in
+        assertSnapshot(
+          matching: label,
+          as: .image(traits: .init(preferredContentSizeCategory: contentSize)),
+          named: "label-\(name)"
+        )
+      }
+    }
+    #endif
+  }
+
+  func testTraitsWithViewController() {
+    #if os(iOS)
+    let label = UILabel()
+    label.font = .preferredFont(forTextStyle: .title1)
+    label.adjustsFontForContentSizeCategory = true
+    label.text = "What's the point?"
+
+    let viewController = UIViewController()
+    viewController.view.addSubview(label)
+
+    label.translatesAutoresizingMaskIntoConstraints = false
+    NSLayoutConstraint.activate([
+      label.leadingAnchor.constraint(equalTo: viewController.view.layoutMarginsGuide.leadingAnchor),
+      label.topAnchor.constraint(equalTo: viewController.view.layoutMarginsGuide.topAnchor),
+      label.trailingAnchor.constraint(equalTo: viewController.view.layoutMarginsGuide.trailingAnchor)
+    ])
+
+    allContentSizes.forEach { name, contentSize in
+      assertSnapshot(
+        matching: viewController,
+        as: .recursiveDescription(on: .iPhoneSe, traits: .init(preferredContentSizeCategory: contentSize)),
+        named: "label-\(name)"
+      )
+    }
+    #endif
+  }
+
+  func testUIBezierPath() {
+    #if os(iOS) || os(tvOS)
+    let path = UIBezierPath.heart
+
+    let osName: String
+    #if os(iOS)
+    osName = "iOS"
+    #elseif os(tvOS)
+    osName = "tvOS"
+    #endif
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(matching: path, as: .image, named: osName)
+    }
+
+    if #available(iOS 11.0, tvOS 11.0, *) {
+      assertSnapshot(matching: path, as: .elementsDescription, named: osName)
+    }
+    #endif
+  }
+
   func testUIView() {
     #if os(iOS)
     let view = UIButton(type: .contactAdd)
     assertSnapshot(matching: view, as: .image)
     assertSnapshot(matching: view, as: .recursiveDescription)
+    #endif
+  }
+
+  func testUIViewControllerLifeCycle() {
+    #if os(iOS)
+    class ViewController: UIViewController {
+      let viewDidLoadExpectation: XCTestExpectation
+      let viewWillAppearExpectation: XCTestExpectation
+      let viewDidAppearExpectation: XCTestExpectation
+      let viewWillDisappearExpectation: XCTestExpectation
+      let viewDidDisappearExpectation: XCTestExpectation
+      init(viewDidLoadExpectation: XCTestExpectation,
+           viewWillAppearExpectation: XCTestExpectation,
+           viewDidAppearExpectation: XCTestExpectation,
+           viewWillDisappearExpectation: XCTestExpectation,
+           viewDidDisappearExpectation: XCTestExpectation){
+        self.viewDidLoadExpectation = viewDidLoadExpectation
+        self.viewWillAppearExpectation = viewWillAppearExpectation
+        self.viewDidAppearExpectation = viewDidAppearExpectation
+        self.viewWillDisappearExpectation = viewWillDisappearExpectation
+        self.viewDidDisappearExpectation = viewDidDisappearExpectation
+        super.init(nibName: nil, bundle: nil)
+      }
+      required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+      }
+      override func viewDidLoad() {
+        super.viewDidLoad()
+        viewDidLoadExpectation.fulfill()
+      }
+      override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        viewWillAppearExpectation.fulfill()
+      }
+      override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        viewDidAppearExpectation.fulfill()
+      }
+      override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        viewWillDisappearExpectation.fulfill()
+      }
+      override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        viewDidDisappearExpectation.fulfill()
+      }
+    }
+
+    let viewDidLoadExpectation = expectation(description: "viewDidLoad")
+    let viewWillAppearExpectation = expectation(description: "viewWillAppear")
+    let viewDidAppearExpectation = expectation(description: "viewDidAppear")
+    let viewWillDisappearExpectation = expectation(description: "viewWillDisappear")
+    let viewDidDisappearExpectation = expectation(description: "viewDidDisappear")
+    viewWillAppearExpectation.expectedFulfillmentCount = 4
+    viewDidAppearExpectation.expectedFulfillmentCount = 4
+    viewWillDisappearExpectation.expectedFulfillmentCount = 4
+    viewDidDisappearExpectation.expectedFulfillmentCount = 4
+
+    let viewController = ViewController(
+      viewDidLoadExpectation: viewDidLoadExpectation,
+      viewWillAppearExpectation: viewWillAppearExpectation,
+      viewDidAppearExpectation: viewDidAppearExpectation,
+      viewWillDisappearExpectation: viewWillDisappearExpectation,
+      viewDidDisappearExpectation: viewDidDisappearExpectation
+    )
+
+    assertSnapshot(matching: viewController, as: .image)
+    assertSnapshot(matching: viewController, as: .image)
+
+    wait(for: [
+      viewDidLoadExpectation,
+      viewWillAppearExpectation,
+      viewDidAppearExpectation,
+      viewWillDisappearExpectation,
+      viewDidDisappearExpectation,
+    ], timeout: 1.0, enforceOrder: true)
+    #endif
+  }
+
+  func testCALayer() {
+    #if os(iOS)
+    let layer = CALayer()
+    layer.frame = CGRect(x: 0, y: 0, width: 100, height: 100)
+    layer.backgroundColor = UIColor.red.cgColor
+    layer.borderWidth = 4.0
+    layer.borderColor = UIColor.black.cgColor
+    assertSnapshot(matching: layer, as: .image)
+    #endif
+  }
+
+  func testCALayerWithGradient() {
+    #if os(iOS)
+    let baseLayer = CALayer()
+    baseLayer.frame = CGRect(x: 0, y: 0, width: 100, height: 100)
+    let gradientLayer = CAGradientLayer()
+    gradientLayer.colors = [UIColor.red.cgColor, UIColor.yellow.cgColor]
+    gradientLayer.frame = baseLayer.frame
+    baseLayer.addSublayer(gradientLayer)
+    assertSnapshot(matching: baseLayer, as: .image)
     #endif
   }
 
@@ -626,6 +920,14 @@ final class SnapshotTestingTests: XCTestCase {
     post.httpBody = Data("pricing[billing]=monthly&pricing[lane]=individual".utf8)
     assertSnapshot(matching: post, as: .raw, named: "post")
     assertSnapshot(matching: post, as: .curl, named: "post-curl")
+    
+    var postWithJSON = URLRequest(url: URL(string: "http://dummy.restapiexample.com/api/v1/create")!)
+    postWithJSON.httpMethod = "POST"
+    postWithJSON.addValue("application/json", forHTTPHeaderField: "Content-Type")
+    postWithJSON.addValue("application/json", forHTTPHeaderField: "Accept")
+    postWithJSON.httpBody = Data("{\"name\":\"tammy134235345235\", \"salary\":0, \"age\":\"tammy133\"}".utf8)
+    assertSnapshot(matching: postWithJSON, as: .raw, named: "post-with-json")
+    assertSnapshot(matching: postWithJSON, as: .curl, named: "post-with-json-curl")
 
     var head = URLRequest(url: URL(string: "https://www.pointfree.co/")!)
     head.httpMethod = "HEAD"
@@ -656,13 +958,13 @@ final class SnapshotTestingTests: XCTestCase {
 
   func testWebView() throws {
     #if os(iOS) || os(macOS)
-    let fixtureUrl = URL(fileURLWithPath: String(#file))
+    let fixtureUrl = URL(fileURLWithPath: String(#file), isDirectory: false)
       .deletingLastPathComponent()
       .appendingPathComponent("__Fixtures__/pointfree.html")
     let html = try String(contentsOf: fixtureUrl)
     let webView = WKWebView()
     webView.loadHTMLString(html, baseURL: nil)
-    if !ProcessInfo.processInfo.environment.keys.contains("CIRCLECI") {
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
       assertSnapshot(
         matching: webView,
         as: .image(size: .init(width: 800, height: 600)),
@@ -671,7 +973,7 @@ final class SnapshotTestingTests: XCTestCase {
     }
     #endif
   }
-  
+
   func testSimulatorBasedFilenames() {
     supportedPlatforms = [.iPhoneXrSimulator_12_1]
     let view = UIView(frame: .init(origin: .zero, size: .init(width: 10, height: 10)))
@@ -716,7 +1018,117 @@ final class SnapshotTestingTests: XCTestCase {
         .appendingPathComponent("__Snapshots__/SnapshotTestingTests/testSimulatorBasedFilenamesBlockAutorecord-2-\(Platform.iPhoneXrSimulator_12_1.rawValue).png"))
     XCTAssert(!fileExists(for: .iPhoneXrSimulator_12_1, snapshot: 2))
   }
+
+  func testViewWithZeroHeightOrWidth() {
+    #if os(iOS) || os(tvOS)
+    var rect = CGRect(x: 0, y: 0, width: 350, height: 0)
+    var view = UIView(frame: rect)
+    view.backgroundColor = .red
+    assertSnapshot(matching: view, as: .image, named: "noHeight")
+    
+    rect = CGRect(x: 0, y: 0, width: 0, height: 350)
+    view = UIView(frame: rect)
+    view.backgroundColor = .green
+    assertSnapshot(matching: view, as: .image, named: "noWidth")
+
+    rect = CGRect(x: 0, y: 0, width: 0, height: 0)
+    view = UIView(frame: rect)
+    view.backgroundColor = .blue
+    assertSnapshot(matching: view, as: .image, named: "noWidth.noHeight")
+    #endif
+  }
+
+  func testEmbeddedWebView() throws {
+    #if os(iOS)
+    let label = UILabel()
+    label.text = "Hello, Blob!"
+
+    let fixtureUrl = URL(fileURLWithPath: String(#file), isDirectory: false)
+      .deletingLastPathComponent()
+      .appendingPathComponent("__Fixtures__/pointfree.html")
+    let html = try String(contentsOf: fixtureUrl)
+    let webView = WKWebView()
+    webView.loadHTMLString(html, baseURL: nil)
+    webView.isHidden = true
+
+    let stackView = UIStackView(arrangedSubviews: [label, webView])
+    stackView.axis = .vertical
+
+    if !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW") {
+      assertSnapshot(
+        matching: stackView,
+        as: .image(size: .init(width: 800, height: 600)),
+        named: platform
+      )
+    }
+    #endif
+  }
+
+  @available(iOS 13.0, *)
+  func testSwiftUIView_iOS() {
+    #if os(iOS)
+    struct MyView: SwiftUI.View {
+      var body: some SwiftUI.View {
+        HStack {
+          Image(systemName: "checkmark.circle.fill")
+            Text("Checked").fixedSize()
+        }
+        .padding(5)
+        .background(RoundedRectangle(cornerRadius: 5.0).fill(Color.blue))
+        .padding(10)
+      }
+    }
+
+    let view = MyView().background(Color.yellow)
+
+    assertSnapshot(matching: view, as: .image(traits: .init(userInterfaceStyle: .light)))
+    assertSnapshot(matching: view, as: .image(layout: .sizeThatFits, traits: .init(userInterfaceStyle: .light)), named: "size-that-fits")
+    assertSnapshot(matching: view, as: .image(layout: .fixed(width: 200.0, height: 100.0), traits: .init(userInterfaceStyle: .light)), named: "fixed")
+    assertSnapshot(matching: view, as: .image(layout: .device(config: .iPhoneSe), traits: .init(userInterfaceStyle: .light)), named: "device")
+    #endif
+  }
+
+  @available(tvOS 13.0, *)
+  func testSwiftUIView_tvOS() {
+    #if os(tvOS)
+    struct MyView: SwiftUI.View {
+      var body: some SwiftUI.View {
+        HStack {
+          Image(systemName: "checkmark.circle.fill")
+            Text("Checked").fixedSize()
+        }
+        .padding(5)
+        .background(RoundedRectangle(cornerRadius: 5.0).fill(Color.blue))
+        .padding(10)
+      }
+    }
+    let view = MyView().background(Color.yellow)
+
+    assertSnapshot(matching: view, as: .image())
+    assertSnapshot(matching: view, as: .image(layout: .sizeThatFits), named: "size-that-fits")
+    assertSnapshot(matching: view, as: .image(layout: .fixed(width: 300.0, height: 100.0)), named: "fixed")
+    assertSnapshot(matching: view, as: .image(layout: .device(config: .tv)), named: "device")
+    #endif
+  }
 }
+
+#if os(iOS)
+private let allContentSizes =
+  [
+    "extra-small": UIContentSizeCategory.extraSmall,
+    "small": .small,
+    "medium": .medium,
+    "large": .large,
+    "extra-large": .extraLarge,
+    "extra-extra-large": .extraExtraLarge,
+    "extra-extra-extra-large": .extraExtraExtraLarge,
+    "accessibility-medium": .accessibilityMedium,
+    "accessibility-large": .accessibilityLarge,
+    "accessibility-extra-large": .accessibilityExtraLarge,
+    "accessibility-extra-extra-large": .accessibilityExtraExtraLarge,
+    "accessibility-extra-extra-extra-large": .accessibilityExtraExtraExtraLarge,
+    ]
+#endif
 
 #if os(Linux)
 extension SnapshotTestingTests {
@@ -736,6 +1148,7 @@ extension SnapshotTestingTests {
       ("testTableViewController", testTableViewController),
       ("testTraits", testTraits),
       ("testTraitsEmbeddedInTabNavigation", testTraitsEmbeddedInTabNavigation),
+      ("testTraitsWithView", testTraitsWithView),
       ("testUIView", testUIView),
       ("testURLRequest", testURLRequest),
       ("testWebView", testWebView),

@@ -51,7 +51,7 @@ public func assertSnapshot<Value, Format>(
 ///
 /// - Parameters:
 ///   - value: A value to compare against a reference.
-///   - snapshotting: An dictionnay of names and strategies for serializing, deserializing, and comparing values.
+///   - snapshotting: A dictionary of names and strategies for serializing, deserializing, and comparing values.
 ///   - recording: Whether or not to record a new reference.
 ///   - timeout: The amount of time a snapshot must be generated in.
 ///   - file: The file in which failure occurred. Defaults to the file name of the test case in which this function was called.
@@ -171,10 +171,10 @@ public func verifySnapshot<Value, Format>(
     let recording = recording || record
 
     do {
-      let fileUrl = URL(fileURLWithPath: "\(file)")
+      let fileUrl = URL(fileURLWithPath: "\(file)", isDirectory: false)
       let fileName = fileUrl.deletingPathExtension().lastPathComponent
 
-      let snapshotDirectoryUrl = snapshotDirectory.map(URL.init(fileURLWithPath:))
+      let snapshotDirectoryUrl = snapshotDirectory.map { URL(fileURLWithPath: $0, isDirectory: true) }
         ?? fileUrl
           .deletingLastPathComponent()
           .appendingPathComponent("__Snapshots__")
@@ -214,25 +214,27 @@ public func verifySnapshot<Value, Format>(
       case .completed:
         break
       case .timedOut:
-        return "Exceeded timeout of \(timeout) seconds waiting for snapshot"
+        return """
+          Exceeded timeout of \(timeout) seconds waiting for snapshot.
+
+          This can happen when an asynchronously rendered view (like a web view) has not loaded. \
+          Ensure that every subview of the view hierarchy has loaded to avoid timeouts, or, if a \
+          timeout is unavoidable, consider setting the "timeout" parameter of "assertSnapshot" to \
+          a higher value.
+          """
       case .incorrectOrder, .invertedFulfillment, .interrupted:
         return "Couldn't snapshot value"
       @unknown default:
         return "Couldn't snapshot value"
       }
 
-      guard let diffable = optionalDiffable else {
+      guard var diffable = optionalDiffable else {
         return "Couldn't snapshot value"
       }
-
+      
       guard !recording, fileManager.fileExists(atPath: snapshotFileUrl.path) else {
-        let diffMessage = (try? Data(contentsOf: snapshotFileUrl))
-          .flatMap { data in snapshotting.diffing.diff(snapshotting.diffing.fromData(data), diffable) }
-          .map { diff, _ in diff.trimmingCharacters(in: .whitespacesAndNewlines) }
-          ?? "Recorded snapshot: …"
-
         // FIXME: check for pre-v2 filename format which will no longer match
-        
+
         if let supportedPlatforms = supportedPlatforms,
           !supportedPlatforms.contains(platform),
           let otherSnapshots = Optional.some(try fileManager.contentsOfDirectory(
@@ -248,7 +250,7 @@ public func verifySnapshot<Value, Format>(
           see "\(snapshotFromOtherSimulator)"
           """
         }
-          
+
         try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)
         return recording
           ? """
@@ -256,7 +258,7 @@ public func verifySnapshot<Value, Format>(
 
             open "\(snapshotFileUrl.path)"
 
-            \(diffMessage)
+            Recorded snapshot: …
             """
           : """
             No reference was found on disk. Automatically recorded snapshot: …
@@ -270,12 +272,19 @@ public func verifySnapshot<Value, Format>(
       let data = try Data(contentsOf: snapshotFileUrl)
       let reference = snapshotting.diffing.fromData(data)
 
+      #if os(iOS) || os(tvOS)
+      // If the image generation fails for the diffable part use the reference
+      if let localDiff = diffable as? UIImage, localDiff.size == .zero {
+        diffable = reference
+      }
+      #endif
+
       guard let (failure, attachments) = snapshotting.diffing.diff(reference, diffable) else {
         return nil
       }
 
       let artifactsUrl = URL(
-        fileURLWithPath: ProcessInfo.processInfo.environment["SNAPSHOT_ARTIFACTS"] ?? NSTemporaryDirectory()
+        fileURLWithPath: ProcessInfo.processInfo.environment["SNAPSHOT_ARTIFACTS"] ?? NSTemporaryDirectory(), isDirectory: true
       )
       let artifactsSubUrl = artifactsUrl.appendingPathComponent(fileName)
       try fileManager.createDirectory(at: artifactsSubUrl, withIntermediateDirectories: true)

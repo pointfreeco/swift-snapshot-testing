@@ -48,7 +48,7 @@ public struct Snapshotting<Value, Format> {
 
   /// Transforms a strategy on `Value`s into a strategy on `NewValue`s through a function `(NewValue) -> Value`.
   ///
-  /// This is the most important operation for transforming existing strategies into new strategies. It allows you to transform a `Snapshotting<Value, Format>` into a `Snapshotting<NewValue, Format>` by pulling it back along a function `(NewValue) -> Value`. Notice that the function must go in in the direction `(NewValue) -> Value` even though we are transforming in the other direction `(Snapshotting<Value, Format>) -> Snapshotting<NewValue, Format>`.
+  /// This is the most important operation for transforming existing strategies into new strategies. It allows you to transform a `Snapshotting<Value, Format>` into a `Snapshotting<NewValue, Format>` by pulling it back along a function `(NewValue) -> Value`. Notice that the function must go in the direction `(NewValue) -> Value` even though we are transforming in the other direction `(Snapshotting<Value, Format>) -> Snapshotting<NewValue, Format>`.
   ///
   /// A simple example of this is to `pullback` the snapshot strategy on `UIView`s to work on `UIViewController`s:
   ///

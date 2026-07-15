@@ -22,7 +22,7 @@ extension Snapshotting where Value == UIView, Format == UIImage {
     )
     -> Snapshotting {
 
-      return SimplySnapshotting.image(precision: precision).asyncPullback { view in
+      return SimplySnapshotting.image(precision: precision, scale: traits.displayScale).asyncPullback { view in
         snapshotView(
           config: .init(safeArea: .zero, size: size ?? view.frame.size, traits: .init()),
           drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
@@ -36,7 +36,9 @@ extension Snapshotting where Value == UIView, Format == UIImage {
 
 extension Snapshotting where Value == UIView, Format == String {
   /// A snapshot strategy for comparing views based on a recursive description of their properties and hierarchies.
-  public static let recursiveDescription = Snapshotting<UIView, String>.recursiveDescription()
+  public static var recursiveDescription: Snapshotting {
+    return Snapshotting.recursiveDescription()
+  }
 
   /// A snapshot strategy for comparing views based on a recursive description of their properties and hierarchies.
   public static func recursiveDescription(
@@ -45,13 +47,14 @@ extension Snapshotting where Value == UIView, Format == String {
     )
     -> Snapshotting<UIView, String> {
       return SimplySnapshotting.lines.pullback { view in
-        prepareView(
+        let dispose = prepareView(
           config: .init(safeArea: .zero, size: size ?? view.frame.size, traits: traits),
           drawHierarchyInKeyWindow: false,
           traits: .init(),
           view: view,
           viewController: .init()
         )
+        defer { dispose() }
         return purgePointers(
           view.perform(Selector(("recursiveDescription"))).retain().takeUnretainedValue()
             as! String

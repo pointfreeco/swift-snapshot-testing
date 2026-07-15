@@ -337,6 +337,11 @@ public struct ViewImageConfig {
     size: .init(width: 1920, height: 1080),
     traits: .init()
   )
+  public static let tv4K = ViewImageConfig(
+    safeArea: .init(top: 120, left: 180, bottom: 120, right: 180),
+    size: .init(width: 3840, height: 2160),
+    traits: .init()
+  )
   #endif
 }
 
@@ -576,7 +581,7 @@ extension View {
       #endif
       return perform()
     }
-    #if os(iOS) || os(tvOS)
+    #if (os(iOS) && !targetEnvironment(macCatalyst)) || os(tvOS)
     if let glkView = self as? GLKView {
       return Async(value: inWindow { glkView.snapshot })
     }
@@ -603,6 +608,10 @@ extension View {
         let work = {
           if #available(iOS 11.0, macOS 10.13, *) {
             inWindow {
+              guard wkWebView.frame.width != 0, wkWebView.frame.height != 0 else {
+                callback(Image())
+                return
+              }
               wkWebView.takeSnapshot(with: nil) { image, _ in
                 _ = delegate
                 callback(image!)
@@ -628,6 +637,14 @@ extension View {
     #endif
     return nil
   }
+  #if os(iOS) || os(tvOS)
+  func asImage() -> Image {
+    let renderer = UIGraphicsImageRenderer(bounds: bounds)
+    return renderer.image { rendererContext in
+      layer.render(in: rendererContext.cgContext)
+    }
+  }
+  #endif
 }
 
 #if os(iOS) || os(macOS)
@@ -647,17 +664,26 @@ private final class NavigationDelegate: NSObject, WKNavigationDelegate {
 #endif
 
 #if os(iOS) || os(tvOS)
+extension UIApplication {
+    static var sharedIfAvailable: UIApplication? {
+      let sharedSelector = NSSelectorFromString("shared")
+      guard UIApplication.responds(to: sharedSelector) else {
+        return nil
+      }
+      
+      let shared = UIApplication.perform(sharedSelector)
+      return shared?.takeUnretainedValue() as! UIApplication?
+  }
+}
+
 func prepareView(
   config: ViewImageConfig,
   drawHierarchyInKeyWindow: Bool,
   traits: UITraitCollection,
   view: UIView,
   viewController: UIViewController
-  ) {
+  ) -> () -> Void {
   let size = config.size ?? viewController.view.frame.size
-  guard size.width > 0, size.height > 0 else {
-    fatalError("View not renderable to image at size \(size)")
-  }
   view.frame.size = size
   if view != viewController.view {
     viewController.view.bounds = view.bounds
@@ -666,7 +692,7 @@ func prepareView(
   let traits = UITraitCollection(traitsFrom: [config.traits, traits])
   let window: UIWindow
   if drawHierarchyInKeyWindow {
-    guard let keyWindow = UIApplication.shared.keyWindow else {
+    guard let keyWindow = UIApplication.sharedIfAvailable?.keyWindow else {
       fatalError("'drawHierarchyInKeyWindow' requires tests to be run in a host application")
     }
     window = keyWindow
@@ -677,7 +703,16 @@ func prepareView(
       viewController: viewController
     )
   }
-  add(traits: traits, viewController: viewController, to: window)
+  let dispose = add(traits: traits, viewController: viewController, to: window)
+
+  if size.width == 0 || size.height == 0 {
+    // Try to call sizeToFit() if the view still has invalid size
+    view.sizeToFit()
+    view.setNeedsLayout()
+    view.layoutIfNeeded()
+  }
+
+  return dispose
 }
 
 func snapshotView(
@@ -689,7 +724,7 @@ func snapshotView(
   )
   -> Async<UIImage> {
     let initialFrame = view.frame
-    prepareView(
+    let dispose = prepareView(
       config: config,
       drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
       traits: traits,
@@ -698,7 +733,8 @@ func snapshotView(
     )
     // NB: Avoid safe area influence.
     if config.safeArea == .zero { view.frame.origin = .init(x: offscreen, y: offscreen) }
-    return view.snapshot ?? Async { callback in
+
+    return (view.snapshot ?? Async { callback in
       addImagesForRenderedViews(view).sequence().run { views in
         callback(
           renderer(bounds: view.bounds, for: traits).image { ctx in
@@ -712,7 +748,7 @@ func snapshotView(
         views.forEach { $0.removeFromSuperview() }
         view.frame = initialFrame
       }
-    }
+    }).map { dispose(); return $0 }
 }
 
 private let offscreen: CGFloat = 10_000
@@ -727,33 +763,50 @@ func renderer(bounds: CGRect, for traits: UITraitCollection) -> UIGraphicsImageR
   return renderer
 }
 
-private func add(traits: UITraitCollection, viewController: UIViewController, to window: UIWindow) {
-  let rootViewController = UIViewController()
-  rootViewController.view.backgroundColor = .clear
-  rootViewController.view.frame = window.frame
-  rootViewController.view.translatesAutoresizingMaskIntoConstraints =
-    viewController.view.translatesAutoresizingMaskIntoConstraints
-  rootViewController.preferredContentSize = rootViewController.view.frame.size
-  viewController.view.frame = rootViewController.view.frame
-  rootViewController.view.addSubview(viewController.view)
-  if viewController.view.translatesAutoresizingMaskIntoConstraints {
-    viewController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-  } else {
-    NSLayoutConstraint.activate([
-      viewController.view.topAnchor.constraint(equalTo: rootViewController.view.topAnchor),
-      viewController.view.bottomAnchor.constraint(equalTo: rootViewController.view.bottomAnchor),
-      viewController.view.leadingAnchor.constraint(equalTo: rootViewController.view.leadingAnchor),
-      viewController.view.trailingAnchor.constraint(equalTo: rootViewController.view.trailingAnchor),
+private func add(traits: UITraitCollection, viewController: UIViewController, to window: UIWindow) -> () -> Void {
+  let rootViewController: UIViewController
+  if viewController != window.rootViewController {
+    rootViewController = UIViewController()
+    rootViewController.view.backgroundColor = .clear
+    rootViewController.view.frame = window.frame
+    rootViewController.view.translatesAutoresizingMaskIntoConstraints =
+      viewController.view.translatesAutoresizingMaskIntoConstraints
+    rootViewController.preferredContentSize = rootViewController.view.frame.size
+    viewController.view.frame = rootViewController.view.frame
+    rootViewController.view.addSubview(viewController.view)
+    if viewController.view.translatesAutoresizingMaskIntoConstraints {
+      viewController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    } else {
+      NSLayoutConstraint.activate([
+        viewController.view.topAnchor.constraint(equalTo: rootViewController.view.topAnchor),
+        viewController.view.bottomAnchor.constraint(equalTo: rootViewController.view.bottomAnchor),
+        viewController.view.leadingAnchor.constraint(equalTo: rootViewController.view.leadingAnchor),
+        viewController.view.trailingAnchor.constraint(equalTo: rootViewController.view.trailingAnchor),
       ])
+    }
+    rootViewController.addChild(viewController)
+  } else {
+    rootViewController = viewController
   }
-  rootViewController.addChild(viewController)
   rootViewController.setOverrideTraitCollection(traits, forChild: viewController)
   viewController.didMove(toParent: rootViewController)
+
+  window.rootViewController = rootViewController
+
   rootViewController.beginAppearanceTransition(true, animated: false)
   rootViewController.endAppearanceTransition()
-  window.rootViewController = rootViewController
+
   rootViewController.view.setNeedsLayout()
   rootViewController.view.layoutIfNeeded()
+
+  viewController.view.setNeedsLayout()
+  viewController.view.layoutIfNeeded()
+
+  return {
+    rootViewController.beginAppearanceTransition(false, animated: false)
+    rootViewController.endAppearanceTransition()
+    window.rootViewController = nil
+  }
 }
 
 private final class Window: UIWindow {

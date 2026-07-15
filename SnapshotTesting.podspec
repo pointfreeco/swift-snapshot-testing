@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = "SnapshotTesting"
-  s.version = "1.5.0"
+  s.version = "1.8.1"
   s.summary = "Tests that save and assert against reference data"
 
   s.description = <<-DESC
@@ -24,13 +24,14 @@ Pod::Spec.new do |s|
     :tag => s.version
   }
 
-  s.swift_version = "5.0"
+  s.swift_versions = "5.0", "5.1.2", "5.2"
 
-  s.ios.deployment_target = "10.0"
+  s.ios.deployment_target = "11.0"
   s.osx.deployment_target = "10.10"
   s.tvos.deployment_target = "10.0"
 
   s.frameworks = "XCTest"
+  s.pod_target_xcconfig = { 'ENABLE_BITCODE' => 'NO' }
 
   s.source_files  = "Sources", "Sources/**/*.swift"
 end

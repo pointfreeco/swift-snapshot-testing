@@ -1,6 +1,8 @@
 # 📸 SnapshotTesting
 
-[![Swift 5](https://img.shields.io/badge/swift-5-ED523F.svg?style=flat)](https://swift.org/download/) [![iOS/macOS/tvOS CI](https://img.shields.io/circleci/project/github/pointfreeco/swift-snapshot-testing/master.svg?label=ios/macos/tvos)](https://circleci.com/gh/pointfreeco/swift-snapshot-testing) [![Linux CI](https://img.shields.io/travis/pointfreeco/swift-snapshot-testing/master.svg?label=linux)](https://travis-ci.org/pointfreeco/swift-snapshot-testing) [![@pointfreeco](https://img.shields.io/badge/contact-@pointfreeco-5AA9E7.svg?style=flat)](https://twitter.com/pointfreeco)
+[![Swift 5.1](https://img.shields.io/badge/swift-5.1-ED523F.svg?style=flat)](https://swift.org/download/)
+[![CI](https://github.com/pointfreeco/swift-snapshot-testing/workflows/CI/badge.svg)](https://actions-badge.atrox.dev/pointfreeco/swift-snapshot-testing/goto)
+[![@pointfreeco](https://img.shields.io/badge/contact-@pointfreeco-5AA9E7.svg?style=flat)](https://twitter.com/pointfreeco)
 
 Delightful Swift snapshot testing.
 
@@ -33,7 +35,7 @@ When an assertion first runs, a snapshot is automatically recorded to disk and t
 >
 > Re-run "testMyViewController" to test against the newly-recorded snapshot.
 
-Repeat test runs will load this reference and compare it with the runtime value. If they don't match, the test will fail and describe the difference.
+Repeat test runs will load this reference and compare it with the runtime value. If they don't match, the test will fail and describe the difference. Failures can be inspected from Xcode's Report Navigator or by inspecting the file URLs of the failure.
 
 You can record a new reference by setting the `record` mode to `true` on the assertion or globally.
 
@@ -126,12 +128,40 @@ If your data can be represented as an image, text, or data, you can write a snap
 
 ## Installation
 
+### Xcode 11
+
+> ⚠️ Warning: By default, Xcode will try to add the SnapshotTesting package to your project's main application/framework target. Please ensure that SnapshotTesting is added to a _test_ target instead, as documented in the last step, below.
+
+ 1. From the **File** menu, navigate through **Swift Packages** and select **Add Package Dependency…**.
+ 2. Enter package repository URL: `https://github.com/pointfreeco/swift-snapshot-testing.git`
+ 3. Confirm the version and let Xcode resolve the package
+ 4. On the final dialog, update SnapshotTesting's **Add to Target** column to a test target that will contain snapshot tests (if you have more than one test target, you can later add SnapshotTesting to them by manually linking the library in its build phase)
+
+### Swift Package Manager
+
+If you want to use SnapshotTesting in any other project that uses [SwiftPM](https://swift.org/package-manager/), add the package as a dependency in `Package.swift`:
+
+```swift
+dependencies: [
+  .package(name: "SnapshotTesting", url: "https://github.com/pointfreeco/swift-snapshot-testing.git", from: "1.8.1"),
+]
+```
+
+Next, add `SnapshotTesting` as a dependency of your test target:
+
+```swift
+targets: [
+  .target(name: "MyApp", dependencies: [], path: "Sources"),
+  .testTarget(name: "MyAppTests", dependencies: ["MyApp", "SnapshotTesting"])
+]
+```
+
 ### Carthage
 
 If you use [Carthage](https://github.com/Carthage/Carthage), you can add the following dependency to your `Cartfile`:
 
 ``` ruby
-github "pointfreeco/swift-snapshot-testing" ~> 1.5
+github "pointfreeco/swift-snapshot-testing" ~> 1.8.0
 ```
 
 > ⚠️ Warning: Carthage instructs you to drag frameworks into your Xcode project. Xcode may automatically attempt to link these frameworks to your app target. `SnapshotTesting.framework` is only compatible with test targets, so when you first add it to your project:
@@ -149,18 +179,8 @@ If your project uses [CocoaPods](https://cocoapods.org), add the pod to any appl
 
 ```ruby
 target 'MyAppTests' do
-  pod 'SnapshotTesting', '~> 1.5'
+  pod 'SnapshotTesting', '~> 1.8.1'
 end
-```
-
-### Swift Package Manager
-
-If you want to use SnapshotTesting in a project that uses [SwiftPM](https://swift.org/package-manager/), add the package as a dependency in `Package.swift`:
-
-```swift
-dependencies: [
-  .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", from: "1.5.0"),
-]
 ```
 
 ## Features
@@ -182,6 +202,12 @@ dependencies: [
   - [swift-snapshot-testing-nimble](https://github.com/Killectro/swift-snapshot-testing-nimble) adds [Nimble](https://github.com/Quick/Nimble) matchers for SnapshotTesting.
 
   - [swift-html](https://github.com/pointfreeco/swift-html) is a Swift DSL for type-safe, extensible, and transformable HTML documents and includes an `HtmlSnapshotTesting` module to snapshot test its HTML documents.
+  
+  - [GRDBSnapshotTesting](https://github.com/SebastianOsinski/GRDBSnapshotTesting) adds snapshot strategy for testing SQLite database migrations made with [GRDB](https://github.com/groue/GRDB.swift).
+  
+  - [AccessibilitySnapshot+SnapshotTesting](https://github.com/Sherlouk/AccessibilitySnapshot-SnapshotTesting) adds [AccessibilitySnapshot](https://github.com/cashapp/AccessibilitySnapshot) support for SnapshotTesting.
+  
+  - [PreviewSnapshots](https://github.com/doordash-oss/swiftui-preview-snapshots) share `View` configurations between SwiftUI Previews and snapshot tests and generate several snapshots with a single test assertion.
 
 Have you written your own SnapshotTesting plug-in? [Add it here](https://github.com/pointfreeco/swift-snapshot-testing/edit/master/README.md) and submit a pull request!
   
@@ -195,7 +221,7 @@ Have you written your own SnapshotTesting plug-in? [Add it here](https://github.
 
 SnapshotTesting was designed with [witness-oriented programming](https://www.pointfree.co/episodes/ep39-witness-oriented-library-design).
 
-This concept (and more) are explored thoroughly in a series of episodes on [Point-Free](https://www.pointfree.co), a video series exploring functional programming and Swift hosted by [Brandon Williams](https://github.com/mbrandonw) and [Stephen Celis](https://github.com/stephencelis).
+This concept (and more) are explored thoroughly in a series of episodes on [Point-Free](https://www.pointfree.co), a video series exploring functional programming and Swift hosted by [Brandon Williams](https://twitter.com/mbrandonw) and [Stephen Celis](https://twitter.com/stephencelis).
 
 Witness-oriented programming and the design of this library was explored in the following [Point-Free](https://www.pointfree.co) episodes:
 
