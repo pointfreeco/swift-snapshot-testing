@@ -137,8 +137,3 @@ extension Platform: RawRepresentable {
     return try! NSRegularExpression(pattern: pattern)
   }()
 }
-
-extension Platform {
-  public static let iPhone5sSimulator_12_1 = Platform(os: .iOS, version: "12.1", gamut: .srgb, scale: 2)
-  public static let iPhoneXrSimulator_12_1 = Platform(os: .iOS, version: "12.1", gamut: .p3, scale: 2)
-}
