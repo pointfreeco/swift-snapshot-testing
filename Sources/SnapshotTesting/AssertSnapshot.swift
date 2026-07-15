@@ -8,7 +8,18 @@ public var diffTool: String? = nil
 /// Whether or not to record all new references.
 public var record = false
 
-/// Simulators and devices to record snapshots for, or nil for pre-2.0 compatibility
+/// The platforms snapshots are maintained for, or nil for the legacy single-platform behavior.
+///
+/// - `nil` (the default): snapshot filenames are `testName.identifier.ext` and no platform
+///   checks are performed. Snapshots recorded on one simulator are compared — and spuriously
+///   fail — against runs on any other simulator.
+/// - non-nil: filenames embed the platform that recorded them (e.g.
+///   `testName-identifier-iOS-18.5-p3@3x.ext`), so each platform keeps its own reference
+///   files. When snapshots of a test exist but none matches the current platform, the current
+///   platform must be listed here before a new snapshot is recorded — this stops unlisted
+///   simulators from silently recording references nobody maintains. An empty array is valid:
+///   the very first snapshot of a test can always be recorded (bootstrapping), after which the
+///   guard applies.
 public var supportedPlatforms: [Platform]? = nil
 
 /// Asserts that a given value matches a reference on disk.
@@ -194,9 +205,9 @@ public func verifySnapshot<Value, Format>(
 
       let platform = Platform()
       let testName = sanitizePathComponent(testName)
-      let preV2Basename = "\(testName).\(identifier)"
-      let postV2Basename = "\(testName)-\(identifier)-\(platform.rawValue)"
-      let fileBasename: String = supportedPlatforms == nil ? preV2Basename : postV2Basename
+      let fileBasename = supportedPlatforms == nil
+        ? "\(testName).\(identifier)"
+        : "\(testName)-\(identifier)-\(platform.rawValue)"
       let snapshotFileUrl = snapshotDirectoryUrl
         .appendingPathComponent(fileBasename)
         .appendingPathExtension(snapshotting.pathExtension ?? "")
@@ -233,22 +244,34 @@ public func verifySnapshot<Value, Format>(
       }
       
       guard !recording, fileManager.fileExists(atPath: snapshotFileUrl.path) else {
-        // FIXME: check for pre-v2 filename format which will no longer match
+        if let supportedPlatforms = supportedPlatforms, !supportedPlatforms.contains(platform) {
+          let snapshotsFromOtherPlatforms = try fileManager
+            .contentsOfDirectory(atPath: snapshotDirectoryUrl.path)
+            .compactMap { fileName -> (path: String, platform: Platform)? in
+              guard
+                let filePlatform = Platform.ofSnapshot(
+                  fileNamed: fileName, testName: testName, identifier: identifier),
+                filePlatform != platform
+                else { return nil }
+              return (snapshotDirectoryUrl.appendingPathComponent(fileName).path, filePlatform)
+            }
+            .sorted { $0.path < $1.path }
+          if !snapshotsFromOtherPlatforms.isEmpty {
+            // Do *not* record a snapshot, regardless of recording=true
+            return """
+            A snapshot already exists from an incompatible simulator, and the current platform \
+            "\(platform.rawValue)" is not in SnapshotTesting.supportedPlatforms. Not recording.
 
-        if let supportedPlatforms = supportedPlatforms,
-          !supportedPlatforms.contains(platform),
-          let otherSnapshots = Optional.some(try fileManager.contentsOfDirectory(
-            atPath: snapshotFileUrl.deletingLastPathComponent().path)),
-          // FIXME: duplicated string-construction
-          let snapshotFromOtherSimulator = otherSnapshots
-            .first(where: { $0.starts(with: "\(testName)-\(identifier)-") }) {
-          // Do *not* autorecord a screenshot, regardless of recording=true
-          // FIXME: this reports only the filename, not full path, of the other snapshot
-          return """
-          A screenshot already exists from an incompatible simulator. To record from this simulator add "\(platform.rawValue)" to SnapshotTesting.supportedPlatforms.
-          
-          see "\(snapshotFromOtherSimulator)"
-          """
+            Existing snapshots:
+
+            \(snapshotsFromOtherPlatforms.map { "\"\($0.path)\"" }.joined(separator: "\n"))
+
+            Either run this test on a simulator matching one of those platforms, or add the \
+            current platform to record from this simulator:
+
+            SnapshotTesting.supportedPlatforms = [..., Platform(rawValue: "\(platform.rawValue)")!]
+            """
+          }
         }
 
         try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)

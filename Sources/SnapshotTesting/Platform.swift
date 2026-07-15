@@ -137,3 +137,16 @@ extension Platform: RawRepresentable {
     return try! NSRegularExpression(pattern: pattern)
   }()
 }
+
+extension Platform {
+  /// If `fileName` (e.g. `"testFoo-1-iOS-18.5-p3@3x.png"`) is a platform-suffixed snapshot
+  /// for the given test name and identifier, returns the platform it was recorded on.
+  internal static func ofSnapshot(
+    fileNamed fileName: String, testName: String, identifier: String
+  ) -> Platform? {
+    let basename = (fileName as NSString).deletingPathExtension
+    let prefix = "\(testName)-\(identifier)-"
+    guard basename.hasPrefix(prefix) else { return nil }
+    return Platform(rawValue: String(basename.dropFirst(prefix.count)))
+  }
+}
