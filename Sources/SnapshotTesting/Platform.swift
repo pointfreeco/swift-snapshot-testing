@@ -1,9 +1,10 @@
 import Foundation
+
 #if canImport(UIKit)
-import UIKit
+  import UIKit
 #endif
 #if canImport(AppKit)
-import AppKit
+  import AppKit
 #endif
 
 /// The rendering-relevant identity of the environment a snapshot was recorded on: operating
@@ -33,29 +34,39 @@ public struct Platform: Equatable, Hashable {
     case p3
 
     #if canImport(UIKit) && !os(watchOS)
-    init(from gamut: UIDisplayGamut) {
-      switch gamut {
-      case .unspecified: self = .unspecified
-      case .SRGB: self = .srgb
-      case .P3: self = .p3
-      @unknown default: self = .unspecified
+      init(from gamut: UIDisplayGamut) {
+        switch gamut {
+        case .unspecified: self = .unspecified
+        case .SRGB: self = .srgb
+        case .P3: self = .p3
+        @unknown default: self = .unspecified
+        }
       }
-    }
     #endif
   }
 
   public enum OS: String, CaseIterable {
-    case iOS, macOS, tvOS, linux
+    case iOS, macOS, tvOS, watchOS, visionOS, linux, android, windows, unknown
 
     init() {
       #if os(iOS)
-      self = .iOS
+        self = .iOS
       #elseif os(macOS)
-      self = .macOS
+        self = .macOS
       #elseif os(tvOS)
-      self = .tvOS
+        self = .tvOS
+      #elseif os(watchOS)
+        self = .watchOS
+      #elseif os(visionOS)
+        self = .visionOS
       #elseif os(Linux)
-      self = .linux
+        self = .linux
+      #elseif os(Android)
+        self = .android
+      #elseif os(Windows)
+        self = .windows
+      #else
+        self = .unknown
       #endif
     }
   }
@@ -67,27 +78,27 @@ extension Platform {
     let osVersion = ProcessInfo().operatingSystemVersion
     let version = "\(osVersion.majorVersion).\(osVersion.minorVersion).\(osVersion.patchVersion)"
     #if os(iOS) || os(tvOS)
-    let traits = UIScreen.main.traitCollection
-    self.init(
-      os: OS(),
-      version: version,
-      gamut: Gamut(from: traits.displayGamut),
-      scale: Int(traits.displayScale)
-    )
+      let traits = UIScreen.main.traitCollection
+      self.init(
+        os: OS(),
+        version: version,
+        gamut: Gamut(from: traits.displayGamut),
+        scale: Int(traits.displayScale)
+      )
     #elseif os(macOS)
-    self.init(
-      os: OS(),
-      version: version,
-      gamut: .unspecified,
-      scale: Int(NSScreen.main?.backingScaleFactor ?? 1)
-    )
+      self.init(
+        os: OS(),
+        version: version,
+        gamut: .unspecified,
+        scale: Int(NSScreen.main?.backingScaleFactor ?? 1)
+      )
     #else
-    self.init(
-      os: OS(),
-      version: version,
-      gamut: .unspecified,
-      scale: 0 // "unspecified" in UITraitCollection.displayScale
-    )
+      self.init(
+        os: OS(),
+        version: version,
+        gamut: .unspecified,
+        scale: 0  // "unspecified" in UITraitCollection.displayScale
+      )
     #endif
   }
 
@@ -115,7 +126,7 @@ extension Platform: RawRepresentable {
   public init?(rawValue: String) {
     let fullRange = NSRange(rawValue.startIndex..., in: rawValue)
     guard let match = Platform.rawValueExpression.firstMatch(in: rawValue, range: fullRange)
-      else { return nil }
+    else { return nil }
     func group(_ index: Int) -> String {
       guard let range = Range(match.range(at: index), in: rawValue) else { return "" }
       return String(rawValue[range])
@@ -124,7 +135,7 @@ extension Platform: RawRepresentable {
       let os = OS(rawValue: group(1)),
       let gamut = Gamut(rawValue: group(3)),
       let scale = Int(group(4))
-      else { return nil }
+    else { return nil }
     self.init(os: os, version: group(2), gamut: gamut, scale: scale)
   }
 

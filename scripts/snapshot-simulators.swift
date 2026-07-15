@@ -40,7 +40,7 @@ struct PlatformSpec: Equatable {
   var rawValue: String { return "\(os)-\(version)-\(gamut)@\(scale)x" }
 }
 
-let osCases = ["iOS", "macOS", "tvOS", "linux"]
+let osCases = ["iOS", "macOS", "tvOS", "watchOS", "visionOS", "linux", "android", "windows", "unknown"]
 let gamutCases = ["unspecified", "srgb", "p3"]
 
 /// Trailing zero components beyond major.minor are insignificant: "18.5.0" == "18.5".
@@ -263,12 +263,12 @@ func resolve(_ platformString: String, runtimes: [Runtime], devicesByRuntime: [S
         command: nil)],
       warnings: [])
   }
-  if spec.os == "macOS" || spec.os == "linux" {
+  if spec.os != "iOS" && spec.os != "tvOS" {
     return Resolution(
       platform: platformString, status: "host", matches: [],
       nearMisses: [NearMiss(
         kind: "host",
-        message: "\(spec.os) snapshots run on the host, not a simulator",
+        message: "\(spec.os) snapshots do not run on a simulator this script can resolve",
         command: nil)],
       warnings: [])
   }
