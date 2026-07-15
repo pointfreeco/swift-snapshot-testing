@@ -975,48 +975,60 @@ final class SnapshotTestingTests: XCTestCase {
   }
 
   func testSimulatorBasedFilenames() {
-    supportedPlatforms = [.iPhoneXrSimulator_12_1]
+    #if os(iOS) || os(tvOS)
+    let snapshotDirectory = NSTemporaryDirectory() + "SimulatorBasedFilenames-" + UUID().uuidString
+    defer { try? FileManager.default.removeItem(atPath: snapshotDirectory) }
+
+    supportedPlatforms = [Platform()]
     let view = UIView(frame: .init(origin: .zero, size: .init(width: 10, height: 10)))
-    assertSnapshot(matching: view, as: .image)
-    let snapshotURL = URL(fileURLWithPath: String(#file))
-      .deletingLastPathComponent()
-      .appendingPathComponent("__Snapshots__/SnapshotTestingTests/testSimulatorBasedFilenames-1-\(Platform.iPhoneXrSimulator_12_1.rawValue).png")
-    XCTAssert(FileManager.default.fileExists(atPath: snapshotURL.path))
+    let failure = verifySnapshot(
+      matching: view, as: .image, named: "reference", snapshotDirectory: snapshotDirectory)
+
+    // the first run in an empty directory records a reference named for the current platform
+    XCTAssert(failure?.contains("Automatically recorded") ?? false)
+    let snapshotPath = snapshotDirectory
+      + "/testSimulatorBasedFilenames-reference-\(Platform().rawValue).png"
+    XCTAssert(FileManager.default.fileExists(atPath: snapshotPath))
+
+    // and a second run compares clean against it
+    XCTAssertNil(verifySnapshot(
+      matching: view, as: .image, named: "reference", snapshotDirectory: snapshotDirectory))
+    #endif
   }
-  
+
   func testSimulatorBasedFilenamesBlockAutorecord() {
+    #if os(iOS) || os(tvOS)
+    let fileManager = FileManager.default
+    let snapshotDirectory = NSTemporaryDirectory() + "BlockAutorecord-" + UUID().uuidString
+    try! fileManager.createDirectory(atPath: snapshotDirectory, withIntermediateDirectories: true)
+    defer { try? fileManager.removeItem(atPath: snapshotDirectory) }
+
+    // a reference recorded by some other, incompatible simulator (the guard never reads it)
+    let otherPlatform = Platform(os: .iOS, version: "1.0", gamut: .srgb, scale: 1)
+    XCTAssertNotEqual(otherPlatform, Platform())
+    let otherPath = snapshotDirectory
+      + "/testSimulatorBasedFilenamesBlockAutorecord-reference-\(otherPlatform.rawValue).png"
+    fileManager.createFile(atPath: otherPath, contents: Data("not a real png".utf8))
+
+    let currentPath = snapshotDirectory
+      + "/testSimulatorBasedFilenamesBlockAutorecord-reference-\(Platform().rawValue).png"
     let view = UIView(frame: .init(origin: .zero, size: .init(width: 10, height: 10)))
 
-    func fileExists(for simulator: Platform, snapshot number: UInt) -> Bool {
-      let snapshotURL = URL(fileURLWithPath: String(#file))
-        .deletingLastPathComponent()
-        .appendingPathComponent("__Snapshots__/SnapshotTestingTests/testSimulatorBasedFilenamesBlockAutorecord-\(number)-\(simulator.rawValue).png")
-      return FileManager.default.fileExists(atPath: snapshotURL.path)
-    }
-    // confirm test setup
-    XCTAssert(fileExists(for: .iPhone5sSimulator_12_1, snapshot: 1))
-    XCTAssert(!fileExists(for: .iPhoneXrSimulator_12_1, snapshot: 1))
-    XCTAssert(fileExists(for: .iPhone5sSimulator_12_1, snapshot: 2))
-    XCTAssert(!fileExists(for: .iPhoneXrSimulator_12_1, snapshot: 2))
-
-    // do not autorecord if a same-name snapshot from other simulator exists
+    // do not record while the current platform is not explicitly supported
     supportedPlatforms = []
-    let failureBecauseOtherExists = verifySnapshot(matching: view, as: .image)
-    XCTAssert(failureBecauseOtherExists != nil) // FIXME: more specific please
-    XCTAssert(!fileExists(for: .iPhoneXrSimulator_12_1, snapshot: 1))
+    let failureBecauseOtherExists = verifySnapshot(
+      matching: view, as: .image, named: "reference", snapshotDirectory: snapshotDirectory)
+    XCTAssert(failureBecauseOtherExists?.contains("incompatible simulator") ?? false)
+    XCTAssert(failureBecauseOtherExists?.contains(otherPath) ?? false)
+    XCTAssert(!fileManager.fileExists(atPath: currentPath))
 
-    // do autorecord (despite the same-name other-simulator snapshot) if this simulator is *explicitly* requested
-    supportedPlatforms = [.iPhoneXrSimulator_12_1]
-    let failureBecauseAutorecording = verifySnapshot(matching: view, as: .image)
-    XCTAssert(failureBecauseAutorecording != nil) // FIXME: more specific please
-    XCTAssert(fileExists(for: .iPhoneXrSimulator_12_1, snapshot: 2))
-
-    // Clean up and check cleanup succeeded
-    try? FileManager.default.removeItem(at:
-      URL(fileURLWithPath: String(#file))
-        .deletingLastPathComponent()
-        .appendingPathComponent("__Snapshots__/SnapshotTestingTests/testSimulatorBasedFilenamesBlockAutorecord-2-\(Platform.iPhoneXrSimulator_12_1.rawValue).png"))
-    XCTAssert(!fileExists(for: .iPhoneXrSimulator_12_1, snapshot: 2))
+    // do record (despite the other-platform snapshot) once this platform is *explicitly* supported
+    supportedPlatforms = [Platform()]
+    let failureBecauseAutorecording = verifySnapshot(
+      matching: view, as: .image, named: "reference", snapshotDirectory: snapshotDirectory)
+    XCTAssert(failureBecauseAutorecording?.contains("Automatically recorded") ?? false)
+    XCTAssert(fileManager.fileExists(atPath: currentPath))
+    #endif
   }
 
   func testViewWithZeroHeightOrWidth() {
