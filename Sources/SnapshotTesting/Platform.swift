@@ -2,41 +2,59 @@ import Foundation
 #if canImport(UIKit)
 import UIKit
 #endif
+#if canImport(AppKit)
+import AppKit
+#endif
 
-public struct Platform: Equatable {
-  let os: OS
-  let version: String
-  let gamut: Gamut
-  let scale: Int
+/// The rendering-relevant identity of the environment a snapshot was recorded on: operating
+/// system, OS version, display gamut, and display scale.
+///
+/// Two simulators with equal `Platform`s render pixel-identical snapshots, so they share
+/// reference files; snapshots record which platform they were taken on via
+/// `rawValue` (e.g. `"iOS-18.5-p3@3x"`) embedded in their filename.
+public struct Platform: Equatable, Hashable {
+  public let os: OS
+  public let version: String
+  public let gamut: Gamut
+  public let scale: Int
 
-  enum Gamut: String {
+  /// - Parameter version: Normalized on the way in: at least `major.minor`, with trailing
+  ///   zero components beyond that dropped (`"18.5.0"` is stored as `"18.5"`).
+  public init(os: OS, version: String, gamut: Gamut, scale: Int) {
+    self.os = os
+    self.version = Platform.normalize(version: version)
+    self.gamut = gamut
+    self.scale = scale
+  }
+
+  public enum Gamut: String, CaseIterable {
     case unspecified
-    case SRGB = "srgb"
-    case P3 = "p3"
+    case srgb
+    case p3
 
+    #if canImport(UIKit) && !os(watchOS)
     init(from gamut: UIDisplayGamut) {
       switch gamut {
       case .unspecified: self = .unspecified
-      case .SRGB: self = .SRGB
-      case .P3: self = .P3
+      case .SRGB: self = .srgb
+      case .P3: self = .p3
+      @unknown default: self = .unspecified
       }
     }
+    #endif
   }
 
-  enum OS: String {
+  public enum OS: String, CaseIterable {
     case iOS, macOS, tvOS, linux
 
     init() {
       #if os(iOS)
       self = .iOS
-      #endif
-      #if os(macOS)
+      #elseif os(macOS)
       self = .macOS
-      #endif
-      #if os(tvOS)
+      #elseif os(tvOS)
       self = .tvOS
-      #endif
-      #if os(Linux)
+      #elseif os(Linux)
       self = .linux
       #endif
     }
@@ -44,52 +62,83 @@ public struct Platform: Equatable {
 }
 
 extension Platform {
+  /// The platform of the currently running environment.
   internal init() {
-    os = OS()
-    version = ProcessInfo().operatingSystemVersion.pretty
-    #if os(Linux)
-    gamut = .unspecified
-    scale = 0 // "unspecified" in UITraitCollection.displayScale
-    #endif
+    let osVersion = ProcessInfo().operatingSystemVersion
+    let version = "\(osVersion.majorVersion).\(osVersion.minorVersion).\(osVersion.patchVersion)"
     #if os(iOS) || os(tvOS)
     let traits = UIScreen.main.traitCollection
-    gamut = Gamut(from: traits.displayGamut)
-    scale = Int(traits.displayScale)
-    #endif
-    #if os(macOS)
-    // TODO (no trait collection, gamut especially seems to have to read API?)
+    self.init(
+      os: OS(),
+      version: version,
+      gamut: Gamut(from: traits.displayGamut),
+      scale: Int(traits.displayScale)
+    )
+    #elseif os(macOS)
+    self.init(
+      os: OS(),
+      version: version,
+      gamut: .unspecified,
+      scale: Int(NSScreen.main?.backingScaleFactor ?? 1)
+    )
+    #else
+    self.init(
+      os: OS(),
+      version: version,
+      gamut: .unspecified,
+      scale: 0 // "unspecified" in UITraitCollection.displayScale
+    )
     #endif
   }
-}
 
-extension OperatingSystemVersion {
-  fileprivate var pretty: String {
-    return patchVersion == 0 ? "\(majorVersion).\(minorVersion)" : "\(majorVersion).\(minorVersion).\(patchVersion)"
+  /// Normalizes a version string for comparison and display: pads to at least
+  /// `major.minor`, then drops trailing zero components beyond that
+  /// (`"18"` → `"18.0"`, `"18.5.0"` → `"18.5"`, `"26.3.1"` unchanged).
+  internal static func normalize(version: String) -> String {
+    var components = version.split(separator: ".").map(String.init)
+    while components.count > 2, components.last == "0" {
+      components.removeLast()
+    }
+    while components.count < 2 {
+      components.append("0")
+    }
+    return components.joined(separator: ".")
   }
 }
 
 extension Platform: RawRepresentable {
+  /// e.g. `"iOS-18.5-p3@3x"`. This string is embedded in snapshot filenames.
   public var rawValue: String {
-    return "\(os)-\(version)-\(gamut.rawValue)@\(scale)x"
+    return "\(os.rawValue)-\(version)-\(gamut.rawValue)@\(scale)x"
   }
 
   public init?(rawValue: String) {
-    let components = rawValue.split(separator: "-")
-    guard components.count == 3 else { return nil }
-    guard let os = OS(rawValue: String(components[0])) else { return nil }
-    guard components[2].last == "x" else { return nil } // FIXME: oh come on this is ridiculous
-    let imageStuff = components[2].dropLast().split(separator: "@")
-    guard imageStuff.count == 2 else { return nil }
-    guard let gamut = Gamut(rawValue: String(imageStuff[0])) else { return nil }
-    guard let scale = Int(imageStuff[1]) else { return nil }
-    self.os = os
-    self.gamut = gamut
-    self.version = String(components[1]) // FIXME: validate it's a version-string?
-    self.scale = scale
+    let fullRange = NSRange(rawValue.startIndex..., in: rawValue)
+    guard let match = Platform.rawValueExpression.firstMatch(in: rawValue, range: fullRange)
+      else { return nil }
+    func group(_ index: Int) -> String {
+      guard let range = Range(match.range(at: index), in: rawValue) else { return "" }
+      return String(rawValue[range])
+    }
+    guard
+      let os = OS(rawValue: group(1)),
+      let gamut = Gamut(rawValue: group(3)),
+      let scale = Int(group(4))
+      else { return nil }
+    self.init(os: os, version: group(2), gamut: gamut, scale: scale)
   }
+
+  /// Anchored expression for the `rawValue` format. The os and gamut alternations are built
+  /// from `allCases` so the parser cannot drift from the enums.
+  private static let rawValueExpression: NSRegularExpression = {
+    let osCases = OS.allCases.map { $0.rawValue }.joined(separator: "|")
+    let gamutCases = Gamut.allCases.map { $0.rawValue }.joined(separator: "|")
+    let pattern = "\\A(\(osCases))-([0-9]+(?:\\.[0-9]+){0,2})-(\(gamutCases))@([0-9]+)x\\z"
+    return try! NSRegularExpression(pattern: pattern)
+  }()
 }
 
 extension Platform {
-  public static let iPhone5sSimulator_12_1 = Platform(os: .iOS, version: "12.1", gamut: .SRGB, scale: 2)
-  public static let iPhoneXrSimulator_12_1 = Platform(os: .iOS, version: "12.1", gamut: .P3, scale: 2)
+  public static let iPhone5sSimulator_12_1 = Platform(os: .iOS, version: "12.1", gamut: .srgb, scale: 2)
+  public static let iPhoneXrSimulator_12_1 = Platform(os: .iOS, version: "12.1", gamut: .p3, scale: 2)
 }
