@@ -1,0 +1,5 @@
+curl \
+	--header "Accept: text/html" \
+	--header "Content-Type: application/json" \
+	--cookie "pf_session={}" \
+	"https://www.pointfree.co?key_1=value_1&key_2=value_2&key_3=value_3"

@@ -1,7 +1,8 @@
 import XCTest
+
 @testable import SnapshotTesting
 
-class WaitTests: XCTestCase {
+class WaitTests: BaseTestCase {
   func testWait() {
     var value = "Hello"
     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
@@ -12,6 +13,6 @@ class WaitTests: XCTestCase {
       value
     }
 
-    assertSnapshot(matching: (), as: .wait(for: 1.5, on: strategy))
+    assertSnapshot(of: (), as: .wait(for: 1.5, on: strategy))
   }
 }
