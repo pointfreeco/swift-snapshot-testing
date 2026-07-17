@@ -33,11 +33,9 @@
         let transform = AffineTransform(translationByX: -bounds.origin.x, byY: -bounds.origin.y)
         path.transform(using: transform)
 
-        let image = NSImage(size: path.bounds.size)
-        image.lockFocus()
-        path.fill()
-        image.unlockFocus()
-        return image
+        return snapshotImage(size: path.bounds.size) {
+          path.fill()
+        }
       }
     }
   }

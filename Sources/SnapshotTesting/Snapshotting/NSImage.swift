@@ -53,7 +53,19 @@
     public static func image(precision: Float = 1, perceptualPrecision: Float = 1) -> Snapshotting {
       return .init(
         pathExtension: "png",
-        diffing: .image(precision: precision, perceptualPrecision: perceptualPrecision)
+        diffing: .image(precision: precision, perceptualPrecision: perceptualPrecision),
+        snapshot: { image in
+          let pixelSize = CGSize(width: image.size.width * 2, height: image.size.height * 2)
+          if let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil),
+            CGFloat(cgImage.width) >= pixelSize.width,
+            CGFloat(cgImage.height) >= pixelSize.height
+          {
+            return image
+          }
+          return snapshotImage(size: image.size) {
+            image.draw(in: NSRect(origin: .zero, size: image.size))
+          }
+        }
       )
     }
   }

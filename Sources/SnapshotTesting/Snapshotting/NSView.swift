@@ -34,11 +34,7 @@
         return view.snapshot
           ?? Async { callback in
             addImagesForRenderedViews(view).sequence().run { views in
-              let bitmapRep = view.bitmapImageRepForCachingDisplay(in: view.bounds)!
-              view.cacheDisplay(in: view.bounds, to: bitmapRep)
-              let image = NSImage(size: view.bounds.size)
-              image.addRepresentation(bitmapRep)
-              callback(image)
+              callback(snapshotImage(view))
               views.forEach { $0.removeFromSuperview() }
               view.frame.size = initialSize
             }
@@ -69,6 +65,38 @@
             as! String
         )
       }
+    }
+  }
+
+  func snapshotImage(_ view: NSView) -> NSImage {
+    let proxy = NSView(frame: view.bounds)
+    let bitmapRep = withScaledWindow(proxy) {
+      proxy.bitmapImageRepForCachingDisplay(in: proxy.bounds)!
+    }
+    view.cacheDisplay(in: view.bounds, to: bitmapRep)
+    let image = NSImage(size: view.bounds.size)
+    image.addRepresentation(bitmapRep)
+    return image
+  }
+
+  func snapshotImage(size: CGSize, drawing: @escaping () -> Void) -> NSImage {
+    snapshotImage(SnapshotDrawingView(size: size, drawing: drawing))
+  }
+
+  private final class SnapshotDrawingView: NSView {
+    let drawing: () -> Void
+
+    init(size: CGSize, drawing: @escaping () -> Void) {
+      self.drawing = drawing
+      super.init(frame: CGRect(origin: .zero, size: size))
+    }
+
+    required init?(coder: NSCoder) {
+      fatalError("init(coder:) has not been implemented")
+    }
+
+    override func draw(_ dirtyRect: NSRect) {
+      drawing()
     }
   }
 #endif
