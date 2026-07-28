@@ -19,9 +19,10 @@ Powerfully flexible snapshot testing.
 
 ### Configuration
 
-- ``Testing/Trait/snapshots(diffTool:record:)``
+- ``Testing/Trait/snapshots(record:diffTool:)``
 - ``withSnapshotTesting(record:diffTool:operation:)-2kuyr``
 - ``SnapshotTestingConfiguration``
+- <doc:ChoosingAnImagePixelFormat>
 
 ### Deprecations
 

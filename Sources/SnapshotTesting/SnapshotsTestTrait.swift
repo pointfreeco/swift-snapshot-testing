@@ -13,6 +13,8 @@
       snapshots()
     }
 
+    // Kept unchanged for existing calls and references; the overload below requires
+    // imagePixelFormat so the two never conflict.
     /// Configure snapshot testing in a suite or test.
     ///
     /// - Parameters:
@@ -22,10 +24,27 @@
       record: SnapshotTestingConfiguration.Record? = nil,
       diffTool: SnapshotTestingConfiguration.DiffTool? = nil
     ) -> Self {
+      snapshots(record: record, diffTool: diffTool, imagePixelFormat: nil)
+    }
+
+    /// Configure snapshot testing in a suite or test.
+    ///
+    /// - Parameters:
+    ///   - record: The record mode of the test.
+    ///   - diffTool: The diff tool to use in failure messages.
+    ///   - imagePixelFormat: The pixel format image snapshots are recorded and compared in. `nil`
+    ///     keeps the format of the enclosing configuration. See
+    ///     ``SnapshotTestingConfiguration/ImagePixelFormat-swift.struct``.
+    public static func snapshots(
+      record: SnapshotTestingConfiguration.Record? = nil,
+      diffTool: SnapshotTestingConfiguration.DiffTool? = nil,
+      imagePixelFormat: SnapshotTestingConfiguration.ImagePixelFormat?
+    ) -> Self {
       _SnapshotsTestTrait(
         configuration: SnapshotTestingConfiguration(
           record: record,
-          diffTool: diffTool
+          diffTool: diffTool,
+          imagePixelFormat: imagePixelFormat
         )
       )
     }
@@ -49,7 +68,8 @@
       ) async throws {
         try await withSnapshotTesting(
           record: configuration.record,
-          diffTool: configuration.diffTool
+          diffTool: configuration.diffTool,
+          imagePixelFormat: configuration.imagePixelFormat
         ) {
           try await File.$counter.withValue(File.Counter()) {
             try await function()
