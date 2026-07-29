@@ -22,7 +22,7 @@ Snapshotting<UIView, UIImage>.image
 We can define an `image` strategy on `UIViewController` using the `pullback` method:
 
 ``` swift
-extension Snapshotting where Value == UIViewController, Format == UIImage {
+extension Snapshotting where Value: UIViewController, Format == UIImage {
   public static let image: Snapshotting = Snapshotting<UIView, UIImage>
     .image
     .pullback { viewController in viewController.view }
