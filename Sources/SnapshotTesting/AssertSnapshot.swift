@@ -112,6 +112,7 @@ public func assertSnapshot<Value, Format>(
   as snapshotting: Snapshotting<Value, Format>,
   named name: String? = nil,
   record: SnapshotTestingConfiguration.Record? = nil,
+  artifactsDirectory: String? = nil,
   timeout: TimeInterval = 5,
   fileID: StaticString = #fileID,
   file filePath: StaticString = #filePath,
@@ -124,6 +125,7 @@ public func assertSnapshot<Value, Format>(
     as: snapshotting,
     named: name,
     record: record,
+    artifactsDirectory: artifactsDirectory,
     timeout: timeout,
     fileID: fileID,
     file: filePath,
@@ -286,6 +288,7 @@ public func verifySnapshot<Value, Format>(
   named name: String? = nil,
   record: SnapshotTestingConfiguration.Record? = nil,
   snapshotDirectory: String? = nil,
+  artifactsDirectory: String? = nil,
   timeout: TimeInterval = 5,
   fileID: StaticString = #fileID,
   file filePath: StaticString = #file,
@@ -437,15 +440,22 @@ public func verifySnapshot<Value, Format>(
             No reference was found on disk. New snapshot was not recorded because recording is disabled
             """
         } else {
-          try recordSnapshot(writeToDisk: true)
+          let shouldWriteToDisk = artifactsDirectory == nil
+          try recordSnapshot(writeToDisk: shouldWriteToDisk)
 
-          return """
-            No reference was found on disk. Automatically recorded snapshot: …
+          if shouldWriteToDisk {
+            return """
+              No reference was found on disk. Automatically recorded snapshot: …
 
-            open "\(snapshotFileUrl.absoluteString)"
+              open "\(snapshotFileUrl.absoluteString)"
 
-            Re-run "\(testName)" to assert against the newly-recorded snapshot.
-            """
+              Re-run "\(testName)" to assert against the newly-recorded snapshot.
+              """
+          } else {
+            return """
+              No reference was found on disk. Snapshot was not recorded because an artifacts directory is configured.
+              """
+          }
         }
       }
 
@@ -467,7 +477,8 @@ public func verifySnapshot<Value, Format>(
       }
 
       let artifactsUrl = URL(
-        fileURLWithPath: ProcessInfo.processInfo.environment["SNAPSHOT_ARTIFACTS"]
+        fileURLWithPath: artifactsDirectory
+          ?? ProcessInfo.processInfo.environment["SNAPSHOT_ARTIFACTS"]
           ?? NSTemporaryDirectory(),
         isDirectory: true
       )
@@ -533,8 +544,11 @@ public func verifySnapshot<Value, Format>(
       }
 
       if record == .failed {
-        try recordSnapshot(writeToDisk: true)
-        failureMessage += " A new snapshot was automatically recorded."
+        let shouldWriteToDisk = artifactsDirectory == nil
+        try recordSnapshot(writeToDisk: shouldWriteToDisk)
+        if shouldWriteToDisk {
+          failureMessage += " A new snapshot was automatically recorded."
+        }
       }
 
       return """
