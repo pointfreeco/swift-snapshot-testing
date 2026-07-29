@@ -9,6 +9,14 @@
 
     /// A snapshot strategy for comparing views based on pixel equality.
     ///
+    /// If you are using a host application we recommend that you set
+    /// `drawHierarchyInKeyWindow` to `true` to capture the most accurate
+    /// snapshots. Setting it to `false` can result in snapshots that don't look
+    /// exactly like your user interface. Examples we've seen are tab bars that
+    /// don't have the right color for their unselected tabs, lists that have
+    /// corner radii on every row instead of only on the top and bottom rows,
+    /// and rounded rectangles that have rendering artifacts. 
+    ///
     /// - Parameters:
     ///   - drawHierarchyInKeyWindow: Utilize the simulator's key window in order to render
     ///     `UIAppearance` and `UIVisualEffect`s. This option requires a host application for your

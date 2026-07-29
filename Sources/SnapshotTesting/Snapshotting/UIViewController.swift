@@ -9,6 +9,18 @@
 
     /// A snapshot strategy for comparing view controller views based on pixel equality.
     ///
+    /// This strategy trades image accuracy for the flexibility to use this
+    /// strategy inside of framework and package test targets. This can result
+    /// in snapshots that don't look exactly like the user interface they are
+    /// snapshotting. Examples we've seen are tab bars that don't have the right
+    /// color for their unselected tabs, lists that have corner radii on every
+    /// row instead of only on the top and bottom rows, and rounded rectangles
+    /// that have rendering artifacts.
+    ///
+    /// For more accurate snapshots use a host application for your tests with
+    /// the ``image(drawHierarchyInKeyWindow:precision:perceptualPrecision:size:traits:)``
+    /// method and pass `true` to the `drawHierarchyInKeyWindow` parameter.
+    ///
     /// - Parameters:
     ///   - config: A set of device configuration settings.
     ///   - drawHierarchyInKeyWindow: Utilize the simulator's key window in order to render
@@ -47,6 +59,14 @@
     }
 
     /// A snapshot strategy for comparing view controller views based on pixel equality.
+    ///
+    /// If you are using a host application we recommend that you set
+    /// `drawHierarchyInKeyWindow` to `true` to capture the most accurate
+    /// snapshots. Setting it to `false` can result in snapshots that don't look
+    /// exactly like your user interface. Examples we've seen are tab bars that
+    /// don't have the right color for their unselected tabs, lists that have
+    /// corner radii on every row instead of only on the top and bottom rows,
+    /// and rounded rectangles that have rendering artifacts.
     ///
     /// - Parameters:
     ///   - drawHierarchyInKeyWindow: Utilize the simulator's key window in order to render
