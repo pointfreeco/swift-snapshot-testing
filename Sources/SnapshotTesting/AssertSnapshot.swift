@@ -376,22 +376,22 @@ public func verifySnapshot<Value, Format>(
           try snapshotData.write(to: snapshotFileUrl)
         }
 
-        #if !os(Android) && !os(Linux) && !os(Windows)
-          if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
-            if isSwiftTesting {
-              #if compiler(>=6.2)
-                recordSwiftTestingAttachment(
-                  writeToDisk ? try Data(contentsOf: snapshotFileUrl) : snapshotData,
-                  named: snapshotFileUrl.lastPathComponent,
-                  sourceLocation: SourceLocation(
-                    fileID: fileID.description,
-                    filePath: filePath.description,
-                    line: Int(line),
-                    column: Int(column)
-                  )
-                )
-              #endif
-            } else {
+        if isSwiftTesting {
+          #if compiler(>=6.2)
+            recordSwiftTestingAttachment(
+              writeToDisk ? try Data(contentsOf: snapshotFileUrl) : snapshotData,
+              named: snapshotFileUrl.lastPathComponent,
+              sourceLocation: SourceLocation(
+                fileID: fileID.description,
+                filePath: filePath.description,
+                line: Int(line),
+                column: Int(column)
+              )
+            )
+          #endif
+        } else {
+          #if !os(Android) && !os(Linux) && !os(Windows)
+            if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
               XCTContext.runActivity(named: "Attached Recorded Snapshot") { activity in
                 if writeToDisk {
                   // Snapshot was written to disk. Create attachment from file
@@ -413,8 +413,8 @@ public func verifySnapshot<Value, Format>(
                 }
               }
             }
-          }
-        #endif
+          #endif
+        }
       }
 
       if record == .all {
@@ -479,29 +479,29 @@ public func verifySnapshot<Value, Format>(
       try snapshotting.diffing.toData(diffable).write(to: failedSnapshotFileUrl)
 
       if !attachments.isEmpty {
-        #if !os(Linux) && !os(Android) && !os(Windows)
-          if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
-            if isSwiftTesting {
-              #if compiler(>=6.2)
-                attachments.forEach {
-                  switch $0 {
-                  case .xcTest:
-                    break
-                  case .data(let data, let name):
-                    recordSwiftTestingAttachment(
-                      data,
-                      named: name,
-                      sourceLocation: SourceLocation(
-                        fileID: fileID.description,
-                        filePath: filePath.description,
-                        line: Int(line),
-                        column: Int(column)
-                      )
-                    )
-                  }
-                }
-              #endif
-            } else {
+        if isSwiftTesting {
+          #if compiler(>=6.2)
+            attachments.forEach {
+              switch $0 {
+              case .xcTest:
+                break
+              case .data(let data, let name):
+                recordSwiftTestingAttachment(
+                  data,
+                  named: name,
+                  sourceLocation: SourceLocation(
+                    fileID: fileID.description,
+                    filePath: filePath.description,
+                    line: Int(line),
+                    column: Int(column)
+                  )
+                )
+              }
+            }
+          #endif
+        } else {
+          #if !os(Linux) && !os(Android) && !os(Windows)
+            if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
               XCTContext.runActivity(named: "Attached Failure Diff") { activity in
                 attachments.forEach {
                   switch $0 {
@@ -516,8 +516,8 @@ public func verifySnapshot<Value, Format>(
                 }
               }
             }
-          }
-        #endif
+          #endif
+        }
       }
 
       let diffMessage = (SnapshotTestingConfiguration.current?.diffTool ?? _diffTool)(
@@ -639,17 +639,29 @@ enum File {
     named name: String,
     sourceLocation: SourceLocation
   ) {
-    #if !os(Android) && !os(Linux) && !os(Windows)
-      #if compiler(>=6.3) && (canImport(UIKit) || canImport(AppKit))
-        if #available(iOS 14.0, tvOS 14.0, macOS 11.0, *),
-          name.hasSuffix(".png"),
-          let image = Image(data: data)
-        {
-          Attachment.record(image, named: name, as: .png, sourceLocation: sourceLocation)
-          return
-        }
-      #endif
-      Attachment.record(data, named: name, sourceLocation: sourceLocation)
+    #if compiler(>=6.3) && (canImport(UIKit) || canImport(AppKit))
+      if #available(iOS 14.0, tvOS 14.0, macOS 11.0, *),
+        name.hasSuffix(".png"),
+        let image = Image(data: data)
+      {
+        Attachment.record(image, named: name, as: .png, sourceLocation: sourceLocation)
+        return
+      }
     #endif
+
+    Attachment.record(SnapshotAttachment(data: data), named: name, sourceLocation: sourceLocation)
+  }
+
+  private struct SnapshotAttachment: Attachable, Sendable {
+    let data: Data
+
+    borrowing func withUnsafeBytes<R>(
+      for attachment: borrowing Attachment<Self>,
+      _ body: (UnsafeRawBufferPointer) throws -> R
+    ) throws -> R {
+      try data.withUnsafeBytes { buffer in
+        try body(buffer)
+      }
+    }
   }
 #endif
