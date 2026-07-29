@@ -22,6 +22,7 @@
     ///   - traits: A trait collection override.
     public static func image(
       drawHierarchyInKeyWindow: Bool = false,
+      isOpaque: Bool = true,
       precision: Float = 1,
       perceptualPrecision: Float = 1,
       size: CGSize? = nil,
@@ -36,6 +37,7 @@
         snapshotView(
           config: .init(safeArea: .zero, size: size ?? view.frame.size, traits: .init()),
           drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+          isOpaque: isOpaque,
           traits: traits,
           view: view,
           viewController: .init()

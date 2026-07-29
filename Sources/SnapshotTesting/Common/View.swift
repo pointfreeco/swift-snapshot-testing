@@ -968,6 +968,7 @@
     func snapshotView(
       config: ViewImageConfig,
       drawHierarchyInKeyWindow: Bool,
+      isOpaque: Bool,
       traits: UITraitCollection,
       view: UIView,
       viewController: UIViewController
@@ -990,7 +991,14 @@
         ?? Async { callback in
           addImagesForRenderedViews(view).sequence().run { views in
             callback(
-              renderer(bounds: view.bounds, for: traits).image { ctx in
+              renderer(bounds: view.bounds, for: traits, isOpaque: isOpaque).image { ctx in
+                if isOpaque == false {
+                  UIColor.clear.setFill()
+                } else {
+                  UIColor.white.setFill()
+                }
+                ctx.fill(view.bounds)
+                
                 if drawHierarchyInKeyWindow {
                   view.drawHierarchy(in: view.bounds, afterScreenUpdates: true)
                 } else {
@@ -1009,10 +1017,12 @@
 
     private let offscreen: CGFloat = 10_000
 
-    func renderer(bounds: CGRect, for traits: UITraitCollection) -> UIGraphicsImageRenderer {
+    func renderer(bounds: CGRect, for traits: UITraitCollection, isOpaque: Bool) -> UIGraphicsImageRenderer {
       let renderer: UIGraphicsImageRenderer
       if #available(iOS 11.0, tvOS 11.0, *) {
-        renderer = UIGraphicsImageRenderer(bounds: bounds, format: .init(for: traits))
+        let format = UIGraphicsImageRendererFormat(for: traits)
+        format.opaque = isOpaque
+        renderer = UIGraphicsImageRenderer(bounds: bounds, format: format)
       } else {
         renderer = UIGraphicsImageRenderer(bounds: bounds)
       }

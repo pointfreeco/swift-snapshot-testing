@@ -38,6 +38,7 @@
       ///   - traits: A trait collection override.
       public static func image(
         drawHierarchyInKeyWindow: Bool = false,
+        isOpaque: Bool = true,
         precision: Float = 1,
         perceptualPrecision: Float = 1,
         layout: SwiftUISnapshotLayout = .sizeThatFits,
@@ -72,6 +73,9 @@
             )
           } else {
             let hostingController = UIHostingController.init(rootView: view)
+            if isOpaque == false {
+              hostingController.view.backgroundColor = .clear
+            }
 
             if config.safeArea == .zero {
               if #available(iOS 16.4, tvOS 16.4, *) {
@@ -90,6 +94,7 @@
           return snapshotView(
             config: config,
             drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+            isOpaque: isOpaque,
             traits: traits,
             view: controller.view,
             viewController: controller
