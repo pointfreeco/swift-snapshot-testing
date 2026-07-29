@@ -20,12 +20,14 @@
     ///     human eye.
     ///   - size: A view size override.
     ///   - traits: A trait collection override.
+    ///   - prepare: A closure to run after view layout but before the snapshot is taken.
     public static func image(
       drawHierarchyInKeyWindow: Bool = false,
       precision: Float = 1,
       perceptualPrecision: Float = 1,
       size: CGSize? = nil,
-      traits: UITraitCollection = .init()
+      traits: UITraitCollection = .init(),
+      prepare: (() -> Void)? = nil
     )
       -> Snapshotting
     {
@@ -38,7 +40,8 @@
           drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
           traits: traits,
           view: view,
-          viewController: .init()
+          viewController: .init(),
+          prepare: prepare
         )
       }
     }
