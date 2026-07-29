@@ -10,6 +10,19 @@
   #if os(iOS) || os(macOS)
     import WebKit
   #endif
+  #if canImport(SwiftUI)
+    import SwiftUI
+
+    /// The rendering mode for SwiftUI snapshots.
+    public enum SwiftUIRenderingMode {
+      /// Automatically detect SwiftUI content and use the most accurate rendering method when possible.
+      case auto
+      /// Always use drawHierarchy rendering (requires host application).
+      case enabled
+      /// Always use layer rendering (works in framework tests).
+      case disabled
+    }
+  #endif
 
   #if os(iOS) || os(tvOS)
     public struct ViewImageConfig: Sendable {
@@ -928,6 +941,45 @@
 
     func prepareView(
       config: ViewImageConfig,
+      renderingMode: SwiftUIRenderingMode,
+      traits: UITraitCollection,
+      view: UIView,
+      viewController: UIViewController
+    ) -> () -> Void {
+      let size = config.size ?? viewController.view.frame.size
+      view.frame.size = size
+      if view != viewController.view {
+        viewController.view.bounds = view.bounds
+        viewController.view.addSubview(view)
+      }
+      let traits = UITraitCollection(traitsFrom: [config.traits, traits])
+      let window: UIWindow
+      if shouldUseDrawHierarchy(renderingMode: renderingMode, viewController: viewController) {
+        guard let keyWindow = getKeyWindow() else {
+          fatalError("'renderingMode' requires tests to be run in a host application")
+        }
+        window = keyWindow
+        window.frame.size = size
+      } else {
+        window = Window(
+          config: .init(safeArea: config.safeArea, size: config.size ?? size, traits: traits),
+          viewController: viewController
+        )
+      }
+      let dispose = add(traits: traits, viewController: viewController, to: window)
+
+      if size.width == 0 || size.height == 0 {
+        // Try to call sizeToFit() if the view still has invalid size
+        view.sizeToFit()
+        view.setNeedsLayout()
+        view.layoutIfNeeded()
+      }
+
+      return dispose
+    }
+
+    func prepareView(
+      config: ViewImageConfig,
       drawHierarchyInKeyWindow: Bool,
       traits: UITraitCollection,
       view: UIView,
@@ -963,6 +1015,26 @@
       }
 
       return dispose
+    }
+
+    func snapshotView(
+      config: ViewImageConfig,
+      renderingMode: SwiftUIRenderingMode,
+      traits: UITraitCollection,
+      view: UIView,
+      viewController: UIViewController
+    )
+      -> Async<UIImage>
+    {
+      // Convert to legacy call for UIKit compatibility
+      let drawHierarchy = shouldUseDrawHierarchy(renderingMode: renderingMode, viewController: viewController)
+      return snapshotView(
+        config: config,
+        drawHierarchyInKeyWindow: drawHierarchy,
+        traits: traits,
+        view: view,
+        viewController: viewController
+      )
     }
 
     func snapshotView(
@@ -1017,6 +1089,31 @@
         renderer = UIGraphicsImageRenderer(bounds: bounds)
       }
       return renderer
+    }
+
+    private func shouldUseDrawHierarchy(
+      renderingMode: SwiftUIRenderingMode, viewController: UIViewController
+    ) -> Bool {
+      #if canImport(SwiftUI)
+        switch renderingMode {
+        case .enabled:
+          return true
+        case .disabled:
+          return false
+        case .auto:
+          if #available(iOS 13.0, tvOS 13.0, *) {
+            // Auto-detect SwiftUI content and prefer drawHierarchy for better rendering accuracy
+            // Only when a key window is available to avoid breaking framework tests
+            let typeName = String(describing: type(of: viewController))
+            if typeName.contains("UIHostingController") && getKeyWindow() != nil {
+              return true
+            }
+          }
+          return false
+        }
+      #else
+        return false
+      #endif
     }
 
     private func add(
