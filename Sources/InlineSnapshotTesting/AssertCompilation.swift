@@ -64,6 +64,13 @@
   ///   - flags: Additional flags to pass to the Swift compiler, _e.g._
   ///     `[.languageMode(.v6)]`, `[.strictConcurrency(.complete)]`, etc. Appended after any
   ///     ambient flags.
+  ///   - targets: Targets of the package under test to build with the given compiler's
+  ///     toolchain, making their modules importable, _e.g._ `["MyLibrary"]`. Binary Swift
+  ///     modules can only be read by the exact compiler version that produced them, so a test
+  ///     that pins a `compiler` and imports a module of the package under test must rebuild that
+  ///     module with the pinned toolchain. Builds are incremental and cached per toolchain in
+  ///     '.build/compilation-testing'. When omitted, the modules already built for the running
+  ///     test are importable instead, which is compatible with the default compiler only.
   ///   - message: An optional description of the assertion, for inclusion in test results.
   ///   - record: Whether or not to record a new reference.
   ///   - code: The Swift source code to compile.
@@ -78,6 +85,7 @@
   public func assertCompilation(
     compiler: SwiftCompiler? = nil,
     flags: [SwiftFlag] = [],
+    building targets: [String]? = nil,
     message: @autoclosure () -> String = "",
     record: SnapshotTestingConfiguration.Record? = nil,
     of code: () -> String,
@@ -91,15 +99,20 @@
     let source = code()
     let configuration = CompilationTestingConfiguration.current
     let compiler = compiler ?? configuration?.compiler ?? .default
-    let flags = (testModuleSearchFlags + (configuration?.flags ?? []) + flags)
-      .flatMap(\.arguments)
+    let targets = (configuration?.building ?? []) + (targets ?? [])
     let actual: String?
     do {
+      let searchFlags =
+        targets.isEmpty
+        ? testModuleSearchFlags
+        : try buildPackage(targets: targets, compiler: compiler, testFilePath: filePath)
+      let flags = (searchFlags + (configuration?.flags ?? []) + flags)
+        .flatMap(\.arguments)
       let diagnostics = try compile(source, compiler: compiler, flags: flags)
       actual = diagnostics.isEmpty ? nil : render(diagnostics: diagnostics, in: source)
     } catch {
       recordIssue(
-        "Failed to invoke the Swift compiler: \(error)",
+        "Failed to compile: \(error)",
         fileID: fileID,
         filePath: filePath,
         line: line,
@@ -252,6 +265,29 @@
     public static func path(_ url: URL, sdk: URL? = nil) -> Self {
       Self(executable: url, sdk: sdk)
     }
+
+    /// Derives a 'swift build' invocation from this compiler's 'swiftc' invocation, or `nil` if
+    /// one cannot be derived.
+    func packageBuildInvocation() -> (executable: URL, arguments: [String])? {
+      var toolName = executable.lastPathComponent
+      if toolName.hasSuffix(".exe") { toolName.removeLast(4) }
+      switch toolName {
+      case "swiftly":
+        let selector = arguments.first(where: { $0.hasPrefix("+") })
+        return (executable, ["run", "swift", "build"] + (selector.map { [$0] } ?? []))
+      case "xcrun":
+        return (executable, ["swift", "build"])
+      case "swiftc":
+        return (
+          executable.deletingLastPathComponent().appendingPathComponent("swift"),
+          ["build"]
+        )
+      case "swift":
+        return (executable, ["build"])
+      default:
+        return nil
+      }
+    }
   }
 
   // MARK: - Private
@@ -284,28 +320,212 @@
       addCandidate(URL(fileURLWithPath: executable).deletingLastPathComponent())
     }
 
+    return directories.flatMap(searchFlags(forBuildDirectory:))
+  }()
+
+  private func searchFlags(forBuildDirectory directory: URL) -> [SwiftFlag] {
     let fileManager = FileManager.default
+    let contents = (try? fileManager.contentsOfDirectory(atPath: directory.path)) ?? []
     var flags: [SwiftFlag] = []
-    for directory in directories {
-      let contents =
-        (try? fileManager.contentsOfDirectory(atPath: directory.path)) ?? []
-      let modules = directory.appendingPathComponent("Modules")
-      if fileManager.fileExists(atPath: modules.path) {
-        flags.append(.importPath(modules))
-      }
-      if contents.contains(where: { $0.hasSuffix(".swiftmodule") }) {
-        flags.append(.importPath(directory))
-      }
-      let packageFrameworks = directory.appendingPathComponent("PackageFrameworks")
-      if fileManager.fileExists(atPath: packageFrameworks.path) {
-        flags.append(.frameworkPath(packageFrameworks))
-      }
-      if contents.contains(where: { $0.hasSuffix(".framework") }) {
-        flags.append(.frameworkPath(directory))
-      }
+    let modules = directory.appendingPathComponent("Modules")
+    if fileManager.fileExists(atPath: modules.path) {
+      flags.append(.importPath(modules))
+    }
+    if contents.contains(where: { $0.hasSuffix(".swiftmodule") }) {
+      flags.append(.importPath(directory))
+    }
+    let packageFrameworks = directory.appendingPathComponent("PackageFrameworks")
+    if fileManager.fileExists(atPath: packageFrameworks.path) {
+      flags.append(.frameworkPath(packageFrameworks))
+    }
+    if contents.contains(where: { $0.hasSuffix(".framework") }) {
+      flags.append(.frameworkPath(directory))
     }
     return flags
-  }()
+  }
+
+  private let packageBuildCache = LockIsolated<[String: [SwiftFlag]]>([:])
+
+  /// Builds the given targets of the package containing the test file using the given compiler's
+  /// toolchain, and returns search path flags for the resulting build directory.
+  ///
+  /// Builds are incremental, in a scratch directory per compiler invocation
+  /// ('.build/compilation-testing/<compiler>'), and results are cached for the life of the test
+  /// process.
+  private func buildPackage(
+    targets: [String],
+    compiler: SwiftCompiler,
+    testFilePath: StaticString
+  ) throws -> [SwiftFlag] {
+    let fileManager = FileManager.default
+    var packageRoot = URL(fileURLWithPath: "\(testFilePath)").deletingLastPathComponent()
+    while !fileManager.fileExists(
+      atPath: packageRoot.appendingPathComponent("Package.swift").path
+    ) {
+      let parent = packageRoot.deletingLastPathComponent()
+      guard parent.path != packageRoot.path
+      else {
+        throw CompilerError(
+          description: """
+            Could not locate 'Package.swift' in any directory containing the test file.
+            """
+        )
+      }
+      packageRoot = parent
+    }
+
+    guard let build = compiler.packageBuildInvocation()
+    else {
+      throw CompilerError(
+        description: """
+          Could not derive a 'swift build' invocation from the compiler \
+          '\(compiler.executable.path)'. Targets can only be built with compilers whose \
+          executable is 'swiftly', 'xcrun', 'swift', or 'swiftc'.
+          """
+      )
+    }
+
+    let slug = ([compiler.executable.lastPathComponent]
+      + compiler.arguments
+      + [compiler.sdk?.lastPathComponent].compactMap { $0 })
+      .joined(separator: "-")
+      .map { $0.isLetter || $0.isNumber || $0 == "." || $0 == "+" || $0 == "-" ? $0 : "-" }
+    let scratchDirectory = packageRoot
+      .appendingPathComponent(".build")
+      .appendingPathComponent("compilation-testing")
+      .appendingPathComponent(String(slug))
+    let cacheKey = "\(scratchDirectory.path)|\(targets.sorted().joined(separator: ","))"
+    if let cached = packageBuildCache.withLock({ $0[cacheKey] }) {
+      return cached
+    }
+
+    // NB: The build's environment is hermetic rather than inherited: the test runner's
+    //     environment is full of variables pinning the toolchain that built the tests, which can
+    //     leak into the pinned toolchain's build and break it.
+    let inherited = ProcessInfo.processInfo.environment
+    var environment: [String: String] = [:]
+    for key in ["HOME", "TMPDIR", "USER", "LOGNAME"] {
+      environment[key] = inherited[key]
+    }
+    environment["PATH"] = "/usr/bin:/bin:/usr/sbin:/sbin"
+    if let overrides = compiler.environment {
+      environment.merge(overrides) { $1 }
+    }
+    if let sdk = compiler.sdk {
+      environment["SDKROOT"] = sdk.path
+      if let developerDirectory = developerDirectory(forSDK: sdk) {
+        environment["DEVELOPER_DIR"] = developerDirectory
+      }
+    }
+    let commonArguments = [
+      "--package-path", packageRoot.path,
+      "--scratch-path", scratchDirectory.path,
+    ]
+    for target in Set(targets).sorted() {
+      let result = try run(
+        executable: build.executable,
+        arguments: build.arguments + commonArguments + ["--target", target],
+        environment: environment
+      )
+      guard result.status == 0
+      else {
+        throw CompilerError(
+          description: """
+            'swift build --target \(target)' exited with code \(result.status): …
+
+            \(result.standardOutput.suffix(4_000))
+            \(result.standardError.suffix(4_000))
+            """
+        )
+      }
+    }
+    let binPath = try run(
+      executable: build.executable,
+      arguments: build.arguments + commonArguments + ["--show-bin-path"],
+      environment: environment
+    )
+    guard
+      let binDirectory = binPath.standardOutput
+        .split(separator: "\n", omittingEmptySubsequences: true)
+        .last
+        .map({ String($0).trimmingCharacters(in: .whitespaces) }),
+      !binDirectory.isEmpty
+    else {
+      throw CompilerError(
+        description: """
+          'swift build --show-bin-path' produced no output: …
+
+          \(binPath.standardError.suffix(4_000))
+          """
+      )
+    }
+
+    let flags = searchFlags(
+      forBuildDirectory: URL(fileURLWithPath: binDirectory).resolvingSymlinksInPath()
+    )
+    packageBuildCache.withLock { $0[cacheKey] = flags }
+    return flags
+  }
+
+  /// The developer directory of the Xcode installation containing the given SDK, or `nil` if the
+  /// SDK does not live inside one.
+  ///
+  /// Platform framework search paths (XCTest, Testing, etc.) are resolved from the active
+  /// developer directory, not the SDK, so a pinned SDK must pin its Xcode too or an older
+  /// compiler will encounter '.swiftinterface' files generated by a newer one.
+  private func developerDirectory(forSDK sdk: URL) -> String? {
+    guard let range = sdk.path.range(of: "/Contents/Developer/")
+    else { return nil }
+    return String(sdk.path[..<range.lowerBound]) + "/Contents/Developer"
+  }
+
+  /// The environment for a compiler process, deriving 'DEVELOPER_DIR' when the compiler pins an
+  /// SDK that lives inside an Xcode installation.
+  private func environment(for compiler: SwiftCompiler) -> [String: String]? {
+    guard
+      compiler.environment == nil,
+      let sdk = compiler.sdk,
+      let developerDirectory = developerDirectory(forSDK: sdk)
+    else { return compiler.environment }
+    var environment = ProcessInfo.processInfo.environment
+    environment["DEVELOPER_DIR"] = developerDirectory
+    return environment
+  }
+
+  private func run(
+    executable: URL,
+    arguments: [String],
+    environment: [String: String]? = nil
+  ) throws -> (status: Int32, standardOutput: String, standardError: String) {
+    let process = Process()
+    process.executableURL = executable
+    process.arguments = arguments
+    if let environment {
+      process.environment = environment
+    }
+    let standardOutput = Pipe()
+    let standardError = Pipe()
+    process.standardOutput = standardOutput
+    process.standardError = standardError
+    try process.run()
+    // NB: Read concurrently so that a filled pipe buffer cannot deadlock the process.
+    let errorData = LockIsolated(Data())
+    let thread = Thread {
+      let data = standardError.fileHandleForReading.readDataToEndOfFile()
+      errorData.withLock { $0 = data }
+    }
+    thread.start()
+    let outputData = standardOutput.fileHandleForReading.readDataToEndOfFile()
+    process.waitUntilExit()
+    while !thread.isFinished {
+      Thread.sleep(forTimeInterval: 0.001)
+    }
+    return (
+      process.terminationStatus,
+      String(decoding: outputData, as: UTF8.self),
+      String(decoding: errorData.withLock { $0 }, as: UTF8.self)
+    )
+  }
 
   private func findExecutable(_ name: String) -> URL? {
     #if os(Windows)
@@ -371,7 +591,7 @@
         "-diagnostic-style", "llvm",
         sourceURL.path,
       ]
-    if let environment = compiler.environment {
+    if let environment = environment(for: compiler) {
       process.environment = environment
     }
     process.currentDirectoryURL = temporaryDirectory

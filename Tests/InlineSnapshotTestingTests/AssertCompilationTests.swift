@@ -186,6 +186,30 @@
         }
       }
 
+      #if os(macOS) || os(Linux)
+        // NB: Binary Swift modules can only be read by the exact compiler that produced them, so
+        //     importing the package under test with a pinned toolchain requires rebuilding it
+        //     with that toolchain, via 'building:'.
+        @Test(.enabled(if: isSwiftlyInstalled && hasSwift63SDK))
+        func importPackageModule_Swift63() {
+          assertCompilation(
+            compiler: .swiftly("6.3.1", sdk: URL(fileURLWithPath: swift63SDKPath)),
+            building: ["SnapshotTesting"]
+          ) {
+            """
+            import SnapshotTesting
+            SnapshotTesting.diffTool = .ksdiff
+            """
+          } diagnostics: {
+            """
+            SnapshotTesting.diffTool = .ksdiff
+                            ˄
+                            ╰─ warning: 'diffTool' is deprecated: Use 'withSnapshotTesting' to customize the diff tool. See the documentation for more information. [#DeprecatedDeclaration]
+            """
+          }
+        }
+      #endif
+
       @Test func mixedTypedAndStringFlags() {
         assertCompilation(flags: [.languageMode(.v6), "-warnings-as-errors"]) {
           """
@@ -296,5 +320,11 @@
       /MacOSX.sdk
       """
     private let hasSwift62SDK = FileManager.default.fileExists(atPath: swift62SDKPath)
+
+    private let swift63SDKPath = """
+      /Applications/Xcode-26.6.0.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs\
+      /MacOSX.sdk
+      """
+    private let hasSwift63SDK = FileManager.default.fileExists(atPath: swift63SDKPath)
   #endif
 #endif

@@ -33,12 +33,14 @@
   public func withCompilationTesting<R>(
     compiler: SwiftCompiler? = nil,
     flags: [SwiftFlag]? = nil,
+    building: [String]? = nil,
     operation: () throws -> R
   ) rethrows -> R {
     try CompilationTestingConfiguration.$current.withValue(
       CompilationTestingConfiguration(
         compiler: compiler ?? CompilationTestingConfiguration.current?.compiler,
-        flags: (CompilationTestingConfiguration.current?.flags ?? []) + (flags ?? [])
+        flags: (CompilationTestingConfiguration.current?.flags ?? []) + (flags ?? []),
+        building: (CompilationTestingConfiguration.current?.building ?? []) + (building ?? [])
       )
     ) {
       try operation()
@@ -51,12 +53,14 @@
   public func withCompilationTesting<R>(
     compiler: SwiftCompiler? = nil,
     flags: [SwiftFlag]? = nil,
+    building: [String]? = nil,
     operation: () async throws -> R
   ) async rethrows -> R {
     try await CompilationTestingConfiguration.$current.withValue(
       CompilationTestingConfiguration(
         compiler: compiler ?? CompilationTestingConfiguration.current?.compiler,
-        flags: (CompilationTestingConfiguration.current?.flags ?? []) + (flags ?? [])
+        flags: (CompilationTestingConfiguration.current?.flags ?? []) + (flags ?? []),
+        building: (CompilationTestingConfiguration.current?.building ?? []) + (building ?? [])
       )
     ) {
       try await operation()
@@ -73,12 +77,18 @@
     /// Flags to pass to the Swift compiler.
     public var flags: [SwiftFlag]?
 
+    /// Targets of the package under test to build with the compiler's toolchain, making their
+    /// modules importable.
+    public var building: [String]?
+
     public init(
       compiler: SwiftCompiler? = nil,
-      flags: [SwiftFlag]? = nil
+      flags: [SwiftFlag]? = nil,
+      building: [String]? = nil
     ) {
       self.compiler = compiler
       self.flags = flags
+      self.building = building
     }
   }
 #endif

@@ -30,12 +30,14 @@
     ///   - flags: Flags to pass to the Swift compiler, appended after any flags already in scope.
     public static func compilation(
       compiler: SwiftCompiler? = nil,
-      flags: [SwiftFlag]? = nil
+      flags: [SwiftFlag]? = nil,
+      building: [String]? = nil
     ) -> Self {
       _CompilationTestTrait(
         configuration: CompilationTestingConfiguration(
           compiler: compiler,
-          flags: flags
+          flags: flags,
+          building: building
         )
       )
     }
