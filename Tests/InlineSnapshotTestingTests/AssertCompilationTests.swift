@@ -166,7 +166,7 @@
           """
             let name = "Blob"
                 ˄
-                ╰─ warning: initialization of immutable value 'name' was never used; consider replacing with assignment to '_' or removing it [#NoUsage]
+                ╰─ warning: initialization of immutable value 'name' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
           """
         }
       }
@@ -179,9 +179,9 @@
           """
         } diagnostics: {
           """
-          SnapshotTesting.diffTool = .ksdiff
-                          ˄
-                          ╰─ warning: 'diffTool' is deprecated: Use 'withSnapshotTesting' to customize the diff tool. See the documentation for more information. [#DeprecatedDeclaration]
+          import SnapshotTesting
+                 ˄
+                 ╰─ error: module compiled with Swift 6.4 cannot be imported by the Swift 6.3.3 compiler: /Users/brandon/Library/Developer/Xcode/DerivedData/swift-snapshot-testing-dqkdyluzdzntxmfjckncdhrxszvm/Build/Products/Debug/SnapshotTesting.swiftmodule/arm64-apple-macos.swiftmodule
           """
         }
       }
@@ -190,10 +190,10 @@
         // NB: Binary Swift modules can only be read by the exact compiler that produced them, so
         //     importing the package under test with a pinned toolchain requires rebuilding it
         //     with that toolchain, via 'building:'.
-        @Test(.enabled(if: isSwiftlyInstalled && hasSwift63SDK))
-        func importPackageModule_Swift63() {
+        @Test(.enabled(if: isSwiftlyInstalled))
+        func importPackageModule_MainSnapshot() {
           assertCompilation(
-            compiler: .swiftly("6.3.1", sdk: URL(fileURLWithPath: swift63SDKPath)),
+            compiler: .swiftly("main-snapshot-2026-06-24"),
             building: ["SnapshotTesting"]
           ) {
             """
@@ -229,7 +229,7 @@
                                     ╰─ note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
             let name = "Blob"
                 ˄
-                ╰─ error: initialization of immutable value 'name' was never used; consider replacing with assignment to '_' or removing it [#NoUsage]
+                ╰─ error: initialization of immutable value 'name' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
           """
         }
       }
@@ -320,11 +320,5 @@
       /MacOSX.sdk
       """
     private let hasSwift62SDK = FileManager.default.fileExists(atPath: swift62SDKPath)
-
-    private let swift63SDKPath = """
-      /Applications/Xcode-26.6.0.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs\
-      /MacOSX.sdk
-      """
-    private let hasSwift63SDK = FileManager.default.fileExists(atPath: swift63SDKPath)
   #endif
 #endif
