@@ -59,14 +59,14 @@
       let namesByType: [NSBezierPath.ElementType: String] = [
         .moveTo: "MoveTo",
         .lineTo: "LineTo",
-        .cubicCurveTo: "CurveTo",
+        .curveTo: "CurveTo",
         .closePath: "Close",
       ]
 
       let numberOfPointsByType: [NSBezierPath.ElementType: Int] = [
         .moveTo: 1,
         .lineTo: 1,
-        .cubicCurveTo: 3,
+        .curveTo: 3,
         .closePath: 0,
       ]
 
