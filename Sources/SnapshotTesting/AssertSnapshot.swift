@@ -11,6 +11,15 @@ import XCTest
   import Testing
 #endif
 
+#if canImport(_Testing_Foundation)
+  import _Testing_Foundation
+#endif
+#if canImport(UIKit) && canImport(_Testing_UIKit)
+  import _Testing_UIKit
+#elseif canImport(AppKit) && canImport(_Testing_AppKit)
+  import _Testing_AppKit
+#endif
+
 /// Enhances failure messages with a command line diff tool expression that can be copied and pasted
 /// into a terminal.
 @available(
@@ -574,17 +583,10 @@ func sanitizePathComponent(_ string: String) -> String {
 }
 
 #if !os(Android) && !os(Linux) && !os(Windows)
-  import CoreServices
+  import UniformTypeIdentifiers
 
   func uniformTypeIdentifier(fromExtension pathExtension: String) -> String? {
-    // This can be much cleaner in macOS 11+ using UTType
-    let unmanagedString = UTTypeCreatePreferredIdentifierForTag(
-      kUTTagClassFilenameExtension as CFString,
-      pathExtension as CFString,
-      nil
-    )
-
-    return unmanagedString?.takeRetainedValue() as String?
+    UTType(filenameExtension: pathExtension)?.identifier
   }
 #endif
 
