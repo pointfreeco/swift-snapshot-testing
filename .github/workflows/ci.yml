@@ -24,6 +24,25 @@ jobs:
       - name: Run tests
         run: make test-swift
 
+  macos-swiftly:
+    strategy:
+      matrix:
+        swift:
+          - '6.3.1'
+
+    name: macOS (Swiftly ${{ matrix.swift }})
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Swift ${{ matrix.swift }}
+        uses: swift-actions/setup-swift@v3
+        with:
+          swift-version: ${{ matrix.swift }}
+      - name: Print Swift version
+        run: swift --version
+      - name: Build
+        run: swift build --build-tests
+
   ubuntu:
     strategy:
       matrix:
