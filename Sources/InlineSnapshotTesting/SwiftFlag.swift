@@ -1,4 +1,6 @@
 #if canImport(SwiftSyntax509) && (os(macOS) || os(Linux) || os(Windows))
+  import Foundation
+
   /// A flag to pass to the Swift compiler.
   ///
   /// A flag represents zero or more command line arguments, and comes with static constructors
@@ -85,6 +87,20 @@
     /// Defines a compilation condition, _e.g._ `-D DEBUG`.
     public static func define(_ name: String) -> Self {
       Self(arguments: ["-D", name])
+    }
+
+    /// Adds a directory to the module import search path, _i.e._ `-I <path>`.
+    ///
+    /// Directories containing the modules of the current test's build are automatically added to
+    /// the search path, so that code compiled by `assertCompilation` can import the modules of
+    /// the package under test.
+    public static func importPath(_ url: URL) -> Self {
+      Self(arguments: ["-I", url.path])
+    }
+
+    /// Adds a directory to the framework search path, _i.e._ `-F <path>`.
+    public static func frameworkPath(_ url: URL) -> Self {
+      Self(arguments: ["-F", url.path])
     }
 
     /// Escalates all warnings to errors, _i.e._ `-warnings-as-errors`.

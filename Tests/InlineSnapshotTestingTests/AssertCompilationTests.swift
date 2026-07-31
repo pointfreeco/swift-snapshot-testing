@@ -171,6 +171,45 @@
         }
       }
 
+      @Test func importPackageModule() {
+        assertCompilation {
+          """
+          import SnapshotTesting
+          SnapshotTesting.diffTool = .ksdiff
+          """
+        } diagnostics: {
+          """
+          SnapshotTesting.diffTool = .ksdiff
+                          ˄
+                          ╰─ warning: 'diffTool' is deprecated: Use 'withSnapshotTesting' to customize the diff tool. See the documentation for more information. [#DeprecatedDeclaration]
+          """
+        }
+      }
+
+      @Test func mixedTypedAndStringFlags() {
+        assertCompilation(flags: [.languageMode(.v6), "-warnings-as-errors"]) {
+          """
+          class Counter {}
+          enum Sharing { static var counter = Counter() }
+          func greet() {
+            let name = "Blob"
+          }
+          """
+        } diagnostics: {
+          """
+          enum Sharing { static var counter = Counter() }
+                                    ˄
+                                    ╰─ error: static property 'counter' is not concurrency-safe because it is nonisolated global shared mutable state [#MutableGlobalVariable]
+                                    ╰─ note: convert 'counter' to a 'let' constant to make 'Sendable' shared state immutable
+                                    ╰─ note: add '@MainActor' to make static property 'counter' part of global actor 'MainActor'
+                                    ╰─ note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+            let name = "Blob"
+                ˄
+                ╰─ error: initialization of immutable value 'name' was never used; consider replacing with assignment to '_' or removing it [#NoUsage]
+          """
+        }
+      }
+
       @Test func withCompilationTestingScope() {
         withCompilationTesting(flags: [.languageMode(.v6)]) {
           assertCompilation {

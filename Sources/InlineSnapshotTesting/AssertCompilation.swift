@@ -25,6 +25,18 @@
   ///
   /// If the code compiles cleanly, no `diagnostics` closure is required.
   ///
+  /// The modules of the package under test are automatically importable, so the tool can
+  /// snapshot the diagnostics your own library produces:
+  ///
+  /// ```swift
+  /// assertCompilation {
+  ///   """
+  ///   import MyLibrary
+  ///   useDeprecatedSymbol()
+  ///   """
+  /// }
+  /// ```
+  ///
   /// By default the code is compiled with the toolchain's default compiler (`xcrun swiftc` on
   /// Apple platforms, `swiftc` from the path elsewhere), but this is customizable, as are the
   /// flags passed to the compiler:
@@ -79,7 +91,8 @@
     let source = code()
     let configuration = CompilationTestingConfiguration.current
     let compiler = compiler ?? configuration?.compiler ?? .default
-    let flags = ((configuration?.flags ?? []) + flags).flatMap(\.arguments)
+    let flags = (testModuleSearchFlags + (configuration?.flags ?? []) + flags)
+      .flatMap(\.arguments)
     let actual: String?
     do {
       let diagnostics = try compile(source, compiler: compiler, flags: flags)
@@ -242,6 +255,57 @@
   }
 
   // MARK: - Private
+
+  private final class BundleLocator {}
+
+  /// Search path flags for the current test's build directory, so that compiled code can import
+  /// the modules of the package under test.
+  ///
+  /// The build directory is located from the running test executable itself, and probes the
+  /// layouts of SwiftPM's native build system ('debug/Modules'), the Swift Build system and
+  /// Xcode ('Products/Debug' with loose '.swiftmodule's and 'PackageFrameworks'), on Apple
+  /// platforms, Linux, and Windows.
+  private let testModuleSearchFlags: [SwiftFlag] = {
+    var directories: [URL] = []
+    func addCandidate(_ url: URL) {
+      let url = url.resolvingSymlinksInPath()
+      guard !directories.contains(where: { $0.path == url.path }) else { return }
+      directories.append(url)
+      if url.lastPathComponent == "PackageFrameworks" {
+        addCandidate(url.deletingLastPathComponent())
+      }
+    }
+    #if canImport(ObjectiveC)
+      // NB: This library is linked into the running test bundle, which lives in the build's
+      //     products directory.
+      addCandidate(Bundle(for: BundleLocator.self).bundleURL.deletingLastPathComponent())
+    #endif
+    if let executable = CommandLine.arguments.first {
+      addCandidate(URL(fileURLWithPath: executable).deletingLastPathComponent())
+    }
+
+    let fileManager = FileManager.default
+    var flags: [SwiftFlag] = []
+    for directory in directories {
+      let contents =
+        (try? fileManager.contentsOfDirectory(atPath: directory.path)) ?? []
+      let modules = directory.appendingPathComponent("Modules")
+      if fileManager.fileExists(atPath: modules.path) {
+        flags.append(.importPath(modules))
+      }
+      if contents.contains(where: { $0.hasSuffix(".swiftmodule") }) {
+        flags.append(.importPath(directory))
+      }
+      let packageFrameworks = directory.appendingPathComponent("PackageFrameworks")
+      if fileManager.fileExists(atPath: packageFrameworks.path) {
+        flags.append(.frameworkPath(packageFrameworks))
+      }
+      if contents.contains(where: { $0.hasSuffix(".framework") }) {
+        flags.append(.frameworkPath(directory))
+      }
+    }
+    return flags
+  }()
 
   private func findExecutable(_ name: String) -> URL? {
     #if os(Windows)
