@@ -40,7 +40,7 @@ let package = Package(
       exclude: [
         "__Fixtures__",
         "__Snapshots__",
-      ]
+      ],
     ),
     .target(
       name: "InlineSnapshotTesting",
