@@ -3,7 +3,7 @@
   typealias Image = NSImage
   typealias ImageView = NSImageView
   typealias View = NSView
-#elseif os(iOS) || os(tvOS)
+#elseif os(iOS) || os(tvOS) || os(visionOS)
   import UIKit
   typealias Image = UIImage
   typealias ImageView = UIImageView
