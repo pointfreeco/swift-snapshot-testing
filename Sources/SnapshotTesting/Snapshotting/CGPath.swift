@@ -49,7 +49,7 @@
       }
     }
   }
-#elseif os(iOS) || os(tvOS)
+#elseif os(iOS) || os(tvOS) || os(visionOS)
   import UIKit
 
   extension Snapshotting where Value == CGPath, Format == UIImage {
@@ -91,7 +91,7 @@
   }
 #endif
 
-#if os(macOS) || os(iOS) || os(tvOS)
+#if os(macOS) || os(iOS) || os(tvOS) || os(visionOS)
   @available(iOS 11.0, OSX 10.13, tvOS 11.0, *)
   extension Snapshotting where Value == CGPath, Format == String {
     /// A snapshot strategy for comparing bezier paths based on element descriptions.
