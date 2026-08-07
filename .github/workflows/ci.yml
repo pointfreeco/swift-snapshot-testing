@@ -50,3 +50,6 @@ jobs:
         with:
           swift-version: ${{ matrix.swift }}
           copy-files: ${GITHUB_WORKSPACE}/Tests/SnapshotTestingTests/__Snapshots__
+          # AssertSnapshot.swift hardcodes this path for os(Android); the
+          # action's default changed to swift-android-tests in v2.9.5.
+          android-emulator-test-folder: /data/local/tmp/android-xctest
