@@ -11,9 +11,6 @@ import XCTest
   import Testing
 #endif
 
-#if canImport(_Testing_Foundation)
-  import _Testing_Foundation
-#endif
 #if canImport(UIKit) && canImport(_Testing_UIKit)
   import _Testing_UIKit
 #elseif canImport(AppKit) && canImport(_Testing_AppKit)
@@ -643,15 +640,12 @@ enum File {
   ) {
     #if !os(Android) && !os(Linux) && !os(Windows)
       #if compiler(>=6.3) && (canImport(UIKit) || canImport(AppKit))
-        if #available(iOS 14.0, tvOS 14.0, macOS 11.0, *),
-          name.hasSuffix(".png"),
-          let image = Image(data: data)
-        {
+        if name.hasSuffix(".png"), let image = Image(data: data) {
           Attachment.record(image, named: name, as: .png, sourceLocation: sourceLocation)
           return
         }
       #endif
-      Attachment.record(data, named: name, sourceLocation: sourceLocation)
+      Attachment.record([UInt8](data), named: name, sourceLocation: sourceLocation)
     #endif
   }
 #endif
