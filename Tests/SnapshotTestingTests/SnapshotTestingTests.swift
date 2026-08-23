@@ -276,26 +276,9 @@ final class SnapshotTestingTests: BaseTestCase {
       let width = 256
       let height = 256
       let colorSpace = try XCTUnwrap(CGColorSpace(name: CGColorSpace.sRGB))
-      let referenceData = Data(repeating: 255, count: width * height * 3)
+      let referenceData = Data(repeating: 255, count: width * height * 4)
       let referenceProvider = try XCTUnwrap(CGDataProvider(data: referenceData as CFData))
       let referenceCgImage = try XCTUnwrap(
-        CGImage(
-          width: width,
-          height: height,
-          bitsPerComponent: 8,
-          bitsPerPixel: 24,
-          bytesPerRow: width * 3,
-          space: colorSpace,
-          bitmapInfo: [],
-          provider: referenceProvider,
-          decode: nil,
-          shouldInterpolate: false,
-          intent: .defaultIntent
-        )
-      )
-      let failureData = Data(repeating: 0, count: width * height * 4)
-      let failureProvider = try XCTUnwrap(CGDataProvider(data: failureData as CFData))
-      let failureCgImage = try XCTUnwrap(
         CGImage(
           width: width,
           height: height,
@@ -304,12 +287,32 @@ final class SnapshotTestingTests: BaseTestCase {
           bytesPerRow: width * 4,
           space: colorSpace,
           bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue),
+          provider: referenceProvider,
+          decode: nil,
+          shouldInterpolate: false,
+          intent: .defaultIntent
+        )
+      )
+      let failureData = Data(repeating: 0, count: width * height * 2)
+      let failureProvider = try XCTUnwrap(CGDataProvider(data: failureData as CFData))
+      let failureCgImage = try XCTUnwrap(
+        CGImage(
+          width: width,
+          height: height,
+          bitsPerComponent: 8,
+          bitsPerPixel: 16,
+          bytesPerRow: width * 2,
+          space: CGColorSpaceCreateDeviceGray(),
+          bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue),
           provider: failureProvider,
           decode: nil,
           shouldInterpolate: false,
           intent: .defaultIntent
         )
       )
+
+      XCTAssertEqual(referenceCgImage.bitsPerPixel, 32)
+      XCTAssertEqual(failureCgImage.bitsPerPixel, 16)
 
       let difference = Diffing<UIImage>.image.diffV2(
         UIImage(cgImage: referenceCgImage),
