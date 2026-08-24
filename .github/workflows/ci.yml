@@ -60,7 +60,7 @@ jobs:
     strategy:
       matrix:
         swift:
-          - "6.2"
+          - "6.3"
     name: Android
     runs-on: ubuntu-latest
     steps:
