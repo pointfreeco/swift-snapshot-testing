@@ -8,4 +8,7 @@
   typealias Image = UIImage
   typealias ImageView = UIImageView
   typealias View = UIView
+#elseif os(watchOS)
+  import UIKit
+  typealias Image = UIImage
 #endif
