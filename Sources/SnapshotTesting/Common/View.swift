@@ -242,6 +242,74 @@
           return .init(safeArea: safeArea, size: size, traits: .iPhone13ProMax(orientation))
         }
 
+        public static let iPhone17 = ViewImageConfig.iPhone17(.portrait)
+
+        public static func iPhone17(_ orientation: Orientation) -> ViewImageConfig {
+          let safeArea: UIEdgeInsets
+          let size: CGSize
+          switch orientation {
+          case .landscape:
+            safeArea = .init(top: 20, left: 62, bottom: 20, right: 62)
+            size = .init(width: 874, height: 402)
+          case .portrait:
+            safeArea = .init(top: 62, left: 0, bottom: 34, right: 0)
+            size = .init(width: 402, height: 874)
+          }
+
+          return .init(safeArea: safeArea, size: size, traits: .iPhone17(orientation))
+        }
+
+      public static let iPhone17Pro = ViewImageConfig.iPhone17(.portrait)
+
+      public static func iPhone17Pro(_ orientation: Orientation) -> ViewImageConfig {
+        let safeArea: UIEdgeInsets
+        let size: CGSize
+        switch orientation {
+        case .landscape:
+          safeArea = .init(top: 20, left: 62, bottom: 20, right: 62)
+          size = .init(width: 874, height: 402)
+        case .portrait:
+          safeArea = .init(top: 62, left: 0, bottom: 34, right: 0)
+          size = .init(width: 402, height: 874)
+        }
+
+        return .init(safeArea: safeArea, size: size, traits: .iPhone17Pro(orientation))
+      }
+
+      public static let iPhone17ProMax = ViewImageConfig.iPhone17ProMax(.portrait)
+
+      public static func iPhone17ProMax(_ orientation: Orientation) -> ViewImageConfig {
+        let safeArea: UIEdgeInsets
+        let size: CGSize
+        switch orientation {
+        case .landscape:
+          safeArea = .init(top: 20, left: 62, bottom: 20, right: 62)
+          size = .init(width: 956, height: 440)
+        case .portrait:
+          safeArea = .init(top: 62, left: 0, bottom: 34, right: 0)
+          size = .init(width: 440, height: 956)
+        }
+
+        return .init(safeArea: safeArea, size: size, traits: .iPhone17ProMax(orientation))
+      }
+
+      public static let iPhoneAir = ViewImageConfig.iPhoneAir(.portrait)
+
+      public static func iPhoneAir(_ orientation: Orientation) -> ViewImageConfig {
+        let safeArea: UIEdgeInsets
+        let size: CGSize
+        switch orientation {
+        case .landscape:
+          safeArea = .init(top: 20, left: 68, bottom: 29, right: 68)
+          size = .init(width: 912, height: 420)
+        case .portrait:
+          safeArea = .init(top: 68, left: 0, bottom: 34, right: 0)
+          size = .init(width: 420, height: 912)
+        }
+
+        return .init(safeArea: safeArea, size: size, traits: .iPhoneAir(orientation))
+      }
+
         public static let iPadMini = ViewImageConfig.iPadMini(.landscape)
 
         public static func iPadMini(_ orientation: Orientation) -> ViewImageConfig {
@@ -747,6 +815,114 @@
         }
 
         public static func iPhone13ProMax(_ orientation: ViewImageConfig.Orientation)
+          -> UITraitCollection
+        {
+          let base: [UITraitCollection] = [
+            .init(forceTouchCapability: .available),
+            .init(layoutDirection: .leftToRight),
+            .init(preferredContentSizeCategory: .medium),
+            .init(userInterfaceIdiom: .phone),
+          ]
+          switch orientation {
+          case .landscape:
+            return .init(
+              traitsFrom: base + [
+                .init(horizontalSizeClass: .regular),
+                .init(verticalSizeClass: .compact),
+              ]
+            )
+          case .portrait:
+            return .init(
+              traitsFrom: base + [
+                .init(horizontalSizeClass: .compact),
+                .init(verticalSizeClass: .regular),
+              ]
+            )
+          }
+        }
+
+        public static func iPhone17(_ orientation: ViewImageConfig.Orientation)
+          -> UITraitCollection
+        {
+          let base: [UITraitCollection] = [
+            .init(forceTouchCapability: .available),
+            .init(layoutDirection: .leftToRight),
+            .init(preferredContentSizeCategory: .medium),
+            .init(userInterfaceIdiom: .phone),
+          ]
+          switch orientation {
+          case .landscape:
+            return .init(
+              traitsFrom: base + [
+                .init(horizontalSizeClass: .compact),
+                .init(verticalSizeClass: .compact),
+              ]
+            )
+          case .portrait:
+            return .init(
+              traitsFrom: base + [
+                .init(horizontalSizeClass: .compact),
+                .init(verticalSizeClass: .regular),
+              ]
+            )
+          }
+        }
+
+        public static func iPhone17Pro(_ orientation: ViewImageConfig.Orientation)
+          -> UITraitCollection
+        {
+          let base: [UITraitCollection] = [
+            .init(forceTouchCapability: .available),
+            .init(layoutDirection: .leftToRight),
+            .init(preferredContentSizeCategory: .medium),
+            .init(userInterfaceIdiom: .phone),
+          ]
+          switch orientation {
+          case .landscape:
+            return .init(
+              traitsFrom: base + [
+                .init(horizontalSizeClass: .compact),
+                .init(verticalSizeClass: .compact),
+              ]
+            )
+          case .portrait:
+            return .init(
+              traitsFrom: base + [
+                .init(horizontalSizeClass: .compact),
+                .init(verticalSizeClass: .regular),
+              ]
+            )
+          }
+        }
+
+        public static func iPhone17ProMax(_ orientation: ViewImageConfig.Orientation)
+          -> UITraitCollection
+        {
+          let base: [UITraitCollection] = [
+            .init(forceTouchCapability: .available),
+            .init(layoutDirection: .leftToRight),
+            .init(preferredContentSizeCategory: .medium),
+            .init(userInterfaceIdiom: .phone),
+          ]
+          switch orientation {
+          case .landscape:
+            return .init(
+              traitsFrom: base + [
+                .init(horizontalSizeClass: .regular),
+                .init(verticalSizeClass: .compact),
+              ]
+            )
+          case .portrait:
+            return .init(
+              traitsFrom: base + [
+                .init(horizontalSizeClass: .compact),
+                .init(verticalSizeClass: .regular),
+              ]
+            )
+          }
+        }
+
+        public static func iPhoneAir(_ orientation: ViewImageConfig.Orientation)
           -> UITraitCollection
         {
           let base: [UITraitCollection] = [
