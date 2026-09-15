@@ -7,6 +7,10 @@ import XCTest
   import AppKit
 #endif
 
+#if canImport(UniformTypeIdentifiers)
+  import UniformTypeIdentifiers
+#endif
+
 #if canImport(Testing)
   import Testing
 #endif
@@ -508,10 +512,14 @@ public func verifySnapshot<Value, Format>(
                   case .xcTest(let attachment):
                     activity.add(attachment)
                   case .data(let data, let name):
-                    let attachment = XCTAttachment(data: data)
+                    let attachment: XCTAttachment
+                    if let identifier = uniformTypeIdentifier(forFileName: name) {
+                      attachment = XCTAttachment(data: data, uniformTypeIdentifier: identifier)
+                    } else {
+                      attachment = XCTAttachment(data: data)
+                    }
                     attachment.name = name
                     activity.add(attachment)
-                    break
                   }
                 }
               }
@@ -551,6 +559,17 @@ public func verifySnapshot<Value, Format>(
 }
 
 // MARK: - Private
+
+private func uniformTypeIdentifier(forFileName fileName: String) -> String? {
+  let pathExtension = (fileName as NSString).pathExtension
+  guard !pathExtension.isEmpty else { return nil }
+  #if canImport(UniformTypeIdentifiers)
+    if #available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *) {
+      return UTType(filenameExtension: pathExtension)?.identifier
+    }
+  #endif
+  return nil
+}
 
 private var counter: File.Counter {
   #if canImport(Testing)
