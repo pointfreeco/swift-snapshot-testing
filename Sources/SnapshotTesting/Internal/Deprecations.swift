@@ -234,7 +234,7 @@ public func _verifyInlineSnapshot<Value>(
       let fileName = "\(filePath)"
       let sourceCodeFilePath = URL(fileURLWithPath: fileName, isDirectory: false)
       let sourceCode = try String(contentsOf: sourceCodeFilePath)
-      var newRecordings = recordings
+      var newRecordings = recordingsStorage.withValue { $0 }
 
       let modifiedSource = try writeInlineSnapshot(
         &newRecordings,
@@ -250,8 +250,12 @@ public func _verifyInlineSnapshot<Value>(
         .data(using: String.Encoding.utf8)?
         .write(to: sourceCodeFilePath)
 
-      if newRecordings != recordings {
+      let recordedSnapshot = recordingsStorage.withValue { recordings in
+        guard newRecordings != recordings else { return false }
         recordings = newRecordings
+        return true
+      }
+      if recordedSnapshot {
         /// If no other recording has been made, then fail!
         return """
           No reference was found inline. Automatically recorded snapshot.
@@ -449,7 +453,7 @@ private let extendedClosingStringDelimitersPattern = ##"\"\"\"#{0,}"##
 // When we modify a file, the line numbers reported by the compiler through #line are no longer
 // accurate. With the FileRecording values we keep track of we modify the files so we can adjust
 // line numbers.
-private var recordings: Recordings = [:]
+private let recordingsStorage = SnapshotTestingLockedState<Recordings>([:])
 
 // Deprecated after 1.11.1:
 

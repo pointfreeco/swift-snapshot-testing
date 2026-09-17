@@ -2242,7 +2242,7 @@ extension _PlistDecoder {
 
 // Since plists do not support null values by default, we will encode them as "$null".
 private let _plistNull = "$null"
-private let _plistNullNSString = NSString(string: _plistNull)
+private var _plistNullNSString: NSString { NSString(string: _plistNull) }
 
 //===----------------------------------------------------------------------===//
 // Shared Key Types
