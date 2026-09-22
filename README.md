@@ -277,6 +277,8 @@ targets: [
 
   - [SnapshotVision](https://github.com/gregersson/swift-snapshot-testing-vision) adds snapshot
     strategy for text recognition on views and images. Uses Apples Vision framework.
+  
+  - [NSAssets](https://apps.apple.com/gr/app/nsassets/id6760512142?mt=12) free macOS app viewer for your Snapshot Tests images.
 
 Have you written your own SnapshotTesting plug-in?
 [Add it here](https://github.com/pointfreeco/swift-snapshot-testing/edit/master/README.md) and
