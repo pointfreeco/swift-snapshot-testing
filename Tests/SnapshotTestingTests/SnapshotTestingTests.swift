@@ -271,6 +271,100 @@ final class SnapshotTestingTests: BaseTestCase {
     #endif
   }
 
+  func testImagePerceptualPrecisionAcrossColorSpaces() throws {
+    #if os(iOS) || os(tvOS) || os(macOS)
+      guard #available(iOS 11.0, tvOS 11.0, macOS 10.13, *) else { return }
+
+      // A snapshot taken with `drawHierarchyInKeyWindow` comes back in extended sRGB, while the
+      // reference is decoded from PNG as Display P3. Both encode the same color, so the perceptual
+      // comparison has to report no difference. Before the comparison was fed the color-matched
+      // images, every pixel differed and the failure message reported a constant delta unrelated
+      // to the actual contents.
+      let extent = CGRect(x: 0, y: 0, width: 32, height: 32)
+      let color = try XCTUnwrap(
+        CIColor(
+          red: 0.8, green: 0.2, blue: 0.2, colorSpace: CGColorSpace(name: CGColorSpace.sRGB)!)
+      )
+      let ciImage = CIImage(color: color).cropped(to: extent)
+      let context = CIContext()
+      let asDisplayP3 = try XCTUnwrap(
+        context.createCGImage(
+          ciImage, from: extent, format: .RGBA8,
+          colorSpace: CGColorSpace(name: CGColorSpace.displayP3)!)
+      )
+      let asSRGB = try XCTUnwrap(
+        context.createCGImage(
+          ciImage, from: extent, format: .RGBA8,
+          colorSpace: CGColorSpace(name: CGColorSpace.sRGB)!)
+      )
+
+      XCTAssertNil(Self.perceptualDifference(between: asDisplayP3, and: asSRGB))
+    #endif
+  }
+
+  func testImagePerceptualPrecisionInDarkTones() throws {
+    #if os(iOS) || os(tvOS) || os(macOS)
+      guard #available(iOS 11.0, tvOS 11.0, macOS 10.13, *) else { return }
+
+      // A single 8-bit step is imperceptible wherever it occurs, so `perceptualPrecision: 0.99`
+      // (delta <= 1) has to accept it. Core Image runs filters in the working color space and its
+      // kernels expect linear light, so leaving color management disabled makes CILabDeltaE read
+      // gamma-encoded values as linear and inflates dark differences: the same step at black
+      // reports 3.54 instead of 0.27. Anti-aliased edges on a dark background hit exactly this.
+      //
+      // 24 is included on purpose: L* switches from its linear segment to the cube-root one around
+      // there, which is where a single step moves lightness the most.
+      for base in [UInt8(0), 4, 16, 24] {
+        let reference = try Self.solidImage(value: base)
+        let snapshot = try Self.solidImage(value: base + 1)
+        XCTAssertNil(
+          Self.perceptualDifference(between: reference, and: snapshot),
+          "a one-step difference at \(base) should be within the perceptual tolerance"
+        )
+      }
+    #endif
+  }
+
+  #if os(iOS) || os(tvOS) || os(macOS)
+    /// Runs the shipped image diffing with `perceptualPrecision: 0.99` and returns the failure, if any.
+    private static func perceptualDifference(between old: CGImage, and new: CGImage) -> String? {
+      #if os(iOS) || os(tvOS)
+        let strategy = Snapshotting<UIImage, UIImage>.image(perceptualPrecision: 0.99)
+        return strategy.diffing.diffV2(UIImage(cgImage: old), UIImage(cgImage: new))?.0
+      #elseif os(macOS)
+        let strategy = Snapshotting<NSImage, NSImage>.image(perceptualPrecision: 0.99)
+        let size = CGSize(width: old.width, height: old.height)
+        return strategy.diffing.diffV2(
+          NSImage(cgImage: old, size: size), NSImage(cgImage: new, size: size)
+        )?.0
+      #endif
+    }
+
+    private static func solidImage(value: UInt8) throws -> CGImage {
+      let width = 16
+      let height = 16
+      var bytes = [UInt8](repeating: 0, count: width * height * 4)
+      for index in stride(from: 0, to: bytes.count, by: 4) {
+        bytes[index] = value
+        bytes[index + 1] = value
+        bytes[index + 2] = value
+        bytes[index + 3] = 255
+      }
+      let image: CGImage? = bytes.withUnsafeMutableBytes { raw in
+        CGContext(
+          data: raw.baseAddress,
+          width: width,
+          height: height,
+          bitsPerComponent: 8,
+          bytesPerRow: width * 4,
+          space: CGColorSpace(name: CGColorSpace.sRGB)!,
+          bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+        )?.makeImage()
+      }
+      return try XCTUnwrap(image)
+    }
+  #endif
+
   func testSCNView() {
     // #if os(iOS) || os(macOS) || os(tvOS)
     // // NB: CircleCI crashes while trying to instantiate SCNView.

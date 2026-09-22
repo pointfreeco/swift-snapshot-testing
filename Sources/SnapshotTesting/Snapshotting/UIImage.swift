@@ -130,9 +130,18 @@
       return "Newly-taken snapshot does not match reference."
     }
     if perceptualPrecision < 1, #available(iOS 11.0, tvOS 11.0, *) {
+      // Compare the images that were remapped to a common color space above. Passing the original
+      // images here would compare a Display P3 reference against an extended sRGB snapshot, which
+      // reports a difference on every pixel even when the images are perceptually identical.
+      guard
+        let oldNormalized = context(for: oldCgImage)?.makeImage(),
+        let newNormalized = newerContext.makeImage()
+      else {
+        return "Newly-taken snapshot's data could not be loaded."
+      }
       return perceptuallyCompare(
-        CIImage(cgImage: oldCgImage),
-        CIImage(cgImage: newCgImage),
+        CIImage(cgImage: oldNormalized),
+        CIImage(cgImage: newNormalized),
         pixelPrecision: precision,
         perceptualPrecision: perceptualPrecision
       )
@@ -298,9 +307,18 @@ private func normalizedComponentDiff(_ old: UIImage, _ new: UIImage) -> UIImage?
     // Calculate the deltaE values. Each pixel is a value between 0-100.
     // 0 means no difference, 100 means completely opposite.
     let deltaOutputImage = old.applyingLabDeltaE(new)
-    // Setting the working color space and output color space to NSNull disables color management. This is appropriate when the output
-    // of the operations is computational instead of an image intended to be displayed.
-    let context = CIContext(options: [.workingColorSpace: NSNull(), .outputColorSpace: NSNull()])
+    // Core Image runs filters in the working color space, and its kernels expect those values to be
+    // linear light. Disabling color management (NSNull) leaves gamma-encoded values untouched, so
+    // CILabDeltaE treats them as linear and inflates the difference in dark regions: a single 8-bit
+    // step at black reports 3.54 instead of 0.27. Ask for a linear working space so the sRGB
+    // transfer function is decoded before the delta is computed. The output stays unmanaged because
+    // it is a computed value rather than an image to display.
+    let context = CIContext(
+      options: [
+        .workingColorSpace: CGColorSpace(name: CGColorSpace.extendedLinearSRGB) as Any,
+        .outputColorSpace: NSNull(),
+      ]
+    )
     let deltaThreshold = (1 - perceptualPrecision) * 100
     let actualPixelPrecision: Float
     var maximumDeltaE: Float = 0
