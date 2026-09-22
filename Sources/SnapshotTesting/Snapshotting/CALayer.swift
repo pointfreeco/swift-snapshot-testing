@@ -59,14 +59,17 @@
     ///     human eye.
     ///   - traits: A trait collection override.
     public static func image(
-      precision: Float = 1, perceptualPrecision: Float = 1, traits: UITraitCollection = .init()
+      precision: Float = 1,
+      perceptualPrecision: Float = 1,
+      traits: UITraitCollection = .init(),
+      isOpaque: Bool = true
     )
       -> Snapshotting
     {
       return SimplySnapshotting.image(
         precision: precision, perceptualPrecision: perceptualPrecision, scale: traits.displayScale
       ).pullback { layer in
-        renderer(bounds: layer.bounds, for: traits).image { ctx in
+        renderer(bounds: layer.bounds, for: traits, isOpaque: isOpaque).image { ctx in
           layer.setNeedsLayout()
           layer.layoutIfNeeded()
           layer.render(in: ctx.cgContext)

@@ -24,6 +24,7 @@
     public static func image(
       on config: ViewImageConfig,
       drawHierarchyInKeyWindow: Bool = false,
+      isOpaque: Bool = true,
       precision: Float = 1,
       perceptualPrecision: Float = 1,
       size: CGSize? = nil,
@@ -39,6 +40,7 @@
           config: size.map { .init(safeArea: config.safeArea, size: $0, traits: config.traits) }
             ?? config,
           drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+          isOpaque: isOpaque,
           traits: traits,
           view: viewController.view,
           viewController: viewController
@@ -61,6 +63,7 @@
     ///   - traits: A trait collection override.
     public static func image(
       drawHierarchyInKeyWindow: Bool = false,
+      isOpaque: Bool = true,
       precision: Float = 1,
       perceptualPrecision: Float = 1,
       size: CGSize? = nil,
@@ -75,6 +78,7 @@
         snapshotView(
           config: .init(safeArea: .zero, size: size, traits: traits),
           drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+          isOpaque: isOpaque,
           traits: traits,
           view: viewController.view,
           viewController: viewController
