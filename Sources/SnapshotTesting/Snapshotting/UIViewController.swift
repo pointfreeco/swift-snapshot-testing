@@ -7,6 +7,7 @@
       return .image()
     }
 
+
     /// A snapshot strategy for comparing view controller views based on pixel equality.
     ///
     /// - Parameters:
@@ -21,13 +22,15 @@
     ///     human eye.
     ///   - size: A view size override.
     ///   - traits: A trait collection override.
+    ///   - delay: A time in seconds, for how long to wait before making snapshot
     public static func image(
       on config: ViewImageConfig,
       drawHierarchyInKeyWindow: Bool = false,
       precision: Float = 1,
       perceptualPrecision: Float = 1,
       size: CGSize? = nil,
-      traits: UITraitCollection = .init()
+      traits: UITraitCollection = .init(),
+      delay: Double? = nil
     )
       -> Snapshotting
     {
@@ -41,7 +44,8 @@
           drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
           traits: traits,
           view: viewController.view,
-          viewController: viewController
+          viewController: viewController,
+          delay: delay
         )
       }
     }
