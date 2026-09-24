@@ -840,6 +840,9 @@
           window.contentView = NSView()
           window.contentView?.addSubview(self)
           window.makeKey()
+        #elseif os(iOS)
+          let window = UIWindow()
+          window.addSubview(self)
         #endif
         return perform()
       }
@@ -889,10 +892,10 @@
               var subscription: NSKeyValueObservation?
               subscription = wkWebView.observe(\.isLoading, options: [.initial, .new]) {
                 (webview, change) in
-                subscription?.invalidate()
-                subscription = nil
                 if change.newValue == false {
                   work()
+                  subscription?.invalidate()
+                  subscription = nil
                 }
               }
             } else {
