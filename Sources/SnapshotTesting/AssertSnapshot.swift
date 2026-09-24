@@ -45,8 +45,19 @@ public var _diffTool: SnapshotTestingConfiguration.DiffTool {
   }
 }
 
+private let __diffToolStorage = SnapshotTestingLockedState<SnapshotTestingConfiguration.DiffTool>(
+  .default
+)
+
 @_spi(Internals)
-public var __diffTool: SnapshotTestingConfiguration.DiffTool = .default
+public var __diffTool: SnapshotTestingConfiguration.DiffTool {
+  get {
+    __diffToolStorage.withValue { $0 }
+  }
+  set {
+    __diffToolStorage.withValue { $0 = newValue }
+  }
+}
 
 /// Whether or not to record all new references.
 @available(
@@ -79,15 +90,24 @@ public var _record: SnapshotTestingConfiguration.Record {
   }
 }
 
-@_spi(Internals)
-public var __record: SnapshotTestingConfiguration.Record = {
+private let __recordStorage = SnapshotTestingLockedState<SnapshotTestingConfiguration.Record>({
   if let value = ProcessInfo.processInfo.environment["SNAPSHOT_TESTING_RECORD"],
     let record = SnapshotTestingConfiguration.Record(rawValue: value)
   {
     return record
   }
   return .missing
-}()
+}())
+
+@_spi(Internals)
+public var __record: SnapshotTestingConfiguration.Record {
+  get {
+    __recordStorage.withValue { $0 }
+  }
+  set {
+    __recordStorage.withValue { $0 = newValue }
+  }
+}
 
 /// Asserts that a given value matches a reference on disk.
 ///
@@ -590,11 +610,15 @@ func sanitizePathComponent(_ string: String) -> String {
 
 // We need to clean counter between tests executions in order to support test-iterations.
 private class CleanCounterBetweenTestCases: NSObject, XCTestObservation {
-  private static var registered = false
+  private static let registrationState = SnapshotTestingLockedState(false)
 
   static func registerIfNeeded() {
-    guard !registered else { return }
-    defer { registered = true }
+    let shouldRegister = registrationState.withValue { registered in
+      guard !registered else { return false }
+      registered = true
+      return true
+    }
+    guard shouldRegister else { return }
     if Thread.isMainThread {
       XCTestObservationCenter.shared.addTestObserver(CleanCounterBetweenTestCases())
     } else {

@@ -218,7 +218,7 @@ import Foundation
 /// Provide this structure when defining custom snapshot functions that call
 /// ``assertInlineSnapshot(of:as:message:record:timeout:syntaxDescriptor:matches:file:function:line:column:)``
 /// under the hood.
-public struct InlineSnapshotSyntaxDescriptor: Hashable {
+public struct InlineSnapshotSyntaxDescriptor: Hashable, Sendable {
   /// The default label describing an inline snapshot.
   public static let defaultTrailingClosureLabel = "matches"
 
@@ -363,7 +363,7 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
   }
 
   @_spi(Internals)
-  public var inlineSnapshotState: LockIsolated<[File: [InlineSnapshot]]> = LockIsolated([:])
+  public let inlineSnapshotState: LockIsolated<[File: [InlineSnapshot]]> = LockIsolated([:])
 
   private struct TestSource {
     let source: String
@@ -372,24 +372,42 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
   }
 
   private func testSource(file: File) throws -> TestSource {
-    guard let testSource = testSourceCache[file]
-    else {
-      let filePath = "\(file.path)"
-      let source = try String(contentsOfFile: filePath)
-      let sourceFile = Parser.parse(source: source)
-      let sourceLocationConverter = SourceLocationConverter(fileName: filePath, tree: sourceFile)
-      let testSource = TestSource(
-        source: source,
-        sourceFile: sourceFile,
-        sourceLocationConverter: sourceLocationConverter
-      )
-      testSourceCache[file] = testSource
+    if let testSource = testSourceCache.value(for: file) {
       return testSource
     }
+
+    let filePath = "\(file.path)"
+    let source = try String(contentsOfFile: filePath)
+    let sourceFile = Parser.parse(source: source)
+    let sourceLocationConverter = SourceLocationConverter(fileName: filePath, tree: sourceFile)
+    let testSource = TestSource(
+      source: source,
+      sourceFile: sourceFile,
+      sourceLocationConverter: sourceLocationConverter
+    )
+    testSourceCache.insert(testSource, for: file)
     return testSource
   }
 
-  private var testSourceCache: [File: TestSource] = [:]
+  private let testSourceCache = TestSourceCache()
+
+  private final class TestSourceCache: @unchecked Sendable {
+    // Safety invariant: cache access is serialized by `lock`.
+    private var cache: [File: TestSource] = [:]
+    private let lock = NSLock()
+
+    func value(for file: File) -> TestSource? {
+      lock.lock()
+      defer { lock.unlock() }
+      return cache[file]
+    }
+
+    func insert(_ testSource: TestSource, for file: File) {
+      lock.lock()
+      defer { lock.unlock() }
+      cache[file] = testSource
+    }
+  }
 
   private func writeInlineSnapshots() {
     inlineSnapshotState.withLock { inlineSnapshotState in
