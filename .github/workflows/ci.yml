@@ -21,10 +21,14 @@ jobs:
     strategy:
       matrix:
         xcode:
-          - '16.4'
+          - '27.0'
 
     name: visionOS
-    runs-on: macos-15
+    # The visionOS 27.0 simulator runtime ships only with the Xcode 27 image.
+    runs-on: xcode-27
+    env:
+      VISIONOS_RUNTIME: '27.0'
+      VISIONOS_DEVICE: Apple Vision Pro
     steps:
       - uses: actions/checkout@v4
       - name: Select Xcode ${{ matrix.xcode }}
@@ -38,7 +42,7 @@ jobs:
           set -o pipefail && \
           TEST_RUNNER_GITHUB_WORKFLOW=CI xcodebuild test \
             -scheme swift-snapshot-testing-Package \
-            -destination platform="visionOS Simulator,name=Apple Vision Pro (at 2732x2048),OS=2.5"
+            -destination platform="visionOS Simulator,name=$VISIONOS_DEVICE,OS=$VISIONOS_RUNTIME"
 
   macos:
     strategy:
