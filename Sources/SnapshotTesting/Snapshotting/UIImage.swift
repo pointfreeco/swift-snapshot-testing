@@ -1,4 +1,4 @@
-#if os(iOS) || os(tvOS)
+#if os(iOS) || os(tvOS) || os(visionOS)
   import UIKit
 
   extension Diffing where Value == UIImage {
@@ -23,7 +23,19 @@
       if let scale = scale, scale != 0.0 {
         imageScale = scale
       } else {
-        imageScale = UIScreen.main.scale
+        #if os(visionOS)
+          // visionOS has no UIScreen, so there is no screen scale to fall back on. Content
+          // rasterizes at a default @2x scale factor unless a layer opts in to dynamic content
+          // scaling, which doesn't apply to offscreen rendering. See "Drawing sharp layer-based
+          // content in visionOS":
+          // https://developer.apple.com/documentation/visionos/drawing-sharp-layer-based-content
+          //
+          // This matches what 'UIGraphicsImageRenderer' produces there, so a reference decoded at
+          // this scale describes the same point size as the newly-taken snapshot.
+          imageScale = 2.0
+        #else
+          imageScale = UIScreen.main.scale
+        #endif
       }
       let toData: (UIImage) -> Data = { $0.pngData() ?? emptyImage().pngData()! }
       return .diff(
@@ -286,7 +298,7 @@ private func normalizedComponentDiff(_ old: UIImage, _ new: UIImage) -> UIImage?
 }
 #endif
 
-#if os(iOS) || os(tvOS) || os(macOS)
+#if os(iOS) || os(tvOS) || os(macOS) || os(visionOS)
   import Accelerate.vImage
   import CoreImage.CIKernel
   import MetalPerformanceShaders

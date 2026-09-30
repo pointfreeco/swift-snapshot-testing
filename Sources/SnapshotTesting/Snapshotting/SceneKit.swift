@@ -1,8 +1,8 @@
-#if os(iOS) || os(macOS) || os(tvOS)
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS)
   import SceneKit
   #if os(macOS)
     import Cocoa
-  #elseif os(iOS) || os(tvOS)
+  #elseif os(iOS) || os(tvOS) || os(visionOS)
     import UIKit
   #endif
 
@@ -23,7 +23,7 @@
         return .scnScene(precision: precision, perceptualPrecision: perceptualPrecision, size: size)
       }
     }
-  #elseif os(iOS) || os(tvOS)
+  #elseif os(iOS) || os(tvOS) || os(visionOS)
     extension Snapshotting where Value == SCNScene, Format == UIImage {
       /// A snapshot strategy for comparing SceneKit scenes based on pixel equality.
       ///

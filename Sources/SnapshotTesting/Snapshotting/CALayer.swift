@@ -40,7 +40,7 @@
       }
     }
   }
-#elseif os(iOS) || os(tvOS)
+#elseif os(iOS) || os(tvOS) || os(visionOS)
   import UIKit
 
   extension Snapshotting where Value == CALayer, Format == UIImage {
