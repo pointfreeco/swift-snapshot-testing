@@ -98,7 +98,7 @@ assertSnapshot(of: vc, as: .image(on: .iPadMini(.portrait)))
 assertSnapshot(of: vc, as: .recursiveDescription(on: .iPadMini(.portrait)))
 ```
 
-> **Warning**
+> [!WARNING]
 > Snapshots must be compared using the exact same simulator that originally took the reference to
 > avoid discrepancies between images.
 
@@ -163,7 +163,7 @@ The latest documentation is available
 
 ### Xcode
 
-> **Warning**
+> [!WARNING]
 > By default, Xcode will try to add the SnapshotTesting package to your project's main
 > application/framework target. Please ensure that SnapshotTesting is added to a _test_ target
 > instead, as documented in the last step, below.
