@@ -191,6 +191,40 @@
       XCTAssertEqual(try Data(contentsOf: file), pointer.data)
     }
 
+    // Saving the failed snapshot and recording it share one encoding, which for images is slow.
+    func testFailedComparisonEncodesTheSnapshotOnce() throws {
+      var encodings = 0
+      let strategy = countingStrategy { encodings += 1 }
+      let directory = try temporaryDirectory()
+      _ = verifySnapshot(
+        of: "old", as: strategy, named: "text", record: .all, snapshotDirectory: directory,
+        testName: "encoding")
+      encodings = 0
+
+      let failure = verifySnapshot(
+        of: "new", as: strategy, named: "text", record: .failed, snapshotDirectory: directory,
+        testName: "encoding")
+
+      XCTAssertTrue(
+        failure?.contains("A new snapshot was automatically recorded.") == true, failure ?? "nil")
+      XCTAssertEqual(encodings, 1)
+    }
+
+    func testUnreadableReferenceEncodesTheSnapshotOnce() throws {
+      var encodings = 0
+      let strategy = countingStrategy { encodings += 1 }
+      let directory = try temporaryDirectory()
+      try Data([0xFF]).write(
+        to: URL(fileURLWithPath: directory).appendingPathComponent("encoding.text.txt"))
+
+      let failure = verifySnapshot(
+        of: "new", as: strategy, named: "text", record: .never, snapshotDirectory: directory,
+        testName: "encoding")
+
+      XCTAssertTrue(failure?.contains("The new snapshot was saved to") == true, failure ?? "nil")
+      XCTAssertEqual(encodings, 1)
+    }
+
     func testFailedRecordModeReportsWhyTheNewSnapshotCouldntBeRecorded() throws {
       let directory = try temporaryDirectory()
       let file = URL(fileURLWithPath: directory).appendingPathComponent("encoding.truncated.png")
@@ -378,6 +412,24 @@
       XCTAssertNotNil(
         saved.flatMap { PlatformImage(contentsOfFile: String($0)) }, "\(reference.name): \(failure)"
       )
+    }
+
+    /// A text strategy that calls `encoded` each time it encodes a snapshot and can't decode a
+    /// reference that isn't UTF-8.
+    private func countingStrategy(_ encoded: @escaping () -> Void) -> Snapshotting<String, String> {
+      struct NotUTF8: Error {}
+      return Snapshotting(
+        pathExtension: "txt",
+        diffing: .diff(
+          toData: {
+            encoded()
+            return Data($0.utf8)
+          },
+          fromData: { data in
+            guard let string = String(data: data, encoding: .utf8) else { throw NotUTF8() }
+            return string
+          }
+        ) { $0 == $1 ? nil : ("\"\($1)\" doesn't match \"\($0)\".", []) })
     }
 
     private func temporaryDirectory() throws -> String {

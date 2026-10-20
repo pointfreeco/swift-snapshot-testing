@@ -389,9 +389,7 @@ public func verifySnapshot<Value, Format>(
         return "Couldn't snapshot value"
       }
 
-      func recordSnapshot(writeToDisk: Bool) throws {
-        let snapshotData = try snapshotting.diffing.toData(diffable)
-
+      func recordSnapshot(_ snapshotData: Data, writeToDisk: Bool) throws {
         if writeToDisk {
           try snapshotData.write(to: snapshotFileUrl)
         }
@@ -438,7 +436,7 @@ public func verifySnapshot<Value, Format>(
       }
 
       if record == .all {
-        try recordSnapshot(writeToDisk: true)
+        try recordSnapshot(snapshotting.diffing.toData(diffable), writeToDisk: true)
 
         return """
           Record mode is on. Automatically recorded snapshot: …
@@ -451,13 +449,13 @@ public func verifySnapshot<Value, Format>(
 
       guard fileManager.fileExists(atPath: snapshotFileUrl.path) else {
         if record == .never {
-          try recordSnapshot(writeToDisk: false)
+          try recordSnapshot(snapshotting.diffing.toData(diffable), writeToDisk: false)
 
           return """
             No reference was found on disk. New snapshot was not recorded because recording is disabled
             """
         } else {
-          try recordSnapshot(writeToDisk: true)
+          try recordSnapshot(snapshotting.diffing.toData(diffable), writeToDisk: true)
 
           return """
             No reference was found on disk. Automatically recorded snapshot: …
@@ -469,7 +467,7 @@ public func verifySnapshot<Value, Format>(
         }
       }
 
-      func writeFailedSnapshot() throws -> URL {
+      func writeFailedSnapshot(_ snapshotData: Data) throws -> URL {
         let artifactsUrl = URL(
           fileURLWithPath: ProcessInfo.processInfo.environment["SNAPSHOT_ARTIFACTS"]
             ?? NSTemporaryDirectory(),
@@ -480,7 +478,7 @@ public func verifySnapshot<Value, Format>(
         let failedSnapshotFileUrl = artifactsSubUrl.appendingPathComponent(
           snapshotFileUrl.lastPathComponent
         )
-        try snapshotting.diffing.toData(diffable).write(to: failedSnapshotFileUrl)
+        try snapshotData.write(to: failedSnapshotFileUrl)
         return failedSnapshotFileUrl
       }
 
@@ -501,16 +499,16 @@ public func verifySnapshot<Value, Format>(
         // against it, and "git lfs pull" skips files with local changes.
         if record == .failed, gitLFSPointer == nil {
           do {
-            try recordSnapshot(writeToDisk: true)
+            try recordSnapshot(snapshotting.diffing.toData(diffable), writeToDisk: true)
             message += " A new snapshot was automatically recorded."
           } catch {
             message += " A new snapshot couldn't be recorded: \(error.localizedDescription)"
           }
-        } else {
+        } else if let snapshotData = try? snapshotting.diffing.toData(diffable) {
           // Attached and saved like a mismatched snapshot, so the replacement can be inspected.
           // Encoding failures are ignored so they can't hide why the reference couldn't be loaded.
-          try? recordSnapshot(writeToDisk: false)
-          if let failedSnapshotFileUrl = try? writeFailedSnapshot() {
+          try? recordSnapshot(snapshotData, writeToDisk: false)
+          if let failedSnapshotFileUrl = try? writeFailedSnapshot(snapshotData) {
             message += " The new snapshot was saved to \"\(failedSnapshotFileUrl.path)\"."
           }
         }
@@ -531,7 +529,9 @@ public func verifySnapshot<Value, Format>(
         return nil
       }
 
-      let failedSnapshotFileUrl = try writeFailedSnapshot()
+      // Encoded once for both the failed snapshot and, with record: .failed, the new reference.
+      let snapshotData = try snapshotting.diffing.toData(diffable)
+      let failedSnapshotFileUrl = try writeFailedSnapshot(snapshotData)
 
       if !attachments.isEmpty {
         #if !os(Linux) && !os(Android) && !os(Windows)
@@ -588,7 +588,7 @@ public func verifySnapshot<Value, Format>(
       }
 
       if record == .failed {
-        try recordSnapshot(writeToDisk: true)
+        try recordSnapshot(snapshotData, writeToDisk: true)
         failureMessage += " A new snapshot was automatically recorded."
       }
 
