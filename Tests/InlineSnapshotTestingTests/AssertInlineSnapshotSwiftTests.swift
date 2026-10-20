@@ -119,6 +119,38 @@
         )
       }
 
+      @Test func conditionalInlineSnapshot_Hello() {
+        assertConditionalInlineSnapshot(of: { "Hello" }) {
+          """
+          - "Hello"
+
+          """
+        }
+      }
+
+      @Test func conditionalInlineSnapshot_Goodbye_NoTrailingClosure() {
+        withKnownIssue {
+          assertConditionalInlineSnapshot(of: { "Goodbye" }, record: .never)
+        } matching: { issue in
+          issue.description.hasSuffix("No expected value to assert against.")
+        }
+      }
+
+      @Test func conditionalInlineSnapshot_Hello_NoTrailingClosure() {
+        withKnownIssue {
+          assertConditionalInlineSnapshot(of: { "Hello" }, record: .never)
+        } matching: { issue in
+          issue.description.hasSuffix(
+            """
+            No expected value to assert against. Actual: …
+
+              - "Hello"
+
+            """
+          )
+        }
+      }
+
       @Test func argumentlessInlineSnapshot() {
         func assertArgumentlessInlineSnapshot(
           expected: (() -> String)? = nil,
@@ -321,6 +353,34 @@
     assertInlineSnapshot(
       of: value(),
       as: .dump,
+      syntaxDescriptor: InlineSnapshotSyntaxDescriptor(
+        trailingClosureLabel: "is",
+        trailingClosureOffset: 1
+      ),
+      matches: expected,
+      fileID: fileID,
+      file: filePath,
+      function: function,
+      line: line,
+      column: column
+    )
+  }
+
+  private func assertConditionalInlineSnapshot(
+    of value: () -> String,
+    record: SnapshotTestingConfiguration.Record? = nil,
+    is expected: (() -> String)? = nil,
+    fileID: StaticString = #fileID,
+    filePath: StaticString = #filePath,
+    function: StaticString = #function,
+    line: UInt = #line,
+    column: UInt = #column
+  ) {
+    let value = value()
+    assertInlineSnapshot(
+      of: value == "Hello" ? value : nil,
+      as: .dump,
+      record: record,
       syntaxDescriptor: InlineSnapshotSyntaxDescriptor(
         trailingClosureLabel: "is",
         trailingClosureOffset: 1
