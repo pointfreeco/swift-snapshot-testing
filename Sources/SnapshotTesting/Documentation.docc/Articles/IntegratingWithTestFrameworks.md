@@ -38,14 +38,17 @@ class FeatureTests: XCTestCase {
 ### Configuring snapshots
 
 For the most part, asserting on snapshots works the same whether you are using XCTest or Swift
-Testing. There is one major difference, and that is how snapshot configuration works. There are
-two major ways snapshots can be configured: ``SnapshotTestingConfiguration/diffTool-swift.property``
-and ``SnapshotTestingConfiguration/record-swift.property``. 
+Testing. There is one major difference, and that is how snapshot configuration works. Snapshots
+are configured with three properties: ``SnapshotTestingConfiguration/diffTool-swift.property``,
+``SnapshotTestingConfiguration/record-swift.property`` and
+``SnapshotTestingConfiguration/imagePixelFormat-swift.property``.
 
 The `diffTool` property allows you to customize how a command is printed to the test failure
 message that allows you to quickly open a diff of two files, such as
 [Kaleidoscope](http://kaleidoscope.app). The `record` property allows you to change the mode of
-assertion so that new snapshots are generated and saved to disk.
+assertion so that new snapshots are generated and saved to disk. The `imagePixelFormat` property
+controls how image snapshots are recorded and compared; see
+<doc:ChoosingAnImagePixelFormat>.
 
 These properties can be overridden for a scope of an operation using the
 ``withSnapshotTesting(record:diffTool:operation:)-2kuyr`` function. In a Swift Testing context 

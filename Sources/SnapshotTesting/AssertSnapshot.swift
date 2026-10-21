@@ -89,6 +89,26 @@ public var __record: SnapshotTestingConfiguration.Record = {
   return .missing
 }()
 
+@_spi(Internals)
+public var _imagePixelFormat: SnapshotTestingConfiguration.ImagePixelFormat? {
+  if let imagePixelFormat = SnapshotTestingConfiguration.current?.imagePixelFormat {
+    return imagePixelFormat
+  }
+  #if canImport(Testing)
+    // Swift toolchains without 'TestScoping' (compiler(<6.1)) never bind the trait's
+    // configuration into the task local, so fall back to scanning the current test's
+    // traits, mirroring '_record' and '_diffTool' above.
+    if let test = Test.current {
+      for trait in test.traits.reversed() {
+        if let imagePixelFormat = (trait as? _SnapshotsTestTrait)?.configuration.imagePixelFormat {
+          return imagePixelFormat
+        }
+      }
+    }
+  #endif
+  return nil
+}
+
 /// Asserts that a given value matches a reference on disk.
 ///
 /// - Parameters:
@@ -369,9 +389,7 @@ public func verifySnapshot<Value, Format>(
         return "Couldn't snapshot value"
       }
 
-      func recordSnapshot(writeToDisk: Bool) throws {
-        let snapshotData = snapshotting.diffing.toData(diffable)
-
+      func recordSnapshot(_ snapshotData: Data, writeToDisk: Bool) throws {
         if writeToDisk {
           try snapshotData.write(to: snapshotFileUrl)
         }
@@ -418,7 +436,7 @@ public func verifySnapshot<Value, Format>(
       }
 
       if record == .all {
-        try recordSnapshot(writeToDisk: true)
+        try recordSnapshot(snapshotting.diffing.toData(diffable), writeToDisk: true)
 
         return """
           Record mode is on. Automatically recorded snapshot: …
@@ -431,13 +449,13 @@ public func verifySnapshot<Value, Format>(
 
       guard fileManager.fileExists(atPath: snapshotFileUrl.path) else {
         if record == .never {
-          try recordSnapshot(writeToDisk: false)
+          try recordSnapshot(snapshotting.diffing.toData(diffable), writeToDisk: false)
 
           return """
             No reference was found on disk. New snapshot was not recorded because recording is disabled
             """
         } else {
-          try recordSnapshot(writeToDisk: true)
+          try recordSnapshot(snapshotting.diffing.toData(diffable), writeToDisk: true)
 
           return """
             No reference was found on disk. Automatically recorded snapshot: …
@@ -449,8 +467,53 @@ public func verifySnapshot<Value, Format>(
         }
       }
 
+      func writeFailedSnapshot(_ snapshotData: Data) throws -> URL {
+        let artifactsUrl = URL(
+          fileURLWithPath: ProcessInfo.processInfo.environment["SNAPSHOT_ARTIFACTS"]
+            ?? NSTemporaryDirectory(),
+          isDirectory: true
+        )
+        let artifactsSubUrl = artifactsUrl.appendingPathComponent(fileName)
+        try fileManager.createDirectory(at: artifactsSubUrl, withIntermediateDirectories: true)
+        let failedSnapshotFileUrl = artifactsSubUrl.appendingPathComponent(
+          snapshotFileUrl.lastPathComponent
+        )
+        try snapshotData.write(to: failedSnapshotFileUrl)
+        return failedSnapshotFileUrl
+      }
+
       let data = try Data(contentsOf: snapshotFileUrl)
-      let reference = snapshotting.diffing.fromData(data)
+      let reference: Format
+      do {
+        reference = try snapshotting.diffing.fromData(data)
+      } catch {
+        let gitLFSPointer = gitLFSPointerDescription(data)
+        // Errors without a LocalizedError description keep their details, such as a decoding
+        // error's missing key, rather than a generic "couldn't be completed".
+        let reason =
+          gitLFSPointer ?? (error as? LocalizedError)?.errorDescription ?? String(describing: error)
+        var message = """
+          Reference "\(snapshotFileUrl.path)" could not be loaded: \(reason)
+          """
+        // Recording over a Git LFS pointer would replace the committed file without comparing
+        // against it, and "git lfs pull" skips files with local changes.
+        if record == .failed, gitLFSPointer == nil {
+          do {
+            try recordSnapshot(snapshotting.diffing.toData(diffable), writeToDisk: true)
+            message += " A new snapshot was automatically recorded."
+          } catch {
+            message += " A new snapshot couldn't be recorded: \(error.localizedDescription)"
+          }
+        } else if let snapshotData = try? snapshotting.diffing.toData(diffable) {
+          // Attached and saved like a mismatched snapshot, so the replacement can be inspected.
+          // Encoding failures are ignored so they can't hide why the reference couldn't be loaded.
+          try? recordSnapshot(snapshotData, writeToDisk: false)
+          if let failedSnapshotFileUrl = try? writeFailedSnapshot(snapshotData) {
+            message += " The new snapshot was saved to \"\(failedSnapshotFileUrl.path)\"."
+          }
+        }
+        return message
+      }
 
       #if os(iOS) || os(tvOS)
         // If the image generation fails for the diffable part and the reference was empty, use the reference
@@ -466,17 +529,9 @@ public func verifySnapshot<Value, Format>(
         return nil
       }
 
-      let artifactsUrl = URL(
-        fileURLWithPath: ProcessInfo.processInfo.environment["SNAPSHOT_ARTIFACTS"]
-          ?? NSTemporaryDirectory(),
-        isDirectory: true
-      )
-      let artifactsSubUrl = artifactsUrl.appendingPathComponent(fileName)
-      try fileManager.createDirectory(at: artifactsSubUrl, withIntermediateDirectories: true)
-      let failedSnapshotFileUrl = artifactsSubUrl.appendingPathComponent(
-        snapshotFileUrl.lastPathComponent
-      )
-      try snapshotting.diffing.toData(diffable).write(to: failedSnapshotFileUrl)
+      // Encoded once for both the failed snapshot and, with record: .failed, the new reference.
+      let snapshotData = try snapshotting.diffing.toData(diffable)
+      let failedSnapshotFileUrl = try writeFailedSnapshot(snapshotData)
 
       if !attachments.isEmpty {
         #if !os(Linux) && !os(Android) && !os(Windows)
@@ -533,7 +588,7 @@ public func verifySnapshot<Value, Format>(
       }
 
       if record == .failed {
-        try recordSnapshot(writeToDisk: true)
+        try recordSnapshot(snapshotData, writeToDisk: true)
         failureMessage += " A new snapshot was automatically recorded."
       }
 
@@ -565,6 +620,21 @@ private var counter: File.Counter {
 }
 
 private let _counter = File.Counter()
+
+/// Describes a reference that is a Git LFS pointer, whose content hasn't been downloaded, or returns
+/// nil for any other data.
+func gitLFSPointerDescription(_ data: Data) -> String? {
+  let specLine = "version https://git-lfs.github.com/spec/"
+  // A pointer is text, so only its start is decoded.
+  let text = String(decoding: data.prefix(512), as: UTF8.self)
+  let hasConflictMarkers = text.contains("<<<<<<<") || text.contains(">>>>>>>")
+  // A diff3-style conflict between two added pointers starts with a conflict marker instead.
+  guard text.hasPrefix(specLine) || (text.hasPrefix("<<<<<<<") && text.contains("\n" + specLine))
+  else { return nil }
+  return hasConflictMarkers
+    ? "the file is a Git LFS pointer with merge conflict markers. Resolve the conflict, then run \"git lfs pull\" to download its content."
+    : "the file is a Git LFS pointer, so its content hasn't been downloaded. Run \"git lfs pull\" to download it."
+}
 
 func sanitizePathComponent(_ string: String) -> String {
   return

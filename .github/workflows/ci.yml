@@ -24,6 +24,33 @@ jobs:
       - name: Run tests
         run: make test-swift
 
+  ios:
+    strategy:
+      matrix:
+        xcode:
+          - '27.0'
+
+    name: iOS
+    # The macOS 27 image, in public preview. Its only iOS runtime is iOS 27.0.
+    runs-on: xcode-27
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode ${{ matrix.xcode }}
+        run: sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode }}.app
+      - name: Run image tests
+        # Only tests that record their references at runtime; the rest compare against references
+        # recorded on other simulators.
+        run: |
+          xcodebuild test \
+            -scheme swift-snapshot-testing-Package \
+            -destination 'platform=iOS Simulator,name=iPhone 18 Pro,OS=27.0' \
+            -only-testing:SnapshotTestingTests/ImagePixelFormatTests \
+            -only-testing:SnapshotTestingTests/ImagePixelFormatConfigurationTests \
+            -only-testing:SnapshotTestingTests/PerceptualColorManagementTests \
+            -only-testing:SnapshotTestingTests/ColorSpaceComparisonTests \
+            -only-testing:SnapshotTestingTests/DifferenceImageLayoutTests \
+            -only-testing:SnapshotTestingTests/ImageDataErrorTests
+
   ubuntu:
     strategy:
       matrix:
@@ -50,3 +77,6 @@ jobs:
         with:
           swift-version: ${{ matrix.swift }}
           copy-files: ${GITHUB_WORKSPACE}/Tests/SnapshotTestingTests/__Snapshots__
+          # AssertSnapshot.swift reads references from this folder on Android; the action's
+          # default is now /data/local/tmp/swift-android-tests.
+          android-emulator-test-folder: /data/local/tmp/android-xctest

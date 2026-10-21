@@ -25,27 +25,50 @@
       } else {
         imageScale = UIScreen.main.scale
       }
-      let toData: (UIImage) -> Data = { $0.pngData() ?? emptyImage().pngData()! }
+      let toData: (UIImage) throws -> Data = { image in
+        if let data = image.pngData() { return data }
+        let error = ImageEncodingError(image)
+        // A snapshot without image data, such as one of a zero-size view, records a placeholder
+        // that explains how to fix it.
+        if case .noImageData = error.reason, let data = emptyImage().pngData() { return data }
+        throw error
+      }
+      let decode: (Data) throws -> UIImage = { data in
+        try ImageReferenceError.validate(data)
+        guard let image = UIImage(data: data, scale: imageScale) else {
+          throw ImageReferenceError(data: data)
+        }
+        return image
+      }
+      // The pixel format is resolved when recording and comparing, which run inside the assertion's
+      // configuration scope; snapshots can arrive in callbacks outside it.
       return .diff(
-        toData: toData,
-        fromData: { UIImage(data: $0, scale: imageScale)! }
+        toData: { snapshot in
+          let format = ImageComparisonFormat(_imagePixelFormat)
+          return try toData(withoutAlphaIfOpaque(normalized(snapshot, to: format), format: format))
+        },
+        fromData: decode
       ) { old, new in
+        let format = ImageComparisonFormat(_imagePixelFormat)
+        let new = normalized(new, to: format)
         guard
-          let message = compare(
-            old, new, precision: precision, perceptualPrecision: perceptualPrecision)
+          let failure = compare(
+            old, new, precision: precision, perceptualPrecision: perceptualPrecision,
+            format: format)
         else { return nil }
-        let difference = SnapshotTesting.diff(old, new)
+        let message = failure.message
+        let difference =
+          failure.bitmaps.flatMap { normalizedComponentDiff($0, format: format, scale: old.scale) }
+          ?? blendModeDiff(old, new)
         let isEmptyImage = new.size == .zero
-        let referenceAttachment = DiffAttachment.data(toData(old), name: "reference.png")
-        let failureAttachment = DiffAttachment.data(
-          toData(isEmptyImage ? emptyImage() : new),
-          name: "failure.png"
-        )
-        let differenceAttachment = DiffAttachment.data(toData(difference), name: "difference.png")
-        return (
-          message,
-          [referenceAttachment, failureAttachment, differenceAttachment]
-        )
+        // An attachment that can't be encoded is left out; the message still reports the failure.
+        let attachments = [
+          ("reference.png", old), ("failure.png", isEmptyImage ? emptyImage() : new),
+          ("difference.png", difference),
+        ].compactMap { name, image in
+          (try? toData(image)).map { DiffAttachment.data($0, name: name) }
+        }
+        return (message, attachments)
       }
     }
 
@@ -87,203 +110,269 @@
     }
   }
 
-  // remap snapshot & reference to same colorspace
-  private let imageContextColorSpace = CGColorSpace(name: CGColorSpace.sRGB)
-  private let imageContextBitsPerComponent = 8
-  private let imageContextBytesPerPixel = 4
+  /// Converts a snapshot to `format` when the format requires it, keeping its pixel dimensions,
+  /// scale and orientation. Symbol images are drawn first, as UIKit draws them, so their tint and
+  /// padding are kept and their orientation is applied to the pixels.
+  ///
+  /// Recording depends on this: UIKit clips colors outside sRGB when it encodes extended-range
+  /// images as PNG. Conversion fails only for images without bitmap data or when a context can't be
+  /// allocated; the snapshot is then returned unconverted, and comparing it fails the same way.
+  func normalized(_ image: UIImage, to format: ImageComparisonFormat) -> UIImage {
+    guard format.convertsSnapshots else { return image }
+    // A symbol image's cgImage is its untinted template cropped to the glyph, not what UIKit draws.
+    let image = image.isSymbolImage ? drawn(image) : image
+    guard let cgImage = image.cgImage, let converted = convertedImage(cgImage, to: format) else {
+      return image
+    }
+    return UIImage(cgImage: converted, scale: image.scale, orientation: image.imageOrientation)
+  }
 
-  private func compare(_ old: UIImage, _ new: UIImage, precision: Float, perceptualPrecision: Float)
-    -> String?
-  {
+  private func drawn(_ image: UIImage) -> UIImage {
+    let format = UIGraphicsImageRendererFormat.preferred()
+    format.scale = image.scale
+    return UIGraphicsImageRenderer(size: image.size, format: format).image { _ in
+      image.draw(at: .zero)
+    }
+  }
+
+  /// Drops the alpha channel of a converted snapshot whose pixels are all opaque, so its reference
+  /// encodes as a smaller RGB PNG. The comparison context restores full opacity when drawing it, so
+  /// comparisons are unaffected.
+  func withoutAlphaIfOpaque(_ image: UIImage, format: ImageComparisonFormat) -> UIImage {
+    guard let cgImage = image.cgImage, let opaque = opaqueImage(cgImage, format: format) else {
+      return image
+    }
+    return UIImage(cgImage: opaque, scale: image.scale, orientation: image.imageOrientation)
+  }
+
+  /// The reference and the snapshot as they were compared, in the comparison layout.
+  private struct ComparisonBitmaps {
+    let old: [UInt8]
+    let new: [UInt8]
+    let width: Int
+    let height: Int
+  }
+
+  private struct ComparisonFailure {
+    let message: String
+    /// The compared pixels, when the comparison got as far as reading them.
+    var bitmaps: ComparisonBitmaps?
+  }
+
+  private func compare(
+    _ old: UIImage, _ new: UIImage, precision: Float, perceptualPrecision: Float,
+    format: ImageComparisonFormat
+  ) -> ComparisonFailure? {
     guard let oldCgImage = old.cgImage else {
-      return "Reference image could not be loaded."
+      return ComparisonFailure(message: "Reference image could not be loaded.")
     }
     guard let newCgImage = new.cgImage else {
-      return "Newly-taken snapshot could not be loaded."
+      return ComparisonFailure(message: "Newly-taken snapshot could not be loaded.")
     }
     guard newCgImage.width != 0, newCgImage.height != 0 else {
-      return "Newly-taken snapshot is empty."
+      return ComparisonFailure(message: "Newly-taken snapshot is empty.")
     }
     guard oldCgImage.width == newCgImage.width, oldCgImage.height == newCgImage.height else {
-      return "Newly-taken snapshot@\(new.size) does not match reference@\(old.size)."
+      return ComparisonFailure(
+        message: "Newly-taken snapshot@\(new.size) does not match reference@\(old.size).")
     }
-    let pixelCount = oldCgImage.width * oldCgImage.height
-    let byteCount = imageContextBytesPerPixel * pixelCount
-    var oldBytes = [UInt8](repeating: 0, count: byteCount)
-    guard let oldData = context(for: oldCgImage, data: &oldBytes)?.data else {
-      return "Reference image's data could not be loaded."
+    guard let oldBytes = bitmap(of: oldCgImage, format: format) else {
+      return ComparisonFailure(message: "Reference image's data could not be loaded.")
     }
-    if let newContext = context(for: newCgImage), let newData = newContext.data {
-      if memcmp(oldData, newData, byteCount) == 0 { return nil }
+    // Most matches are equal before the PNG round trip below, which is then skipped.
+    if let newBytes = bitmap(of: newCgImage, format: format), bytesEqual(oldBytes, newBytes) {
+      return nil
     }
-    var newerBytes = [UInt8](repeating: 0, count: byteCount)
+    // The snapshot as it would be recorded: PNG encoding can change pixels, for example by clipping
+    // extended-range colors.
     guard
       let pngData = new.pngData(),
       let newerCgImage = UIImage(data: pngData)?.cgImage,
-      let newerContext = context(for: newerCgImage, data: &newerBytes),
-      let newerData = newerContext.data
+      let newerBytes = bitmap(of: newerCgImage, format: format)
     else {
-      return "Newly-taken snapshot's data could not be loaded."
+      return ComparisonFailure(message: "Newly-taken snapshot's data could not be loaded.")
     }
-    if memcmp(oldData, newerData, byteCount) == 0 { return nil }
+    if bytesEqual(oldBytes, newerBytes) { return nil }
+    let bitmaps = ComparisonBitmaps(
+      old: oldBytes, new: newerBytes, width: oldCgImage.width, height: oldCgImage.height)
     if precision >= 1, perceptualPrecision >= 1 {
-      return "Newly-taken snapshot does not match reference."
+      return ComparisonFailure(
+        message: "Newly-taken snapshot does not match reference.", bitmaps: bitmaps)
     }
     if perceptualPrecision < 1, #available(iOS 11.0, tvOS 11.0, *) {
+      // Compare the pixels the byte comparisons above saw. The original images can be in different
+      // colorspaces, and wide-gamut colors that UIKit clipped while encoding the reference would
+      // otherwise read as differences. Drawing at 16 bits keeps differences smaller than one 8-bit
+      // step from becoming whole steps, which near black are worth several ΔE.
+      let perceptualFormat = format.withBitsPerComponent(16)
+      guard
+        let oldImage = context(for: oldCgImage, format: perceptualFormat)?.makeImage(),
+        let newerImage = context(for: newerCgImage, format: perceptualFormat)?.makeImage()
+      else {
+        return ComparisonFailure(
+          message: "Newly-taken snapshot's data could not be processed.", bitmaps: bitmaps)
+      }
       return perceptuallyCompare(
-        CIImage(cgImage: oldCgImage),
-        CIImage(cgImage: newCgImage),
+        CIImage(cgImage: oldImage),
+        CIImage(cgImage: newerImage),
         pixelPrecision: precision,
-        perceptualPrecision: perceptualPrecision
-      )
+        perceptualPrecision: perceptualPrecision,
+        colorManaged: format.colorManaged
+      ).map { ComparisonFailure(message: $0, bitmaps: bitmaps) }
     } else {
-      let byteCountThreshold = Int((1 - precision) * Float(byteCount))
-      var differentByteCount = 0
+      // Precision counts color components: one byte each in 8-bit formats, two in 16-bit ones.
+      let bytesPerComponent = format.bytesPerComponent
+      let byteCount = oldBytes.count
+      let componentCount = byteCount / bytesPerComponent
+      let componentCountThreshold = Int((1 - precision) * Float(componentCount))
+      var differentComponentCount = 0
       // NB: We are purposely using a verbose 'while' loop instead of a 'for in' loop.  When the
       //     compiler doesn't have optimizations enabled, like in test targets, a `while` loop is
       //     significantly faster than a `for` loop for iterating through the elements of a memory
       //     buffer. Details can be found in [SR-6983](https://github.com/apple/swift/issues/49531)
       var index = 0
       while index < byteCount {
-        defer { index += 1 }
-        if oldBytes[index] != newerBytes[index] {
-          differentByteCount += 1
+        defer { index += bytesPerComponent }
+        if oldBytes[index] != newerBytes[index]
+          || (bytesPerComponent == 2 && oldBytes[index + 1] != newerBytes[index + 1])
+        {
+          differentComponentCount += 1
         }
       }
-      if differentByteCount > byteCountThreshold {
-        let actualPrecision = 1 - Float(differentByteCount) / Float(byteCount)
-        return "Actual image precision \(actualPrecision) is less than required \(precision)"
+      if differentComponentCount > componentCountThreshold {
+        let actualPrecision = 1 - Float(differentComponentCount) / Float(componentCount)
+        return ComparisonFailure(
+          message: "Actual image precision \(actualPrecision) is less than required \(precision)",
+          bitmaps: bitmaps)
       }
     }
     return nil
   }
 
-  private func context(for cgImage: CGImage, data: UnsafeMutableRawPointer? = nil) -> CGContext? {
-    let bytesPerRow = cgImage.width * imageContextBytesPerPixel
-    guard
-      let colorSpace = imageContextColorSpace,
-      let context = CGContext(
-        data: data,
-        width: cgImage.width,
-        height: cgImage.height,
-        bitsPerComponent: imageContextBitsPerComponent,
-        bytesPerRow: bytesPerRow,
-        space: colorSpace,
-        bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
-      )
-    else { return nil }
-
-    context.draw(cgImage, in: CGRect(x: 0, y: 0, width: cgImage.width, height: cgImage.height))
-    return context
-  }
-
-  private func diff(_ old: UIImage, _ new: UIImage) -> UIImage {
-    normalizedComponentDiff(old, new)
-    ?? blendModeDiff(old, new)
-  }
-
-  private func blendModeDiff(_ old: UIImage, _ new: UIImage) -> UIImage {
-    let width = max(old.size.width, new.size.width)
-    let height = max(old.size.height, new.size.height)
-    let scale = max(old.scale, new.scale)
-    UIGraphicsBeginImageContextWithOptions(CGSize(width: width, height: height), true, scale)
-    new.draw(at: .zero)
-    old.draw(at: .zero, blendMode: .difference, alpha: 1)
-    let differenceImage = UIGraphicsGetImageFromCurrentImageContext()!
-    UIGraphicsEndImageContext()
-    return differenceImage
-  }
-
-private func normalizedComponentDiff(_ old: UIImage, _ new: UIImage) -> UIImage? {
-  guard let oldCgImage = old.cgImage,
-        let pngData = new.pngData(),
-        let newCgImage = UIImage(data: pngData)?.cgImage,
-        oldCgImage.width == newCgImage.width,
-        oldCgImage.height == newCgImage.height,
-        let oldData = oldCgImage.dataProvider?.data,
-        let newData = newCgImage.dataProvider?.data
-  else {
-    return nil
-  }
-  
-  guard let outputColorSpace = CGColorSpace(name: CGColorSpace.linearGray),
-        let outputFormat = vImage_CGImageFormat(
-          bitsPerComponent: imageContextBitsPerComponent,
-          bitsPerPixel: imageContextBitsPerComponent,
-          colorSpace: outputColorSpace,
-          bitmapInfo: .init()
-        )
-  else {
-    return nil
-  }
-  
-  let width = oldCgImage.width
-  let height = oldCgImage.height
-  let pixelCount = width * height
-  let scale = old.scale
-  
-  let oldBytes = CFDataGetBytePtr(oldData)!
-  let newBytes = CFDataGetBytePtr(newData)!
-  var diffBytes = [UInt8](repeating: 0, count: pixelCount)
-  
-  var index = 0
-  while index < pixelCount {
-    defer { index += 1 }
-    let pixelOffset = index * imageContextBytesPerPixel
-    
-    let rOld = Int16(oldBytes[pixelOffset])
-    let gOld = Int16(oldBytes[pixelOffset + 1])
-    let bOld = Int16(oldBytes[pixelOffset + 2])
-    let aOld = Int16(oldBytes[pixelOffset + 3])
-    
-    let rNew = Int16(newBytes[pixelOffset])
-    let gNew = Int16(newBytes[pixelOffset + 1])
-    let bNew = Int16(newBytes[pixelOffset + 2])
-    let aNew = Int16(newBytes[pixelOffset + 3])
-    
-    let rDiff = abs(rOld - rNew)
-    let gDiff = abs(gOld - gNew)
-    let bDiff = abs(bOld - bNew)
-    let aDiff = abs(aOld - aNew)
-    
-    let maxDiff = max(rDiff, gDiff, bDiff, aDiff)
-    diffBytes[index] = UInt8(maxDiff)
-  }
-  
-  let outputCgImage: CGImage? = diffBytes.withUnsafeMutableBytes { diffPtr in
-    var diffBuffer = vImage_Buffer(
-      data: diffPtr.baseAddress,
-      height: vImagePixelCount(height),
-      width: vImagePixelCount(width),
-      rowBytes: width
-    )
-    
-    do {
-      var normalizedBuffer = try vImage_Buffer(
-        width: width,
-        height: height,
-        bitsPerPixel: UInt32(imageContextBitsPerComponent)
-      )
-      defer { normalizedBuffer.free() }
-      
-      let error = vImageContrastStretch_Planar8(
-        &diffBuffer,
-        &normalizedBuffer,
-        vImage_Flags(kvImageNoFlags)
-      )
-      
-      let buffer = error == kvImageNoError ? normalizedBuffer : diffBuffer
-      
-      return try buffer.createCGImage(format: outputFormat)
-    } catch {
-      return nil
+  private func bytesEqual(_ lhs: [UInt8], _ rhs: [UInt8]) -> Bool {
+    guard lhs.count == rhs.count else { return false }
+    return lhs.withUnsafeBytes { lhsBuffer in
+      rhs.withUnsafeBytes { rhsBuffer in
+        guard let lhsBase = lhsBuffer.baseAddress, let rhsBase = rhsBuffer.baseAddress else {
+          return true
+        }
+        return memcmp(lhsBase, rhsBase, lhsBuffer.count) == 0
+      }
     }
   }
-  
-  guard let outputCgImage else { return nil }
-  
-  return UIImage(cgImage: outputCgImage, scale: scale, orientation: .up)
-}
+
+  // UIGraphicsBeginImageContextWithOptions is deprecated and raises an exception for a zero size,
+  // aborting the test process, so this uses UIGraphicsImageRenderer.
+  private func blendModeDiff(_ old: UIImage, _ new: UIImage) -> UIImage {
+    let size = CGSize(
+      width: max(old.size.width, new.size.width), height: max(old.size.height, new.size.height))
+    guard size.width > 0, size.height > 0 else { return UIImage() }
+    let format = UIGraphicsImageRendererFormat()
+    format.scale = max(old.scale, new.scale)
+    // The difference blend draws |new - old|, so unchanged pixels are black whatever their color;
+    // opaque makes areas transparent in both images black too. Alpha-only changes can also draw
+    // black, but this only runs when no pixels were compared.
+    format.opaque = true
+    return UIGraphicsImageRenderer(size: size, format: format).image { _ in
+      new.draw(at: .zero)
+      old.draw(at: .zero, blendMode: .difference, alpha: 1)
+    }
+  }
+
+  /// A grayscale image of how much each pixel changed, made from the bytes the comparison read:
+  /// black where a pixel is unchanged and brighter the more it changed.
+  private func normalizedComponentDiff(
+    _ bitmaps: ComparisonBitmaps, format: ImageComparisonFormat, scale: CGFloat
+  ) -> UIImage? {
+    // One 8-bit linear gray byte per pixel: the largest component difference.
+    guard let outputColorSpace = CGColorSpace(name: CGColorSpace.linearGray),
+      let outputFormat = vImage_CGImageFormat(
+        bitsPerComponent: 8,
+        bitsPerPixel: 8,
+        colorSpace: outputColorSpace,
+        bitmapInfo: .init()
+      )
+    else {
+      return nil
+    }
+
+    let width = bitmaps.width
+    let height = bitmaps.height
+    let pixelCount = width * height
+    let oldBytes = bitmaps.old
+    let newBytes = bitmaps.new
+    var diffBytes = [UInt8](repeating: 0, count: pixelCount)
+
+    // Each pixel's brightness is its largest component difference, so a change to any component,
+    // alpha included, lights it.
+    var index = 0
+    while index < pixelCount {
+      defer { index += 1 }
+      let pixelOffset = index * format.bytesPerPixel
+      var maxDiff = 0
+      var component = 0
+      // Premultiplied red, green, blue and alpha.
+      while component < 4 {
+        defer { component += 1 }
+        let offset = pixelOffset + component * format.bytesPerComponent
+        let difference: Int
+        if format.bytesPerComponent == 2 {
+          // Little-endian 16-bit components (low byte first).
+          let old = Int(oldBytes[offset]) | Int(oldBytes[offset + 1]) << 8
+          let new = Int(newBytes[offset]) | Int(newBytes[offset + 1]) << 8
+          let delta = abs(old - new)
+          // `>> 8` scales to 8 bits; a change smaller than one 8-bit step still counts as 1, which
+          // the contrast stretch below makes visible.
+          difference = delta == 0 ? 0 : max(delta >> 8, 1)
+        } else {
+          difference = abs(Int(oldBytes[offset]) - Int(newBytes[offset]))
+        }
+        maxDiff = max(maxDiff, difference)
+      }
+      // At most 255: 8-bit differences and shifted 16-bit ones both fit in a byte.
+      diffBytes[index] = UInt8(maxDiff)
+    }
+
+    let outputCgImage: CGImage? = diffBytes.withUnsafeMutableBytes { diffPtr in
+      // Wraps the differences without copying them; their rows are unpadded.
+      var diffBuffer = vImage_Buffer(
+        data: diffPtr.baseAddress,
+        height: vImagePixelCount(height),
+        width: vImagePixelCount(width),
+        rowBytes: width
+      )
+
+      do {
+        // Allocated by vImage, which may pad its rows, and freed once the image is made.
+        var normalizedBuffer = try vImage_Buffer(
+          width: width,
+          height: height,
+          bitsPerPixel: outputFormat.bitsPerPixel
+        )
+        defer { normalizedBuffer.free() }
+
+        // Stretches the differences across the full range, so small ones are visible.
+        let error = vImageContrastStretch_Planar8(
+          &diffBuffer,
+          &normalizedBuffer,
+          vImage_Flags(kvImageNoFlags)
+        )
+
+        // Falls back to the unstretched differences if stretching fails.
+        let buffer = error == kvImageNoError ? normalizedBuffer : diffBuffer
+
+        // Copies the pixels, so the image outlives both buffers.
+        return try buffer.createCGImage(format: outputFormat)
+      } catch {
+        return nil
+      }
+    }
+
+    guard let outputCgImage else { return nil }
+
+    // The reference's scale, so the attachment has its point size.
+    return UIImage(cgImage: outputCgImage, scale: scale, orientation: .up)
+  }
 #endif
 
 #if os(iOS) || os(tvOS) || os(macOS)
@@ -291,16 +380,26 @@ private func normalizedComponentDiff(_ old: UIImage, _ new: UIImage) -> UIImage?
   import CoreImage.CIKernel
   import MetalPerformanceShaders
 
+  /// - Parameter colorManaged: Whether to measure color differences between the images' actual
+  ///   colors, rather than reading their components as sRGB.
   @available(iOS 10.0, tvOS 10.0, macOS 10.13, *)
   func perceptuallyCompare(
-    _ old: CIImage, _ new: CIImage, pixelPrecision: Float, perceptualPrecision: Float
+    _ old: CIImage, _ new: CIImage, pixelPrecision: Float, perceptualPrecision: Float,
+    colorManaged: Bool
   ) -> String? {
     // Calculate the deltaE values. Each pixel is a value between 0-100.
     // 0 means no difference, 100 means completely opposite.
     let deltaOutputImage = old.applyingLabDeltaE(new)
-    // Setting the working color space and output color space to NSNull disables color management. This is appropriate when the output
-    // of the operations is computational instead of an image intended to be displayed.
-    let context = CIContext(options: [.workingColorSpace: NSNull(), .outputColorSpace: NSNull()])
+    // An NSNull working colorspace disables color management: CILabDeltaE then reads encoded
+    // components as linear sRGB, which keeps the historical values but compares images in different
+    // colorspaces as if they held the same colors. Color managed comparisons convert into extended
+    // linear sRGB, the space its Lab conversion assumes. The output is measurements, not colors, so
+    // it is never color managed.
+    let workingColorSpace: Any =
+      colorManaged
+      ? CGColorSpace(name: CGColorSpace.extendedLinearSRGB) as Any? ?? NSNull() : NSNull()
+    let context = CIContext(
+      options: [.workingColorSpace: workingColorSpace, .outputColorSpace: NSNull()])
     let deltaThreshold = (1 - perceptualPrecision) * 100
     let actualPixelPrecision: Float
     var maximumDeltaE: Float = 0
