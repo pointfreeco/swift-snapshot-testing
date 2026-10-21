@@ -91,6 +91,48 @@ extension Snapshotting where Value == WKWebView, Format == UIImage {
 }
 ```
 
+## SwiftUI Considerations
+
+When working with SwiftUI views, you can control the rendering method using the `renderingMode` 
+parameter to ensure proper snapshot consistency across different iOS versions and complex shapes.
+
+### Rendering Modes
+
+SwiftUI views with complex shapes (such as `RoundedRectangle` with `.continuous` style) may render 
+differently when using Core Graphics layer rendering versus the system's native drawing hierarchy. 
+The `renderingMode` parameter gives you explicit control over this behavior:
+
+``` swift
+// Default: Automatic detection (recommended)
+assertSnapshot(of: mySwiftUIView, as: .image)
+assertSnapshot(of: mySwiftUIView, as: .image(renderingMode: .auto))
+
+// Always use high-accuracy rendering (requires host application)
+assertSnapshot(of: mySwiftUIView, as: .image(renderingMode: .enabled))
+
+// Always use layer rendering (works in framework tests)
+assertSnapshot(of: mySwiftUIView, as: .image(renderingMode: .disabled))
+```
+
+### Automatic Mode (`.auto`)
+
+The default `.auto` mode intelligently detects SwiftUI content and uses `drawHierarchy` rendering 
+for better accuracy when a key window is available, gracefully falling back to layer rendering 
+in framework test environments.
+
+### Framework Test Compatibility
+
+When using `.auto` mode, the library automatically adapts to framework test environments where 
+no key window is available. For complex SwiftUI views that may have minor rendering differences 
+in framework tests, consider using perceptual precision:
+
+``` swift
+assertSnapshot(of: myView, as: .image(
+  renderingMode: .auto,
+  perceptualPrecision: 0.98  // Allow minor rendering differences
+))
+```
+
 ## Diffing
 
 The ``SnapshotTesting/Diffing`` type represents the ability to compare `Value`s and convert them to
