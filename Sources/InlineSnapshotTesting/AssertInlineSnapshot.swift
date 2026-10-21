@@ -486,26 +486,35 @@ public struct InlineSnapshotSyntaxDescriptor: Hashable {
           ClosureExprSyntax(
             leftBrace: .leftBraceToken(trailingTrivia: .newline),
             statements: CodeBlockItemListSyntax {
-              StringLiteralExprSyntax(
-                leadingTrivia: Trivia(stringLiteral: leadingIndent),
-                openingPounds: .rawStringPoundDelimiter(delimiter),
-                openingQuote: .multilineStringQuoteToken(trailingTrivia: .newline),
-                segments: [
-                  .stringSegment(
-                    StringSegmentSyntax(
-                      content: .stringSegment(
-                        actual
-                          .replacingOccurrences(of: "\r", with: #"\\#(delimiter)r"#)
-                          .indenting(with: leadingIndent)
+              if actual.isEmpty {
+                StringLiteralExprSyntax(
+                  leadingTrivia: Trivia(stringLiteral: leadingIndent),
+                  openingQuote: .stringQuoteToken(),
+                  segments: [],
+                  closingQuote: .stringQuoteToken()
+                )
+              } else {
+                StringLiteralExprSyntax(
+                  leadingTrivia: Trivia(stringLiteral: leadingIndent),
+                  openingPounds: .rawStringPoundDelimiter(delimiter),
+                  openingQuote: .multilineStringQuoteToken(trailingTrivia: .newline),
+                  segments: [
+                    .stringSegment(
+                      StringSegmentSyntax(
+                        content: .stringSegment(
+                          actual
+                            .replacingOccurrences(of: "\r", with: #"\\#(delimiter)r"#)
+                            .indenting(with: leadingIndent)
+                        )
                       )
                     )
-                  )
-                ],
-                closingQuote: .multilineStringQuoteToken(
-                  leadingTrivia: .newline + Trivia(stringLiteral: leadingIndent)
-                ),
-                closingPounds: .rawStringPoundDelimiter(delimiter)
-              )
+                  ],
+                  closingQuote: .multilineStringQuoteToken(
+                    leadingTrivia: .newline + Trivia(stringLiteral: leadingIndent)
+                  ),
+                  closingPounds: .rawStringPoundDelimiter(delimiter)
+                )
+              }
             },
             rightBrace: .rightBraceToken(
               leadingTrivia: .newline + Trivia(stringLiteral: leadingTrivia)
