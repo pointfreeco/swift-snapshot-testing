@@ -148,10 +148,12 @@ import Foundation
 
         guard let expected
         else {
+          var failure = "No expected value to assert against."
+          if let actual {
+            failure += " Actual: …\n\n\(actual.indenting(by: 2))"
+          }
           recordIssue(
-            """
-            No expected value to assert against.
-            """,
+            failure,
             fileID: fileID,
             filePath: filePath,
             line: line,
