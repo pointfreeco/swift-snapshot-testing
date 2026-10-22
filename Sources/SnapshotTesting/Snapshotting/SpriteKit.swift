@@ -1,8 +1,8 @@
-#if os(iOS) || os(macOS) || os(tvOS)
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS)
   import SpriteKit
   #if os(macOS)
     import Cocoa
-  #elseif os(iOS) || os(tvOS)
+  #elseif os(iOS) || os(tvOS) || os(visionOS)
     import UIKit
   #endif
 
@@ -23,7 +23,7 @@
         return .skScene(precision: precision, perceptualPrecision: perceptualPrecision, size: size)
       }
     }
-  #elseif os(iOS) || os(tvOS)
+  #elseif os(iOS) || os(tvOS) || os(visionOS)
     extension Snapshotting where Value == SKScene, Format == UIImage {
       /// A snapshot strategy for comparing SpriteKit scenes based on pixel equality.
       ///

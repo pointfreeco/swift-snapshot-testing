@@ -3,12 +3,47 @@ name: CI
 on:
   push:
     branches:
-      - main
+      # NB: Fork-only, must be dropped before the upstream PR is cut: run CI on this branch's
+      #     pushes (and manually) so the visionOS enablement is validated pre-PR. Upstream
+      #     triggers on main pushes and PRs only.
+      - "**"
   pull_request:
     branches:
       - "*"
+  workflow_dispatch:
 
 jobs:
+  # NB: Fork-only validation job, must be dropped before the upstream PR is cut (upstream asked
+  #     for compiler directives only in pointfreeco/swift-snapshot-testing#855). It proves the
+  #     library and test bundle compile and run for visionOS; no visionOS-specific tests exist
+  #     on this branch, so most suites are compile-only here.
+  visionos:
+    strategy:
+      matrix:
+        xcode:
+          - '27.0'
+
+    name: visionOS
+    # The visionOS 27.0 simulator runtime ships only with the Xcode 27 image.
+    runs-on: xcode-27
+    env:
+      VISIONOS_RUNTIME: '27.0'
+      VISIONOS_DEVICE: Apple Vision Pro
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode ${{ matrix.xcode }}
+        run: sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode }}.app
+      # NB: xcodebuild does not forward the job environment to the test process, so the suite's
+      #     GITHUB_WORKFLOW guard (which upstream relies on to skip device-scale-dependent
+      #     image asserts on CI) never fires on its own; TEST_RUNNER_GITHUB_WORKFLOW delivers
+      #     it the way upstream intends.
+      - name: Run tests
+        run: |
+          set -o pipefail && \
+          TEST_RUNNER_GITHUB_WORKFLOW=CI xcodebuild test \
+            -scheme swift-snapshot-testing-Package \
+            -destination platform="visionOS Simulator,name=$VISIONOS_DEVICE,OS=$VISIONOS_RUNTIME"
+
   macos:
     strategy:
       matrix:
@@ -50,3 +85,7 @@ jobs:
         with:
           swift-version: ${{ matrix.swift }}
           copy-files: ${GITHUB_WORKSPACE}/Tests/SnapshotTestingTests/__Snapshots__
+          # NB: Fork-only while validating this branch (upstream main is broken the same way):
+          #     AssertSnapshot.swift hardcodes this path for os(Android); the action's default
+          #     changed to swift-android-tests in v2.9.5. Upstream-relevant fix on its own.
+          android-emulator-test-folder: /data/local/tmp/android-xctest
