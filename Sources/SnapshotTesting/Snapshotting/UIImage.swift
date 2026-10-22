@@ -199,9 +199,20 @@ private func normalizedComponentDiff(_ old: UIImage, _ new: UIImage) -> UIImage?
         let pngData = new.pngData(),
         let newCgImage = UIImage(data: pngData)?.cgImage,
         oldCgImage.width == newCgImage.width,
-        oldCgImage.height == newCgImage.height,
-        let oldData = oldCgImage.dataProvider?.data,
-        let newData = newCgImage.dataProvider?.data
+        oldCgImage.height == newCgImage.height
+  else {
+    return nil
+  }
+
+  // NB: Redraw both images into the same 8-bit RGBA context `compare` uses. Reading the raw
+  //     provider bytes assumes that layout, which crashes on grayscale images (1–2 bytes per
+  //     pixel) and points at the wrong pixels for 16-bit images (8 bytes per pixel).
+  let pixelCount = oldCgImage.width * oldCgImage.height
+  let byteCount = imageContextBytesPerPixel * pixelCount
+  var oldBytes = [UInt8](repeating: 0, count: byteCount)
+  var newBytes = [UInt8](repeating: 0, count: byteCount)
+  guard context(for: oldCgImage, data: &oldBytes) != nil,
+        context(for: newCgImage, data: &newBytes) != nil
   else {
     return nil
   }
@@ -219,11 +230,8 @@ private func normalizedComponentDiff(_ old: UIImage, _ new: UIImage) -> UIImage?
   
   let width = oldCgImage.width
   let height = oldCgImage.height
-  let pixelCount = width * height
   let scale = old.scale
   
-  let oldBytes = CFDataGetBytePtr(oldData)!
-  let newBytes = CFDataGetBytePtr(newData)!
   var diffBytes = [UInt8](repeating: 0, count: pixelCount)
   
   var index = 0
