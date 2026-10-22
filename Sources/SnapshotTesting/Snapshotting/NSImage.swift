@@ -104,9 +104,18 @@
       return "Newly-taken snapshot does not match reference."
     }
     if perceptualPrecision < 1, #available(macOS 10.13, *) {
+      // Compare the images that were remapped to a common color space above. Passing the original
+      // images here would compare images in different color spaces, which reports a difference on
+      // every pixel even when the images are perceptually identical.
+      guard
+        let oldNormalized = oldContext.makeImage(),
+        let newNormalized = newerContext.makeImage()
+      else {
+        return "Newly-taken snapshot's data could not be loaded."
+      }
       return perceptuallyCompare(
-        CIImage(cgImage: oldCgImage),
-        CIImage(cgImage: newCgImage),
+        CIImage(cgImage: oldNormalized),
+        CIImage(cgImage: newNormalized),
         pixelPrecision: precision,
         perceptualPrecision: perceptualPrecision
       )
