@@ -9,14 +9,15 @@ Delightful Swift snapshot testing.
 
 ## Usage
 
-Once [installed](#installation), _no additional configuration is required_. You can import the
-`SnapshotTesting` module and call the `assertSnapshot` function.
+Once [installed](#installation), you can import the `SnapshotTesting` module and call the
+`assertSnapshot` function.
 
 ``` swift
 import SnapshotTesting
 import Testing
 
 @MainActor
+@Suite(.snapshots)
 struct MyViewControllerTests {
   @Test func myViewController() {
     let vc = MyViewController()
@@ -25,6 +26,13 @@ struct MyViewControllerTests {
   }
 }
 ```
+
+> **Important**
+> When using **Swift Testing**, you must apply the `.snapshots` trait to your `@Suite` (or
+> individual `@Test` functions). Without it, the library's internal snapshot counter does not reset
+> between test iterations, which can cause tests to **fail unexpectedly or flake** by recording
+> duplicate snapshots on each run, leading to non-deterministic behavior. This is not required
+> for `XCTestCase`-based tests, which manage lifecycle automatically via `invokeTest()`.
 
 When an assertion first runs, a snapshot is automatically recorded to disk and the test will fail,
 printing out the file path of any newly-recorded reference.
@@ -212,8 +220,8 @@ targets: [
   - [**Write your own snapshot strategies**][defining-strategies].
     If you can convert it to an image, string, data, or your own diffable format, you can snapshot
     test it! Build your own snapshot strategies from scratch or transform existing ones.
-  - **No configuration required.** Don't fuss with scheme settings and environment variables.
-    Snapshots are automatically saved alongside your tests.
+  - **Minimal configuration.** Snapshots are automatically saved alongside your tests. Swift Testing
+    users just need to add the `.snapshots` trait (see [Usage](#usage)).
   - **More hands-off.** New snapshots are recorded whether `isRecording` mode is `true` or not.
   - **Subclass-free.** Assert from any XCTest case or Quick spec.
   - **Device-agnostic snapshots.** Render views and view controllers for specific devices and trait
