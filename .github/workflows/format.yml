@@ -9,19 +9,22 @@ concurrency:
   group: format-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: write
+
 jobs:
   swift_format:
     name: swift-format
-    runs-on: macos-13
+    runs-on: macos-15
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
       - name: Xcode Select
-        run: sudo xcode-select -s /Applications/Xcode_14.3.1.app
+        run: sudo xcode-select -s /Applications/Xcode_16.4.app
       - name: Install
         run: brew install swift-format
       - name: Format
         run: make format
-      - uses: stefanzweifel/git-auto-commit-action@v4
+      - uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: Run swift-format
           branch: 'main'
