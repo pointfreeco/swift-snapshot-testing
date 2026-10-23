@@ -1186,6 +1186,42 @@ final class SnapshotTestingTests: BaseTestCase {
     #endif
   }
 
+#if os(iOS)
+  func testPrepareCalledOnce() {
+    let onAppearExpectation = expectation(description: "onAppear called")
+    let prepareExpectation = expectation(description: "prepare called")
+    prepareExpectation.expectedFulfillmentCount = 1
+
+    // Only turns blue after onAppear is called
+    struct RedThenBlueView: SwiftUI.View {
+      @State var color: Color = .red
+
+      var body: some SwiftUI.View {
+        color
+          .frame(width: 100, height: 100)
+          .onAppear {
+            color = Color(red: 0, green: 0, blue: 1)
+          }
+      }
+    }
+
+    let failure = verifySnapshot(
+      of: RedThenBlueView()
+        .onAppear {
+          onAppearExpectation.fulfill()
+        },
+      as: .image(prepare: {
+        self.wait(for: [onAppearExpectation], timeout: 0.1)
+        prepareExpectation.fulfill()
+      }),
+      named: "prepare-test"
+    )
+
+    wait(for: [prepareExpectation], timeout: 1.0)
+    XCTAssertNil(failure)
+  }
+#endif
+
   func testEmbeddedWebView() throws {
     #if os(iOS)
       let label = UILabel()

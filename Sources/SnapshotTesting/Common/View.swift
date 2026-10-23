@@ -931,7 +931,8 @@
       drawHierarchyInKeyWindow: Bool,
       traits: UITraitCollection,
       view: UIView,
-      viewController: UIViewController
+      viewController: UIViewController,
+      prepare: (() -> Void)? = nil
     ) -> () -> Void {
       let size = config.size ?? viewController.view.frame.size
       view.frame.size = size
@@ -953,7 +954,7 @@
           viewController: viewController
         )
       }
-      let dispose = add(traits: traits, viewController: viewController, to: window)
+      let dispose = add(traits: traits, viewController: viewController, to: window, prepare: prepare)
 
       if size.width == 0 || size.height == 0 {
         // Try to call sizeToFit() if the view still has invalid size
@@ -970,7 +971,8 @@
       drawHierarchyInKeyWindow: Bool,
       traits: UITraitCollection,
       view: UIView,
-      viewController: UIViewController
+      viewController: UIViewController,
+      prepare: (() -> Void)? = nil
     )
       -> Async<UIImage>
     {
@@ -980,7 +982,8 @@
         drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
         traits: traits,
         view: view,
-        viewController: viewController
+        viewController: viewController,
+        prepare: prepare
       )
       // NB: Avoid safe area influence.
       if config.safeArea == .zero { view.frame.origin = .init(x: offscreen, y: offscreen) }
@@ -1020,7 +1023,10 @@
     }
 
     private func add(
-      traits: UITraitCollection, viewController: UIViewController, to window: UIWindow
+      traits: UITraitCollection,
+      viewController: UIViewController,
+      to window: UIWindow,
+      prepare: (() -> Void)? = nil
     ) -> () -> Void {
       let rootViewController: UIViewController
       if viewController != window.rootViewController {
@@ -1062,6 +1068,8 @@
 
       viewController.view.setNeedsLayout()
       viewController.view.layoutIfNeeded()
+
+      prepare?()
 
       return {
         rootViewController.beginAppearanceTransition(false, animated: false)
