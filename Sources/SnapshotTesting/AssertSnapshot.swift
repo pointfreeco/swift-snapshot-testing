@@ -643,7 +643,7 @@ enum File {
       #if compiler(>=6.3) && (canImport(UIKit) || canImport(AppKit))
         if #available(iOS 14.0, tvOS 14.0, macOS 11.0, watchOS 7.0, *),
           name.hasSuffix(".png"),
-          let image = Image(data: data)
+          let image = attachableImage(data)
         {
           Attachment.record(image, named: name, as: .png, sourceLocation: sourceLocation)
           return
@@ -652,4 +652,16 @@ enum File {
       Attachment.record(data, named: name, sourceLocation: sourceLocation)
     #endif
   }
+
+  #if compiler(>=6.3) && (canImport(UIKit) || canImport(AppKit))
+    @available(iOS 14.0, tvOS 14.0, macOS 11.0, watchOS 7.0, *)
+    private func attachableImage(_ data: Data) -> (some AttachableAsImage)? {
+      #if targetEnvironment(macCatalyst)
+        // Swift Testing doesn't make 'UIImage' attachable on Mac Catalyst, but 'CGImage' is.
+        Image(data: data)?.cgImage
+      #else
+        Image(data: data)
+      #endif
+    }
+  #endif
 #endif
