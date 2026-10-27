@@ -242,6 +242,23 @@
           return .init(safeArea: safeArea, size: size, traits: .iPhone13ProMax(orientation))
         }
 
+        public static let iPhone16ProMax = ViewImageConfig.iPhone16ProMax(.portrait)
+
+        public static func iPhone16ProMax(_ orientation: Orientation) -> ViewImageConfig {
+          let safeArea: UIEdgeInsets
+          let size: CGSize
+          switch orientation {
+          case .landscape:
+            safeArea = .init(top: 0, left: 62, bottom: 21, right: 62)
+            size = .init(width: 956, height: 440)
+          case .portrait:
+            safeArea = .init(top: 62, left: 0, bottom: 34, right: 0)
+            size = .init(width: 440, height: 956)
+          }
+
+          return .init(safeArea: safeArea, size: size, traits: .iPhone16ProMax(orientation))
+        }
+
         public static let iPadMini = ViewImageConfig.iPadMini(.landscape)
 
         public static func iPadMini(_ orientation: Orientation) -> ViewImageConfig {
@@ -771,6 +788,11 @@
               ]
             )
           }
+        }
+
+        public static func iPhone16ProMax(_ orientation: ViewImageConfig.Orientation)
+        -> UITraitCollection {
+          return Self.iPhone13ProMax(orientation)
         }
 
         public static let iPadMini = iPad
