@@ -30,7 +30,7 @@
         }
       }
 
-      #if canImport(UIKit) && !os(watchOS)
+      #if canImport(UIKit) && !os(visionOS) && !os(watchOS)
         @Test(
           .enabled {
             !ProcessInfo.processInfo.environment.keys.contains("GITHUB_WORKFLOW")
