@@ -926,6 +926,29 @@
       }
     }
 
+    private func prepareWindow(
+      config: ViewImageConfig,
+      traits: UITraitCollection,
+      window: UIWindow
+    ) -> () -> Void {
+      if let rootViewController = window.rootViewController {
+        let size = config.size ?? window.rootViewController?.view.frame.size ?? window.frame.size
+        let traits = UITraitCollection(traitsFrom: [config.traits, traits])
+        // We don't want to dispose of the window since there can be changes
+        // later to the window by the caller which expects the views to stay
+        _ = add(traits: traits, viewController: rootViewController, to: window)
+        window.frame.size = size
+
+        if size.width == 0 || size.height == 0 {
+          // Try to call sizeToFit() if the view still has invalid size
+          rootViewController.view.sizeToFit()
+          rootViewController.view.setNeedsLayout()
+          rootViewController.view.layoutIfNeeded()
+        }
+      }
+      return {}
+    }
+
     func prepareView(
       config: ViewImageConfig,
       drawHierarchyInKeyWindow: Bool,
@@ -933,6 +956,16 @@
       view: UIView,
       viewController: UIViewController
     ) -> () -> Void {
+      /// Return early if a `UIWindow` is used for creating snapshots.
+      ///
+      /// If we end up adding a window to another window, we can end up with unbalanced calls to
+      /// appearance transitions during test teardown.
+      ///
+      /// Example: `Unbalanced calls to begin/end appearance transitions for <UIViewController: *>`.
+      if let window = view as? UIWindow {
+        return prepareWindow(config: config, traits: traits, window: window)
+      }
+
       let size = config.size ?? viewController.view.frame.size
       view.frame.size = size
       if view != viewController.view {
