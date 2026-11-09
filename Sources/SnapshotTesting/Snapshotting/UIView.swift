@@ -19,12 +19,15 @@
     ///     [the precision](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e) of the
     ///     human eye.
     ///   - size: A view size override.
+    ///   - computeScrollSize: Grows the image to show all the content of the view, if it is or
+    ///     contains a wide scroll view.
     ///   - traits: A trait collection override.
     public static func image(
       drawHierarchyInKeyWindow: Bool = false,
       precision: Float = 1,
       perceptualPrecision: Float = 1,
       size: CGSize? = nil,
+      computeScrollSize: Bool = false,
       traits: UITraitCollection = .init()
     )
       -> Snapshotting
@@ -36,6 +39,7 @@
         snapshotView(
           config: .init(safeArea: .zero, size: size ?? view.frame.size, traits: .init()),
           drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+          computeScrollSize: computeScrollSize,
           traits: traits,
           view: view,
           viewController: .init()
@@ -71,8 +75,15 @@
 
     /// A snapshot strategy for comparing views based on a recursive description of their properties
     /// and hierarchies.
+    ///
+    /// - Parameters:
+    ///   - size: A view size override.
+    ///   - computeScrollSize: Grows the view to fit all its content, if it is or contains a wide
+    ///     scroll view.
+    ///   - traits: A trait collection override.
     public static func recursiveDescription(
       size: CGSize? = nil,
+      computeScrollSize: Bool = false,
       traits: UITraitCollection = .init()
     )
       -> Snapshotting<UIView, String>
@@ -81,6 +92,7 @@
         let dispose = prepareView(
           config: .init(safeArea: .zero, size: size ?? view.frame.size, traits: traits),
           drawHierarchyInKeyWindow: false,
+          computeScrollSize: computeScrollSize,
           traits: .init(),
           view: view,
           viewController: .init()

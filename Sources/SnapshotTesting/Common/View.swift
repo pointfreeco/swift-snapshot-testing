@@ -929,6 +929,7 @@
     func prepareView(
       config: ViewImageConfig,
       drawHierarchyInKeyWindow: Bool,
+      computeScrollSize: Bool,
       traits: UITraitCollection,
       view: UIView,
       viewController: UIViewController
@@ -955,6 +956,27 @@
       }
       let dispose = add(traits: traits, viewController: viewController, to: window)
 
+      if computeScrollSize, let scrollView = contentScrollView(of: viewController) {
+        // NB: Grow the view by the hidden content. `adjustedContentInset` includes the safe area.
+        let insets = scrollView.adjustedContentInset
+        let hiddenWidth =
+          scrollView.contentSize.width + insets.left + insets.right - scrollView.bounds.width
+        let hiddenHeight =
+          scrollView.contentSize.height + insets.top + insets.bottom - scrollView.bounds.height
+        let viewSize = viewController.view.bounds.size
+        let scrollSize = CGSize(
+          width: viewSize.width + max(0, hiddenWidth),
+          height: viewSize.height + max(0, hiddenHeight)
+        )
+        // NB: Resize the window too. Otherwise the safe area changes and layout loops forever.
+        window.frame.size = scrollSize
+        window.rootViewController?.view.frame.size = scrollSize
+        viewController.view.frame.size = scrollSize
+        // NB: The `UIView` strategies render a subview. Resize it too.
+        view.frame.size = scrollSize
+        viewController.view.layoutIfNeeded()
+      }
+
       if size.width == 0 || size.height == 0 {
         // Try to call sizeToFit() if the view still has invalid size
         view.sizeToFit()
@@ -965,9 +987,48 @@
       return dispose
     }
 
+    /// The scroll view that `computeScrollSize` uses: the one set with `setContentScrollView(_:)`,
+    /// or else ``firstScrollView(in:)``.
+    func contentScrollView(of viewController: UIViewController) -> UIScrollView? {
+      if #available(iOS 15.0, tvOS 15.0, *),
+        let scrollView = viewController.contentScrollView(for: .top)
+      {
+        return scrollView
+      }
+      return firstScrollView(in: viewController.view)
+    }
+
+    /// The first scroll view, found level by level, that is visible, at least half as wide as
+    /// `rootView`, and not a text view or a horizontal carousel. Skips the content of other scroll
+    /// views.
+    func firstScrollView(in rootView: UIView) -> UIScrollView? {
+      var level = [rootView]
+      while !level.isEmpty {
+        var nextLevel: [UIView] = []
+        for view in level {
+          if let scrollView = view as? UIScrollView {
+            if isContentScrollView(scrollView, in: rootView) { return scrollView }
+            continue
+          }
+          nextLevel.append(contentsOf: view.subviews)
+        }
+        level = nextLevel
+      }
+      return nil
+    }
+
+    private func isContentScrollView(_ scrollView: UIScrollView, in rootView: UIView) -> Bool {
+      if scrollView is UITextView || scrollView.isHidden { return false }
+      if scrollView.bounds.width < rootView.bounds.width / 2 { return false }
+      let scrollsHorizontally = scrollView.contentSize.width > scrollView.bounds.width
+      let scrollsVertically = scrollView.contentSize.height > scrollView.bounds.height
+      return !(scrollsHorizontally && !scrollsVertically)
+    }
+
     func snapshotView(
       config: ViewImageConfig,
       drawHierarchyInKeyWindow: Bool,
+      computeScrollSize: Bool,
       traits: UITraitCollection,
       view: UIView,
       viewController: UIViewController
@@ -978,6 +1039,7 @@
       let dispose = prepareView(
         config: config,
         drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+        computeScrollSize: computeScrollSize,
         traits: traits,
         view: view,
         viewController: viewController

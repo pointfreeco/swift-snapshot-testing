@@ -20,6 +20,8 @@
     ///     [the precision](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e) of the
     ///     human eye.
     ///   - size: A view size override.
+    ///   - computeScrollSize: Grows the image to show all the content of the main scroll view: the
+    ///     one set with `setContentScrollView(_:)`, or else the first wide scroll view inside.
     ///   - traits: A trait collection override.
     public static func image(
       on config: ViewImageConfig,
@@ -27,6 +29,7 @@
       precision: Float = 1,
       perceptualPrecision: Float = 1,
       size: CGSize? = nil,
+      computeScrollSize: Bool = false,
       traits: UITraitCollection = .init()
     )
       -> Snapshotting
@@ -39,6 +42,7 @@
           config: size.map { .init(safeArea: config.safeArea, size: $0, traits: config.traits) }
             ?? config,
           drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+          computeScrollSize: computeScrollSize,
           traits: traits,
           view: viewController.view,
           viewController: viewController
@@ -58,12 +62,15 @@
     ///     [the precision](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e) of the
     ///     human eye.
     ///   - size: A view size override.
+    ///   - computeScrollSize: Grows the image to show all the content of the main scroll view: the
+    ///     one set with `setContentScrollView(_:)`, or else the first wide scroll view inside.
     ///   - traits: A trait collection override.
     public static func image(
       drawHierarchyInKeyWindow: Bool = false,
       precision: Float = 1,
       perceptualPrecision: Float = 1,
       size: CGSize? = nil,
+      computeScrollSize: Bool = false,
       traits: UITraitCollection = .init()
     )
       -> Snapshotting
@@ -75,6 +82,7 @@
         snapshotView(
           config: .init(safeArea: .zero, size: size, traits: traits),
           drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+          computeScrollSize: computeScrollSize,
           traits: traits,
           view: viewController.view,
           viewController: viewController
@@ -112,6 +120,7 @@
         let dispose = prepareView(
           config: .init(),
           drawHierarchyInKeyWindow: false,
+          computeScrollSize: false,
           traits: .init(),
           view: viewController.view,
           viewController: viewController
@@ -136,10 +145,13 @@
     /// - Parameters:
     ///   - config: A set of device configuration settings.
     ///   - size: A view size override.
+    ///   - computeScrollSize: Grows the view to fit all the content of the main scroll view: the
+    ///     one set with `setContentScrollView(_:)`, or else the first wide scroll view inside.
     ///   - traits: A trait collection override.
     public static func recursiveDescription(
       on config: ViewImageConfig = .init(),
       size: CGSize? = nil,
+      computeScrollSize: Bool = false,
       traits: UITraitCollection = .init()
     )
       -> Snapshotting<UIViewController, String>
@@ -149,6 +161,7 @@
           config: .init(
             safeArea: config.safeArea, size: size ?? config.size, traits: config.traits),
           drawHierarchyInKeyWindow: false,
+          computeScrollSize: computeScrollSize,
           traits: traits,
           view: viewController.view,
           viewController: viewController
