@@ -956,9 +956,7 @@
       }
       let dispose = add(traits: traits, viewController: viewController, to: window)
 
-      if #available(iOS 15.0, tvOS 15.0, *), computeScrollSize,
-        let scrollView = viewController.contentScrollView(for: .top)
-      {
+      if computeScrollSize, let scrollView = contentScrollView(of: viewController) {
         // NB: `adjustedContentInset` includes the safe area, so all content fits in the image.
         let insets = scrollView.adjustedContentInset
         let scrollSize = CGSize(
@@ -980,6 +978,44 @@
       }
 
       return dispose
+    }
+
+    /// The scroll view that `computeScrollSize` uses: the one set with `setContentScrollView(_:)`,
+    /// or else ``firstScrollView(in:)``.
+    func contentScrollView(of viewController: UIViewController) -> UIScrollView? {
+      if #available(iOS 15.0, tvOS 15.0, *),
+        let scrollView = viewController.contentScrollView(for: .top)
+      {
+        return scrollView
+      }
+      return firstScrollView(in: viewController.view)
+    }
+
+    /// The first scroll view, found level by level, that is visible, at least half as wide as
+    /// `rootView`, and not a text view or a horizontal carousel. Skips the content of other scroll
+    /// views.
+    func firstScrollView(in rootView: UIView) -> UIScrollView? {
+      var level = [rootView]
+      while !level.isEmpty {
+        var nextLevel: [UIView] = []
+        for view in level {
+          if let scrollView = view as? UIScrollView {
+            if isContentScrollView(scrollView, in: rootView) { return scrollView }
+            continue
+          }
+          nextLevel.append(contentsOf: view.subviews)
+        }
+        level = nextLevel
+      }
+      return nil
+    }
+
+    private func isContentScrollView(_ scrollView: UIScrollView, in rootView: UIView) -> Bool {
+      if scrollView is UITextView || scrollView.isHidden { return false }
+      if scrollView.bounds.width < rootView.bounds.width / 2 { return false }
+      let scrollsHorizontally = scrollView.contentSize.width > scrollView.bounds.width
+      let scrollsVertically = scrollView.contentSize.height > scrollView.bounds.height
+      return !(scrollsHorizontally && !scrollsVertically)
     }
 
     func snapshotView(
