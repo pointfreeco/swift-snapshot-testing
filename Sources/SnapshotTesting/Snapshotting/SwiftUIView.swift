@@ -41,6 +41,7 @@
         precision: Float = 1,
         perceptualPrecision: Float = 1,
         layout: SwiftUISnapshotLayout = .sizeThatFits,
+        computeScrollSize: Bool = false,
         traits: UITraitCollection = .init()
       )
         -> Snapshotting
@@ -90,6 +91,7 @@
           return snapshotView(
             config: config,
             drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+            computeScrollSize: computeScrollSize,
             traits: traits,
             view: controller.view,
             viewController: controller

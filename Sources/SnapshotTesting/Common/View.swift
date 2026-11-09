@@ -929,6 +929,7 @@
     func prepareView(
       config: ViewImageConfig,
       drawHierarchyInKeyWindow: Bool,
+      computeScrollSize: Bool,
       traits: UITraitCollection,
       view: UIView,
       viewController: UIViewController
@@ -955,6 +956,22 @@
       }
       let dispose = add(traits: traits, viewController: viewController, to: window)
 
+      if #available(iOS 15.0, tvOS 15.0, *), computeScrollSize,
+        let scrollView = viewController.contentScrollView(for: .top)
+      {
+        // NB: `adjustedContentInset` includes the safe area, so all content fits in the image.
+        let insets = scrollView.adjustedContentInset
+        let scrollSize = CGSize(
+          width: scrollView.contentSize.width + insets.left + insets.right,
+          height: scrollView.contentSize.height + insets.top + insets.bottom
+        )
+        // NB: Resize the window too. Otherwise the safe area changes and layout loops forever.
+        window.frame.size = scrollSize
+        window.rootViewController?.view.frame.size = scrollSize
+        viewController.view.frame.size = scrollSize
+        viewController.view.layoutIfNeeded()
+      }
+
       if size.width == 0 || size.height == 0 {
         // Try to call sizeToFit() if the view still has invalid size
         view.sizeToFit()
@@ -968,6 +985,7 @@
     func snapshotView(
       config: ViewImageConfig,
       drawHierarchyInKeyWindow: Bool,
+      computeScrollSize: Bool,
       traits: UITraitCollection,
       view: UIView,
       viewController: UIViewController
@@ -978,6 +996,7 @@
       let dispose = prepareView(
         config: config,
         drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+        computeScrollSize: computeScrollSize,
         traits: traits,
         view: view,
         viewController: viewController

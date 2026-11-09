@@ -25,6 +25,7 @@
       precision: Float = 1,
       perceptualPrecision: Float = 1,
       size: CGSize? = nil,
+      computeScrollSize: Bool = false,
       traits: UITraitCollection = .init()
     )
       -> Snapshotting
@@ -36,6 +37,7 @@
         snapshotView(
           config: .init(safeArea: .zero, size: size ?? view.frame.size, traits: .init()),
           drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+          computeScrollSize: computeScrollSize,
           traits: traits,
           view: view,
           viewController: .init()
@@ -73,6 +75,7 @@
     /// and hierarchies.
     public static func recursiveDescription(
       size: CGSize? = nil,
+      computeScrollSize: Bool = false,
       traits: UITraitCollection = .init()
     )
       -> Snapshotting<UIView, String>
@@ -81,6 +84,7 @@
         let dispose = prepareView(
           config: .init(safeArea: .zero, size: size ?? view.frame.size, traits: traits),
           drawHierarchyInKeyWindow: false,
+          computeScrollSize: computeScrollSize,
           traits: .init(),
           view: view,
           viewController: .init()

@@ -27,6 +27,7 @@
       precision: Float = 1,
       perceptualPrecision: Float = 1,
       size: CGSize? = nil,
+      computeScrollSize: Bool = false,
       traits: UITraitCollection = .init()
     )
       -> Snapshotting
@@ -39,6 +40,7 @@
           config: size.map { .init(safeArea: config.safeArea, size: $0, traits: config.traits) }
             ?? config,
           drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+          computeScrollSize: computeScrollSize,
           traits: traits,
           view: viewController.view,
           viewController: viewController
@@ -64,6 +66,7 @@
       precision: Float = 1,
       perceptualPrecision: Float = 1,
       size: CGSize? = nil,
+      computeScrollSize: Bool = false,
       traits: UITraitCollection = .init()
     )
       -> Snapshotting
@@ -75,6 +78,7 @@
         snapshotView(
           config: .init(safeArea: .zero, size: size, traits: traits),
           drawHierarchyInKeyWindow: drawHierarchyInKeyWindow,
+          computeScrollSize: computeScrollSize,
           traits: traits,
           view: viewController.view,
           viewController: viewController
@@ -112,6 +116,7 @@
         let dispose = prepareView(
           config: .init(),
           drawHierarchyInKeyWindow: false,
+          computeScrollSize: false,
           traits: .init(),
           view: viewController.view,
           viewController: viewController
@@ -140,6 +145,7 @@
     public static func recursiveDescription(
       on config: ViewImageConfig = .init(),
       size: CGSize? = nil,
+      computeScrollSize: Bool = false,
       traits: UITraitCollection = .init()
     )
       -> Snapshotting<UIViewController, String>
@@ -149,6 +155,7 @@
           config: .init(
             safeArea: config.safeArea, size: size ?? config.size, traits: config.traits),
           drawHierarchyInKeyWindow: false,
+          computeScrollSize: computeScrollSize,
           traits: traits,
           view: viewController.view,
           viewController: viewController
