@@ -19,6 +19,8 @@
     ///     [the precision](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e) of the
     ///     human eye.
     ///   - size: A view size override.
+    ///   - computeScrollSize: Grows the image to show all the content of the view, if it is or
+    ///     contains a wide scroll view.
     ///   - traits: A trait collection override.
     public static func image(
       drawHierarchyInKeyWindow: Bool = false,
@@ -73,6 +75,12 @@
 
     /// A snapshot strategy for comparing views based on a recursive description of their properties
     /// and hierarchies.
+    ///
+    /// - Parameters:
+    ///   - size: A view size override.
+    ///   - computeScrollSize: Grows the view to fit all its content, if it is or contains a wide
+    ///     scroll view.
+    ///   - traits: A trait collection override.
     public static func recursiveDescription(
       size: CGSize? = nil,
       computeScrollSize: Bool = false,

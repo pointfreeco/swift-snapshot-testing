@@ -35,6 +35,7 @@
       ///     [the precision](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e) of the
       ///     human eye.
       ///   - layout: A view layout override.
+      ///   - computeScrollSize: Grows the image to show all the content of the main `ScrollView`.
       ///   - traits: A trait collection override.
       public static func image(
         drawHierarchyInKeyWindow: Bool = false,

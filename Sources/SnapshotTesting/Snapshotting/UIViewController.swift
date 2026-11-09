@@ -20,6 +20,8 @@
     ///     [the precision](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e) of the
     ///     human eye.
     ///   - size: A view size override.
+    ///   - computeScrollSize: Grows the image to show all the content of the main scroll view: the
+    ///     one set with `setContentScrollView(_:)`, or else the first wide scroll view inside.
     ///   - traits: A trait collection override.
     public static func image(
       on config: ViewImageConfig,
@@ -60,6 +62,8 @@
     ///     [the precision](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e) of the
     ///     human eye.
     ///   - size: A view size override.
+    ///   - computeScrollSize: Grows the image to show all the content of the main scroll view: the
+    ///     one set with `setContentScrollView(_:)`, or else the first wide scroll view inside.
     ///   - traits: A trait collection override.
     public static func image(
       drawHierarchyInKeyWindow: Bool = false,
@@ -141,6 +145,8 @@
     /// - Parameters:
     ///   - config: A set of device configuration settings.
     ///   - size: A view size override.
+    ///   - computeScrollSize: Grows the view to fit all the content of the main scroll view: the
+    ///     one set with `setContentScrollView(_:)`, or else the first wide scroll view inside.
     ///   - traits: A trait collection override.
     public static func recursiveDescription(
       on config: ViewImageConfig = .init(),
