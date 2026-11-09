@@ -1,4 +1,5 @@
 #if os(iOS)
+  import SwiftUI
   import UIKit
   import XCTest
 
@@ -149,6 +150,54 @@
       let image = snapshotImage(of: TableViewController(), computeScrollSize: false)
 
       XCTAssertEqual(image.size, CGSize(width: 375, height: 812))
+    }
+
+    func testComputeScrollSizeWithSwiftUIScrollView() {
+      let view = ScrollView {
+        VStack {
+          ForEach(0..<100) { Text("Row \($0)") }
+        }
+      }
+
+      let image = snapshotImage(
+        of: view, as: .image(layout: .device(config: .iPhoneX), computeScrollSize: true))
+      let imageOff = snapshotImage(
+        of: view, as: .image(layout: .device(config: .iPhoneX), computeScrollSize: false))
+
+      // NB: The content is narrow, but the image keeps the device width.
+      XCTAssertEqual(image.size.width, 375)
+      XCTAssertGreaterThan(image.size.height, 812)
+      XCTAssertEqual(imageOff.size, CGSize(width: 375, height: 812))
+    }
+
+    func testComputeScrollSizeKeepsDeviceSizeForShortContent() {
+      let viewController = UIViewController()
+      viewController.view.frame = .init(x: 0, y: 0, width: 375, height: 812)
+      let scrollView = makeScrollView(width: 375, contentHeight: 200)
+      scrollView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+      viewController.view.addSubview(scrollView)
+
+      let image = snapshotImage(of: viewController, computeScrollSize: true)
+
+      XCTAssertEqual(image.size, CGSize(width: 375, height: 812))
+    }
+
+    func testComputeScrollSizeKeepsViewsOutsideScrollView() {
+      let viewController = UIViewController()
+      viewController.view.frame = .init(x: 0, y: 0, width: 375, height: 812)
+      let header = UIView(frame: .init(x: 0, y: 0, width: 375, height: 100))
+      header.autoresizingMask = [.flexibleWidth, .flexibleBottomMargin]
+      let scrollView = UIScrollView(frame: .init(x: 0, y: 100, width: 375, height: 712))
+      scrollView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+      scrollView.contentInsetAdjustmentBehavior = .never
+      scrollView.contentSize = .init(width: 375, height: 2000)
+      viewController.view.addSubview(header)
+      viewController.view.addSubview(scrollView)
+
+      let image = snapshotImage(of: viewController, computeScrollSize: true)
+
+      // NB: 100-point header + 2000 points of content.
+      XCTAssertEqual(image.size, CGSize(width: 375, height: 2100))
     }
 
     // MARK: - Helpers

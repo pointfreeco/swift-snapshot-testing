@@ -957,11 +957,16 @@
       let dispose = add(traits: traits, viewController: viewController, to: window)
 
       if computeScrollSize, let scrollView = contentScrollView(of: viewController) {
-        // NB: `adjustedContentInset` includes the safe area, so all content fits in the image.
+        // NB: Grow the view by the hidden content. `adjustedContentInset` includes the safe area.
         let insets = scrollView.adjustedContentInset
+        let hiddenWidth =
+          scrollView.contentSize.width + insets.left + insets.right - scrollView.bounds.width
+        let hiddenHeight =
+          scrollView.contentSize.height + insets.top + insets.bottom - scrollView.bounds.height
+        let viewSize = viewController.view.bounds.size
         let scrollSize = CGSize(
-          width: scrollView.contentSize.width + insets.left + insets.right,
-          height: scrollView.contentSize.height + insets.top + insets.bottom
+          width: viewSize.width + max(0, hiddenWidth),
+          height: viewSize.height + max(0, hiddenHeight)
         )
         // NB: Resize the window too. Otherwise the safe area changes and layout loops forever.
         window.frame.size = scrollSize
