@@ -972,6 +972,8 @@
         window.frame.size = scrollSize
         window.rootViewController?.view.frame.size = scrollSize
         viewController.view.frame.size = scrollSize
+        // NB: The `UIView` strategies render a subview. Resize it too.
+        view.frame.size = scrollSize
         viewController.view.layoutIfNeeded()
       }
 

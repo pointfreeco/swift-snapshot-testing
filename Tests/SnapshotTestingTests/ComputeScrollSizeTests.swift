@@ -152,6 +152,20 @@
       XCTAssertEqual(image.size, CGSize(width: 375, height: 812))
     }
 
+    func testComputeScrollSizeWithUIView() {
+      let dataSource = DataSource()
+      let tableView = UITableView(frame: .init(x: 0, y: 0, width: 375, height: 812))
+      tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
+      tableView.dataSource = dataSource
+
+      let image = snapshotImage(of: tableView as UIView, as: .image(computeScrollSize: true))
+
+      // NB: No safe area, so the image is as tall as the content.
+      XCTAssertEqual(image.size.width, 375)
+      XCTAssertEqual(image.size.height, tableView.contentSize.height, accuracy: 0.5)
+      XCTAssertGreaterThan(image.size.height, 812)
+    }
+
     func testComputeScrollSizeWithSwiftUIScrollView() {
       let view = ScrollView {
         VStack {
@@ -201,6 +215,20 @@
     }
 
     // MARK: - Helpers
+
+    private final class DataSource: NSObject, UITableViewDataSource {
+      func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        50
+      }
+
+      func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath)
+        -> UITableViewCell
+      {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+        cell.textLabel?.text = "Row \(indexPath.row)"
+        return cell
+      }
+    }
 
     /// The top and bottom safe area of `.iPhoneX`. Read from the config, because
     /// `adjustedContentInset` is zero after the snapshot.
